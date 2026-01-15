@@ -3,109 +3,140 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Panel Maestro | Ideas Textiles</title>
-    
+    <title>App Ideas Textiles SpA</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
-        :root {
-            --primary: #2563eb; --dark: #0f172a; --bg: #f8fafc;
-            --white: #ffffff; --border: #cbd5e1;
-            --success: #16a34a; --warning: #d97706; --danger: #dc2626;
-        }
-
+        :root { --primary: #2563eb; --dark: #0f172a; --bg: #f8fafc; --white: #ffffff; --border: #cbd5e1; --success: #16a34a; --warning: #d97706; --danger: #dc2626; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
-        body { background: var(--bg); color: var(--dark); padding-bottom: 80px; }
+        body { background: var(--bg); color: var(--dark); padding-bottom: 80px; min-height: 100vh; }
         .container { max-width: 800px; margin: 0 auto; padding: 15px; }
+        .hidden { display: none !important; }
 
-        /* HEADER */
+        /* --- PANTALLA DE LOGIN --- */
+        #loginScreen {
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            min-height: 90vh; text-align: center; padding: 20px;
+        }
+        .login-logo { font-size: 4em; color: var(--primary); margin-bottom: 20px; }
+        .login-title { font-size: 2em; font-weight: 900; margin-bottom: 10px; color: var(--dark); }
+        .login-subtitle {color: #64748b; margin-bottom: 40px; font-weight: 600;}
+        
+        .user-grid { display: grid; gap: 15px; width: 100%; max-width: 400px; }
+        .user-btn {
+            background: white; border: 2px solid var(--border); padding: 20px;
+            border-radius: 16px; font-size: 1.2em; font-weight: 800; color: var(--dark);
+            cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: center; gap: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+        .user-btn:active { transform: scale(0.98); background: var(--primary); color: white; border-color: var(--primary); }
+        .user-btn i { color: var(--primary); }
+        .user-btn:active i { color: white; }
+
+        /* --- PANEL PRINCIPAL (ESTILOS ANTERIORES) --- */
         .top-bar { position: sticky; top: 0; z-index: 50; background: var(--bg); padding-bottom: 10px; padding-top: 10px; }
-        .header { display: flex; justify-content: space-between; align-items: center; background: var(--dark); color: white; padding: 15px; border-radius: 12px; margin-bottom: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        .brand { font-weight: 900; letter-spacing: 0.5px; font-size: 1.1em; }
-        .stats-badge { background: rgba(255,255,255,0.15); padding: 5px 12px; border-radius: 20px; font-size: 0.85em; font-weight: 600; }
-
-        /* BUSCADOR */
-        .search-container { position: relative; }
+        .header { display: flex; align-items: center; justify-content: center; gap: 15px; background: var(--dark); color: white; padding: 20px; border-radius: 16px; margin-bottom: 15px; box-shadow: 0 8px 20px rgba(0,0,0,0.15); text-align: center; }
+        .logo-icon { font-size: 2.2em; color: #60a5fa; background: rgba(255,255,255,0.1); padding: 10px; border-radius: 12px; }
+        .brand-text h1 { font-size: 1.2em; font-weight: 900; letter-spacing: 1px; line-height: 1; margin-bottom: 4px; }
+        .brand-text span { font-size: 0.75em; text-transform: uppercase; color: #94a3b8; letter-spacing: 2px; font-weight: 600; }
+        .stats-bar { display: flex; justify-content: space-between; margin-bottom: 15px; gap: 10px; }
+        .stat-pill { background: white; flex: 1; padding: 10px; border-radius: 10px; text-align: center; font-size: 0.8em; font-weight: 700; color: #64748b; border: 1px solid var(--border); }
+        .stat-pill b { display: block; font-size: 1.4em; color: var(--dark); }
+        .search-container { position: relative; margin-bottom: 20px; }
         .search-input { width: 100%; padding: 16px 16px 16px 45px; border-radius: 12px; border: 2px solid white; background: white; font-size: 1em; box-shadow: 0 4px 10px rgba(0,0,0,0.05); outline: none; transition: 0.2s; }
         .search-input:focus { border-color: var(--primary); }
         .search-icon { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #94a3b8; font-size: 1.1em; }
-
-        /* TARJETA */
         .order-card { background: var(--white); border-radius: 16px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); border: 1px solid var(--border); overflow: hidden; }
-
         .card-header { padding: 15px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: start; background: #f8fafc; }
         .client-info span { font-size: 0.8em; color: #64748b; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
         .client-info h3 { font-size: 1.2em; font-weight: 800; color: var(--dark); line-height: 1.2; margin-top: 2px; }
         .price-tag { background: #dbeafe; color: #1e40af; padding: 6px 10px; border-radius: 8px; font-weight: 700; font-size: 0.9em; white-space: nowrap; }
-
-        /* PROGRESO */
         .progress-section { padding: 15px 15px 5px 15px; }
         .progress-labels { display: flex; justify-content: space-between; font-size: 0.85em; font-weight: 700; margin-bottom: 6px; color: #475569; }
         .progress-track { background: #e2e8f0; height: 12px; border-radius: 6px; overflow: hidden; }
         .progress-fill { height: 100%; transition: width 0.6s ease; border-radius: 6px; }
-
-        /* COLORES */
-        .st-red { background: var(--danger); }
-        .st-orange { background: var(--warning); }
-        .st-blue { background: var(--primary); }
-        .st-green { background: var(--success); }
-
-        /* TABLA */
+        .st-red { background: var(--danger); } .st-orange { background: var(--warning); } .st-blue { background: var(--primary); } .st-green { background: var(--success); }
         .details-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
         .details-table td { padding: 12px 15px; border-bottom: 1px solid #f1f5f9; font-size: 0.9em; vertical-align: middle; }
         .prod-name { font-weight: 700; display: block; color: var(--dark); }
         .prod-size { background: #f1f5f9; padding: 2px 6px; border-radius: 4px; font-size: 0.8em; color: #64748b; font-weight: 600; }
-        
         .status-badge { padding: 4px 8px; border-radius: 6px; font-size: 0.7em; font-weight: 800; text-transform: uppercase; display: inline-block; letter-spacing: 0.5px; }
-        .bg-pending { background: #fef2f2; color: #991b1b; }
-        .bg-working { background: #fff7ed; color: #9a3412; }
-        .bg-process { background: #eff6ff; color: #1e40af; }
-        .bg-done { background: #f0fdf4; color: #166534; }
-
-        /* BOTONES */
+        .bg-pending { background: #fef2f2; color: #991b1b; } .bg-working { background: #fff7ed; color: #9a3412; } .bg-process { background: #eff6ff; color: #1e40af; } .bg-done { background: #f0fdf4; color: #166534; }
         .card-actions { padding: 12px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; background: #f8fafc; border-top: 1px solid var(--border); }
         .btn { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 12px; border-radius: 10px; text-decoration: none; font-weight: 700; font-size: 0.9em; border: none; cursor: pointer; transition: 0.1s; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
         .btn:active { transform: scale(0.97); }
-        .btn-wa { background: #25D366; color: white; }
-        .btn-edit { background: var(--dark); color: white; }
-
+        .btn-wa { background: #25D366; color: white; } .btn-edit { background: var(--dark); color: white; }
         #loading { text-align: center; margin-top: 50px; font-weight: 600; color: #64748b; }
-        .hidden { display: none; }
     </style>
 </head>
 <body>
 
-<div class="container">
+<div id="loginScreen">
+    <div class="login-logo">
+        <i class="fa-solid fa-scissors"></i> </div>
+    <h1 class="login-title">IDEAS TEXTILES SPA</h1>
+    <p class="login-subtitle">Selecciona quién eres para entrar:</p>
+    
+    <div class="user-grid">
+        <button class="user-btn" onclick="login('RICARDO')">
+            <i class="fa-solid fa-user-tie"></i> RICARDO
+        </button>
+        <button class="user-btn" onclick="login('ALEJANDRO')">
+            <i class="fa-solid fa-user-gear"></i> ALEJANDRO
+        </button>
+        <button class="user-btn" onclick="login('RENATO')">
+            <i class="fa-solid fa-user-pen"></i> RENATO
+        </button>
+    </div>
+</div>
+
+<div id="dashboardView" class="container hidden">
     <div class="top-bar">
         <div class="header">
-            <div class="brand"><i class="fa-solid fa-industry"></i> CONTROL PAE</div>
-            <div class="stats-badge" id="globalStats">Cargando...</div>
+            <div class="logo-icon">
+                <i class="fa-solid fa-scissors"></i>
+            </div>
+            <div class="brand-text">
+                <h1>HOLA, <span id="userNameDisplay">EQUIPO</span></h1>
+                <span>PANEL DE CONTROL</span>
+            </div>
         </div>
+
+        <div class="stats-bar">
+            <div class="stat-pill"><b id="kpiTotal">0</b>PRENDAS</div>
+            <div class="stat-pill"><b id="kpiDone" style="color:var(--success)">0</b>LISTAS</div>
+        </div>
+
         <div class="search-container">
             <i class="fa-solid fa-magnifying-glass search-icon"></i>
             <input type="text" id="searchInput" class="search-input" placeholder="Buscar pedido, cliente..." onkeyup="filterOrders()">
         </div>
     </div>
 
-    <div id="loading"><i class="fa-solid fa-spinner fa-spin"></i> Sincronizando...</div>
+    <div id="loading"><i class="fa-solid fa-spinner fa-spin"></i> Conectando...</div>
     <div id="ordersContainer"></div>
 </div>
 
 <script>
-    // ==========================================
-    // ⚙️ TUS ENLACES REALES (YA CONFIGURADOS)
-    // ==========================================
-    
-    // 1. LINK DE LECTURA (CSV)
-    const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR709g0cB4EtdROEnIWBrK2O4FQrKHUd3jXNUTWwdWvT1F5UraKHGOr6dDQHsJtgrdv4-ARqow_jKi0/pub?output=csv";
-
-    // 2. LINK DE EDICIÓN (HOJA PRIVADA)
-    const EDIT_URL = "https://docs.google.com/spreadsheets/d/1-Fxxi6Na5E-I15W5FuZd_TSDppYQKcAF_gsxwgxIULI/edit";
-
-    // ==========================================
+    // ID DE TU HOJA
+    const SHEET_ID = "1-Fxxi6Na5E-I15W5FuZd_TSDppYQKcAF_gsxwgxIULI";
+    const CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/pub?output=csv`;
+    const EDIT_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/edit`;
 
     let allOrders = [];
+    let currentUser = null;
+
+    // FUNCIÓN DE LOGIN
+    function login(name) {
+        currentUser = name;
+        // Ocultar login, mostrar dashboard
+        document.getElementById('loginScreen').classList.add('hidden');
+        document.getElementById('dashboardView').classList.remove('hidden');
+        // Actualizar saludo
+        document.getElementById('userNameDisplay').innerText = name;
+        window.scrollTo(0,0); // Subir al inicio
+    }
 
     async function init() {
         try {
@@ -113,7 +144,13 @@
             if (!res.ok) throw new Error("Error fetching data");
             parseData(await res.text());
         } catch(e) {
-            document.getElementById('loading').innerHTML = "⚠️ Revisa tu conexión a internet.";
+            document.getElementById('loading').innerHTML = `
+                <div style="padding:20px; color:#ef4444;">
+                    <i class="fa-solid fa-triangle-exclamation" style="font-size:2em;"></i><br><br>
+                    <b>NO SE PUEDE LEER EL EXCEL</b><br>
+                    Por favor, ve a tu computador:<br>
+                    Archivo > Compartir > Publicar en la web > CSV
+                </div>`;
         }
     }
 
@@ -126,31 +163,17 @@
             if(cols.length < 12) return; 
             const clean = t => t ? t.replace(/"/g, '').trim() : '';
 
-            // --- TU MAPEO EXACTO ---
-            // 0:FILA | 1:ID | 2:NOMBRE | 3:CLIENTE | 4:VALOR
-            // 5:PROD | 6:TALLA | 7:SOLICITADA | 8:ESTADO
-            // 9:DISPONIBLE | 10:OBS | 11:TELEFONO
-
-            const id = clean(cols[1]); // Columna B
+            const id = clean(cols[1]); 
 
             if(!temp[id]) {
                 temp[id] = {
                     id: id,
-                    name: clean(cols[2]),   // C
-                    client: clean(cols[3]), // D
-                    price: clean(cols[4]),  // E
-                    phone: clean(cols[11]), // L
-                    items: []
+                    name: clean(cols[2]), client: clean(cols[3]), price: clean(cols[4]), phone: clean(cols[11]), items: []
                 };
             }
-
             temp[id].items.push({
-                row: clean(cols[0]),          // A (Fila)
-                product: clean(cols[5]),      // F
-                size: clean(cols[6]),         // G
-                qty: parseInt(cols[7]) || 0,  // H
-                status: clean(cols[8]).toUpperCase(), // I
-                done: parseInt(cols[9]) || 0  // J
+                row: clean(cols[0]), product: clean(cols[5]), size: clean(cols[6]), qty: parseInt(cols[7]) || 0,
+                status: clean(cols[8]).toUpperCase(), done: parseInt(cols[9]) || 0
             });
         });
 
@@ -179,16 +202,11 @@
 
     function renderOrders(list) {
         const container = document.getElementById('ordersContainer');
-        
         if(list.length === 0) {
-            container.innerHTML = `<div style="text-align:center; padding:40px; color:#94a3b8;">No hay pedidos.</div>`;
-            return;
+            container.innerHTML = `<div style="text-align:center; padding:40px; color:#94a3b8;">No hay pedidos.</div>`; return;
         }
-
         container.innerHTML = list.map(o => {
             let totalQty = 0, weightedScore = 0, realDone = 0;
-            
-            // Botón editar va a la columna I (Estado) de la fila correcta
             const editRow = o.items[0].row;
             const editLink = `${EDIT_URL}#gid=0&range=I${editRow}`; 
 
@@ -200,63 +218,31 @@
 
             const progress = totalQty === 0 ? 0 : Math.round(weightedScore / totalQty);
             const pending = totalQty - realDone;
-
             let barColor = 'st-red';
-            if(progress >= 30) barColor = 'st-orange'; 
-            if(progress >= 80) barColor = 'st-blue';
-            if(progress === 100) barColor = 'st-green';
+            if(progress >= 30) barColor = 'st-orange'; if(progress >= 80) barColor = 'st-blue'; if(progress === 100) barColor = 'st-green';
 
             const waMsg = `Hola *${o.client}*, reporte de orden *${o.name}*: Avance ${progress}%. Entregadas: ${realDone}/${totalQty}.`;
-            const waLink = o.phone && o.phone.length > 5
-                ? `https://wa.me/${o.phone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(waMsg)}`
-                : `https://wa.me/?text=${encodeURIComponent(waMsg)}`;
+            const waLink = o.phone && o.phone.length > 5 ? `https://wa.me/${o.phone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(waMsg)}` : `https://wa.me/?text=${encodeURIComponent(waMsg)}`;
 
             return `
             <div class="order-card">
                 <div class="card-header">
-                    <div class="client-info">
-                        <span>${o.client}</span>
-                        <h3>${o.name}</h3>
-                    </div>
+                    <div class="client-info"><span>${o.client}</span><h3>${o.name}</h3></div>
                     <div class="price-tag">${o.price}</div>
                 </div>
-
                 <div class="progress-section">
-                    <div class="progress-labels">
-                        <span>Avance Global</span>
-                        <span>${progress}%</span>
-                    </div>
-                    <div class="progress-track">
-                        <div class="progress-fill ${barColor}" style="width: ${progress}%"></div>
-                    </div>
-                    <div style="text-align:right; font-size:0.75em; color:#64748b; margin-top:5px;">
-                        Faltan por entregar: <b>${pending}</b>
-                    </div>
+                    <div class="progress-labels"><span>Avance Global</span><span>${progress}%</span></div>
+                    <div class="progress-track"><div class="progress-fill ${barColor}" style="width: ${progress}%"></div></div>
+                    <div style="text-align:right; font-size:0.75em; color:#64748b; margin-top:5px;">Faltan por entregar: <b>${pending}</b></div>
                 </div>
-
-                <table class="details-table">
-                    <tbody>
-                        ${o.items.map(i => `
-                        <tr>
-                            <td>
-                                <span class="prod-name">${i.product}</span>
-                                <span class="prod-size">${i.size}</span>
-                            </td>
-                            <td style="text-align:center; font-weight:bold;">${i.qty}</td>
-                            <td style="text-align:right;">
-                                <span class="status-badge ${getBadgeColor(i.status)}">${i.status}</span>
-                            </td>
-                        </tr>`).join('')}
-                    </tbody>
-                </table>
-
+                <table class="details-table"><tbody>${o.items.map(i => `
+                    <tr><td><span class="prod-name">${i.product}</span><span class="prod-size">${i.size}</span></td>
+                    <td style="text-align:center; font-weight:bold;">${i.qty}</td>
+                    <td style="text-align:right;"><span class="status-badge ${getBadgeColor(i.status)}">${i.status}</span></td></tr>`).join('')}
+                </tbody></table>
                 <div class="card-actions">
-                    <a href="${waLink}" target="_blank" class="btn btn-wa">
-                        <i class="fa-brands fa-whatsapp"></i> Reportar
-                    </a>
-                    <a href="${editLink}" class="btn btn-edit">
-                        <i class="fa-solid fa-pen"></i> Editar
-                    </a>
+                    <a href="${waLink}" target="_blank" class="btn btn-wa"><i class="fa-brands fa-whatsapp"></i> Reportar</a>
+                    <a href="${editLink}" class="btn btn-edit"><i class="fa-solid fa-pen"></i> Editar</a>
                 </div>
             </div>`;
         }).join('');
@@ -264,15 +250,15 @@
 
     function filterOrders() {
         const q = document.getElementById('searchInput').value.toUpperCase();
-        const filtered = allOrders.filter(o => JSON.stringify(o).toUpperCase().includes(q));
-        renderOrders(filtered);
+        renderOrders(allOrders.filter(o => JSON.stringify(o).toUpperCase().includes(q)));
     }
 
     function updateStats(list) {
-        let t = 0; list.forEach(o => o.items.forEach(i => t+=i.qty));
-        document.getElementById('globalStats').innerText = `📦 ${t} Uds. Totales`;
+        let t = 0; let d = 0;
+        list.forEach(o => o.items.forEach(i => { t+=i.qty; if(getWeight(i.status)===100) d+=i.qty; }));
+        document.getElementById('kpiTotal').innerText = t;
+        document.getElementById('kpiDone').innerText = d;
     }
-
     init();
 </script>
 </body>
