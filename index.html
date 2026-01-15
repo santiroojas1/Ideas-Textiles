@@ -10,198 +10,139 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
 
     <style>
-        /* --- ESTILOS PROFESIONALES --- */
+        /* ESTILOS PREMIUM */
         :root {
-            --primary: #2563eb;       /* Azul Moderno */
-            --primary-dark: #1e40af;  /* Azul Oscuro */
-            --bg-body: #f3f4f6;       /* Gris muy suave fondo */
-            --card-bg: #ffffff;
-            --text-main: #111827;
-            --text-muted: #6b7280;
-            --success: #10b981;
-            --warning: #f59e0b;
-            --danger: #ef4444;
+            --primary: #2563eb; --bg: #f3f4f6; --text: #1f2937;
+            --bar-bg: #e5e7eb; --card: #ffffff;
         }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        
-        body {
-            font-family: 'Inter', sans-serif; /* Fuente Premium */
-            background: var(--bg-body);
-            color: var(--text-main);
-            padding: 20px;
-            padding-bottom: 80px;
-            line-height: 1.5;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { background: var(--bg); color: var(--text); padding: 20px; padding-bottom: 80px; }
         .container { max-width: 1000px; margin: 0 auto; }
 
-        /* HEADER ELEGANTE */
-        .header { 
-            display: flex; justify-content: space-between; align-items: center; 
-            margin-bottom: 30px; background: white; padding: 15px 20px; 
-            border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.03);
-        }
-        .brand { font-weight: 800; font-size: 1.2em; color: var(--primary-dark); letter-spacing: -0.5px; }
-        .date-badge { 
-            background: #eff6ff; color: var(--primary); padding: 6px 12px; 
-            border-radius: 30px; font-weight: 600; font-size: 0.85em; 
-        }
+        /* HEADER */
+        .header { background: white; padding: 15px 20px; border-radius: 16px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; box-shadow: 0 4px 20px rgba(0,0,0,0.03); }
+        .brand { font-weight: 900; color: var(--primary); font-size: 1.2em; letter-spacing: -0.5px; }
+        .days-badge { background: #eff6ff; color: var(--primary); padding: 5px 12px; border-radius: 20px; font-weight: 700; font-size: 0.85em; }
 
-        /* 1. KPIs (Métricas) */
-        .kpi-grid {
-            display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 30px;
-        }
-        .kpi-card {
-            background: var(--card-bg); padding: 20px 15px; border-radius: 16px;
-            text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.02);
-            border: 1px solid rgba(0,0,0,0.05); transition: transform 0.2s;
-        }
-        .kpi-card:hover { transform: translateY(-2px); }
-        .kpi-number { font-size: 1.8em; font-weight: 800; color: var(--text-main); line-height: 1.1; }
-        .kpi-label { font-size: 0.75em; text-transform: uppercase; color: var(--text-muted); font-weight: 600; letter-spacing: 0.5px; margin-top: 5px; }
+        /* KPI BOARD */
+        .kpi-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 25px; }
+        .kpi-box { background: white; padding: 15px; border-radius: 14px; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
+        .kpi-num { font-size: 1.6em; font-weight: 800; line-height: 1.2; }
+        .kpi-txt { font-size: 0.7em; text-transform: uppercase; color: #6b7280; font-weight: 600; margin-top: 5px; }
 
-        /* 2. BUSCADOR (LUPA) */
-        .search-wrapper { position: relative; margin-bottom: 25px; }
-        .search-icon { 
-            position: absolute; left: 20px; top: 50%; transform: translateY(-50%); 
-            font-size: 1.2em; opacity: 0.5; 
-        }
-        .search-input {
-            width: 100%; padding: 16px 20px 16px 50px; 
-            border: 2px solid transparent; border-radius: 12px;
-            background: white; font-family: 'Inter', sans-serif; font-size: 1em;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.03); outline: none; transition: 0.3s;
-        }
-        .search-input:focus { border-color: var(--primary); box-shadow: 0 4px 20px rgba(37, 99, 235, 0.1); }
-
-        /* TABS NAVEGACIÓN */
-        .tabs { display: flex; gap: 10px; margin-bottom: 20px; overflow-x: auto; padding-bottom: 5px; }
-        .tab {
-            padding: 8px 20px; background: white; border-radius: 30px; border: 1px solid #e5e7eb;
-            color: var(--text-muted); font-weight: 600; font-size: 0.9em; cursor: pointer; white-space: nowrap;
-        }
-        .tab.active { background: var(--text-main); color: white; border-color: var(--text-main); }
-        .refresh-icon { font-size: 1.2em; vertical-align: middle; }
+        /* BUSCADOR */
+        .search-wrap { position: relative; margin-bottom: 20px; }
+        .search-inp { width: 100%; padding: 14px 20px 14px 45px; border-radius: 12px; border: none; background: white; font-size: 1em; box-shadow: 0 4px 15px rgba(0,0,0,0.03); outline: none; }
+        .search-icon { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); opacity: 0.4; }
 
         /* TARJETAS DE ORDEN */
-        .order-card {
-            background: white; border-radius: 16px; padding: 25px; margin-bottom: 25px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.04); position: relative;
-        }
-        .card-top { display: flex; justify-content: space-between; align-items: start; margin-bottom: 15px; }
-        .client-tag { 
-            font-size: 0.75em; text-transform: uppercase; font-weight: 700; 
-            color: var(--primary); background: #eff6ff; padding: 4px 8px; border-radius: 6px; 
-        }
-        .order-title { font-size: 1.4em; font-weight: 800; margin-top: 8px; color: var(--text-main); }
-        .price-tag { font-weight: 600; color: var(--text-muted); font-size: 0.95em; }
+        .order-card { background: white; border-radius: 16px; padding: 20px; margin-bottom: 20px; box-shadow: 0 8px 25px rgba(0,0,0,0.04); animation: fadeUp 0.5s ease; }
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* BARRA DE PROGRESO MINIMALISTA */
-        .progress-container { margin: 20px 0; }
-        .progress-labels { display: flex; justify-content: space-between; font-size: 0.85em; font-weight: 600; color: var(--text-muted); margin-bottom: 8px; }
-        .bar-track { width: 100%; height: 10px; background: #f3f4f6; border-radius: 10px; overflow: hidden; }
-        .bar-fill { height: 100%; border-radius: 10px; transition: width 1s ease; }
-        
-        .bg-low { background: var(--warning); }
-        .bg-mid { background: #3b82f6; }
-        .bg-high { background: var(--success); }
+        .card-head { display: flex; justify-content: space-between; margin-bottom: 15px; }
+        .client { font-size: 0.75em; font-weight: 700; text-transform: uppercase; color: #9ca3af; letter-spacing: 0.5px; }
+        .title { font-size: 1.3em; font-weight: 800; margin-top: 2px; color: #111827; }
+        .price { background: #f3f4f6; padding: 4px 8px; border-radius: 6px; font-weight: 600; font-size: 0.9em; height: fit-content; }
+
+        /* BARRA DE PROGRESO (Semáforo) */
+        .prog-wrap { margin: 15px 0; }
+        .prog-info { display: flex; justify-content: space-between; font-size: 0.85em; font-weight: 600; color: #4b5563; margin-bottom: 6px; }
+        .bar-bg { width: 100%; height: 12px; background: var(--bar-bg); border-radius: 10px; overflow: hidden; }
+        .bar-fill { height: 100%; border-radius: 10px; transition: width 0.8s ease; }
+
+        /* Colores de estado */
+        .st-start { background: #ef4444; } 
+        .st-mid { background: #f59e0b; }   
+        .st-high { background: #3b82f6; }  
+        .st-done { background: #10b981; }  
+
+        /* TABLA */
+        .tbl-wrap { overflow-x: auto; margin-top: 15px; }
+        table { width: 100%; border-collapse: collapse; min-width: 400px; }
+        th { text-align: left; font-size: 0.75em; color: #9ca3af; padding: 8px; border-bottom: 1px solid #e5e7eb; }
+        td { padding: 10px 8px; border-bottom: 1px solid #f9fafb; font-size: 0.9em; font-weight: 500; }
+        .pill { padding: 3px 8px; border-radius: 12px; font-size: 0.75em; font-weight: 700; background: #eef2ff; color: var(--primary); }
 
         /* BOTÓN WHATSAPP */
         .btn-wa {
             display: flex; align-items: center; justify-content: center; gap: 8px;
             width: 100%; background: #25D366; color: white; text-decoration: none;
-            padding: 14px; border-radius: 12px; font-weight: 700; margin-top: 20px;
-            transition: transform 0.1s;
+            padding: 12px; border-radius: 12px; font-weight: 700; margin-top: 20px;
+            transition: transform 0.1s; font-size: 0.9em;
         }
         .btn-wa:active { transform: scale(0.98); }
 
-        /* TABLA LIMPIA */
-        .table-scroll { overflow-x: auto; margin-top: 15px; }
-        table { width: 100%; border-collapse: collapse; min-width: 500px; }
-        th { text-align: left; font-size: 0.75em; color: var(--text-muted); text-transform: uppercase; padding: 10px; border-bottom: 2px solid #f3f4f6; }
-        td { padding: 12px 10px; border-bottom: 1px solid #f9fafb; font-size: 0.9em; vertical-align: middle; }
-        
-        .product-name { font-weight: 600; color: var(--text-main); }
-        .pill { padding: 4px 10px; border-radius: 20px; font-size: 0.7em; font-weight: 700; text-transform: uppercase; }
-        .pill-gray { background: #f3f4f6; color: #4b5563; }
-        .pill-status { background: #eef2ff; color: #4f46e5; }
-        
+        /* NAVEGACIÓN */
+        .nav { position: fixed; bottom: 0; left: 0; width: 100%; background: white; display: flex; justify-content: space-around; padding: 15px; border-top: 1px solid #e5e7eb; z-index: 100; }
+        .nav-btn { border: none; background: none; font-weight: 600; color: #9ca3af; font-size: 0.9em; cursor: pointer; }
+        .nav-btn.active { color: var(--primary); }
+
         /* BITÁCORA */
-        .notebook { background: #fffbeb; padding: 25px; border-radius: 16px; border: 1px solid #fcd34d; height: 60vh; }
-        textarea { width: 100%; height: 100%; background: transparent; border: none; outline: none; font-family: 'Inter', sans-serif; font-size: 1.1em; line-height: 1.6; color: #4b5563; resize: none; }
+        .notebook { height: 70vh; padding: 20px; background: #fffbeb; border-radius: 16px; border: 2px solid #fcd34d; }
+        textarea { width: 100%; height: 100%; background: transparent; border: none; outline: none; font-size: 1.1em; line-height: 1.6; }
 
-        /* ESTADOS DE VISIBILIDAD */
         .hidden { display: none; }
-        #loading { text-align: center; padding: 40px; font-weight: 600; color: var(--text-muted); }
-
+        #loading { text-align: center; margin-top: 50px; font-weight: 600; color: #9ca3af; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    
     <div class="header">
         <div class="brand">IDEAS TEXTILES</div>
-        <div class="date-badge">⏳ <span id="daysLeft">--</span> días para entrega</div>
+        <div class="days-badge">⏰ <span id="daysLeft">--</span> días PAE</div>
     </div>
 
-    <div class="kpi-grid">
-        <div class="kpi-card">
-            <div class="kpi-number" id="kpiTotal">0</div>
-            <div class="kpi-label">Total Prendas</div>
+    <div class="kpi-row">
+        <div class="kpi-box">
+            <div class="kpi-num" id="kpiTotal">0</div>
+            <div class="kpi-txt">Total</div>
         </div>
-        <div class="kpi-card">
-            <div class="kpi-number" style="color:var(--success)" id="kpiDone">0</div>
-            <div class="kpi-label">Entregadas</div>
+        <div class="kpi-box">
+            <div class="kpi-num" style="color:#2563eb" id="kpiAvg">0%</div>
+            <div class="kpi-txt">Avance</div>
         </div>
-        <div class="kpi-card">
-            <div class="kpi-number" style="color:var(--danger)" id="kpiPending">0</div>
-            <div class="kpi-label">Pendientes</div>
+        <div class="kpi-box">
+            <div class="kpi-num" style="color:#10b981" id="kpiDone">0</div>
+            <div class="kpi-txt">Despachadas</div>
         </div>
     </div>
 
-    <div class="search-wrapper">
+    <div class="search-wrap">
         <span class="search-icon">🔍</span>
-        <input type="text" id="searchInput" class="search-input" placeholder="Buscar por cliente, orden o producto..." onkeyup="filterOrders()">
+        <input type="text" id="searchInput" class="search-inp" placeholder="Buscar orden, producto..." onkeyup="filterOrders()">
     </div>
 
-    <div class="tabs">
-        <div class="tab active" onclick="switchView('dashboard', this)">🏭 Producción</div>
-        <div class="tab" onclick="switchView('notes', this)">📝 Notas</div>
-        <div class="tab" onclick="window.location.reload()"><span class="refresh-icon">🔄</span></div>
-    </div>
-
-    <div id="loading">Conectando con la base de datos...</div>
+    <div id="loading">Sincronizando...</div>
 
     <div id="dashboard">
-        <div id="ordersContainer"></div>
+        <div id="ordersList"></div>
     </div>
 
     <div id="notes" class="hidden">
         <div class="notebook">
-            <h3 style="margin-bottom:15px; color:#d97706">✍️ Bitácora Personal</h3>
-            <textarea id="localNotes" placeholder="Escribe aquí tus apuntes rápidos..."></textarea>
+            <h3>📝 Bitácora</h3>
+            <textarea id="localNotes" placeholder="Apuntes personales..."></textarea>
         </div>
     </div>
+</div>
 
+<div class="nav">
+    <button class="nav-btn active" onclick="switchView('dashboard', this)">🏭 Producción</button>
+    <button class="nav-btn" onclick="switchView('notes', this)">✍️ Notas</button>
+    <button class="nav-btn" onclick="window.location.reload()">🔄 Actualizar</button>
 </div>
 
 <script>
-    // --- CONEXIÓN ---
     const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR709g0cB4EtdROEnIWBrK2O4FQrKHUd3jXNUTWwdWvT1F5UraKHGOr6dDQHsJtgrdv4-ARqow_jKi0/pub?output=csv";
     const PROXY = "https://api.allorigins.win/raw?url=";
-
     let allOrders = [];
 
     async function init() {
         try {
             const res = await fetch(PROXY + encodeURIComponent(SHEET_URL) + "&t=" + Date.now());
-            const text = await res.text();
-            parseData(text);
-        } catch (e) {
-            document.getElementById('loading').innerHTML = "⚠️ Error de conexión. Recarga la página.";
-        }
+            parseData(await res.text());
+        } catch(e) { document.getElementById('loading').innerText = "Sin conexión"; }
     }
 
     function parseData(csv) {
@@ -211,137 +152,138 @@
         rows.forEach(row => {
             const cols = row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
             if(cols.length < 6) return;
-
             const clean = t => t ? t.replace(/"/g, '').trim() : '';
             const id = clean(cols[0]);
 
-            if(!temp[id]) {
-                temp[id] = {
-                    id, 
-                    name: clean(cols[1]), 
-                    client: clean(cols[2]), 
-                    price: clean(cols[3]),
-                    items: []
-                };
-            }
+            // LEE LA COLUMNA DE TELÉFONO (Columna K es índice 10)
+            const phone = cols[10] ? clean(cols[10]) : ''; 
+
+            if(!temp[id]) temp[id] = { id, name: clean(cols[1]), client: clean(cols[2]), price: clean(cols[3]), phone: phone, items: [] };
+            
             temp[id].items.push({
                 product: clean(cols[4]),
                 size: clean(cols[5]),
                 qty: parseInt(cols[6]) || 0,
-                status: clean(cols[7]),
+                status: clean(cols[7]).toUpperCase(),
                 done: parseInt(cols[8]) || 0
             });
         });
 
         allOrders = Object.values(temp);
-        updateKPIs();
         renderOrders(allOrders);
         document.getElementById('loading').style.display = 'none';
         
-        // Fecha entrega
-        const days = Math.ceil((new Date('2026-02-16') - new Date()) / (86400000));
-        document.getElementById('daysLeft').innerText = days;
+        document.getElementById('daysLeft').innerText = Math.ceil((new Date('2026-02-16') - new Date())/86400000);
     }
 
-    function updateKPIs() {
-        let t=0, d=0;
-        allOrders.forEach(o => o.items.forEach(i => { t+=i.qty; d+=i.done; }));
-        document.getElementById('kpiTotal').innerText = t;
-        document.getElementById('kpiDone').innerText = d;
-        document.getElementById('kpiPending').innerText = t - d;
+    // --- LÓGICA PORCENTAJES (Tu lógica personalizada) ---
+    function getWeight(status) {
+        if(status.includes("DESPACHADA") || status.includes("ENTREGADA")) return 100;
+        if(status.includes("ARMADO") || status.includes("TERMINACIÓN")) return 80;
+        if(status.includes("BORDADO")) return 50; 
+        if(status.includes("CONFECCIÓN") || status.includes("CONFECCION")) return 30;
+        if(status.includes("CORTE") || status.includes("BODEGA")) return 10;
+        return 0;
     }
 
     function renderOrders(list) {
-        const container = document.getElementById('ordersContainer');
-        if(list.length === 0) {
-            container.innerHTML = '<div style="text-align:center; color:#9ca3af; margin-top:30px;">No se encontraron resultados.</div>';
-            return;
-        }
+        const container = document.getElementById('ordersList');
+        let globalTotal = 0, globalDone = 0, globalProgressSum = 0;
 
         container.innerHTML = list.map(o => {
-            const total = o.items.reduce((s,i)=>s+i.qty,0);
-            const done = o.items.reduce((s,i)=>s+i.done,0);
-            const pending = total - done;
-            const progress = total===0 ? 0 : Math.round((done/total)*100);
+            const totalQty = o.items.reduce((s,i)=>s+i.qty,0);
             
-            let barColor = 'bg-low';
-            if(progress > 40) barColor = 'bg-mid';
-            if(progress > 90) barColor = 'bg-high';
+            let weightedScore = 0;
+            let realDelivered = 0;
 
-            // Mensaje WhatsApp
-            const waMsg = `Reporte *${o.name}*: Avance ${progress}%. Entregadas: ${done}/${total}. Pendientes: ${pending}.`;
+            o.items.forEach(i => {
+                const weight = getWeight(i.status);
+                weightedScore += (i.qty * weight);
+                if(weight === 100) realDelivered += i.qty;
+            });
+
+            const progress = totalQty===0 ? 0 : Math.round(weightedScore / totalQty);
             
+            globalTotal += totalQty;
+            globalDone += realDelivered;
+            globalProgressSum += (progress * totalQty);
+
+            let barClass = 'st-start';
+            let statusText = "Inicio";
+            if(progress >= 30) { barClass = 'st-mid'; statusText = "En Proceso"; }
+            if(progress >= 50) { barClass = 'st-mid'; statusText = "Bordado/Prod"; }
+            if(progress >= 80) { barClass = 'st-high'; statusText = "Terminaciones"; }
+            if(progress === 100) { barClass = 'st-done'; statusText = "Listo"; }
+
+            // LÓGICA WHATSAPP INTELIGENTE
+            const waMsg = `Hola *${o.client}*, reporte de orden *${o.name}*: Avance ${progress}%. Entregadas: ${realDelivered}/${totalQty}.`;
+            // Si hay teléfono en Excel, usa ese. Si no, usa genérico.
+            const waLink = o.phone 
+                ? `https://wa.me/${o.phone}?text=${encodeURIComponent(waMsg)}`
+                : `https://wa.me/?text=${encodeURIComponent(waMsg)}`;
+
             return `
             <div class="order-card">
-                <div class="card-top">
+                <div class="card-head">
                     <div>
-                        <span class="client-tag">${o.client}</span>
-                        <div class="order-title">${o.name}</div>
+                        <div class="client">${o.client}</div>
+                        <div class="title">${o.name}</div>
                     </div>
-                    <div class="price-tag">${o.price}</div>
+                    <div class="price">${o.price}</div>
                 </div>
 
-                <div class="progress-container">
-                    <div class="progress-labels">
-                        <span>Avance de Entrega</span>
+                <div class="prog-wrap">
+                    <div class="prog-info">
+                        <span>Estado: ${statusText}</span>
                         <span>${progress}%</span>
                     </div>
-                    <div class="bar-track">
-                        <div class="bar-fill ${barColor}" style="width:${progress}%"></div>
-                    </div>
-                    <div style="text-align:right; font-size:0.8em; color:#6b7280; margin-top:5px;">
-                        Faltan <b>${pending}</b> prendas
+                    <div class="bar-bg">
+                        <div class="bar-fill ${barClass}" style="width:${progress}%"></div>
                     </div>
                 </div>
 
-                <div class="table-scroll">
+                <div class="tbl-wrap">
                     <table>
-                        <thead><tr><th>Producto</th><th>Talla</th><th>Cant</th><th>Estado</th><th>Falta</th></tr></thead>
+                        <thead><tr><th>Item</th><th>Talla</th><th>Cant</th><th>Etapa</th></tr></thead>
                         <tbody>
                             ${o.items.map(i => `
-                            <tr style="${i.qty===i.done ? 'opacity:0.4' : ''}">
-                                <td class="product-name">${i.product}</td>
-                                <td><span class="pill pill-gray">${i.size}</span></td>
+                            <tr>
+                                <td>${i.product}</td>
+                                <td>${i.size}</td>
                                 <td>${i.qty}</td>
-                                <td><span class="pill pill-status">${i.status}</span></td>
-                                <td style="font-weight:bold; color:${(i.qty-i.done)>0?'#ef4444':'#10b981'}">
-                                    ${i.qty - i.done}
-                                </td>
-                            </tr>
-                            `).join('')}
+                                <td><span class="pill">${i.status}</span></td>
+                            </tr>`).join('')}
                         </tbody>
                     </table>
                 </div>
 
-                <a href="https://wa.me/?text=${encodeURIComponent(waMsg)}" target="_blank" class="btn-wa">
-                    <span>📱</span> Enviar Reporte WA
+                <a href="${waLink}" target="_blank" class="btn-wa">
+                    📱 Enviar Reporte a Cliente
                 </a>
-            </div>
-            `;
+            </div>`;
         }).join('');
+
+        document.getElementById('kpiTotal').innerText = globalTotal;
+        document.getElementById('kpiDone').innerText = globalDone;
+        document.getElementById('kpiAvg').innerText = (globalTotal>0 ? Math.round(globalProgressSum/globalTotal) : 0) + "%";
     }
 
     function filterOrders() {
-        const q = document.getElementById('searchInput').value.toLowerCase();
-        const filtered = allOrders.filter(o => {
-            const prods = o.items.map(i=>i.product).join(' ').toLowerCase();
-            return o.name.toLowerCase().includes(q) || o.client.toLowerCase().includes(q) || prods.includes(q);
-        });
-        renderOrders(filtered);
+        const q = document.getElementById('searchInput').value.toUpperCase();
+        renderOrders(allOrders.filter(o => JSON.stringify(o).toUpperCase().includes(q)));
     }
 
     function switchView(view, btn) {
         document.getElementById('dashboard').classList.add('hidden');
         document.getElementById('notes').classList.add('hidden');
         document.getElementById(view).classList.remove('hidden');
-        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
     }
-
-    // Notas locales
-    const noteEl = document.getElementById('localNotes');
-    noteEl.value = localStorage.getItem('notes') || '';
-    noteEl.addEventListener('input', () => localStorage.setItem('notes', noteEl.value));
+    
+    const n = document.getElementById('localNotes');
+    n.value = localStorage.getItem('notes') || '';
+    n.addEventListener('input', ()=>localStorage.setItem('notes', n.value));
 
     init();
 </script>
