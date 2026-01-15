@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Control PAE 2026 - Ideas Textiles</title>
+    <style>
+        /* --- ESTILOS GENERALES --- */
+        :root {
+            --primary-color: #1e3c72;
+            --secondary-color: #2a5298;
+            --accent-color: #ffc107;
+            --bg-gradient: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: var(--bg-gradient);
+            padding: 15px; min-height: 100vh; padding-bottom: 60px; color: #333;
+            font-size: 16px; 
+        }
+        .container { max-width: 1400px; margin: 0 auto; }
+        
+        /* --- LOGO --- */
+        .logo-container { 
+            text-align: center; margin-bottom: 20px; padding: 15px; 
+            background: rgba(255,255,255,0.95); border-radius: 15px; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            display: flex; justify-content: center; align-items: center;
+        }
+        .logo-text-styled {
+            font-size: 1.8em; font-weight: 900; color: var(--primary-color);
+            text-transform: uppercase; letter-spacing: 3px;
+            border: 3px solid var(--primary-color); padding: 5px 15px;
+            display: inline-block; position: relative;
+        }
+        .logo-text-styled::after {
+            content: 'SPA'; font-size: 0.4em; position: absolute; 
+            bottom: -12px; right: 0; background: var(--primary-color); color: white; padding: 2px 5px;
+        }
+
+        h1 { color: white; text-align: center; font-size: 1.8em; margin-bottom: 5px; font-weight: 700;}
+        .subtitle { color: #e0e0e0; text-align: center; margin-bottom: 20px; font-size: 1em; }
+
+        /* --- NAVEGACIÓN --- */
+        .nav-container { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-bottom: 20px;}
+        .nav-btn {
+            flex: 1 1 auto; min-width: 120px; text-align: center;
+            padding: 12px 15px; border: none; border-radius: 25px;
+            background: rgba(255, 255, 255, 0.2); color: white; font-size: 0.95em;
+            font-weight: bold; cursor: pointer; transition: all 0.2s ease;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .nav-btn.active { background: white; color: var(--primary-color); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+        .refresh-btn { background: rgba(0,0,0,0.4) !important; }
+
+        /* --- OBSERVACIONES --- */
+        .observations-section {
+            background: #fff9c4; padding: 15px; border-radius: 15px; margin-bottom: 25px;
+            border-left: 5px solid var(--accent-color); box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            animation: slideDown 0.5s ease;
+        }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+        .observations-section h3 { color: #d35400; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; font-size: 1.2em;}
+        .obs-grid { display: grid; grid-template-columns: 1fr; gap: 10px; }
+        .obs-card { background: white; padding: 12px; border-radius: 10px; border: 1px solid #eee; }
+        .obs-order-name { font-weight: bold; color: var(--primary-color); margin-bottom: 4px; font-size: 0.9em; }
+        .obs-text { font-style: italic; color: #555; line-height: 1.4; font-size: 0.95em; }
+
+        /* --- PANELES --- */
+        .view-section { display: none; animation: fadeIn 0.4s ease; }
+        .view-section.active-view { display: block; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        .main-panel { background: white; padding: 20px 15px; border-radius: 20px; box-shadow: 0 8px 25px rgba(0,0,0,0.2); margin-bottom: 25px; }
+        h2 { color: var(--primary-color); margin-bottom: 15px; font-size: 1.4em; border-bottom: 2px solid var(--primary-color); padding-bottom: 8px; }
+
+        /* --- TARJETAS (RESUMEN) --- */
+        .orders-grid { display: grid; grid-template-columns: 1fr; gap: 15px; }
+        @media (min-width: 768px) { .orders-grid { grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); } }
+        
+        .order-card {
+            border: 1px solid #e0e0e0; border-radius: 15px; padding: 18px;
+            background: #f8f9fa; box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        .order-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
+        .order-title { font-size: 1.15em; font-weight: 800; color: var(--primary-color); line-height: 1.2; }
+        .order-client { font-size: 0.9em; color: #555; margin-top: 4px; font-weight: 600; }
+        .order-value { font-size: 1em; font-weight: bold; color: var(--secondary-color); background: #e3f2fd; padding: 4px 8px; border-radius: 6px; white-space: nowrap;}
+
+        /* BARRAS DE PROGRESO */
+        .progress-section { margin: 12px 0; }
+        .progress-label { display: flex; justify-content: space-between; margin-bottom: 5px; font-weight: 600; color: #555; font-size: 0.85em; }
+        .progress-bar-bg { width: 100%; height: 20px; background: #e9ecef; border-radius: 10px; overflow: hidden; }
+        .progress-fill { height: 100%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 0.8em; transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1); }
+        .p-red { background: linear-gradient(90deg, #ef5350, #c62828); }
+        .p-yellow { background: linear-gradient(90deg, #ffa726, #ef6c00); }
+        .p-green { background: linear-gradient(90deg, #66bb6a, #2e7d32); }
+        .units-footer { display: flex; justify-content: space-between; margin-top: 12px; padding-top: 8px; border-top: 1px solid #eee; font-size: 0.85em; color: #555; font-weight: 600;}
+
+        /* ALERTAS */
+        .critical-alerts { background: #fff; padding: 15px; border-radius: 15px; margin-bottom: 25px; border-left: 5px solid #d32f2f; }
+        .critical-alerts h3 { color: #d32f2f; font-size: 1.2em; margin-bottom: 10px; }
+        .alert-item { padding: 10px; margin: 8px 0; border-radius: 8px; font-weight: 600; display: flex; gap: 8px; align-items: center; font-size: 0.9em; background: #ffebee; color: #c62828;}
+
+        /* TABLA DETALLE (CON PRODUCTO) */
+        .table-container { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+        .detail-table { width: 100%; border-collapse: collapse; margin-top: 10px; white-space: nowrap; }
+        .detail-table th { background: #f1f3f5; padding: 10px; text-align: left; color: #495057; font-size: 0.85em; text-transform: uppercase;}
+        .detail-table td { padding: 10px; border-bottom: 1px solid #eee; font-size: 0.9em; vertical-align: middle;}
+        
+        .product-cell { font-weight: bold; color: var(--primary-color); }
+        .talla-badge { background: #e9ecef; color: #333; padding: 3px 8px; border-radius: 4px; font-weight: bold; }
+        
+        .status-badge { padding: 5px 10px; border-radius: 15px; font-weight: 700; font-size: 0.75em; text-transform: uppercase; display: inline-block;}
+        .st-sin-stock { background: #ffebee; color: #b71c1c; }
+        .st-bodega { background: #fff3e0; color: #e65100; }
+        .st-confeccion { background: #e3f2fd; color: #0d47a1; }
+        .st-bordado { background: #f3e5f5; color: #4a148c; }
+        .st-armada { background: #e8f5e9; color: #1b5e20; }
+        .st-despachada { background: #c8e6c9; color: #2e7d32; }
+
+        .days-counter { background: #d32f2f; color: white; padding: 8px 15px; border-radius: 20px; font-weight: bold; display: inline-block; font-size: 0.9em; box-shadow: 0 4px 10px rgba(211, 47, 47, 0.3); }
+        
+        /* NOTEBOOK */
+        .notebook-container {
+            background: #fffdeb; padding: 20px; border-radius: 15px;
+            min-height: 50vh; position: relative; background-image: linear-gradient(#e1e1e1 1px, transparent 1px);
+            background-size: 100% 1.8em; line-height: 1.8em;
+        }
+        .notebook-container::before { content: ''; position: absolute; top: 15px; bottom: 15px; left: 25px; width: 2px; background: #ef5350; }
+        textarea#ideasArea { width: 100%; height: 45vh; background: transparent; border: none; outline: none; font-family: monospace; font-size: 1em; line-height: 1.8em; padding-left: 20px; resize: none; color: #333; margin-top: 10px;}
+
+        #loading { text-align: center; color: white; font-size: 1.2em; margin-top: 50px; font-weight: bold;}
+        
+        /* WEB APP METAS */
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+        <meta name="mobile-web-app-capable" content="yes">
+    </style>
+    
+    <link rel="apple-touch-icon" href="logo_ideas.png">
+    <link rel="icon" type="image/png" href="logo_ideas.png">
+</head>
+<body>
+    <div class="container">
+        <div class="logo-container">
+            <div class="logo-text-styled">IDEAS TEXTILES</div>
+        </div>
+
+        <h1>📊 Control Órdenes PAE 2026</h1>
+        <div class="subtitle">Visualizador Sincronizado</div>
+
+        <div class="nav-container">
+            <button class="nav-btn active" onclick="switchView('dashboard')">🏭 Panel</button>
+            <button class="nav-btn" onclick="switchView('ideas')">💡 Notas</button>
+            <button class="nav-btn refresh-btn" onclick="forceRefresh()">🔄 Actualizar</button>
+        </div>
+
+        <div id="loading">⏳ Conectando...</div>
+
+        <div id="dashboard-view" class="view-section active-view" style="display:none">
+            
+            <div id="sheetObservations" class="observations-section" style="display: none;">
+                <h3>📝 Notas Importantes</h3>
+                <div id="obsContainer" class="obs-grid"></div>
+            </div>
+
+            <div class="main-panel">
+                <h2>🎯 Estado General</h2>
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <span class="days-counter">⏰ FALTAN <span id="daysLeft">--</span> DÍAS (16 Feb)</span>
+                </div>
+                <div class="orders-grid" id="ordersGrid"></div>
+            </div>
+            
+            <div class="critical-alerts" id="criticalAlerts" style="display: none;">
+                <h3>🚨 Alertas Críticas</h3>
+                <div id="alertsContainer"></div>
+            </div>
+            
+            <div class="main-panel">
+                <h2>📋 Detalle por Producto</h2>
+                <div style="margin-bottom: 15px; color: #666; font-style: italic; font-size: 0.85em; background: #f0f2f5; padding: 8px; border-radius: 8px;">
+                    ℹ️ Aquí ves el Producto, la Talla y a quién pertenece (arriba).
+                </div>
+                <div id="detailsContainer"></div>
+            </div>
+        </div>
+
+        <div id="ideas-view" class="view-section">
+            <div class="notebook-container">
+                <div style="font-size:1.3em; font-weight:bold; color:var(--primary-color); border-bottom:2px solid var(--primary-color); display:inline-block;">
+                    ✍️ Bitácora Personal
+                </div>
+                <textarea id="ideasArea" placeholder="Escribe aquí..."></textarea>
+            </div>
+        </div>
+    </div>
+
+<script>
+    // URL DE DATOS
+    const ORIGINAL_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR709g0cB4EtdROEnIWBrK2O4FQrKHUd3jXNUTWwdWvT1F5UraKHGOr6dDQHsJtgrdv4-ARqow_jKi0/pub?output=csv";
+    const PROXY_URL = "https://api.allorigins.win/raw?url=";
+    
+    let orders = [];
+
+    async function loadData() {
+        document.getElementById('loading').style.display = 'block';
+        try {
+            const finalUrl = PROXY_URL + encodeURIComponent(ORIGINAL_URL) + "&t=" + new Date().getTime();
+            const response = await fetch(finalUrl);
+            if (!response.ok) throw new Error('Error red');
+            const data = await response.text();
+            parseCSV(data);
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('dashboard-view').style.display = 'block';
+            refresh();
+        } catch (error) {
+            console.error(error);
+            document.getElementById('loading').innerHTML = `
+                <div style="background:rgba(255,0,0,0.2); padding:15px; border-radius:10px; margin:20px; font-size:0.8em;">
+                    ❌ Error de conexión.<br>Intenta recargar.
+                </div>`;
+        }
+    }
+
+    function forceRefresh() {
+        loadData(); 
+        const btn = document.querySelector('.refresh-btn');
+        const originalText = btn.innerText;
+        btn.innerText = "⏳...";
+        setTimeout(() => btn.innerText = originalText, 2000);
+    }
+
+    function parseCSV(csvText) {
+        const rows = csvText.split('\n').slice(1);
+        const tempOrders = {};
+
+        rows.forEach(row => {
+            const cols = row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
+            if(cols.length < 6) return; 
+
+            const clean = (txt) => txt ? txt.replace(/"/g, '').trim() : '';
+            
+            // --- AQUÍ ESTÁ LA LÓGICA DE TUS COLUMNAS ---
+            const id = clean(cols[0]);          // A
+            const name = clean(cols[1]);        // B (Orden)
+            const client = clean(cols[2]);      // C (Cliente)
+            const val = clean(cols[3]);         // D (Valor)
+            const product = clean(cols[4]);     // E (PRODUCTO)
+            const talla = clean(cols[5]);       // F (TALLA)
+            const qty = parseInt(cols[6]) || 0; // G (CANTIDAD)
+            const status = clean(cols[7]);      // H (ESTADO)
+            const delivered = parseInt(cols[8]) || 0; // I (ENTREGADAS)
+            const note = cols[9] ? clean(cols[9]) : ''; // J (NOTAS)
+
+            if (!tempOrders[id]) {
+                tempOrders[id] = {
+                    id: id,
+                    name: name,
+                    client: client,
+                    valueFormatted: val,
+                    items: [],
+                    observation: ''
+                };
+            }
+            if (note && !tempOrders[id].observation) tempOrders[id].observation = note;
+
+            tempOrders[id].items.push({
+                product: product,
+                talla: talla,
+                qty: qty,
+                status: status,
+                delivered: delivered
+            });
+        });
+        orders = Object.values(tempOrders);
+    }
+
+    function switchView(viewName) {
+        document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active-view'));
+        document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+        document.getElementById(viewName + '-view').classList.add('active-view');
+        const btns = document.querySelectorAll('.nav-btn');
+        if(viewName === 'dashboard') btns[0].classList.add('active');
+        if(viewName === 'ideas') btns[1].classList.add('active');
+    }
+
+    const ideasArea = document.getElementById('ideasArea');
+    ideasArea.value = localStorage.getItem('pae2026_notes_local') || '';
+    ideasArea.addEventListener('input', function() { localStorage.setItem('pae2026_notes_local', this.value); });
+
+    function calculateDaysLeft() {
+        const today = new Date();
+        const deadline = new Date('2026-02-16');
+        const diff = Math.ceil((deadline - today) / (1000 * 60 * 60 * 24));
+        document.getElementById('daysLeft').textContent = diff;
+    }
+
+    function getStatusClass(status) {
+        const map = {'SIN STOCK':'st-sin-stock', 'EN BODEGA':'st-bodega', 'EN CONFECCIÓN':'st-confeccion', 'EN BORDADO':'st-bordado', 'ARMADA':'st-armada', 'DESPACHADA':'st-despachada'};
+        return map[status] || '';
+    }
+
+    function calculateOrderProgress(order) {
+        const total = order.items.reduce((s, i) => s + i.qty, 0);
+        if (total === 0) return 0;
+        const done = order.items.reduce((s, i) => {
+            if (i.status === 'DESPACHADA') return s + i.qty;
+            if (i.status === 'ARMADA') return s + (i.qty * 0.85);
+            if (i.status === 'EN BORDADO') return s + (i.qty * 0.6);
+            if (i.status === 'EN CONFECCIÓN') return s + (i.qty * 0.3);
+            if (i.status === 'EN BODEGA') return s + (i.qty * 0.1);
+            return s;
+        }, 0);
+        return Math.round((done / total) * 100);
+    }
+
+    function getProgressColor(p) { return p < 30 ? 'p-red' : p < 70 ? 'p-yellow' : 'p-green'; }
+
+    function renderBossView() {
+        document.getElementById('ordersGrid').innerHTML = orders.map(order => {
+            const p = calculateOrderProgress(order);
+            const total = order.items.reduce((s, i) => s + i.qty, 0);
+            return `
+                <div class="order-card">
+                    <div class="order-header">
+                        <div>
+                            <div class="order-title">${order.name}</div>
+                            <div class="order-client">${order.client}</div>
+                        </div>
+                        <div class="order-value">${order.valueFormatted}</div>
+                    </div>
+                    <div class="progress-section">
+                        <div class="progress-label"><span>Progreso</span><span>${p}%</span></div>
+                        <div class="progress-bar-bg">
+                            <div class="progress-fill ${getProgressColor(p)}" style="width:${p}%">${p}%</div>
+                        </div>
+                    </div>
+                    <div class="units-footer"><span>Total: ${total} unidades</span></div>
+                </div>`;
+        }).join('');
+    }
+
+    function renderObservations() {
+        const obsContainer = document.getElementById('obsContainer');
+        const section = document.getElementById('sheetObservations');
+        const ordersWithNotes = orders.filter(o => o.observation && o.observation.trim() !== '');
+        if (ordersWithNotes.length > 0) {
+            section.style.display = 'block';
+            obsContainer.innerHTML = ordersWithNotes.map(o => `
+                <div class="obs-card">
+                    <div class="obs-order-name">📌 ${o.name}</div>
+                    <div class="obs-text">"${o.observation}"</div>
+                </div>
+            `).join('');
+        } else { section.style.display = 'none'; }
+    }
+
+    function renderCriticalAlerts() {
+        const alerts = [];
+        orders.forEach(o => o.items.forEach(i => {
+            if ((i.status === 'SIN STOCK' || i.status === 'EN BODEGA') && i.qty > i.delivered) {
+                alerts.push({ order: o.name, product: i.product, talla: i.talla, qty: i.qty - i.delivered, status: i.status });
+            }
+        }));
+        const el = document.getElementById('criticalAlerts');
+        if (alerts.length > 0) {
+            el.style.display = 'block';
+            document.getElementById('alertsContainer').innerHTML = alerts.map(a => `
+                <div class="alert-item">
+                    <span>🚨</span>
+                    <span><strong>${a.order}</strong> ${a.product ? a.product : ''} Talla ${a.talla}: ${a.qty} pendientes</span>
+                </div>`).join('');
+        } else { el.style.display = 'none'; }
+    }
+
+    function renderDetailedView() {
+        document.getElementById('detailsContainer').innerHTML = orders.map(o => `
+            <div style="margin-bottom:25px;">
+                <div class="order-header">
+                    <div>
+                        <h3>📦 ${o.name}</h3>
+                        <div style="font-size:0.9em; color:#666; margin-top:2px;">Cliente: ${o.client}</div>
+                    </div>
+                    <div>${o.valueFormatted}</div>
+                </div>
+                <div class="table-container">
+                <table class="detail-table">
+                    <thead><tr><th>Producto</th><th>Talla</th><th>Total</th><th>Estado</th><th>Entreg.</th><th>Faltan</th></tr></thead>
+                    <tbody>${o.items.map(i => `
+                        <tr style="${i.qty===i.delivered?'background:#f0fcf0; opacity:0.6':''}">
+                            <td class="product-cell">${i.product || '-'}</td>
+                            <td><span class="talla-badge">${i.talla}</span></td>
+                            <td><b>${i.qty}</b></td>
+                            <td><span class="status-badge ${getStatusClass(i.status)}">${i.status}</span></td>
+                            <td style="text-align:center">${i.delivered}</td>
+                            <td style="font-weight:bold; color:${i.qty-i.delivered===0?'green':'red'}">${i.qty - i.delivered}</td>
+                        </tr>`).join('')}</tbody>
+                </table>
+                </div>
+            </div>`).join('');
+    }
+
+    function refresh() { renderBossView(); renderObservations(); renderCriticalAlerts(); renderDetailedView(); }
+    
+    calculateDaysLeft();
+    loadData();
+</script>
+</body>
+</html>
