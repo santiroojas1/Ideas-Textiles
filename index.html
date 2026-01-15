@@ -4,257 +4,314 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>App Ideas Textiles SpA</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
-        :root { --primary: #2563eb; --dark: #0f172a; --bg: #f8fafc; --white: #ffffff; --border: #cbd5e1; --success: #16a34a; --warning: #d97706; --danger: #dc2626; }
+        :root {
+            --primary: #1e40af; --dark: #0f172a; --bg: #f1f5f9;
+            --white: #ffffff; --border: #cbd5e1;
+            --success: #16a34a; --warning: #d97706; --danger: #dc2626;
+        }
+
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
-        body { background: var(--bg); color: var(--dark); padding-bottom: 80px; min-height: 100vh; }
-        .container { max-width: 800px; margin: 0 auto; padding: 15px; }
+        body { background: var(--bg); color: var(--dark); padding-bottom: 90px; min-height: 100vh; }
+        .container { max-width: 600px; margin: 0 auto; padding: 15px; }
         .hidden { display: none !important; }
 
-        /* --- LOGIN --- */
+        /* --- 1. LOGIN --- */
         #loginScreen {
             display: flex; flex-direction: column; align-items: center; justify-content: center;
-            min-height: 90vh; text-align: center; padding: 20px;
+            min-height: 90vh; text-align: center; padding: 20px; background: white;
         }
+        .login-brand { font-size: 0.9em; font-weight: 900; letter-spacing: 2px; color: #94a3b8; margin-bottom: 10px; }
         .login-logo { font-size: 4em; color: var(--primary); margin-bottom: 20px; }
-        .login-title { font-size: 2em; font-weight: 900; margin-bottom: 10px; color: var(--dark); }
-        .login-subtitle {color: #64748b; margin-bottom: 40px; font-weight: 600;}
+        .login-title { font-size: 1.8em; font-weight: 900; margin-bottom: 30px; color: var(--dark); }
         
-        .user-grid { display: grid; gap: 15px; width: 100%; max-width: 400px; }
+        .user-grid { display: grid; gap: 15px; width: 100%; max-width: 350px; }
         .user-btn {
-            background: white; border: 2px solid var(--border); padding: 20px;
-            border-radius: 16px; font-size: 1.2em; font-weight: 800; color: var(--dark);
-            cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: center; gap: 10px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            background: var(--bg); border: 1px solid var(--border); padding: 18px;
+            border-radius: 12px; font-size: 1.1em; font-weight: 700; color: var(--dark);
+            cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: flex-start; gap: 15px;
         }
-        .user-btn:active { transform: scale(0.98); background: var(--primary); color: white; border-color: var(--primary); }
+        .user-btn:active { background: var(--primary); color: white; border-color: var(--primary); }
+        .user-btn i { color: var(--primary); font-size: 1.2em; }
+        .user-btn:active i { color: white; }
 
-        /* --- PANEL --- */
-        .top-bar { position: sticky; top: 0; z-index: 50; background: var(--bg); padding-bottom: 10px; padding-top: 10px; }
-        .header { display: flex; align-items: center; justify-content: center; gap: 15px; background: var(--dark); color: white; padding: 20px; border-radius: 16px; margin-bottom: 15px; box-shadow: 0 8px 20px rgba(0,0,0,0.15); text-align: center; }
-        .logo-icon { font-size: 2.2em; color: #60a5fa; background: rgba(255,255,255,0.1); padding: 10px; border-radius: 12px; }
-        .brand-text h1 { font-size: 1.2em; font-weight: 900; letter-spacing: 1px; line-height: 1; margin-bottom: 4px; }
-        .brand-text span { font-size: 0.75em; text-transform: uppercase; color: #94a3b8; letter-spacing: 2px; font-weight: 600; }
-        
-        .stats-bar { display: flex; justify-content: space-between; margin-bottom: 15px; gap: 10px; }
-        .stat-pill { background: white; flex: 1; padding: 10px; border-radius: 10px; text-align: center; font-size: 0.8em; font-weight: 700; color: #64748b; border: 1px solid var(--border); }
-        .stat-pill b { display: block; font-size: 1.4em; color: var(--dark); }
+        /* --- 2. CABECERA --- */
+        .header-card {
+            background: var(--dark); color: white; padding: 20px; 
+            border-radius: 20px; text-align: center; margin-bottom: 20px;
+            box-shadow: 0 10px 25px rgba(15, 23, 42, 0.2); position: relative; overflow: hidden;
+        }
+        .header-card::before {
+            content: '\f0c4'; font-family: "Font Awesome 6 Free"; font-weight: 900;
+            position: absolute; top: -20px; right: -20px; font-size: 8em; 
+            opacity: 0.05; color: white; transform: rotate(-20deg);
+        }
+        .company-name { font-size: 0.75em; font-weight: 800; letter-spacing: 2px; color: #94a3b8; margin-bottom: 10px; display: block; }
+        .main-logo { font-size: 2.5em; margin-bottom: 10px; color: #60a5fa; display: inline-block; }
+        .welcome-text { font-size: 1.4em; font-weight: 800; margin: 0; }
+        .welcome-text span { color: #60a5fa; }
 
-        .search-container { position: relative; margin-bottom: 20px; }
-        .search-input { width: 100%; padding: 16px 16px 16px 45px; border-radius: 12px; border: 2px solid white; background: white; font-size: 1em; box-shadow: 0 4px 10px rgba(0,0,0,0.05); outline: none; transition: 0.2s; }
+        /* KPI */
+        .kpi-container { display: flex; gap: 10px; margin-bottom: 20px; }
+        .kpi-box { flex: 1; background: white; padding: 12px; border-radius: 12px; text-align: center; border: 1px solid var(--border); box-shadow: 0 2px 5px rgba(0,0,0,0.03); }
+        .kpi-num { display: block; font-size: 1.5em; font-weight: 800; color: var(--dark); }
+        .kpi-label { font-size: 0.7em; font-weight: 700; color: #64748b; text-transform: uppercase; }
+
+        /* BUSCADOR */
+        .search-box { position: relative; margin-bottom: 20px; }
+        .search-input { width: 100%; padding: 14px 14px 14px 45px; border-radius: 12px; border: 2px solid white; background: white; font-size: 1em; box-shadow: 0 4px 10px rgba(0,0,0,0.03); outline: none; }
         .search-input:focus { border-color: var(--primary); }
-        .search-icon { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #94a3b8; font-size: 1.1em; }
+        .search-icon { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #94a3b8; }
 
-        .order-card { background: var(--white); border-radius: 16px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); border: 1px solid var(--border); overflow: hidden; }
-        .card-header { padding: 15px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: start; background: #f8fafc; }
-        .client-info span { font-size: 0.8em; color: #64748b; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
-        .client-info h3 { font-size: 1.2em; font-weight: 800; color: var(--dark); line-height: 1.2; margin-top: 2px; }
-        .price-tag { background: #dbeafe; color: #1e40af; padding: 6px 10px; border-radius: 8px; font-weight: 700; font-size: 0.9em; white-space: nowrap; }
+        /* --- 3. TARJETA --- */
+        .card { background: white; border-radius: 16px; margin-bottom: 15px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.02); border: 1px solid var(--border); }
+        .card-top { padding: 15px; background: #f8fafc; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: start; }
+        .client { font-size: 0.75em; font-weight: 800; color: #64748b; text-transform: uppercase; }
+        .order { font-size: 1.1em; font-weight: 900; color: var(--dark); margin-top: 2px; line-height: 1.2; }
+        .price { background: #dbeafe; color: #1e40af; padding: 5px 10px; border-radius: 6px; font-weight: 700; font-size: 0.85em; }
 
-        .progress-section { padding: 15px 15px 5px 15px; }
-        .progress-labels { display: flex; justify-content: space-between; font-size: 0.85em; font-weight: 700; margin-bottom: 6px; color: #475569; }
-        .progress-track { background: #e2e8f0; height: 12px; border-radius: 6px; overflow: hidden; }
-        .progress-fill { height: 100%; transition: width 0.6s ease; border-radius: 6px; }
+        .bar-section { padding: 15px 15px 5px 15px; }
+        .bar-header { display: flex; justify-content: space-between; font-size: 0.8em; font-weight: 700; color: #475569; margin-bottom: 5px; }
+        .bar-bg { background: #e2e8f0; height: 10px; border-radius: 10px; overflow: hidden; }
+        .bar-fill { height: 100%; background: var(--success); transition: width 0.5s; }
 
-        .st-red { background: var(--danger); } .st-orange { background: var(--warning); } .st-blue { background: var(--primary); } .st-green { background: var(--success); }
+        .table-wrap { padding: 0 15px 15px 15px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        td { padding: 8px 0; border-bottom: 1px solid #f1f5f9; font-size: 0.9em; vertical-align: middle; }
+        .prod { font-weight: 700; color: var(--dark); }
+        .size { background: #f1f5f9; padding: 2px 6px; border-radius: 4px; font-size: 0.8em; color: #64748b; margin-left: 5px; }
+        
+        .chip { padding: 3px 8px; border-radius: 6px; font-size: 0.7em; font-weight: 800; text-transform: uppercase; }
+        .c-pend { background: #fef2f2; color: #ef4444; }
+        .c-work { background: #fff7ed; color: #f59e0b; }
+        .c-done { background: #f0fdf4; color: #16a34a; }
 
-        .details-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        .details-table td { padding: 12px 15px; border-bottom: 1px solid #f1f5f9; font-size: 0.9em; vertical-align: middle; }
-        .prod-name { font-weight: 700; display: block; color: var(--dark); }
-        .prod-size { background: #f1f5f9; padding: 2px 6px; border-radius: 4px; font-size: 0.8em; color: #64748b; font-weight: 600; }
-        .status-badge { padding: 4px 8px; border-radius: 6px; font-size: 0.7em; font-weight: 800; text-transform: uppercase; display: inline-block; letter-spacing: 0.5px; }
-        .bg-pending { background: #fef2f2; color: #991b1b; } .bg-working { background: #fff7ed; color: #9a3412; } .bg-process { background: #eff6ff; color: #1e40af; } .bg-done { background: #f0fdf4; color: #166534; }
-
-        .card-actions { padding: 12px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; background: #f8fafc; border-top: 1px solid var(--border); }
-        .btn { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 12px; border-radius: 10px; text-decoration: none; font-weight: 700; font-size: 0.9em; border: none; cursor: pointer; transition: 0.1s; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 12px; background: #f8fafc; border-top: 1px solid var(--border); }
+        .btn { border: none; padding: 10px; border-radius: 8px; font-weight: 700; font-size: 0.9em; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none; transition: 0.1s; }
         .btn:active { transform: scale(0.97); }
-        .btn-wa { background: #25D366; color: white; } .btn-edit { background: var(--dark); color: white; }
+        .btn-wa { background: #25D366; color: white; }
+        .btn-edit { background: var(--dark); color: white; }
 
-        #loading { text-align: center; margin-top: 50px; font-weight: 600; color: #64748b; }
+        /* --- 4. BITÁCORA --- */
+        #notesView { padding: 0 15px; }
+        .notebook { width: 100%; height: 70vh; border: 2px solid #fcd34d; background: #fffbeb; border-radius: 16px; padding: 20px; font-size: 1.1em; line-height: 1.6; color: #4b5563; outline: none; resize: none; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+        .notes-title { font-weight: 800; color: #d97706; margin-bottom: 10px; display: block; }
+
+        /* NAVEGACIÓN */
+        .nav-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: white; border-top: 1px solid var(--border); display: flex; justify-content: space-around; padding: 10px 0; z-index: 100; box-shadow: 0 -5px 20px rgba(0,0,0,0.03); }
+        .nav-item { background: none; border: none; color: #94a3b8; font-size: 0.7em; font-weight: 700; display: flex; flex-direction: column; align-items: center; gap: 5px; cursor: pointer; width: 33%; }
+        .nav-item i { font-size: 1.5em; margin-bottom: 2px; }
+        .nav-item.active { color: var(--primary); }
+
+        #loading { text-align: center; margin-top: 50px; color: #64748b; }
     </style>
 </head>
 <body>
 
 <div id="loginScreen">
+    <div class="login-brand">IDEAS TEXTILES SPA</div>
     <div class="login-logo"><i class="fa-solid fa-scissors"></i></div>
-    <h1 class="login-title">IDEAS TEXTILES SPA</h1>
-    <p class="login-subtitle">Selecciona tu usuario:</p>
-    
+    <h1 class="login-title">PANEL DE CONTROL</h1>
     <div class="user-grid">
-        <button class="user-btn" onclick="login('ALEJANDRO')">
-            <i class="fa-solid fa-user-gear"></i> ALEJANDRO
-        </button>
-        <button class="user-btn" onclick="login('RICARDO')">
-            <i class="fa-solid fa-user-tie"></i> RICARDO
-        </button>
-        <button class="user-btn" onclick="login('RENATO')">
-            <i class="fa-solid fa-user-pen"></i> RENATO
-        </button>
+        <button class="user-btn" onclick="login('ALEJANDRO')"><i class="fa-solid fa-user-gear"></i> ALEJANDRO</button>
+        <button class="user-btn" onclick="login('RICARDO')"><i class="fa-solid fa-user-tie"></i> RICARDO</button>
+        <button class="user-btn" onclick="login('RENATO')"><i class="fa-solid fa-user-pen"></i> RENATO</button>
+         <button class="user-btn" onclick="login('SANTIAGO')"><i class="fa-solid fa-user-pen"></i> RENATO</button>
     </div>
 </div>
 
-<div id="dashboardView" class="container hidden">
-    <div class="top-bar">
-        <div class="header">
-            <div class="logo-icon"><i class="fa-solid fa-scissors"></i></div>
-            <div class="brand-text">
-                <h1>HOLA, <span id="userNameDisplay">EQUIPO</span></h1>
-                <span>PANEL DE CONTROL</span>
-            </div>
-        </div>
-        <div class="stats-bar">
-            <div class="stat-pill"><b id="kpiTotal">0</b>PRENDAS</div>
-            <div class="stat-pill"><b id="kpiDone" style="color:var(--success)">0</b>LISTAS</div>
-        </div>
-        <div class="search-container">
-            <i class="fa-solid fa-magnifying-glass search-icon"></i>
-            <input type="text" id="searchInput" class="search-input" placeholder="Buscar pedido..." onkeyup="filterOrders()">
+<div id="mainApp" class="hidden">
+    <div class="container">
+        <div class="header-card">
+            <span class="company-name">IDEAS TEXTILES SPA</span>
+            <div class="main-logo"><i class="fa-solid fa-scissors"></i></div>
+            <h2 class="welcome-text">HOLA, <span id="userName">EQUIPO</span></h2>
         </div>
     </div>
 
-    <div id="loading"><i class="fa-solid fa-spinner fa-spin"></i> Cargando...</div>
-    <div id="ordersContainer"></div>
+    <div id="ordersView" class="container">
+        <div class="kpi-container">
+            <div class="kpi-box"><span class="kpi-num" id="statTotal">0</span><span class="kpi-label">Total Prendas</span></div>
+            <div class="kpi-box"><span class="kpi-num" style="color:var(--success)" id="statDone">0</span><span class="kpi-label">Entregadas</span></div>
+            <div class="kpi-box"><span class="kpi-num" style="color:var(--warning)" id="statPend">0</span><span class="kpi-label">Pendientes</span></div>
+        </div>
+
+        <div class="search-box">
+            <i class="fa-solid fa-magnifying-glass search-icon"></i>
+            <input type="text" id="search" class="search-input" placeholder="Buscar pedido, cliente..." onkeyup="filter()">
+        </div>
+
+        <div id="loading"><i class="fa-solid fa-spinner fa-spin"></i> Cargando...</div>
+        <div id="list"></div>
+    </div>
+
+    <div id="notesView" class="container hidden">
+        <span class="notes-title"><i class="fa-solid fa-lightbulb"></i> BITÁCORA DE IDEAS Y PENDIENTES</span>
+        <textarea id="myNotes" class="notebook" placeholder="Escribe aquí ideas... (Se guarda en tu celular)"></textarea>
+    </div>
+</div>
+
+<div id="navBar" class="nav-bar hidden">
+    <button class="nav-item active" onclick="go('orders', this)"><i class="fa-solid fa-list-check"></i> PEDIDOS</button>
+    <button class="nav-item" onclick="go('notes', this)"><i class="fa-solid fa-pen-to-square"></i> NOTAS</button>
+    <button class="nav-item" onclick="window.location.reload()"><i class="fa-solid fa-rotate"></i> REFRESCAR</button>
 </div>
 
 <script>
-    // ✅ TU ENLACE DE LECTURA (CSV)
-    const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR709g0cB4EtdROEnIWBrK2O4FQrKHUd3jXNUTWwdWvT1F5UraKHGOr6dDQHsJtgrdv4-ARqow_jKi0/pub?output=csv";
+    // --- TUS LINKS DEFINITIVOS ---
+    // Link de lectura (CSV que publicaste)
+    const CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR709g0cB4EtdROEnIWBrK2O4FQrKHUd3jXNUTWwdWvT1F5UraKHGOr6dDQHsJtgrdv4-ARqow_jKi0/pub?output=csv";
     
-    // ✅ TU ENLACE DE EDICIÓN
-    const EDIT_URL = "https://docs.google.com/spreadsheets/d/1-Fxxi6Na5E-I15W5FuZd_TSDppYQKcAF_gsxwgxIULI/edit";
+    // Link de edición (Hoja privada)
+    const EDIT = "https://docs.google.com/spreadsheets/d/1-Fxxi6Na5E-I15W5FuZd_TSDppYQKcAF_gsxwgxIULI/edit";
 
-    let allOrders = [];
+    let data = [];
 
-    function login(name) {
+    function login(u) {
         document.getElementById('loginScreen').classList.add('hidden');
-        document.getElementById('dashboardView').classList.remove('hidden');
-        document.getElementById('userNameDisplay').innerText = name;
-        init(); // Cargar datos al entrar
+        document.getElementById('mainApp').classList.remove('hidden');
+        document.getElementById('navBar').classList.remove('hidden');
+        document.getElementById('userName').innerText = u;
+        load();
     }
 
-    async function init() {
+    async function load() {
         try {
-            // Usamos un proxy de respaldo por si acaso
-            const res = await fetch("https://api.allorigins.win/raw?url=" + encodeURIComponent(CSV_URL) + "&t=" + Date.now());
-            if (!res.ok) throw new Error("Fallo");
-            parseData(await res.text());
+            const res = await fetch("https://api.allorigins.win/raw?url=" + encodeURIComponent(CSV) + "&t=" + Date.now());
+            if(!res.ok) throw new Error("Error");
+            parse(await res.text());
         } catch(e) {
-            document.getElementById('loading').innerHTML = `
-                <div style="padding:20px; color:#ef4444;">
-                    <i class="fa-solid fa-triangle-exclamation" style="font-size:3em;"></i><br><br>
-                    <b>NO SE PUEDE LEER EL EXCEL</b><br>
-                    1. Ve a Archivo > Compartir > Publicar en la web.<br>
-                    2. Dale a "Publicar" (Botón verde).
-                </div>`;
+            document.getElementById('loading').innerHTML = "⚠️ Error de conexión. Revisa que el Excel esté publicado como CSV.";
         }
     }
 
-    function parseData(csv) {
-        const rows = csv.split('\n').slice(1);
-        const temp = {};
+    function parse(txt) {
+        const rows = txt.split('\n').slice(1);
+        const map = {};
 
         rows.forEach(row => {
-            const cols = row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
-            if(cols.length < 12) return; 
-            const clean = t => t ? t.replace(/"/g, '').trim() : '';
+            const c = row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
+            if(c.length < 12) return;
+            const clean = s => s ? s.replace(/"/g, '').trim() : '';
 
-            const id = clean(cols[1]); 
-            if(!temp[id]) {
-                temp[id] = {
-                    id: id, name: clean(cols[2]), client: clean(cols[3]), price: clean(cols[4]), phone: clean(cols[11]), items: []
+            // MAPEO SEGÚN TU EXCEL:
+            // 0:Fila, 1:ID, 2:Nombre, 3:Cliente, 4:Valor, 5:Prod, 6:Talla, 7:Cant, 8:Estado, 9:Dispo, 10:Obs, 11:Tel
+            
+            const id = clean(c[1]); // Columna B (ID)
+            
+            if(!map[id]) {
+                map[id] = {
+                    id, name: clean(c[2]), client: clean(c[3]), price: clean(c[4]), phone: clean(c[11]), items: []
                 };
             }
-            temp[id].items.push({
-                row: clean(cols[0]), product: clean(cols[5]), size: clean(cols[6]), qty: parseInt(cols[7]) || 0,
-                status: clean(cols[8]).toUpperCase(), done: parseInt(cols[9]) || 0
+            map[id].items.push({
+                row: clean(c[0]), // Fila para editar (Columna A)
+                prod: clean(c[5]), 
+                size: clean(c[6]), 
+                qty: parseInt(c[7])||0, // Solicitada
+                st: clean(c[8]).toUpperCase(), // Estado
+                done: parseInt(c[9])||0 // Disponible/Entregadas
             });
         });
 
-        allOrders = Object.values(temp);
-        renderOrders(allOrders);
-        updateStats(allOrders);
+        data = Object.values(map);
+        render(data);
+        calcStats(data);
         document.getElementById('loading').classList.add('hidden');
     }
 
-    function getWeight(s) {
-        if(s.includes("DESPACHA") || s.includes("ENTREGA") || s.includes("LISTO")) return 100;
-        if(s.includes("TERMINA") || s.includes("ARMADO")) return 80;
-        if(s.includes("BORDADO") || s.includes("ESTAMPADO")) return 50; 
-        if(s.includes("CONFECCI")) return 30;
-        if(s.includes("CORTE") || s.includes("BODEGA") || s.includes("TELA")) return 10;
-        return 0;
-    }
+    function render(list) {
+        const el = document.getElementById('list');
+        if(list.length===0) { el.innerHTML = "<p style='text-align:center;color:#999'>Sin resultados</p>"; return; }
 
-    function getBadgeColor(s) {
-        const w = getWeight(s);
-        if(w === 100) return 'bg-done';
-        if(w >= 50) return 'bg-process';
-        if(w >= 10) return 'bg-working';
-        return 'bg-pending';
-    }
+        el.innerHTML = list.map(o => {
+            let total = 0, ent = 0;
+            // Enlace de edición: Apunta a Columna I (Estado) de la fila correcta
+            const linkEdit = `${EDIT}#gid=0&range=I${o.items[0].row}`;
 
-    function renderOrders(list) {
-        const container = document.getElementById('ordersContainer');
-        if(list.length === 0) {
-            container.innerHTML = `<div style="text-align:center; padding:40px; color:#94a3b8;">No hay pedidos.</div>`; return;
-        }
-        container.innerHTML = list.map(o => {
-            let totalQty = 0, weightedScore = 0, realDone = 0;
-            const editRow = o.items[0].row;
-            const editLink = `${EDIT_URL}#gid=0&range=I${editRow}`; 
+            o.items.forEach(i => { total += i.qty; ent += i.done; });
+            
+            const pct = total===0 ? 0 : Math.round((ent/total)*100);
+            const pend = total - ent;
 
-            o.items.forEach(i => {
-                totalQty += i.qty;
-                weightedScore += (i.qty * getWeight(i.status));
-                if(getWeight(i.status) === 100) realDone += i.qty;
-            });
-
-            const progress = totalQty === 0 ? 0 : Math.round(weightedScore / totalQty);
-            const pending = totalQty - realDone;
-            let barColor = 'st-red';
-            if(progress >= 30) barColor = 'st-orange'; if(progress >= 80) barColor = 'st-blue'; if(progress === 100) barColor = 'st-green';
-
-            const waMsg = `Hola *${o.client}*, reporte *${o.name}*: Avance ${progress}%.`;
-            const waLink = o.phone ? `https://wa.me/${o.phone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(waMsg)}` : `https://wa.me/?text=${encodeURIComponent(waMsg)}`;
+            // WhatsApp
+            const msg = `Hola *${o.client}*, reporte *${o.name}*: Llevamos ${ent} de ${total} prendas listas (${pct}%).`;
+            const wa = o.phone && o.phone.length > 5 ? `https://wa.me/${o.phone.replace(/[^0-9]/g,'')}?text=${encodeURIComponent(msg)}` : `https://wa.me/?text=${encodeURIComponent(msg)}`;
 
             return `
-            <div class="order-card">
-                <div class="card-header">
-                    <div class="client-info"><span>${o.client}</span><h3>${o.name}</h3></div>
-                    <div class="price-tag">${o.price}</div>
+            <div class="card">
+                <div class="card-top">
+                    <div>
+                        <div class="client">${o.client}</div>
+                        <div class="order">${o.name}</div>
+                    </div>
+                    <div class="price">${o.price}</div>
                 </div>
-                <div class="progress-section">
-                    <div class="progress-labels"><span>Avance Global</span><span>${progress}%</span></div>
-                    <div class="progress-track"><div class="progress-fill ${barColor}" style="width: ${progress}%"></div></div>
-                    <div style="text-align:right; font-size:0.75em; color:#64748b; margin-top:5px;">Faltan: <b>${pending}</b></div>
+
+                <div class="bar-section">
+                    <div class="bar-header">
+                        <span>ENTREGAS REALIZADAS: ${ent}/${total}</span>
+                        <span>${pct}%</span>
+                    </div>
+                    <div class="bar-bg"><div class="bar-fill" style="width:${pct}%"></div></div>
                 </div>
-                <table class="details-table"><tbody>${o.items.map(i => `
-                    <tr><td><span class="prod-name">${i.product}</span><span class="prod-size">${i.size}</span></td>
-                    <td style="text-align:center; font-weight:bold;">${i.qty}</td>
-                    <td style="text-align:right;"><span class="status-badge ${getBadgeColor(i.status)}">${i.status}</span></td></tr>`).join('')}
-                </tbody></table>
-                <div class="card-actions">
-                    <a href="${waLink}" target="_blank" class="btn btn-wa"><i class="fa-brands fa-whatsapp"></i> Reportar</a>
-                    <a href="${editLink}" class="btn btn-edit"><i class="fa-solid fa-pen"></i> Editar</a>
+
+                <div class="table-wrap">
+                    <table>
+                        ${o.items.map(i => {
+                            let badge = 'c-pend';
+                            if(i.st.includes('DESPACHA') || i.st.includes('LISTO')) badge = 'c-done';
+                            else if(i.st.includes('BORDADO') || i.st.includes('ARMADO')) badge = 'c-work';
+                            
+                            return `
+                            <tr>
+                                <td><span class="prod">${i.prod}</span><span class="size">${i.size}</span></td>
+                                <td style="text-align:center; font-weight:bold">${i.qty}</td>
+                                <td style="text-align:right"><span class="chip ${badge}">${i.st}</span></td>
+                            </tr>`;
+                        }).join('')}
+                    </table>
+                </div>
+
+                <div class="actions">
+                    <a href="${wa}" target="_blank" class="btn btn-wa"><i class="fa-brands fa-whatsapp"></i> Reportar</a>
+                    <a href="${linkEdit}" class="btn btn-edit"><i class="fa-solid fa-pen"></i> Editar</a>
                 </div>
             </div>`;
         }).join('');
     }
 
-    function filterOrders() {
-        const q = document.getElementById('searchInput').value.toUpperCase();
-        renderOrders(allOrders.filter(o => JSON.stringify(o).toUpperCase().includes(q)));
+    function calcStats(list) {
+        let t=0, d=0;
+        list.forEach(o => o.items.forEach(i => { t+=i.qty; d+=i.done; }));
+        document.getElementById('statTotal').innerText = t;
+        document.getElementById('statDone').innerText = d;
+        document.getElementById('statPend').innerText = t - d;
     }
 
-    function updateStats(list) {
-        let t = 0; let d = 0;
-        list.forEach(o => o.items.forEach(i => { t+=i.qty; if(getWeight(i.status)===100) d+=i.qty; }));
-        document.getElementById('kpiTotal').innerText = t;
-        document.getElementById('kpiDone').innerText = d;
+    function filter() {
+        const q = document.getElementById('search').value.toUpperCase();
+        render(data.filter(o => JSON.stringify(o).toUpperCase().includes(q)));
     }
+
+    function go(view, btn) {
+        document.getElementById('ordersView').classList.add('hidden');
+        document.getElementById('notesView').classList.add('hidden');
+        document.getElementById(view+'View').classList.remove('hidden');
+        
+        document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+    }
+
+    // Guardar notas auto
+    const noteArea = document.getElementById('myNotes');
+    noteArea.value = localStorage.getItem('ideasNotes') || '';
+    noteArea.addEventListener('input', () => localStorage.setItem('ideasNotes', noteArea.value));
+
 </script>
 </body>
 </html>
