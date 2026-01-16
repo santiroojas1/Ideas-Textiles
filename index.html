@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>IDEAS TEXTILES SPA </title>
+    <title>IDEAS TEXTILES | V109 FINAL</title>
     
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -16,7 +16,7 @@
 
     <style>
         :root {
-            --dark: #0f172a; --primary: #2563eb; --accent: #6366f1;
+            --dark: #0f172a; --primary: #3b82f6; --accent: #6366f1;
             --success: #10b981; --danger: #ef4444; --warn: #f59e0b;
             --bg: #f8fafc; --card-bg: #ffffff;
         }
@@ -28,8 +28,7 @@
         header { background: var(--dark); color: white; padding: 15px 20px; position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 15px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; }
         .brand h1 { font-size: 1.1rem; font-weight: 800; margin: 0; }
         .brand span { color: var(--primary); font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
-        
-        .btn-scan { background: linear-gradient(135deg, var(--primary), var(--accent)); border: none; padding: 8px 12px; border-radius: 8px; color: white; font-size: 0.8rem; font-weight: 700; display: flex; align-items: center; gap: 6px; box-shadow: 0 0 10px rgba(37, 99, 235, 0.5); cursor: pointer; }
+        .btn-scan { background: linear-gradient(135deg, var(--primary), var(--accent)); border: none; padding: 8px 12px; border-radius: 8px; color: white; font-size: 0.8rem; font-weight: 700; display: flex; align-items: center; gap: 6px; box-shadow: 0 0 10px rgba(59, 130, 246, 0.5); cursor: pointer; }
 
         /* VISTAS */
         .view { display: none; padding: 20px; max-width: 900px; margin: 0 auto; animation: fadeUp 0.3s ease; }
@@ -37,39 +36,37 @@
         @keyframes fadeUp { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
 
         /* CARDS */
-        .card { background: var(--card-bg); border-radius: 12px; padding: 16px; margin-bottom: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.04); border: 1px solid #e2e8f0; }
+        .card { background: var(--card-bg); border-radius: 12px; padding: 16px; margin-bottom: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.04); border: 1px solid #e2e8f0; position: relative; }
         
-        /* ESTADOS PEDIDO */
+        /* SKU BADGE */
+        .sku-badge { font-family: 'JetBrains Mono', monospace; background: var(--dark); color: #fbbf24; padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; font-weight: bold; display: inline-block; margin-bottom: 4px; }
+
+        /* STATUS */
         .status { display: inline-block; padding: 4px 8px; border-radius: 6px; font-size: 0.65rem; font-weight: 800; text-transform: uppercase; margin-bottom: 8px; }
         .st-1 { background: #fff7ed; color: var(--warn); border: 1px solid #fed7aa; }
         .st-2 { background: #eff6ff; color: var(--primary); border: 1px solid #bfdbfe; }
         .st-3 { background: #ecfdf5; color: var(--success); border: 1px solid #a7f3d0; }
 
-        /* CALENDARIO AVANZADO */
+        /* CALENDARIO */
         .cal-ctrl { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; background: var(--dark); color: white; padding: 10px; border-radius: 10px; }
         .cal-ctrl button { background: none; border: none; color: white; font-size: 1.2rem; cursor: pointer; }
         .cal-select { background: rgba(255,255,255,0.1); border: none; color: white; font-weight: bold; padding: 5px; border-radius: 4px; }
-        
         .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
         .cal-head { text-align: center; font-size: 0.7rem; font-weight: 800; color: #64748b; padding-bottom: 5px; }
-        
-        .day { aspect-ratio: 1; background: white; border: 1px solid #e2e8f0; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 0.9rem; cursor: pointer; position: relative; transition: 0.1s; }
+        .day { aspect-ratio: 1; background: white; border: 1px solid #e2e8f0; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 0.9rem; cursor: pointer; position: relative; }
         .day:active { background: #f1f5f9; transform: scale(0.95); }
         .day.today { border: 2px solid var(--primary); font-weight: 800; color: var(--primary); }
         .day.has-note::after { content: ''; position: absolute; bottom: 4px; width: 6px; height: 6px; background: var(--accent); border-radius: 50%; }
 
-        /* BOTONES COMUNES */
+        /* BOTONES */
         .btn { width: 100%; padding: 12px; border: none; border-radius: 10px; font-weight: 700; font-size: 0.8rem; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px; margin-top: 5px; }
         .btn-pri { background: var(--dark); color: white; }
         .btn-sec { background: white; border: 1px solid #cbd5e1; color: var(--dark); }
         .btn-pdf { background: var(--danger); color: white; }
 
-        /* DOCK */
         .dock { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--dark); padding: 12px 30px; border-radius: 40px; display: flex; gap: 35px; box-shadow: 0 10px 30px rgba(0,0,0,0.4); z-index: 999; }
         .dock i { font-size: 1.4rem; color: #94a3b8; transition: 0.2s; cursor: pointer; }
         .dock i.active { color: white; transform: translateY(-3px); text-shadow: 0 0 15px var(--primary); }
-        
-        /* LISTA ITEMS */
         .item-row { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px dashed #e2e8f0; font-size: 0.85rem; }
     </style>
 </head>
@@ -78,7 +75,7 @@
 <header>
     <div class="brand">
         <h1>IDEAS TEXTILES</h1>
-        <span>Workwear and Corporate</span>
+        <span>V109 FINAL</span>
     </div>
     <button class="btn-scan" onclick="App.IA.trigger()">
         <i class="fa-solid fa-wand-magic-sparkles"></i> IA IMPORT
@@ -86,39 +83,33 @@
 </header>
 
 <section id="v-bodega" class="view active">
-    <input type="text" id="search-inv" class="search-bar" style="width:100%; padding:12px; border-radius:10px; border:1px solid #cbd5e1; margin-bottom:15px;" placeholder="🔍 Buscar producto..." oninput="App.Render.bodega()">
-    <button class="btn btn-pri" onclick="App.Actions.modalProd()">+ AGREGAR PRODUCTO MANUAL</button>
+    <input type="text" id="search-inv" class="search-bar" style="width:100%; padding:12px; border-radius:10px; border:1px solid #cbd5e1; margin-bottom:15px;" placeholder="🔍 Buscar por nombre o SKU..." oninput="App.Render.bodega()">
+    <button class="btn btn-pri" onclick="App.Actions.modalProd()">+ AGREGAR PRODUCTO</button>
     <br><br>
     <div id="list-bodega"></div>
 </section>
 
 <section id="v-ordenes" class="view">
     <h2 style="margin:0 0 15px; font-size:1.2rem;">PEDIDOS ACTIVOS</h2>
-    <button class="btn btn-pri" style="background:var(--primary); box-shadow:0 4px 10px rgba(37,99,235,0.3);" onclick="App.Actions.modalOrder()">
-        <i class="fa-solid fa-cart-shopping"></i> NUEVO PEDIDO MULTI-ITEM
+    <button class="btn btn-pri" style="background:var(--primary); box-shadow:0 4px 10px rgba(59,130,246,0.3);" onclick="App.Actions.modalOrder()">
+        <i class="fa-solid fa-cart-shopping"></i> NUEVO PEDIDO
     </button>
     <br><br>
     <div id="list-ordenes"></div>
 </section>
 
 <section id="v-agenda" class="view">
-    
     <div class="cal-ctrl">
         <button onclick="App.Calendar.moveMonth(-1)"><i class="fa-solid fa-chevron-left"></i></button>
         <div style="text-align:center;">
             <span id="cal-month-name" style="font-weight:800; font-size:1.1rem; display:block;">ENERO</span>
             <select id="cal-year-select" class="cal-select" onchange="App.Calendar.setYear(this.value)">
-                <option value="2025">2025</option>
-                <option value="2026">2026</option>
-                <option value="2027">2027</option>
-                <option value="2028">2028</option>
-                <option value="2029">2029</option>
-                <option value="2030">2030</option>
+                <option value="2025">2025</option><option value="2026">2026</option><option value="2027">2027</option>
+                <option value="2028">2028</option><option value="2029">2029</option><option value="2030">2030</option>
             </select>
         </div>
         <button onclick="App.Calendar.moveMonth(1)"><i class="fa-solid fa-chevron-right"></i></button>
     </div>
-
     <div class="card">
         <div class="cal-grid">
             <div class="cal-head">LUN</div><div class="cal-head">MAR</div><div class="cal-head">MIE</div>
@@ -126,21 +117,15 @@
         </div>
         <div id="cal-days" class="cal-grid" style="margin-top:5px;"></div>
     </div>
-    
-    <div style="text-align:center; color:#64748b; font-size:0.8rem; margin:10px 0;">
-        <i class="fa-solid fa-circle-info"></i> Toca un día para escribir notas o ver despachos.
-    </div>
-
     <div class="card" style="margin-top:20px; text-align:center; border:2px dashed #cbd5e1;">
-        <h3>REPORTES & BACKUP</h3>
+        <h3>REPORTES</h3>
         <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
             <button class="btn btn-pdf" onclick="App.Backup.generatePDF()"><i class="fa-solid fa-file-pdf"></i> PDF</button>
             <button class="btn btn-pri" onclick="App.Backup.exportJSON()"><i class="fa-solid fa-download"></i> JSON</button>
         </div>
         <div style="margin-top:10px;">
             <label style="color:var(--primary); font-size:0.8rem; font-weight:bold; cursor:pointer;">
-                <input type="file" hidden onchange="App.Backup.importJSON(this)">
-                <u>Restaurar Respaldo</u>
+                <input type="file" hidden onchange="App.Backup.importJSON(this)"><u>Restaurar Respaldo</u>
             </label>
         </div>
     </div>
@@ -160,11 +145,14 @@ const App = {
         inv: JSON.parse(localStorage.getItem('db_inv')) || [],
         ord: JSON.parse(localStorage.getItem('db_ord')) || [],
         log: JSON.parse(localStorage.getItem('db_log')) || {}, 
-        // Estado visual del calendario
-        calDate: new Date() 
+        calDate: new Date()
     },
 
     init() {
+        // Garantizar SKUs retroactivos
+        this.db.inv.forEach((p, idx) => {
+            if(!p.sku) p.sku = String(idx + 1).padStart(3, '0');
+        });
         this.Render.bodega();
         this.Render.ordenes();
         this.Calendar.render();
@@ -174,7 +162,6 @@ const App = {
         localStorage.setItem('db_inv', JSON.stringify(this.db.inv));
         localStorage.setItem('db_ord', JSON.stringify(this.db.ord));
         localStorage.setItem('db_log', JSON.stringify(this.db.log));
-        // Refrescar vistas
         this.Render.bodega();
         this.Render.ordenes();
         this.Calendar.render();
@@ -189,18 +176,30 @@ const App = {
         }
     },
 
+    Helpers: {
+        getNextSKU() {
+            if(App.db.inv.length === 0) return '001';
+            const max = App.db.inv.reduce((acc, p) => Math.max(acc, parseInt(p.sku || 0)), 0);
+            return String(max + 1).padStart(3, '0');
+        }
+    },
+
     Render: {
         bodega() {
             const q = document.getElementById('search-inv').value.toUpperCase();
-            const list = App.db.inv.filter(i => i.n.toUpperCase().includes(q));
+            const list = App.db.inv.filter(i => i.n.toUpperCase().includes(q) || (i.sku && i.sku.includes(q)));
             
             document.getElementById('list-bodega').innerHTML = list.map((p, i) => {
                 const sizes = Object.entries(p.s).map(([k,v]) => `<span style="background:#e2e8f0; padding:2px 6px; border-radius:4px; font-size:0.75rem;"><b>${k}:</b>${v}</span>`).join(' ');
                 return `
                 <div class="card">
                     <div style="display:flex; justify-content:space-between; align-items:flex-start;">
-                        <div><h3 style="margin:0;">${p.n}</h3><div style="margin-top:5px; display:flex; flex-wrap:wrap; gap:5px;">${sizes}</div></div>
-                        <i class="fa-solid fa-pen" style="color:var(--primary); cursor:pointer;" onclick="App.Actions.modalProd(${App.db.inv.indexOf(p)})"></i>
+                        <div>
+                            <span class="sku-badge">SKU: ${p.sku}</span>
+                            <h3 style="margin:4px 0;">${p.n}</h3>
+                            <div style="margin-top:5px; display:flex; flex-wrap:wrap; gap:5px;">${sizes}</div>
+                        </div>
+                        <i class="fa-solid fa-pen" style="color:var(--primary); cursor:pointer; padding:10px;" onclick="App.Actions.modalProd(${App.db.inv.indexOf(p)})"></i>
                     </div>
                 </div>`;
             }).join('') || '<div style="text-align:center;color:#94a3b8">Sin inventario</div>';
@@ -211,9 +210,7 @@ const App = {
             document.getElementById('list-ordenes').innerHTML = list.slice().reverse().map((o, idx) => {
                 const realIdx = list.length - 1 - idx;
                 let stBadge = o.st==='done' ? '<span class="status st-3">DESPACHADO</span>' : (o.st==='pack' ? '<span class="status st-2">EMPAQUETADO</span>' : '<span class="status st-1">EN PROCESO</span>');
-                
                 const itemsHtml = o.items.map(it => `<div class="item-row"><span>${it.p} (T:${it.sz})</span><b>x${it.q}</b></div>`).join('');
-
                 return `
                 <div class="card">
                     <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
@@ -235,19 +232,24 @@ const App = {
 
     Actions: {
         async modalProd(i = null) {
-            const item = i !== null ? App.db.inv[i] : {n:'', s:{}};
+            const isNew = i === null;
+            const item = isNew ? {n:'', s:{}, sku: App.Helpers.getNextSKU()} : App.db.inv[i];
             const sTxt = Object.entries(item.s).map(([k,v])=>`${k}:${v}`).join(', ');
+            
             const {value} = await Swal.fire({
-                title: i!==null?'EDITAR':'NUEVO',
-                html: `<input id="sw-n" class="swal2-input" placeholder="Nombre" value="${item.n}">
-                       <input id="sw-s" class="swal2-input" placeholder="Talla:Cant, Talla:Cant" value="${sTxt}">`,
+                title: isNew ? 'NUEVO PRODUCTO' : 'EDITAR PRODUCTO',
+                html: `
+                    <div style="text-align:right; margin-bottom:10px;"><span class="sku-badge">SKU: ${item.sku}</span></div>
+                    <input id="sw-n" class="swal2-input" placeholder="Nombre" value="${item.n}">
+                    <input id="sw-s" class="swal2-input" placeholder="Talla:Cant, Talla:Cant" value="${sTxt}">
+                `,
                 preConfirm: () => {
                     const n = document.getElementById('sw-n').value.toUpperCase();
                     const s = {}; document.getElementById('sw-s').value.split(',').forEach(x => { const [k,v]=x.split(':'); if(k&&v) s[k.trim().toUpperCase()]=Number(v); });
-                    return {n,s};
+                    return {n, s, sku: item.sku};
                 }
             });
-            if(value) { if(i!==null) App.db.inv[i]=value; else App.db.inv.push(value); App.save(); }
+            if(value) { if(!isNew) App.db.inv[i]=value; else App.db.inv.push(value); App.save(); }
         },
 
         async modalOrder(i = null) {
@@ -257,38 +259,73 @@ const App = {
 
             const renderCart = () => {
                 const d = document.getElementById('cart-div');
-                if(!cart.length) d.innerHTML = '<small>Vacío</small>';
-                else d.innerHTML = cart.map((x,ix)=>`<div>${x.p} (${x.sz}) x${x.q} <span onclick="cart.splice(${ix},1); renderCart()" style="color:red;cursor:pointer;">x</span></div>`).join('');
+                if(d) d.innerHTML = !cart.length ? '<small>Vacío</small>' : cart.map((x,ix)=>`<div>${x.p} (${x.sz}) x${x.q} <span onclick="window.delCartItem(${ix})" style="color:red;cursor:pointer;margin-left:5px;">X</span></div>`).join('');
             };
+            window.delCartItem = (idx) => { cart.splice(idx,1); renderCart(); };
 
             await Swal.fire({
-                title: 'PEDIDO',
+                title: 'PEDIDO', width: 600,
                 html: `
-                    <input id="sw-c" class="swal2-input" placeholder="Cliente" value="${ord.c}">
-                    <div style="background:#f1f5f9; padding:10px; border-radius:8px; margin-top:10px;">
-                        <input id="sw-p" list="dl" style="width:100%; padding:8px; margin-bottom:5px;" placeholder="Producto">
+                    <input id="sw-c" class="swal2-input" placeholder="Cliente" value="${ord.c}" style="margin:5px 0 15px 0;">
+                    <div style="background:#f1f5f9; padding:15px; border-radius:8px; border:1px solid #e2e8f0;">
+                        <input id="sw-p" list="dl" class="swal2-input" style="margin:5px 0; width:100%; height:40px;" placeholder="Producto">
                         <datalist id="dl">${prodOpts}</datalist>
-                        <div style="display:flex; gap:5px;">
-                            <input id="sw-sz" style="flex:1; padding:8px;" placeholder="Talla">
-                            <input id="sw-q" type="number" style="width:60px; padding:8px;" value="1">
+                        <div style="display:flex; gap:10px;">
+                            <input id="sw-sz" class="swal2-input" style="flex:1; margin:0; height:40px;" placeholder="Talla">
+                            <input id="sw-q" type="number" class="swal2-input" style="width:80px; margin:0; height:40px;" value="1">
                         </div>
-                        <button type="button" class="btn btn-pri" style="margin-top:5px; padding:5px;" onclick="addIt()">+ AGREGAR</button>
+                        <button type="button" id="btn-add-smart" class="btn btn-pri" style="margin-top:10px;">+ AGREGAR</button>
                     </div>
-                    <div id="cart-div" style="max-height:100px; overflow-y:auto; margin-top:10px; text-align:left;"></div>
+                    <div id="cart-div" style="max-height:150px; overflow-y:auto; margin-top:15px; text-align:left; border:1px dashed #cbd5e1; padding:10px;"></div>
                 `,
                 didOpen: () => {
-                    window.cart = cart; window.renderCart = renderCart; window.addIt = () => {
-                        const p=document.getElementById('sw-p').value.toUpperCase(), sz=document.getElementById('sw-sz').value.toUpperCase(), q=Number(document.getElementById('sw-q').value);
-                        if(p&&sz&&q>0) { cart.push({p,sz,q}); renderCart(); document.getElementById('sw-p').value=''; document.getElementById('sw-sz').value=''; }
-                    };
                     renderCart();
+                    document.getElementById('btn-add-smart').addEventListener('click', async () => {
+                        const pName = document.getElementById('sw-p').value.toUpperCase().trim();
+                        const sz = document.getElementById('sw-sz').value.toUpperCase().trim();
+                        const q = Number(document.getElementById('sw-q').value);
+                        
+                        if(!pName || !sz || q <= 0) return Swal.showValidationMessage('⚠️ Faltan datos');
+
+                        // --- LÓGICA DE CONTROL DE STOCK ---
+                        const invItem = App.db.inv.find(x => x.n === pName);
+                        const stockActual = (invItem && invItem.s[sz] !== undefined) ? invItem.s[sz] : 0;
+                        
+                        // Si pide más de lo que hay
+                        if(q > stockActual) {
+                            const {isConfirmed} = await Swal.fire({
+                                title: '⚠️ Stock Insuficiente',
+                                html: `Solo tienes <b>${stockActual}</b> unidades de <b>${pName} Talla ${sz}</b>.<br>Estás pidiendo <b>${q}</b>.<br><br>¿Deseas agregarlo de todas formas?`,
+                                icon: 'warning',
+                                showCancelButton: true,
+                                confirmButtonText: 'SÍ, AGREGAR IGUAL',
+                                cancelButtonText: 'CANCELAR',
+                                confirmButtonColor: '#f59e0b'
+                            });
+                            if(!isConfirmed) return; // Si cancela, no agrega nada
+                        }
+                        
+                        // Si pasa, agregamos
+                        cart.push({p: pName, sz: sz, q: q});
+                        renderCart();
+                        document.getElementById('sw-p').value = '';
+                        document.getElementById('sw-sz').value = '';
+                        document.getElementById('sw-q').value = '1';
+                        document.getElementById('sw-p').focus();
+                    });
                 },
-                preConfirm: () => { return {c:document.getElementById('sw-c').value.toUpperCase(), items:cart}; }
+                preConfirm: () => {
+                    const c = document.getElementById('sw-c').value.toUpperCase();
+                    if(!c) return Swal.showValidationMessage('Falta cliente');
+                    if(!cart.length) return Swal.showValidationMessage('Carrito vacío');
+                    return {c, items:cart};
+                }
             }).then(r => {
-                if(r.isConfirmed && r.value.items.length) {
+                if(r.isConfirmed) {
                     ord.c = r.value.c; ord.items = r.value.items;
                     if(i!==null) App.db.ord[i]=ord; else App.db.ord.push(ord);
                     App.save();
+                    Swal.fire('Guardado', '', 'success');
                 }
             });
         },
@@ -299,9 +336,7 @@ const App = {
             const {value:f} = await Swal.fire({title:'N° FACTURA', input:'text'});
             if(f) {
                 const o = App.db.ord[i]; o.st='done'; o.fac=f;
-                // Descuento inventario
-                o.items.forEach(it => { const p=App.db.inv.find(x=>x.n===it.p); if(p && p.s[it.sz]) p.s[it.sz]-=it.q; });
-                // Log automatico
+                o.items.forEach(it => { const p=App.db.inv.find(x=>x.n===it.p); if(p && p.s[it.sz]!==undefined) p.s[it.sz]-=it.q; });
                 const d = new Date(); const k = `${d.getDate()}-${d.getMonth()}-${d.getFullYear()}`;
                 App.db.log[k] = (App.db.log[k]||'') + `[AUTO] Despacho ${o.c} (FAC ${f})\n`;
                 App.save(); Swal.fire('Listo','','success');
@@ -322,7 +357,8 @@ const App = {
                     js.forEach(r => {
                         if(r.length>=3 && typeof r[2]==='number') {
                             const n=String(r[0]).toUpperCase(), sz=String(r[1]).toUpperCase(), q=r[2];
-                            let p = App.db.inv.find(x=>x.n===n); if(!p){ p={n,s:{}}; App.db.inv.push(p); }
+                            let p = App.db.inv.find(x=>x.n===n); 
+                            if(!p){ p={n, s:{}, sku: App.Helpers.getNextSKU()}; App.db.inv.push(p); }
                             p.s[sz]=(p.s[sz]||0)+q; cnt++;
                         }
                     });
@@ -343,14 +379,12 @@ const App = {
             doc.setFillColor(15,23,42); doc.rect(0,0,210,25,'F');
             doc.setTextColor(255); doc.setFontSize(16); doc.text("REPORTE IDEAS TEXTILES", 10,16);
             let y=40;
-            // Inv
             doc.setTextColor(0); doc.setFontSize(12); doc.text("INVENTARIO",10,y); y+=5;
-            doc.autoTable({startY:y, head:[['Producto','Stock']], body:App.db.inv.map(p=>[p.n, JSON.stringify(p.s)]), theme:'grid'});
+            doc.autoTable({startY:y, head:[['SKU', 'Producto','Stock']], body:App.db.inv.map(p=>[p.sku, p.n, JSON.stringify(p.s)]), theme:'grid'});
             y=doc.lastAutoTable.finalY+15;
-            // Ord
             doc.text("PEDIDOS",10,y); y+=5;
             doc.autoTable({startY:y, head:[['Cliente','Items','Estado']], body:App.db.ord.filter(o=>o.st!=='done').map(o=>[o.c, o.items.length+' items', o.st])});
-            doc.save('REPORTE.pdf');
+            doc.save('REPORTE_FINAL.pdf');
         },
         exportJSON(){ 
             const blob = new Blob([JSON.stringify(App.db)], {type:'application/json'});
@@ -364,63 +398,31 @@ const App = {
     },
 
     Calendar: {
-        moveMonth(dir) {
-            App.db.calDate.setMonth(App.db.calDate.getMonth() + dir);
-            this.render();
-        },
-        setYear(y) {
-            App.db.calDate.setFullYear(parseInt(y));
-            this.render();
-        },
+        moveMonth(dir) { App.db.calDate.setMonth(App.db.calDate.getMonth() + dir); this.render(); },
+        setYear(y) { App.db.calDate.setFullYear(parseInt(y)); this.render(); },
         render() {
             const d = App.db.calDate;
             const mNames = ["ENERO","FEBRERO","MARZO","ABRIL","MAYO","JUNIO","JULIO","AGOSTO","SEPTIEMBRE","OCTUBRE","NOVIEMBRE","DICIEMBRE"];
-            
-            // Actualizar Header
             document.getElementById('cal-month-name').innerText = mNames[d.getMonth()];
             document.getElementById('cal-year-select').value = d.getFullYear();
-
-            // Lógica Grid
-            const firstDay = new Date(d.getFullYear(), d.getMonth(), 1).getDay(); // 0=Dom, 1=Lun...
+            const firstDay = new Date(d.getFullYear(), d.getMonth(), 1).getDay(); 
             const daysInMonth = new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate();
-            
-            // Ajuste para empezar Lunes (Lunes=1 ... Domingo=7)
             let start = firstDay === 0 ? 6 : firstDay - 1;
-            
             let html = '';
-            // Espacios vacíos
             for(let i=0; i<start; i++) html += '<div></div>';
-            
-            // Días
             const today = new Date();
             for(let i=1; i<=daysInMonth; i++) {
                 const k = `${i}-${d.getMonth()}-${d.getFullYear()}`;
                 const hasNote = App.db.log[k] && App.db.log[k].trim() !== '';
                 const isToday = (i === today.getDate() && d.getMonth() === today.getMonth() && d.getFullYear() === today.getFullYear());
-                
-                html += `
-                <div class="day ${isToday ? 'today' : ''} ${hasNote ? 'has-note' : ''}" onclick="App.Calendar.openDay('${k}')">
-                    ${i}
-                </div>`;
+                html += `<div class="day ${isToday ? 'today' : ''} ${hasNote ? 'has-note' : ''}" onclick="App.Calendar.openDay('${k}')">${i}</div>`;
             }
             document.getElementById('cal-days').innerHTML = html;
         },
         async openDay(k) {
             const currentVal = App.db.log[k] || '';
-            const { value: text } = await Swal.fire({
-                title: `Notas del ${k.replace(/-/g,'/')}`,
-                input: 'textarea',
-                inputPlaceholder: 'Escribe aquí (Recordatorios, Cobros, etc)...',
-                inputValue: currentVal,
-                showCancelButton: true,
-                confirmButtonText: 'GUARDAR NOTA',
-                cancelButtonText: 'CANCELAR'
-            });
-
-            if (text !== undefined) {
-                App.db.log[k] = text;
-                App.save(); // Guarda y refresca para mostrar el puntito
-            }
+            const { value: text } = await Swal.fire({ title: `Notas ${k}`, input: 'textarea', inputValue: currentVal, showCancelButton: true });
+            if (text !== undefined) { App.db.log[k] = text; App.save(); }
         }
     }
 };
