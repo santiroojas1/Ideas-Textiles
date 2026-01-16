@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>IDEAS TEXTILES | V112 FINAL</title>
+    <title>IDEAS TEXTILES | V115 SPEED</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
@@ -76,7 +76,7 @@
 <header>
     <div class="brand">
         <h1>IDEAS TEXTILES</h1>
-        <span>V112 FINAL</span>
+        <span>V115 SPEED</span>
     </div>
     <button class="btn-scan" onclick="App.IA.trigger()">
         <i class="fa-solid fa-wand-magic-sparkles"></i> IA IMPORT
@@ -251,7 +251,28 @@ const App = {
                     return {n, s, sku: item.sku};
                 }
             });
-            if(value) { if(!isNew) App.db.inv[i]=value; else App.db.inv.push(value); App.save(); }
+
+            if(value) {
+                if(!isNew) App.db.inv[i]=value; else App.db.inv.push(value);
+                
+                const {value:reason} = await Swal.fire({
+                    title: 'REGISTRO DE OPERACIÓN',
+                    text: '¿Por qué se modificó el inventario? (Para la bitácora)',
+                    input: 'text',
+                    inputPlaceholder: 'Ej: Llegada de mercadería, Ajuste, Merma...',
+                    confirmButtonText: 'GUARDAR REGISTRO',
+                    allowOutsideClick: false
+                });
+
+                if(reason) {
+                    const opID = Math.floor(Math.random() * 9000) + 1000;
+                    const d = new Date();
+                    const k = `${d.getDate()}-${d.getMonth()}-${d.getFullYear()}`;
+                    const logEntry = `⚙️ OP-${opID}: ${value.n} - ${reason}\n`;
+                    App.db.log[k] = (App.db.log[k] || '') + logEntry;
+                }
+                App.save(); Swal.fire('Guardado', 'Inventario y Calendario actualizados', 'success');
+            }
         },
 
         async modalOrder(i = null) {
@@ -283,46 +304,18 @@ const App = {
                 didOpen: () => {
                     renderCart();
                     const btn = document.getElementById('btn-add-smart');
-                    const inpP = document.getElementById('sw-p');
-                    const inpS = document.getElementById('sw-sz');
+                    const inpP = document.getElementById('sw-p'); const inpS = document.getElementById('sw-sz');
                     let forceAdd = false;
-
-                    // Resetear el botón si cambian el texto
-                    [inpP, inpS].forEach(el => el.addEventListener('input', () => {
-                        btn.innerText = '+ AGREGAR';
-                        btn.style.background = 'var(--dark)';
-                        forceAdd = false;
-                    }));
-
+                    [inpP, inpS].forEach(el => el.addEventListener('input', () => { btn.innerText = '+ AGREGAR'; btn.style.background = 'var(--dark)'; forceAdd = false; }));
                     btn.addEventListener('click', () => {
-                        const pName = inpP.value.toUpperCase().trim();
-                        const sz = inpS.value.toUpperCase().trim();
-                        const q = Number(document.getElementById('sw-q').value);
-                        
+                        const pName = inpP.value.toUpperCase().trim(); const sz = inpS.value.toUpperCase().trim(); const q = Number(document.getElementById('sw-q').value);
                         if(!pName || !sz || q <= 0) return Swal.showValidationMessage('⚠️ Faltan datos');
-
                         const invItem = App.db.inv.find(x => x.n === pName);
                         const stockActual = (invItem && invItem.s[sz] !== undefined) ? invItem.s[sz] : 0;
-                        
-                        // --- NUEVA LÓGICA SIN POPUP ---
-                        // Si no hay stock y NO hemos forzado aún:
-                        if(q > stockActual && !forceAdd) {
-                            btn.innerText = `⚠️ STOCK: ${stockActual} - ¿AGREGAR IGUAL?`;
-                            btn.style.background = '#f59e0b'; // Naranja
-                            forceAdd = true; // Activar modo forzar para el siguiente click
-                            return; // Detener aquí para que el usuario lea
-                        }
-
-                        // Agregar al carrito (Ya sea porque hay stock O porque forceAdd es true)
-                        cart.push({p: pName, sz: sz, q: q});
-                        renderCart();
-
-                        // Limpiar y resetear botón
-                        inpP.value = ''; inpS.value = ''; document.getElementById('sw-q').value = '1'; 
-                        inpP.focus();
-                        btn.innerText = '+ AGREGAR';
-                        btn.style.background = 'var(--dark)';
-                        forceAdd = false;
+                        if(q > stockActual && !forceAdd) { btn.innerText = `⚠️ STOCK: ${stockActual} - ¿AGREGAR IGUAL?`; btn.style.background = '#f59e0b'; forceAdd = true; return; }
+                        cart.push({p: pName, sz: sz, q: q}); renderCart();
+                        inpP.value = ''; inpS.value = ''; document.getElementById('sw-q').value = '1'; inpP.focus();
+                        btn.innerText = '+ AGREGAR'; btn.style.background = 'var(--dark)'; forceAdd = false;
                     });
                 },
                 preConfirm: () => {
@@ -335,8 +328,7 @@ const App = {
                 if(r.isConfirmed) {
                     ord.c = r.value.c; ord.items = r.value.items;
                     if(i!==null) App.db.ord[i]=ord; else App.db.ord.push(ord);
-                    App.save();
-                    Swal.fire('Guardado', '', 'success');
+                    App.save(); Swal.fire('Guardado', '', 'success');
                 }
             });
         },
@@ -353,27 +345,37 @@ const App = {
                 App.save(); Swal.fire('Listo','','success');
             }
         },
-        
         async factoryReset() {
-            const {isConfirmed} = await Swal.fire({
-                title: '¿ESTÁS SEGURO?',
-                text: 'Se borrarán TODOS los datos de Inventario, Pedidos y Calendario. Esta acción es irreversible.',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#ef4444',
-                confirmButtonText: 'SÍ, BORRAR TODO'
-            });
-            if(isConfirmed) {
-                localStorage.clear();
-                location.reload();
-            }
+            const {isConfirmed} = await Swal.fire({title: '¿ESTÁS SEGURO?', text: 'Se borrarán TODOS los datos.', icon: 'warning', showCancelButton: true, confirmButtonColor: '#ef4444'});
+            if(isConfirmed) { localStorage.clear(); location.reload(); }
         }
     },
 
     IA: {
         trigger(){ document.getElementById('ai-input').click(); },
+        
+        // FUNCIÓN DE REDIMENSIONAMIENTO PARA VELOCIDAD
+        resizeImage(file) {
+            return new Promise((resolve) => {
+                const img = new Image();
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    // Máximo 1000px de ancho (Suficiente para leer, rápido para procesar)
+                    const maxW = 1000; 
+                    const scale = maxW / img.width;
+                    canvas.width = maxW;
+                    canvas.height = img.height * scale;
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                    resolve(canvas.toDataURL('image/jpeg', 0.7));
+                };
+                img.src = URL.createObjectURL(file);
+            });
+        },
+
         async process(f) {
             if(!f) return;
+            // MODO EXCEL (RAPIDISIMO)
             if(f.name.match(/\.(xlsx|xls|csv)$/i)) {
                 const reader = new FileReader();
                 reader.onload = (e) => {
@@ -391,36 +393,78 @@ const App = {
                     App.save(); Swal.fire('Importado', `${cnt} registros`, 'success');
                 };
                 reader.readAsArrayBuffer(f);
-            } else {
-                Swal.showLoading();
-                const {data:{text}} = await Tesseract.recognize(f,'spa');
-                Swal.fire({input:'textarea', inputValue:text, title:'Texto Detectado'});
+            } 
+            // MODO FOTO (MEJORADO CON RESIZE Y LIMPIEZA)
+            else {
+                Swal.fire({title:'Procesando...', text:'Redimensionando y leyendo imagen...', allowOutsideClick:false, didOpen:()=>{Swal.showLoading()}});
+                
+                try {
+                    // 1. Redimensionar
+                    const resizedImgUrl = await this.resizeImage(f);
+                    
+                    // 2. Leer con Tesseract
+                    const {data:{text}} = await Tesseract.recognize(resizedImgUrl, 'spa');
+                    
+                    // 3. Limpiar y Ordenar Texto
+                    const lines = text.split('\n')
+                        .map(l => l.trim())
+                        .filter(l => l.length > 3); // Quitar ruido corto
+                    
+                    const cleanText = lines.join('\n');
+
+                    Swal.fire({
+                        title: 'Lectura Completada',
+                        input: 'textarea',
+                        inputValue: cleanText,
+                        footer: '<small>Copia y pega las líneas válidas</small>'
+                    });
+                } catch (err) {
+                    Swal.fire('Error', 'No se pudo leer la imagen', 'error');
+                }
             }
         }
     },
 
     Backup: {
         generatePDF() {
-            const { jsPDF } = window.jspdf; const doc = new jsPDF();
-            doc.setFillColor(15,23,42); doc.rect(0,0,210,25,'F');
-            doc.setTextColor(255); doc.setFontSize(16); doc.text("REPORTE IDEAS TEXTILES", 10,16);
-            let y=40;
-            doc.setTextColor(0); doc.setFontSize(12); doc.text("INVENTARIO",10,y); y+=5;
-            doc.autoTable({startY:y, head:[['SKU', 'Producto','Stock']], body:App.db.inv.map(p=>[p.sku, p.n, JSON.stringify(p.s)]), theme:'grid'});
-            y=doc.lastAutoTable.finalY+15;
-            doc.text("PEDIDOS",10,y); y+=5;
-            doc.autoTable({startY:y, head:[['Cliente','Items','Estado']], body:App.db.ord.filter(o=>o.st!=='done').map(o=>[o.c, o.items.length+' items', o.st])});
-            doc.save('REPORTE_FINAL.pdf');
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            const now = new Date();
+            const dateStr = now.toLocaleDateString('es-CL', {day: 'numeric', month: 'long', year: 'numeric'}).toUpperCase();
+
+            doc.setFillColor(15, 23, 42); doc.rect(0, 0, 210, 30, 'F');
+            doc.setTextColor(255, 255, 255); doc.setFont("helvetica", "bold"); doc.setFontSize(18);
+            doc.text("REPORTE DE IDEAS TEXTILES SPA", 105, 12, { align: "center" });
+            doc.setFontSize(10); doc.setFont("helvetica", "normal");
+            doc.text(`GENERADO EL: ${dateStr}`, 105, 22, { align: "center" });
+
+            let y = 45;
+            const addTitle = (t) => {
+                if(y>250){doc.addPage(); y=20;}
+                doc.setFont("helvetica", "bold"); doc.setFontSize(14); doc.setTextColor(15, 23, 42);
+                doc.text(t, 14, y); y += 6;
+                doc.setLineWidth(0.5); doc.setDrawColor(15, 23, 42); doc.line(14, y, 196, y); y += 5;
+            };
+
+            addTitle("1. INVENTARIO ACTUAL");
+            const bodyInv = App.db.inv.map(p => [p.sku, p.n, Object.entries(p.s).map(([k, v]) => `${k}:${v}`).join(', ')]);
+            doc.autoTable({ startY: y, head: [['SKU', 'PRODUCTO', 'STOCK']], body: bodyInv, theme: 'striped', headStyles: { fillColor: [59, 130, 246], fontStyle: 'bold' }, styles: { fontSize: 8, cellPadding: 3 } });
+            y = doc.lastAutoTable.finalY + 15;
+
+            addTitle("2. PEDIDOS EN PROCESO");
+            const bodyOrd = App.db.ord.filter(o => o.st !== 'done').map(o => [o.c, o.items.map(i => `${i.p} (${i.sz}) x${i.q}`).join('\n'), o.st === 'pack' ? 'EMPAQUETADO' : 'EN ESPERA']);
+            if(bodyOrd.length===0) { doc.setFontSize(10); doc.setTextColor(100); doc.text("(NO HAY PEDIDOS PENDIENTES)", 14, y+5); y+=15; }
+            else { doc.autoTable({ startY: y, head: [['CLIENTE', 'ITEMS', 'ESTADO']], body: bodyOrd, theme: 'grid', headStyles: { fillColor: [245, 158, 11], fontStyle: 'bold' }, styles: { fontSize: 8 } }); y = doc.lastAutoTable.finalY + 15; }
+
+            addTitle("3. HISTORIAL DESPACHADOS");
+            const bodyDone = App.db.ord.filter(o => o.st === 'done').map(o => [o.fac||'S/N', o.c, o.items.map(i => `${i.p} (${i.sz}) x${i.q}`).join('\n')]);
+            if(bodyDone.length===0) { doc.setFontSize(10); doc.setTextColor(100); doc.text("(AÚN NO HAY DESPACHOS)", 14, y+5); }
+            else { doc.autoTable({ startY: y, head: [['N° FAC', 'CLIENTE', 'ITEMS']], body: bodyDone, theme: 'grid', headStyles: { fillColor: [16, 185, 129], fontStyle: 'bold' }, styles: { fontSize: 8 } }); }
+
+            doc.save(`REPORTE_IDEAS_TEXTILES_${now.getDate()}_${now.getMonth()+1}.pdf`);
         },
-        exportJSON(){ 
-            const blob = new Blob([JSON.stringify(App.db)], {type:'application/json'});
-            const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='BACKUP.json'; a.click();
-        },
-        importJSON(el){
-            const r = new FileReader();
-            r.onload = e => { try{ App.db=JSON.parse(e.target.result); App.save(); Swal.fire('Ok','','success'); }catch{ Swal.fire('Error','','error'); } };
-            r.readAsText(el.files[0]);
-        }
+        exportJSON(){ const blob = new Blob([JSON.stringify(App.db)], {type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='BACKUP.json'; a.click(); },
+        importJSON(el){ const r = new FileReader(); r.onload = e => { try{ App.db=JSON.parse(e.target.result); App.save(); Swal.fire('Ok','','success'); }catch{ Swal.fire('Error','','error'); } }; r.readAsText(el.files[0]); }
     },
 
     Calendar: {
@@ -458,14 +502,8 @@ const App = {
                 denyButtonColor: '#ef4444',
                 cancelButtonText: 'CERRAR'
             });
-            if (isConfirmed) {
-                App.db.log[k] = value;
-                App.save();
-            } else if (isDenied) {
-                delete App.db.log[k];
-                App.save();
-                Swal.fire('Nota eliminada', '', 'success');
-            }
+            if (isConfirmed) { App.db.log[k] = value; App.save(); } 
+            else if (isDenied) { delete App.db.log[k]; App.save(); Swal.fire('Nota eliminada', '', 'success'); }
         }
     }
 };
