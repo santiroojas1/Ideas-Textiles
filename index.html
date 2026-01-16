@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>IDEAS TEXTILES SPA </title>
+    <title>IDEAS TEXTILES SPA</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
@@ -79,7 +79,7 @@
         <span>WORKWEAR AND CORPORATE</span>
     </div>
     <button class="btn-scan" onclick="App.IA.trigger()">
-        <i class="fa-solid fa-wand-magic-sparkles"></i> IA IMPORT
+        <i class="fa-solid fa-wand-magic-sparkles"></i> IMPORTAR ARCHIVO 
     </button>
 </header>
 
@@ -254,22 +254,18 @@ const App = {
 
             if(value) {
                 if(!isNew) App.db.inv[i]=value; else App.db.inv.push(value);
-                
                 const {value:reason} = await Swal.fire({
                     title: 'REGISTRO DE OPERACIÓN',
-                    text: '¿Por qué se modificó el inventario? (Para la bitácora)',
+                    text: '¿Motivo del cambio? (Para bitácora)',
                     input: 'text',
-                    inputPlaceholder: 'Ej: Llegada de mercadería, Ajuste, Merma...',
-                    confirmButtonText: 'GUARDAR REGISTRO',
+                    inputPlaceholder: 'Ej: Llegada de mercadería...',
+                    confirmButtonText: 'GUARDAR',
                     allowOutsideClick: false
                 });
-
                 if(reason) {
                     const opID = Math.floor(Math.random() * 9000) + 1000;
-                    const d = new Date();
-                    const k = `${d.getDate()}-${d.getMonth()}-${d.getFullYear()}`;
-                    const logEntry = `⚙️ OP-${opID}: ${value.n} - ${reason}\n`;
-                    App.db.log[k] = (App.db.log[k] || '') + logEntry;
+                    const d = new Date(); const k = `${d.getDate()}-${d.getMonth()}-${d.getFullYear()}`;
+                    App.db.log[k] = (App.db.log[k] || '') + `⚙️ OP-${opID}: ${value.n} - ${reason}\n`;
                 }
                 App.save(); Swal.fire('Guardado', 'Inventario y Calendario actualizados', 'success');
             }
@@ -354,18 +350,42 @@ const App = {
     IA: {
         trigger(){ document.getElementById('ai-input').click(); },
         
-        // FUNCIÓN DE REDIMENSIONAMIENTO PARA VELOCIDAD
+        // --- FUNCIÓN INTELIGENTE DE DETECCIÓN DE COLUMNAS (THE BEST IN THE WORLD) ---
+        detectHeadersAndMap(jsonSheet) {
+            // Valores por defecto (basado en lo que vimos en el PDF)
+            let mapping = { prod: 4, size: 5, qty: 6 }; 
+            let headerRowIndex = 0;
+
+            // Buscamos fila por fila si encontramos palabras clave
+            for(let i=0; i<Math.min(jsonSheet.length, 10); i++) {
+                const row = jsonSheet[i];
+                let foundP = -1, foundS = -1, foundQ = -1;
+
+                row.forEach((cell, idx) => {
+                    if(!cell) return;
+                    const txt = String(cell).toUpperCase();
+                    if(txt.includes('PRODUCTO') || txt.includes('DESCRIPCION') || txt.includes('ITEM')) foundP = idx;
+                    if(txt.includes('TALLA') || txt.includes('SIZE') || txt.includes('MEDIDA')) foundS = idx;
+                    if(txt.includes('CANT') || txt.includes('SOLICITADA') || txt.includes('CTD')) foundQ = idx;
+                });
+
+                // Si encontramos al menos 2 de 3, asumimos que esta es la fila de encabezados
+                if(foundP !== -1 && (foundS !== -1 || foundQ !== -1)) {
+                    mapping = { prod: foundP, size: foundS !== -1 ? foundS : foundP+1, qty: foundQ !== -1 ? foundQ : foundP+2 };
+                    headerRowIndex = i + 1; // Los datos empiezan en la siguiente
+                    break;
+                }
+            }
+            return { mapping, headerRowIndex };
+        },
+
         resizeImage(file) {
             return new Promise((resolve) => {
                 const img = new Image();
                 img.onload = () => {
-                    const canvas = document.createElement('canvas');
-                    const ctx = canvas.getContext('2d');
-                    // Máximo 1000px de ancho (Suficiente para leer, rápido para procesar)
-                    const maxW = 1000; 
-                    const scale = maxW / img.width;
-                    canvas.width = maxW;
-                    canvas.height = img.height * scale;
+                    const canvas = document.createElement('canvas'); const ctx = canvas.getContext('2d');
+                    const maxW = 1000; const scale = maxW / img.width;
+                    canvas.width = maxW; canvas.height = img.height * scale;
                     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
                     resolve(canvas.toDataURL('image/jpeg', 0.7));
                 };
@@ -375,52 +395,46 @@ const App = {
 
         async process(f) {
             if(!f) return;
-            // MODO EXCEL (RAPIDISIMO)
+            // EXCEL / CSV (SÚPER INTELIGENTE AHORA)
             if(f.name.match(/\.(xlsx|xls|csv)$/i)) {
                 const reader = new FileReader();
                 reader.onload = (e) => {
                     const wb = XLSX.read(e.target.result, {type:'array'});
                     const js = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], {header:1});
+                    
+                    // USAR DETECTOR INTELIGENTE
+                    const { mapping, headerRowIndex } = this.detectHeadersAndMap(js);
                     let cnt=0;
-                    js.forEach(r => {
-                        if(r.length>=3 && typeof r[2]==='number') {
-                            const n=String(r[0]).toUpperCase(), sz=String(r[1]).toUpperCase(), q=r[2];
-                            let p = App.db.inv.find(x=>x.n===n); 
-                            if(!p){ p={n, s:{}, sku: App.Helpers.getNextSKU()}; App.db.inv.push(p); }
-                            p.s[sz]=(p.s[sz]||0)+q; cnt++;
+
+                    for(let i = headerRowIndex; i < js.length; i++) {
+                        const row = js[i];
+                        // Verificamos que existan las celdas en los índices detectados
+                        if(row[mapping.prod] && row[mapping.qty]) {
+                            const n = String(row[mapping.prod]).toUpperCase().trim();
+                            const sz = row[mapping.size] ? String(row[mapping.size]).toUpperCase().trim() : 'UNICA';
+                            const q = parseInt(row[mapping.qty]);
+
+                            if(n && q > 0) {
+                                let p = App.db.inv.find(x => x.n === n);
+                                if(!p){ p={n, s:{}, sku: App.Helpers.getNextSKU()}; App.db.inv.push(p); }
+                                p.s[sz] = (p.s[sz]||0) + q;
+                                cnt++;
+                            }
                         }
-                    });
-                    App.save(); Swal.fire('Importado', `${cnt} registros`, 'success');
+                    }
+                    App.save(); Swal.fire('Importado', `${cnt} registros encontrados.\n(Columnas detectadas: Prod:${mapping.prod}, Talla:${mapping.size}, Cant:${mapping.qty})`, 'success');
                 };
                 reader.readAsArrayBuffer(f);
             } 
-            // MODO FOTO (MEJORADO CON RESIZE Y LIMPIEZA)
+            // FOTO (MANTENEMOS LA MEJORA DE VELOCIDAD)
             else {
-                Swal.fire({title:'Procesando...', text:'Redimensionando y leyendo imagen...', allowOutsideClick:false, didOpen:()=>{Swal.showLoading()}});
-                
+                Swal.fire({title:'Procesando...', text:'Optimizando imagen...', allowOutsideClick:false, didOpen:()=>{Swal.showLoading()}});
                 try {
-                    // 1. Redimensionar
                     const resizedImgUrl = await this.resizeImage(f);
-                    
-                    // 2. Leer con Tesseract
                     const {data:{text}} = await Tesseract.recognize(resizedImgUrl, 'spa');
-                    
-                    // 3. Limpiar y Ordenar Texto
-                    const lines = text.split('\n')
-                        .map(l => l.trim())
-                        .filter(l => l.length > 3); // Quitar ruido corto
-                    
-                    const cleanText = lines.join('\n');
-
-                    Swal.fire({
-                        title: 'Lectura Completada',
-                        input: 'textarea',
-                        inputValue: cleanText,
-                        footer: '<small>Copia y pega las líneas válidas</small>'
-                    });
-                } catch (err) {
-                    Swal.fire('Error', 'No se pudo leer la imagen', 'error');
-                }
+                    const cleanText = text.split('\n').map(l=>l.trim()).filter(l=>l.length>3).join('\n');
+                    Swal.fire({ title: 'Lectura IA', input: 'textarea', inputValue: cleanText, footer: 'Copia las líneas útiles' });
+                } catch (err) { Swal.fire('Error', 'No se pudo leer', 'error'); }
             }
         }
     },
