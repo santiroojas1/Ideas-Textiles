@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>IDEAS TEXTILES </title>
+    <title>IDEAS TEXTILES | TITAN V124</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
@@ -15,36 +15,24 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
     <style>
-        :root {
-            --dark: #0f172a; --primary: #3b82f6; --accent: #6366f1;
-            --success: #10b981; --danger: #ef4444; --warn: #f59e0b;
-            --prod: #8b5cf6; --bg: #f8fafc; --card-bg: #ffffff;
-        }
-        
+        :root { --dark: #0f172a; --primary: #3b82f6; --accent: #6366f1; --success: #10b981; --danger: #ef4444; --warn: #f59e0b; --prod: #8b5cf6; --bg: #f8fafc; --card-bg: #ffffff; }
         * { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
         body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--dark); margin: 0; padding-bottom: 120px; }
 
-        /* HEADER */
         header { background: var(--dark); color: white; padding: 15px 20px; position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 15px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; }
         .brand h1 { font-size: 1.1rem; font-weight: 800; margin: 0; display: flex; align-items: center; gap: 8px; }
-        /* PUNTO VERDE DE CONEXIÓN */
         .live-dot { width: 10px; height: 10px; background: #22c55e; border-radius: 50%; box-shadow: 0 0 10px #22c55e; animation: pulse 2s infinite; }
         @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
 
         .btn-scan { background: linear-gradient(135deg, var(--primary), var(--accent)); border: none; padding: 8px 12px; border-radius: 8px; color: white; font-size: 0.8rem; font-weight: 700; display: flex; align-items: center; gap: 6px; cursor: pointer; }
 
-        /* VISTAS */
         .view { display: none; padding: 20px; max-width: 900px; margin: 0 auto; animation: fadeUp 0.3s ease; }
         .view.active { display: block; }
         @keyframes fadeUp { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
 
-        /* CARDS */
         .card { background: var(--card-bg); border-radius: 12px; padding: 16px; margin-bottom: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.04); border: 1px solid #e2e8f0; position: relative; }
-        
-        /* SKU BADGE */
         .sku-badge { font-family: 'JetBrains Mono', monospace; background: var(--dark); color: #fbbf24; padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; font-weight: bold; display: inline-block; margin-bottom: 4px; }
-
-        /* ESTADOS (CHIPS) */
+        
         .status { display: inline-block; padding: 4px 8px; border-radius: 6px; font-size: 0.65rem; font-weight: 800; text-transform: uppercase; margin-bottom: 8px; }
         .st-bodega { background: #eff6ff; color: var(--primary); border: 1px solid #bfdbfe; }
         .st-pack { background: #e0f2fe; color: #0284c7; border: 1px solid #bae6fd; }
@@ -52,7 +40,6 @@
         .st-prod { background: #f5f3ff; color: var(--prod); border: 1px solid #ddd6fe; }
         .st-nostock { background: #fef2f2; color: var(--danger); border: 1px solid #fecaca; }
 
-        /* CALENDARIO */
         .cal-ctrl { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; background: var(--dark); color: white; padding: 10px; border-radius: 10px; }
         .cal-ctrl button { background: none; border: none; color: white; font-size: 1.2rem; cursor: pointer; }
         .cal-select { background: rgba(255,255,255,0.1); border: none; color: white; font-weight: bold; padding: 5px; border-radius: 4px; }
@@ -63,7 +50,6 @@
         .day.today { border: 2px solid var(--primary); font-weight: 800; color: var(--primary); }
         .day.has-note::after { content: ''; position: absolute; bottom: 4px; width: 6px; height: 6px; background: var(--accent); border-radius: 50%; }
 
-        /* BOTONES */
         .btn { width: 100%; padding: 12px; border: none; border-radius: 10px; font-weight: 700; font-size: 0.8rem; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px; margin-top: 5px; transition: 0.2s; }
         .btn-pri { background: var(--dark); color: white; }
         .btn-sec { background: white; border: 1px solid #cbd5e1; color: var(--dark); }
@@ -75,7 +61,6 @@
         .dock i.active { color: white; transform: translateY(-3px); text-shadow: 0 0 15px var(--primary); }
         .item-row { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px dashed #e2e8f0; font-size: 0.85rem; }
 
-        /* PANTALLA DE CARGA */
         #loader { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(255,255,255,0.95); z-index:2000; display:flex; flex-direction:column; justify-content:center; align-items:center; transition: opacity 0.5s; }
         .spinner { width: 40px; height: 40px; border: 4px solid #e2e8f0; border-top: 4px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
@@ -90,7 +75,7 @@
 
 <header>
     <div class="brand">
-        <h1>IDEAS TEXTILES SPA <div class="live-dot" title="En Vivo"></div></h1>
+        <h1>IDEAS TEXTILES <div class="live-dot" title="En Línea"></div></h1>
     </div>
     <button class="btn-scan" onclick="App.IA.trigger()">
         <i class="fa-solid fa-wand-magic-sparkles"></i> IMPORTAR
@@ -105,7 +90,7 @@
 </section>
 
 <section id="v-ordenes" class="view">
-    <h2 style="margin:0 0 15px; font-size:1.2rem;">PEDIDOS ACTIVOS (NUBE)</h2>
+    <h2 style="margin:0 0 15px; font-size:1.2rem;">PEDIDOS EN TIEMPO REAL</h2>
     <button class="btn btn-pri" style="background:var(--primary); box-shadow:0 4px 10px rgba(59,130,246,0.3);" onclick="App.Actions.modalOrder()">
         <i class="fa-solid fa-cart-shopping"></i> NUEVO PEDIDO
     </button>
@@ -132,17 +117,14 @@
         </div>
         <div id="cal-days" class="cal-grid" style="margin-top:5px;"></div>
     </div>
-
     <div class="card" style="margin-top:20px; text-align:center; border:2px dashed #cbd5e1;">
         <h3>CONFIGURACIÓN</h3>
         <button class="btn btn-pdf" onclick="App.Backup.generatePDF()"><i class="fa-solid fa-file-pdf"></i> REPORTE PDF</button>
-        
         <div style="margin-top:20px; padding-top:15px; border-top:1px solid #e2e8f0;">
             <h4 style="color:#ef4444; margin:0 0 10px;">ZONA DE PELIGRO</h4>
             <button class="btn btn-reset" onclick="App.Actions.factoryReset()">
                 <i class="fa-solid fa-skull"></i> BORRAR TODO (RESET NUBE)
             </button>
-            <p style="font-size:0.7rem; color:#ef4444; margin-top:5px;">⚠️ Cuidado: Se borra en todos los celulares.</p>
         </div>
     </div>
 </section>
@@ -159,7 +141,7 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
     import { getDatabase, ref, set, onValue, update } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
 
-    // 1. TUS CREDENCIALES (YA INTEGRADAS)
+    // 1. TUS CREDENCIALES EXACTAS
     const firebaseConfig = {
         apiKey: "AIzaSyBg-Cx9SqZw35TyyMxtpVBEFlwZTjBXBew",
         authDomain: "ideastextilesapp.firebaseapp.com",
@@ -177,7 +159,6 @@
         db: { inv: [], ord: [], log: {}, calDate: new Date() },
 
         init() {
-            // ESCUCHA EN TIEMPO REAL
             const dbRef = ref(db, '/');
             onValue(dbRef, (snapshot) => {
                 const data = snapshot.val();
@@ -186,19 +167,25 @@
                     App.db.ord = data.ord || [];
                     App.db.log = data.log || {};
                 }
-                // Ocultar Loader
                 const l = document.getElementById('loader');
                 if(l) { l.style.opacity=0; setTimeout(()=>l.style.display='none',500); }
-                
                 App.Render.bodega();
                 App.Render.ordenes();
                 App.Calendar.render();
+            }, (error) => {
+                // DETECTOR DE ERRORES DE PERMISO
+                console.error(error);
+                Swal.fire('ERROR DE CONEXIÓN', 'No se pudieron leer los datos. Revisa las REGLAS de Firebase (read: true).', 'error');
             });
         },
 
         save() {
-            // GUARDAR EN LA NUBE
-            update(ref(db, '/'), { inv: App.db.inv, ord: App.db.ord, log: App.db.log });
+            update(ref(db, '/'), { inv: App.db.inv, ord: App.db.ord, log: App.db.log })
+            .catch((error) => {
+                // DETECTOR DE ERRORES DE GUARDADO
+                console.error(error);
+                Swal.fire('ERROR AL GUARDAR', 'Permiso denegado. Ve a Firebase -> Database -> Reglas y pon ".write": true', 'error');
+            });
         },
 
         UI: {
@@ -288,7 +275,6 @@
                 let cart = ord.items;
                 const prodOpts = App.db.inv.map(p=>`<option value="${p.n}">`).join('');
                 window.delCartItem = (idx) => { cart.splice(idx,1); Swal.getPopup().querySelector('#cart-div').innerHTML = cart.map((x,ix)=>`<div>${x.p} (${x.sz}) x${x.q} <span onclick="window.delCartItem(${ix})" style="color:red;cursor:pointer;">X</span></div>`).join(''); };
-                
                 await Swal.fire({
                     title: 'PEDIDO', width: 600,
                     html: `
@@ -321,7 +307,7 @@
             async factoryReset() {
                 const { isConfirmed } = await Swal.fire({
                     title: '¿ESTÁS SEGURO?',
-                    text: 'Se borrarán TODOS los datos de la Nube. Irreversible.',
+                    text: 'Se borrarán TODOS los datos de la Nube para siempre. Irreversible.',
                     icon: 'warning',
                     showCancelButton: true,
                     confirmButtonColor: '#ef4444',
@@ -337,30 +323,24 @@
         IA: {
             trigger(){ document.getElementById('ai-input').click(); },
             
-            // 🔥 LÓGICA INTELIGENTE RESTAURADA DE V117 🔥
+            // 🔥 MOTOR DE IMPORTACIÓN REFORZADO (MATCH EXACTO CON TU PDF) 🔥
             detectHeadersAndMap(jsonSheet) {
                let mapping = { prod: 4, size: 5, qty: 6, client: -1 }, headerRowIndex = 0;
                for(let i=0; i<Math.min(jsonSheet.length, 10); i++) {
                    const row = jsonSheet[i]; 
                    let foundP = -1, foundS = -1, foundQ = -1, foundC = -1;
-                   
                    row.forEach((cell, idx) => { 
                        if(!cell) return; 
                        const txt = String(cell).toUpperCase(); 
-                       // Búsqueda agresiva de columnas
-                       if(txt.includes('PRODUCTO') || txt.includes('DESCRIPCION') || txt.includes('ITEM')) foundP=idx; 
-                       if(txt.includes('TALLA') || txt.includes('SIZE') || txt.includes('MEDIDA')) foundS=idx; 
-                       if(txt.includes('CANT') || txt.includes('SOLICITADA') || txt.includes('CTD')) foundQ=idx; 
-                       if(txt.includes('CLIENTE') || txt.includes('NOMBRE ORDEN') || txt.includes('TIENDA') || txt.includes('ID ORDEN')) foundC=idx; 
+                       // Búsqueda de columnas específicas de tu archivo
+                       if(txt.includes('PRODUCTO') || txt.includes('DESCRIPCION')) foundP=idx; 
+                       if(txt.includes('TALLA') || txt.includes('SIZE')) foundS=idx; 
+                       if(txt.includes('CANT') || txt.includes('CTD')) foundQ=idx; 
+                       if(txt.includes('CLIENTE') || txt.includes('NOMBRE ORDEN') || txt.includes('ID ORDEN')) foundC=idx; 
                    });
 
                    if(foundP!==-1 && (foundS!==-1 || foundQ!==-1)){ 
-                       mapping = {
-                           prod: foundP, 
-                           size: foundS!==-1 ? foundS : foundP+1, 
-                           qty: foundQ!==-1 ? foundQ : foundP+2, 
-                           client: foundC 
-                       }; 
+                       mapping = {prod:foundP, size:foundS!==-1?foundS:foundP+1, qty:foundQ!==-1?foundQ:foundP+2, client:foundC}; 
                        headerRowIndex = i + 1; 
                        break; 
                    }
@@ -370,74 +350,54 @@
 
             async process(f) {
                 if(!f) return;
-                // MODO EXCEL (El más potente)
+                // EXCEL (Recomendado)
                 if(f.name.match(/\.(xlsx|xls|csv)$/i)) {
                     const reader = new FileReader();
                     reader.onload = (e) => {
                         const wb = XLSX.read(e.target.result, {type:'array'});
                         const js = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], {header:1});
-                        
-                        // Detectar columnas
                         const { mapping, headerRowIndex } = this.detectHeadersAndMap(js);
                         
-                        let ordersMap = {}; 
-                        let cnt = 0;
-
-                        // Iterar y Agrupar
+                        let ordersMap = {}; let cnt = 0;
                         for(let i = headerRowIndex; i < js.length; i++) {
                             const row = js[i];
-                            // Si tiene producto y cantidad
                             if(row[mapping.prod] && row[mapping.qty]) {
                                 const n = String(row[mapping.prod]).toUpperCase().trim();
                                 const sz = row[mapping.size] ? String(row[mapping.size]).toUpperCase().trim() : 'UNICA';
                                 const q = parseInt(row[mapping.qty]);
+                                let clientName = (mapping.client !== -1 && row[mapping.client]) ? String(row[mapping.client]).toUpperCase().trim() : null;
                                 
-                                // ¿Tiene Cliente?
-                                let clientName = null;
-                                if(mapping.client !== -1 && row[mapping.client]) {
-                                    clientName = String(row[mapping.client]).toUpperCase().trim();
-                                }
-
                                 if(n && q > 0) {
-                                    // Asegurar producto en inventario
                                     let p = App.db.inv.find(x => x.n === n);
                                     if(!p){ p={n, s:{}, sku: App.Helpers.getNextSKU()}; App.db.inv.push(p); }
                                     
                                     if(clientName) { 
-                                        // Es Pedido
                                         if(!ordersMap[clientName]) ordersMap[clientName] = []; 
                                         ordersMap[clientName].push({p:n, sz:sz, q:q}); 
                                     } else { 
-                                        // Es Stock directo
                                         p.s[sz] = (p.s[sz]||0) + q; 
                                     }
                                     cnt++;
                                 }
                             }
                         }
-
-                        // Crear pedidos agrupados
+                        // Crear pedidos
                         Object.keys(ordersMap).forEach(client => {
-                            App.db.ord.push({
-                                c: client, 
-                                items: ordersMap[client], 
-                                st: 'bodega', 
-                                fac: null
-                            });
+                            App.db.ord.push({c:client, items:ordersMap[client], st:'bodega', fac:null});
                         });
-
+                        
                         App.save(); 
-                        Swal.fire('Importado', `${cnt} items procesados.\n(${Object.keys(ordersMap).length} Pedidos nuevos)`, 'success');
+                        Swal.fire('Importado', `${cnt} registros.\n(${Object.keys(ordersMap).length} Pedidos)`, 'success');
                     };
                     reader.readAsArrayBuffer(f);
                 } 
-                // MODO FOTO (Básico)
+                // IMAGEN
                 else {
-                    Swal.fire({title:'Procesando Imagen...', didOpen:()=>{Swal.showLoading()}});
+                    Swal.fire({title:'Procesando...', didOpen:()=>{Swal.showLoading()}});
                     try {
                         const {data:{text}} = await Tesseract.recognize(f,'spa');
-                        Swal.fire({title:'Texto Detectado', input:'textarea', inputValue:text});
-                    } catch(e) { Swal.fire('Error','No se pudo leer la imagen','error'); }
+                        Swal.fire({title:'Texto', input:'textarea', inputValue:text});
+                    } catch(e) { Swal.fire('Error','No se pudo leer','error'); }
                 }
             }
         },
@@ -454,17 +414,24 @@
                 doc.text(`GENERADO EL: ${dateStr}`, 105, 22, { align: "center" });
 
                 let y = 45;
-                // INVENTARIO
-                doc.setFont("helvetica", "bold"); doc.setFontSize(14); doc.setTextColor(15, 23, 42);
-                doc.text("1. INVENTARIO ACTUAL", 14, y); y += 6; doc.line(14, y, 196, y); y += 5;
+                const addTitle = (t) => {
+                    if(y>250){doc.addPage(); y=20;}
+                    doc.setFont("helvetica", "bold"); doc.setFontSize(14); doc.setTextColor(15, 23, 42);
+                    doc.text(t, 14, y); y += 6; doc.setLineWidth(0.5); doc.setDrawColor(15, 23, 42); doc.line(14, y, 196, y); y += 5;
+                };
+
+                addTitle("1. INVENTARIO ACTUAL");
                 const bodyInv = App.db.inv.map(p => [p.sku, p.n, Object.entries(p.s).map(([k, v]) => `${k}:${v}`).join(', ')]);
-                doc.autoTable({ startY: y, head: [['SKU', 'PRODUCTO', 'STOCK']], body: bodyInv, theme: 'striped' });
+                doc.autoTable({ startY: y, head: [['SKU', 'PRODUCTO', 'STOCK']], body: bodyInv, theme: 'striped', headStyles: { fillColor: [59, 130, 246], fontStyle: 'bold' } });
                 y = doc.lastAutoTable.finalY + 15;
 
-                // PEDIDOS
-                doc.text("2. PEDIDOS EN PROCESO", 14, y); y += 6; doc.line(14, y, 196, y); y += 5;
-                const bodyOrd = App.db.ord.filter(o => o.st !== 'done').map(o => [o.c, o.items.map(i => `${i.p} (${i.sz}) x${i.q}`).join('\n'), o.st]);
-                if(bodyOrd.length) { doc.autoTable({ startY: y, head: [['CLIENTE', 'ITEMS', 'ESTADO']], body: bodyOrd, theme: 'grid' }); y = doc.lastAutoTable.finalY + 15; }
+                addTitle("2. PEDIDOS EN PROCESO");
+                const bodyOrd = App.db.ord.filter(o => o.st !== 'done').map(o => [o.c, o.items.map(i => `${i.p} (${i.sz}) x${i.q}`).join('\n'), o.st === 'pack' ? 'EMPAQUETADO' : (o.st==='prod'?'EN CONFECCIÓN':'PENDIENTE')]);
+                if(bodyOrd.length) { doc.autoTable({ startY: y, head: [['CLIENTE', 'ITEMS', 'ESTADO']], body: bodyOrd, theme: 'grid', headStyles: { fillColor: [245, 158, 11], fontStyle: 'bold' } }); y = doc.lastAutoTable.finalY + 15; }
+
+                addTitle("3. HISTORIAL DESPACHADOS");
+                const bodyDone = App.db.ord.filter(o => o.st === 'done').map(o => [o.fac||'S/N', o.c, o.items.map(i => `${i.p} (${i.sz}) x${i.q}`).join('\n')]);
+                if(bodyDone.length) { doc.autoTable({ startY: y, head: [['N° FAC', 'CLIENTE', 'ITEMS']], body: bodyDone, theme: 'grid', headStyles: { fillColor: [16, 185, 129], fontStyle: 'bold' } }); }
 
                 doc.save(`REPORTE_${now.getDate()}.pdf`);
             }
@@ -493,11 +460,8 @@
         }
     };
 
-    // HACER ACCESIBLE LA APP AL HTML
     window.App = App;
     document.getElementById('ai-input').addEventListener('change', (e) => App.IA.process(e.target.files[0]));
-    
-    // INICIAR TODO
     App.init();
 </script>
 </body>
