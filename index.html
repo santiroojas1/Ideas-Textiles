@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>IDEAS TEXTILES | MASTERPIECE V100</title>
+    <title>IDEAS TEXTILES | ULTIMATE V102</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
@@ -30,7 +30,6 @@
         header { background: var(--dark); color: white; padding: 15px 20px; position: sticky; top: 0; z-index: 999; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
         .brand h1 { font-size: 1rem; font-weight: 800; margin: 0; }
         .brand small { color: var(--blue); font-weight: 700; font-size: 0.6rem; letter-spacing: 1px; }
-        
         .btn-ai { background: linear-gradient(135deg, var(--blue), #4f46e5); border: none; padding: 8px 14px; border-radius: 10px; color: white; font-weight: 700; font-size: 0.7rem; display: flex; align-items: center; gap: 6px; box-shadow: 0 0 10px rgba(37, 99, 235, 0.4); }
 
         /* NAV DOCK */
@@ -46,22 +45,22 @@
         /* CARDS */
         .card { background: white; border-radius: 16px; padding: 16px; margin-bottom: 15px; border: 1px solid #e2e8f0; box-shadow: 0 2px 5px rgba(0,0,0,0.02); position: relative; }
         
-        /* CHIPS DE ESTADO */
+        /* CHIPS ESTADO */
         .chip { display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 8px; font-size: 0.65rem; font-weight: 800; text-transform: uppercase; margin-bottom: 10px; }
         .c-bodega { background: var(--amber-soft); color: var(--amber); }
         .c-sinstock { background: var(--red-soft); color: var(--red); animation: pulse 1.5s infinite; }
         .c-pack { background: var(--purple-soft); color: var(--purple); }
         .c-done { background: var(--green-soft); color: var(--green); }
-        
         @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.6; } 100% { opacity: 1; } }
 
+        /* INVENTARIO GRID */
         .inv-row { display: flex; justify-content: space-between; align-items: center; }
         .inv-sizes { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; margin-top: 10px; }
         .size-box { background: #f1f5f9; text-align: center; padding: 5px; border-radius: 8px; border: 1px solid #e2e8f0; }
         .size-box b { display: block; font-size: 0.9rem; color: var(--dark); }
         .size-box span { font-size: 0.6rem; color: #94a3b8; font-weight: 700; }
 
-        /* FACTURA LABEL */
+        /* FACTURA TAG */
         .factura-tag { display: inline-block; background: var(--dark); color: white; font-size: 0.6rem; font-weight: 700; padding: 2px 6px; border-radius: 4px; margin-top: 5px; }
 
         /* CALENDARIO */
@@ -70,13 +69,20 @@
         .cal-day.today { background: var(--blue); color: white; border-color: var(--blue); }
         .cal-day.has-note { border-bottom: 3px solid var(--amber); }
 
-        /* BOTONES ACCION */
-        .btn-act { width: 100%; padding: 10px; border-radius: 10px; border: none; font-weight: 700; font-size: 0.75rem; margin-top: 10px; cursor: pointer; display: flex; justify-content: center; gap: 5px; align-items: center; }
+        /* BOTONES */
+        .btn-act { width: 100%; padding: 10px; border-radius: 10px; border: none; font-weight: 700; font-size: 0.75rem; margin-top: 10px; cursor: pointer; display: flex; justify-content: center; gap: 5px; align-items: center; transition: 0.2s; }
         .b-dark { background: var(--dark-light); color: white; }
         .b-wsp { background: #25D366; color: white; }
         .b-done { background: transparent; color: var(--green); border: 1px solid var(--green); cursor: default; }
+        
+        /* SNAPSHOT STATUS */
+        #snap-date { margin: 10px 0; font-size: 0.8rem; font-weight: 700; color: var(--blue); background: var(--blue-soft); padding: 8px; border-radius: 8px; }
 
-        /* SEARCH BAR */
+        /* CONTROLES ICONOS */
+        .icon-btn { cursor: pointer; margin-left: 10px; font-size: 1rem; transition: 0.2s; }
+        .icon-edit { color: var(--blue); }
+        .icon-trash { color: #cbd5e1; }
+
         .search-box { width: 100%; padding: 12px; border-radius: 12px; border: 1px solid #cbd5e1; font-weight: 600; margin-bottom: 15px; }
     </style>
 </head>
@@ -85,7 +91,7 @@
 <header>
     <div class="brand">
         <h1>IDEAS TEXTILES</h1>
-        <small>MASTERPIECE V100</small>
+        <small>ULTIMATE V102</small>
     </div>
     <button class="btn-ai" onclick="App.AI.trigger()">
         <i class="fa-solid fa-brain"></i> IA SCAN
@@ -106,7 +112,9 @@
             <i class="fa-brands fa-whatsapp"></i> REPORTE
         </button>
     </div>
-    <button class="btn-act" style="background:white; border:2px dashed #cbd5e1; color:#64748b; margin-bottom:20px;" onclick="App.Actions.modalOrder()">+ INGRESAR ORDEN MANUAL</button>
+    <button class="btn-act" style="background:white; border:2px dashed #cbd5e1; color:#64748b; margin-bottom:20px;" onclick="App.Actions.modalOrderNew()">
+        + INGRESAR ORDEN (MULTI-TALLA)
+    </button>
     <div id="list-ordenes"></div>
 </section>
 
@@ -114,19 +122,30 @@
     <div class="card">
         <div class="inv-row">
             <button onclick="App.Calendar.move(-1)" style="border:none; background:none; font-size:1.2rem;"><i class="fa-solid fa-chevron-left"></i></button>
-            <h3 id="cal-title" style="margin:0; font-weight:800;">ENERO 2026</h3>
+            <h3 id="cal-title" style="margin:0; font-weight:800;">CALENDARIO</h3>
             <button onclick="App.Calendar.move(1)" style="border:none; background:none; font-size:1.2rem;"><i class="fa-solid fa-chevron-right"></i></button>
         </div>
         <div id="cal-grid" class="cal-grid"></div>
     </div>
-    <div class="card" style="text-align:center;">
-        <i class="fa-solid fa-server" style="font-size:2rem; color:var(--blue); margin-bottom:10px;"></i>
-        <h4 style="margin:0;">ZONA DE SEGURIDAD</h4>
-        <p style="font-size:0.7rem; color:#64748b;">Snapshot guarda una foto exacta de Bodega, Órdenes y Agenda.</p>
-        <div style="display:flex; gap:10px; margin-top:10px;">
-            <button class="btn-act b-dark" onclick="App.Backup.saveSnap()">CREAR SNAPSHOT</button>
-            <button class="btn-act" style="background:#e2e8f0;" onclick="App.Backup.loadSnap()">RESTAURAR</button>
+
+    <div class="card" style="text-align:center; border: 2px solid var(--dark-light);">
+        <i class="fa-solid fa-vault" style="font-size:2.5rem; color:var(--dark); margin-bottom:10px;"></i>
+        <h3 style="margin:0; font-weight:800;">CAJA FUERTE (SNAPSHOT)</h3>
+        
+        <div id="snap-date">NO HAY COPIAS GUARDADAS</div>
+
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:15px;">
+            <button class="btn-act b-dark" onclick="App.Backup.saveSnap()">
+                <i class="fa-solid fa-camera"></i> GUARDAR
+            </button>
+            <button class="btn-act" style="background:#e2e8f0; color:var(--dark);" onclick="App.Backup.loadSnap()">
+                <i class="fa-solid fa-clock-rotate-left"></i> RESTAURAR
+            </button>
         </div>
+        
+        <button class="btn-act b-wsp" style="margin-top:10px; background: #128c7e;" onclick="App.Backup.sendWsp()">
+            <i class="fa-brands fa-whatsapp"></i> GUARDAR EN MI WHATSAPP
+        </button>
     </div>
 </section>
 
@@ -140,11 +159,11 @@
 
 <script>
 const App = {
-    // BASE DE DATOS LOCAL
+    // BD Local
     db: {
         inv: JSON.parse(localStorage.getItem('db_inv')) || [],
         ord: JSON.parse(localStorage.getItem('db_ord')) || [],
-        log: JSON.parse(localStorage.getItem('db_log')) || {}, // Agenda
+        log: JSON.parse(localStorage.getItem('db_log')) || {}, 
         date: new Date()
     },
 
@@ -152,14 +171,17 @@ const App = {
         this.Render.bodega();
         this.Render.ordenes();
         this.Calendar.render();
-        // Listener de sincronización entre pestañas
+        this.Backup.init();
+        
+        // Sync pestañas
         window.addEventListener('storage', () => {
             App.db.inv = JSON.parse(localStorage.getItem('db_inv')) || [];
             App.db.ord = JSON.parse(localStorage.getItem('db_ord')) || [];
             App.db.log = JSON.parse(localStorage.getItem('db_log')) || {};
-            App.Render.bodega(); App.Render.ordenes(); App.Calendar.render();
+            App.Render.bodega(); App.Render.ordenes(); App.Calendar.render(); App.Backup.init();
         });
-        // Precarga de IA
+        
+        // Precarga IA
         this.AI.worker = Tesseract.createWorker();
     },
 
@@ -188,7 +210,7 @@ const App = {
                 <div class="card">
                     <div class="inv-row">
                         <h3 style="margin:0; font-size:1rem;">${p.n}</h3>
-                        <i class="fa-solid fa-pen" style="color:var(--blue); cursor:pointer;" onclick="App.Actions.modalProd(${i})"></i>
+                        <i class="fa-solid fa-pen icon-edit" onclick="App.Actions.modalProd(${i})"></i>
                     </div>
                     <div class="inv-sizes">
                         ${Object.entries(p.s).map(([k,v])=>`<div class="size-box"><b>${v}</b><span>${k}</span></div>`).join('')}
@@ -205,6 +227,7 @@ const App = {
                 const realIdx = App.db.ord.length - 1 - idx;
                 let statusInfo = '', actionBtn = '';
 
+                // Lógica de Estado
                 if(o.st === 'bodega') {
                     statusInfo = `<span class="chip c-bodega"><i class="fa-solid fa-warehouse"></i> EN BODEGA</span>`;
                     actionBtn = `<button class="btn-act b-dark" onclick="App.Actions.cycle(${realIdx})">EMPAQUETAR <i class="fa-solid fa-box"></i></button>`;
@@ -223,7 +246,10 @@ const App = {
                 <div class="card" style="border-left:5px solid ${o.st==='sinstock'?'var(--red)':(o.st==='done'?'var(--green)':'var(--blue)')}">
                     <div style="display:flex; justify-content:space-between;">
                         ${statusInfo}
-                        <i class="fa-solid fa-trash" style="color:#cbd5e1; cursor:pointer;" onclick="App.Actions.delOrd(${realIdx})"></i>
+                        <div>
+                            <i class="fa-solid fa-pen-to-square icon-edit" onclick="App.Actions.editOrd(${realIdx})"></i>
+                            <i class="fa-solid fa-trash icon-trash" onclick="App.Actions.delOrd(${realIdx})"></i>
+                        </div>
                     </div>
                     <div style="margin-top:5px;">
                         <h3 style="margin:0; color:var(--dark);">${o.c}</h3>
@@ -234,6 +260,221 @@ const App = {
                     ${o.st!=='done' ? `<div style="text-align:right; margin-top:5px;"><small onclick="App.Actions.noStock(${realIdx})" style="color:var(--red); cursor:pointer; font-weight:700;">Marcar SIN STOCK</small></div>` : ''}
                 </div>`;
             }).join('');
+        }
+    },
+
+    Actions: {
+        async modalProd(i=null) {
+            const item = i!==null ? App.db.inv[i] : {n:'', s:{S:0,M:0,L:0,XL:0}};
+            const {value:f} = await Swal.fire({
+                title: i!==null?'Editar':'Nuevo',
+                html: `<input id="sw-n" class="swal2-input" placeholder="Nombre" value="${item.n}">
+                       <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;">
+                       ${Object.keys(item.s).map(k=>`<div><label>${k}</label><input type="number" id="sw-${k}" class="swal2-input" style="height:40px;margin:0" value="${item.s[k]}"></div>`).join('')}</div>`,
+                preConfirm:()=>{
+                    const n=document.getElementById('sw-n').value.toUpperCase();
+                    const s={}; Object.keys(item.s).forEach(k=>s[k]=Number(document.getElementById('sw-'+k).value));
+                    return {n,s};
+                }
+            });
+            if(f && f.n) { if(i!==null) App.db.inv[i]=f; else App.db.inv.push(f); App.save(); }
+        },
+
+        // --- NUEVA MODAL DE ORDENES MASIVAS (TIPO INVENTARIO) ---
+        async modalOrderNew() {
+            const prods = [...new Set(App.db.inv.map(i=>i.n))].map(p=>`<option value="${p}">`).join('');
+            
+            const {value:form} = await Swal.fire({
+                title: 'NUEVO PEDIDO',
+                width: 600,
+                html: `
+                    <input id="mo-c" class="swal2-input" placeholder="Nombre del Cliente">
+                    <input id="mo-p" class="swal2-input" list="dl-p" placeholder="Producto"><datalist id="dl-p">${prods}</datalist>
+                    <p style="font-size:0.8rem; font-weight:bold; margin-top:10px;">CANTIDADES POR TALLA:</p>
+                    <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap:10px;">
+                        <div><label>S</label><input type="number" id="mo-S" class="swal2-input" style="margin:0; padding:5px;" placeholder="0"></div>
+                        <div><label>M</label><input type="number" id="mo-M" class="swal2-input" style="margin:0; padding:5px;" placeholder="0"></div>
+                        <div><label>L</label><input type="number" id="mo-L" class="swal2-input" style="margin:0; padding:5px;" placeholder="0"></div>
+                        <div><label>XL</label><input type="number" id="mo-XL" class="swal2-input" style="margin:0; padding:5px;" placeholder="0"></div>
+                    </div>
+                `,
+                confirmButtonText: 'CREAR PEDIDOS',
+                preConfirm: () => {
+                    return {
+                        c: document.getElementById('mo-c').value.toUpperCase(),
+                        p: document.getElementById('mo-p').value.toUpperCase(),
+                        sizes: {
+                            S: Number(document.getElementById('mo-S').value),
+                            M: Number(document.getElementById('mo-M').value),
+                            L: Number(document.getElementById('mo-L').value),
+                            XL: Number(document.getElementById('mo-XL').value),
+                        }
+                    }
+                }
+            });
+
+            if(form && form.c && form.p) {
+                let count = 0;
+                // Generamos una orden individual por cada talla que tenga cantidad > 0
+                Object.entries(form.sizes).forEach(([size, qty]) => {
+                    if(qty > 0) {
+                        App.db.ord.push({
+                            c: form.c,
+                            p: form.p,
+                            sz: size,
+                            q: qty,
+                            st: 'bodega',
+                            fac: null
+                        });
+                        count++;
+                    }
+                });
+                App.save();
+                if(count > 0) Swal.fire('ÉXITO', `Se crearon ${count} líneas de pedido para ${form.c}`, 'success');
+            }
+        },
+
+        // --- NUEVA FUNCIÓN PARA EDITAR UNA ORDEN EXISTENTE ---
+        async editOrd(i) {
+            const o = App.db.ord[i];
+            const prods = [...new Set(App.db.inv.map(item=>item.n))].map(p=>`<option value="${p}">`).join('');
+            
+            const {value:newVal} = await Swal.fire({
+                title: 'EDITAR PEDIDO',
+                html: `
+                    <label style="font-size:0.7rem; font-weight:bold;">Cliente</label>
+                    <input id="eo-c" class="swal2-input" value="${o.c}" style="margin-top:5px;">
+                    
+                    <label style="font-size:0.7rem; font-weight:bold;">Producto</label>
+                    <input id="eo-p" class="swal2-input" list="dl-p" value="${o.p}" style="margin-top:5px;"><datalist id="dl-p">${prods}</datalist>
+                    
+                    <div style="display:flex; gap:10px; margin-top:10px;">
+                        <div style="flex:1;">
+                            <label style="font-size:0.7rem; font-weight:bold;">Talla</label>
+                            <select id="eo-sz" class="swal2-input" style="margin-top:5px;">
+                                <option ${o.sz==='S'?'selected':''}>S</option>
+                                <option ${o.sz==='M'?'selected':''}>M</option>
+                                <option ${o.sz==='L'?'selected':''}>L</option>
+                                <option ${o.sz==='XL'?'selected':''}>XL</option>
+                            </select>
+                        </div>
+                        <div style="flex:1;">
+                            <label style="font-size:0.7rem; font-weight:bold;">Cantidad</label>
+                            <input id="eo-q" type="number" class="swal2-input" value="${o.q}" style="margin-top:5px;">
+                        </div>
+                    </div>
+                `,
+                confirmButtonText: 'GUARDAR CAMBIOS',
+                preConfirm: () => {
+                    return {
+                        c: document.getElementById('eo-c').value.toUpperCase(),
+                        p: document.getElementById('eo-p').value.toUpperCase(),
+                        sz: document.getElementById('eo-sz').value,
+                        q: Number(document.getElementById('eo-q').value)
+                    }
+                }
+            });
+
+            if(newVal) {
+                // Actualizamos solo los campos editables, manteniendo el estado y factura
+                App.db.ord[i].c = newVal.c;
+                App.db.ord[i].p = newVal.p;
+                App.db.ord[i].sz = newVal.sz;
+                App.db.ord[i].q = newVal.q;
+                App.save();
+                Swal.fire('ACTUALIZADO', 'El pedido ha sido modificado.', 'success');
+            }
+        },
+
+        async cycle(i) {
+            const o = App.db.ord[i];
+            if(o.st === 'bodega') {
+                o.st = 'pack'; App.save();
+            } else if(o.st === 'pack') {
+                const {value:fac} = await Swal.fire({
+                    title:'DESPACHO', text:'Ingrese N° Factura OBLIGATORIO:', input:'text',
+                    inputValidator: (v) => !v && '¡Necesitas el número de factura!'
+                });
+                if(fac) {
+                    const prod = App.db.inv.find(p => p.n === o.p);
+                    // Verificamos si existe el producto y hay stock
+                    if(prod && prod.s[o.sz] >= o.q) {
+                        prod.s[o.sz] -= o.q; // Restamos stock
+                        o.st = 'done'; o.fac = fac;
+                        App.save();
+                        Swal.fire('¡DESPACHADO!','Stock descontado y factura registrada.','success');
+                    } else {
+                        // Si no hay stock, preguntamos si quiere forzar (para jefes) o cancelar
+                        Swal.fire({
+                            title: '¡STOCK INSUFICIENTE!',
+                            text: `En inventario tienes ${prod ? prod.s[o.sz] : 0}, pero intentas despachar ${o.q}.`,
+                            icon: 'error'
+                        });
+                    }
+                }
+            }
+        },
+
+        noStock(i) { App.db.ord[i].st = 'sinstock'; App.save(); },
+        delOrd(i) { 
+            Swal.fire({title:'¿Borrar?', text:'Esta acción no se deshace (salvo backup)', icon:'warning', showCancelButton:true}).then(r=>{
+                if(r.isConfirmed){ App.db.ord.splice(i,1); App.save(); }
+            });
+        },
+        
+        askTaller(p,s) { window.open(`https://wa.me/?text=${encodeURIComponent(`⚠️ PEDIDO URGENTE TALLER: ${p} Talla ${s}. Confirmar fecha.`)}`); },
+        
+        reporteWsp() {
+            const h = App.db.ord.filter(o=>o.st==='done');
+            if(!h.length) return Swal.fire('Vacío','No hay despachos hoy','info');
+            const t = `*REPORTE DESPACHOS*\n\n` + h.map(o=>`✅ Fac:${o.fac} - ${o.c} (${o.p} x${o.q})`).join('\n');
+            window.open(`https://wa.me/?text=${encodeURIComponent(t)}`);
+        }
+    },
+
+    Backup: {
+        init() {
+            const lastDate = localStorage.getItem('snap_date');
+            if(lastDate) document.getElementById('snap-date').innerHTML = `<i class="fa-solid fa-check"></i> ÚLTIMA COPIA LOCAL: ${lastDate}`;
+        },
+
+        saveSnap() {
+            const now = new Date().toLocaleString();
+            localStorage.setItem('snap_inv', JSON.stringify(App.db.inv));
+            localStorage.setItem('snap_ord', JSON.stringify(App.db.ord));
+            localStorage.setItem('snap_log', JSON.stringify(App.db.log));
+            localStorage.setItem('snap_date', now);
+            this.init();
+            Swal.fire({title: 'SNAPSHOT GUARDADO', text: 'Datos seguros en este dispositivo.', icon: 'success', timer: 1500});
+        },
+
+        loadSnap() {
+            const d = localStorage.getItem('snap_date');
+            if(!d) return Swal.fire('Error', 'No hay copias guardadas.', 'error');
+            Swal.fire({title:'¿Restaurar?', text:`Volver al estado del: ${d}`, showCancelButton:true, confirmButtonText:'SÍ, RESTAURAR'}).then(r=>{
+                if(r.isConfirmed) {
+                    App.db.inv=JSON.parse(localStorage.getItem('snap_inv'));
+                    App.db.ord=JSON.parse(localStorage.getItem('snap_ord'));
+                    App.db.log=JSON.parse(localStorage.getItem('snap_log'));
+                    App.save();
+                    Swal.fire('RESTAURADO','','success');
+                }
+            });
+        },
+
+        sendWsp() {
+            const dataStr = JSON.stringify(App.db);
+            const blob = new Blob([dataStr], {type: "application/json"});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `RESPALDO_IDEAS_${new Date().toLocaleDateString().replace(/\//g,'-')}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            Swal.fire({title: 'PASO 1 LISTO', text: 'Archivo descargado. Ahora adjúntalo en WhatsApp.', icon: 'success', confirmButtonText: 'ABRIR WHATSAPP'}).then(() => {
+                window.open(`https://wa.me/?text=${encodeURIComponent("📂 ADJUNTO RESPALDO DEL SISTEMA (Subir el archivo .json descargado aquí).")}`);
+            });
         }
     },
 
@@ -260,100 +501,6 @@ const App = {
         async edit(k, n) {
             const {value:t} = await Swal.fire({title:`Bitácora Día ${n}`, input:'textarea', inputValue:App.db.log[k]||''});
             if(t!==undefined) { App.db.log[k]=t; App.save(); }
-        }
-    },
-
-    Actions: {
-        async modalProd(i=null) {
-            const item = i!==null ? App.db.inv[i] : {n:'', s:{S:0,M:0,L:0,XL:0}};
-            const {value:f} = await Swal.fire({
-                title: i!==null?'Editar':'Nuevo',
-                html: `<input id="sw-n" class="swal2-input" placeholder="Nombre" value="${item.n}">
-                       <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;">
-                       ${Object.keys(item.s).map(k=>`<div><label>${k}</label><input type="number" id="sw-${k}" class="swal2-input" style="height:40px;margin:0" value="${item.s[k]}"></div>`).join('')}</div>`,
-                preConfirm:()=>{
-                    const n=document.getElementById('sw-n').value.toUpperCase();
-                    const s={}; Object.keys(item.s).forEach(k=>s[k]=Number(document.getElementById('sw-'+k).value));
-                    return {n,s};
-                }
-            });
-            if(f && f.n) { if(i!==null) App.db.inv[i]=f; else App.db.inv.push(f); App.save(); }
-        },
-
-        async modalOrder() {
-            const prods = [...new Set(App.db.inv.map(i=>i.n))].map(p=>`<option value="${p}">`).join('');
-            const {value:f} = await Swal.fire({
-                title: 'Nueva Orden',
-                html: `<input id="mo-c" class="swal2-input" placeholder="Cliente">
-                       <input id="mo-p" class="swal2-input" list="dl-p" placeholder="Producto"><datalist id="dl-p">${prods}</datalist>
-                       <div style="display:flex;gap:10px"><select id="mo-s" class="swal2-input"><option>S</option><option>M</option><option>L</option><option>XL</option></select>
-                       <input id="mo-q" type="number" class="swal2-input" value="1"></div>`,
-                preConfirm:()=>({
-                    c:document.getElementById('mo-c').value.toUpperCase(),
-                    p:document.getElementById('mo-p').value.toUpperCase(),
-                    sz:document.getElementById('mo-s').value,
-                    q:Number(document.getElementById('mo-q').value),
-                    st:'bodega', fac:null
-                })
-            });
-            if(f && f.c) { App.db.ord.push(f); App.save(); }
-        },
-
-        async cycle(i) {
-            const o = App.db.ord[i];
-            if(o.st === 'bodega') {
-                o.st = 'pack'; App.save();
-            } else if(o.st === 'pack') {
-                const {value:fac} = await Swal.fire({
-                    title:'DESPACHO', text:'Ingrese N° Factura OBLIGATORIO:', input:'text',
-                    inputValidator: (v) => !v && '¡Necesitas el número de factura!'
-                });
-                if(fac) {
-                    const prod = App.db.inv.find(p => p.n === o.p);
-                    if(prod && prod.s[o.sz] >= o.q) {
-                        prod.s[o.sz] -= o.q;
-                        o.st = 'done'; o.fac = fac;
-                        App.save();
-                        Swal.fire('¡DESPACHADO!','Stock descontado y factura registrada.','success');
-                    } else {
-                        Swal.fire('ERROR DE STOCK','No hay suficientes unidades físicas.','error');
-                    }
-                }
-            }
-        },
-
-        noStock(i) { App.db.ord[i].st = 'sinstock'; App.save(); },
-        delOrd(i) { App.db.ord.splice(i,1); App.save(); },
-        
-        askTaller(p,s) { window.open(`https://wa.me/?text=${encodeURIComponent(`⚠️ PEDIDO URGENTE TALLER: ${p} Talla ${s}. Confirmar fecha.`)}`); },
-        
-        reporteWsp() {
-            const h = App.db.ord.filter(o=>o.st==='done');
-            if(!h.length) return Swal.fire('Vacío','No hay despachos hoy','info');
-            const t = `*REPORTE DESPACHOS*\n\n` + h.map(o=>`✅ Fac:${o.fac} - ${o.c} (${o.p} x${o.q})`).join('\n');
-            window.open(`https://wa.me/?text=${encodeURIComponent(t)}`);
-        }
-    },
-
-    Backup: {
-        saveSnap() {
-            localStorage.setItem('snap_inv', JSON.stringify(App.db.inv));
-            localStorage.setItem('snap_ord', JSON.stringify(App.db.ord));
-            localStorage.setItem('snap_log', JSON.stringify(App.db.log));
-            Swal.fire('SNAPSHOT GUARDADO', 'Copia de seguridad local lista.', 'success');
-        },
-        loadSnap() {
-            Swal.fire({title:'¿Restaurar?', text:'Se perderá lo actual', showCancelButton:true}).then(r=>{
-                if(r.isConfirmed) {
-                    if(localStorage.getItem('snap_inv')) {
-                        App.db.inv=JSON.parse(localStorage.getItem('snap_inv'));
-                        App.db.ord=JSON.parse(localStorage.getItem('snap_ord'));
-                        App.db.log=JSON.parse(localStorage.getItem('snap_log'));
-                        App.save();
-                        Swal.fire('RESTAURADO','','success');
-                    } else Swal.fire('Error','No existe snapshot','error');
-                }
-            });
         }
     },
 
@@ -384,7 +531,6 @@ const App = {
                     for(let i=1;i<=p.numPages;i++) txt+=(await (await p.getPage(i)).getTextContent()).items.map(s=>s.str).join(' ');
                 }
 
-                // Heuristica Simple para Texto (OCR/PDF)
                 if(txt) {
                     const clean = txt.toUpperCase();
                     if(clean.includes('POLERA') || clean.includes('PANTALON')) {
