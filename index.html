@@ -18,6 +18,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 
     <style>
+        /* ESTILOS PREMIUM V134 */
         :root { --dark: #0f172a; --primary: #3b82f6; --accent: #6366f1; --success: #10b981; --danger: #ef4444; --bg: #f8fafc; --card-bg: #ffffff; }
         * { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
         body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--dark); margin: 0; padding-bottom: 120px; }
@@ -68,12 +69,12 @@
 
 <div id="loader">
     <div class="spinner"></div>
-    <p style="margin-top:15px; font-weight:bold; color:#64748b;">CARGANDO...</p>
+    <p style="margin-top:15px; font-weight:bold; color:#64748b;">CARGANDO SISTEMA...</p>
 </div>
 
 <header>
     <div class="brand">
-        <h1>IDEAS TEXTILES <div class="live-dot" title="Sincronizado"></div></h1>
+        <h1>IDEAS TEXTILES SPA <div class="live-dot" title="En línea"></div></h1>
     </div>
     <button class="btn-scan" onclick="App.IA.trigger()">
         <i class="fa-solid fa-wand-magic-sparkles"></i> IMPORTAR
@@ -81,7 +82,7 @@
 </header>
 
 <section id="v-bodega" class="view active">
-    <input type="text" id="search-inv" class="search-bar" style="width:100%; padding:12px; border-radius:10px; border:1px solid #cbd5e1; margin-bottom:15px;" placeholder="🔍 Buscar producto..." oninput="App.Render.bodega()">
+    <input type="text" id="search-inv" class="search-bar" style="width:100%; padding:12px; border-radius:10px; border:1px solid #cbd5e1; margin-bottom:15px;" placeholder="🔍 Buscar producto (Nombre o SKU)..." oninput="App.Render.bodega()">
     <button class="btn btn-pri" onclick="App.Actions.modalProd()">+ AGREGAR PRODUCTO</button>
     <br><br>
     <div id="list-bodega"></div>
@@ -112,7 +113,7 @@
         <h3>REPORTES</h3>
         <button class="btn btn-pdf" onclick="App.Backup.generatePDF()"><i class="fa-solid fa-file-pdf"></i> DESCARGAR INFORME PDF</button>
         <div style="margin-top:20px; padding-top:10px; border-top:1px solid #eee;">
-            <button class="btn btn-reset" onclick="App.Actions.factoryReset()">⚠️ RESET FABRICA (BORRAR TODO)</button>
+            <button class="btn btn-reset" onclick="App.Actions.factoryReset()">⚠️ BORRAR TODO DATOS</button>
         </div>
     </div>
 </section>
@@ -140,32 +141,44 @@
     const db = firebase.database();
 
     const App = {
+        // Inicialización segura
         db: { inv: [], ord: [], log: {}, calDate: new Date() },
 
         init() {
-            setTimeout(() => { const l=document.getElementById('loader'); if(l) l.style.display='none'; }, 3000);
+            // Loader de seguridad 5s
+            setTimeout(() => { const l=document.getElementById('loader'); if(l) l.style.display='none'; }, 5000);
+            
             db.ref('/').on('value', (snapshot) => {
-                const data = snapshot.val();
-                if (data) {
-                    App.db.inv = data.inv || [];
-                    App.db.ord = data.ord || [];
-                    App.db.log = data.log || {};
-                    
-                    // FIX: SANITIZAR DATOS PARA EVITAR ERROR 'ENTRIES NULL'
-                    App.db.inv.forEach(p => {
-                        if (!p.s) p.s = {}; // Si no hay tallas, crear objeto vacío
-                        if (!p.n) p.n = "Sin Nombre";
-                    });
+                const data = snapshot.val() || {};
+                
+                // Conversión forzosa a Array para evitar pantallazos blancos
+                let rawInv = data.inv;
+                if (rawInv && typeof rawInv === 'object' && !Array.isArray(rawInv)) rawInv = Object.values(rawInv);
+                
+                let rawOrd = data.ord;
+                if (rawOrd && typeof rawOrd === 'object' && !Array.isArray(rawOrd)) rawOrd = Object.values(rawOrd);
+                
+                App.db.inv = (Array.isArray(rawInv) ? rawInv : []).filter(x => x);
+                App.db.ord = (Array.isArray(rawOrd) ? rawOrd : []).filter(x => x);
+                App.db.log = data.log || {};
 
-                } else {
-                    App.db.inv = []; App.db.ord = []; App.db.log = {};
-                }
+                // Sanitización de propiedades
+                App.db.inv.forEach(p => {
+                    if (!p.s) p.s = {};
+                    if (!p.n) p.n = "PRODUCTO SIN NOMBRE";
+                    if (!p.sku) p.sku = "000";
+                });
+                
                 const l = document.getElementById('loader'); if(l) l.style.display = 'none';
-                App.Render.bodega(); App.Render.ordenes(); App.Calendar.render();
+                App.Render.bodega(); 
+                App.Render.ordenes(); 
+                App.Calendar.render();
             });
         },
 
-        save() { db.ref('/').update({ inv: App.db.inv, ord: App.db.ord, log: App.db.log }); },
+        save() { 
+            db.ref('/').update({ inv: App.db.inv, ord: App.db.ord, log: App.db.log }).catch(e => console.error("Error guardando:", e));
+        },
 
         UI: {
             go(id, el) {
@@ -178,9 +191,14 @@
 
         Helpers: {
             getNextSKU() {
-                if(!App.db.inv || App.db.inv.length === 0) return '001';
-                const max = App.db.inv.reduce((acc, p) => Math.max(acc, parseInt(p.sku || 0)), 0);
-                return String(max + 1).padStart(3, '0');
+                try {
+                    if(!App.db.inv || App.db.inv.length === 0) return '001';
+                    const max = App.db.inv.reduce((acc, p) => {
+                        const val = parseInt(p.sku);
+                        return Math.max(acc, isNaN(val) ? 0 : val);
+                    }, 0);
+                    return String(max + 1).padStart(3, '0');
+                } catch(e) { return String(Math.floor(Math.random() * 1000)).padStart(3,'0'); }
             },
             getStatusLabel(st) {
                 const m = {
@@ -191,44 +209,60 @@
                     'done': '<span class="status st-done">🚚 DESPACHADO</span>'
                 };
                 return m[st] || m['bodega'];
+            },
+            getLogDate() {
+                const now = new Date();
+                return `${now.getDate()}-${now.getMonth()}-${now.getFullYear()}`;
+            },
+            addToLog(msg) {
+                const k = this.getLogDate();
+                App.db.log[k] = (App.db.log[k] || '') + `• ${msg}\n`;
             }
         },
 
         Render: {
             bodega() {
-                const el = document.getElementById('list-bodega');
-                const q = document.getElementById('search-inv').value.toUpperCase();
-                const list = (App.db.inv || []).filter(i => (i.n||'').toUpperCase().includes(q) || (i.sku||'').includes(q));
-                if(list.length === 0) { el.innerHTML = '<div style="text-align:center;color:#94a3b8;margin-top:20px;">Inventario vacío.</div>'; return; }
-                el.innerHTML = list.map((p, i) => {
-                    // FIX: Asegurar que p.s existe con (p.s || {})
-                    const sizes = Object.entries(p.s || {}).map(([k,v]) => `<span style="background:#f1f5f9; padding:2px 6px; border-radius:4px; font-size:0.75rem;"><b>${k}:</b>${v}</span>`).join(' ');
-                    return `
-                    <div class="card">
-                        <div style="display:flex; justify-content:space-between; align-items:flex-start;">
-                            <div>
-                                <span class="sku-badge">SKU: ${p.sku}</span>
-                                <h3 style="margin:4px 0;">${p.n}</h3>
-                                <div style="margin-top:5px; display:flex; flex-wrap:wrap; gap:5px;">${sizes}</div>
+                try {
+                    const el = document.getElementById('list-bodega');
+                    const q = (document.getElementById('search-inv').value || '').toUpperCase();
+                    const list = App.db.inv.filter(i => (i.n||'').toUpperCase().includes(q) || (i.sku||'').includes(q));
+                    
+                    if(list.length === 0) { el.innerHTML = '<div style="text-align:center;color:#94a3b8;margin-top:20px;">Inventario vacío o no encontrado.</div>'; return; }
+                    
+                    el.innerHTML = list.map((p, i) => {
+                        const sObj = p.s || {};
+                        const sizes = Object.entries(sObj).map(([k,v]) => `<span style="background:#f1f5f9; padding:2px 6px; border-radius:4px; font-size:0.75rem;"><b>${k}:</b>${v}</span>`).join(' ');
+                        const realIndex = App.db.inv.indexOf(p);
+                        
+                        return `
+                        <div class="card">
+                            <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                                <div>
+                                    <span class="sku-badge">SKU: ${p.sku}</span>
+                                    <h3 style="margin:4px 0;">${p.n}</h3>
+                                    <div style="margin-top:5px; display:flex; flex-wrap:wrap; gap:5px;">${sizes}</div>
+                                </div>
+                                <div style="display:flex; gap:10px;">
+                                    <i class="fa-solid fa-pen" style="color:var(--primary); cursor:pointer;" onclick="App.Actions.modalProd(${realIndex})"></i>
+                                    <i class="fa-solid fa-trash" style="color:var(--danger); cursor:pointer;" onclick="App.Actions.delProd(${realIndex})"></i>
+                                </div>
                             </div>
-                            <div style="display:flex; gap:10px;">
-                                <i class="fa-solid fa-pen" style="color:var(--primary); cursor:pointer;" onclick="App.Actions.modalProd(${App.db.inv.indexOf(p)})"></i>
-                                <i class="fa-solid fa-trash" style="color:var(--danger); cursor:pointer;" onclick="App.Actions.delProd(${App.db.inv.indexOf(p)})"></i>
-                            </div>
-                        </div>
-                    </div>`;
-                }).join('');
+                        </div>`;
+                    }).join('');
+                } catch(e) { console.error("Error Render Bodega:", e); }
             },
             ordenes() {
-                const el = document.getElementById('list-ordenes');
-                const list = App.db.ord || [];
-                if(list.length === 0) { el.innerHTML = '<div style="text-align:center;color:#94a3b8;margin-top:20px;">Sin pedidos activos.</div>'; return; }
-                el.innerHTML = list.slice().reverse().map((o, idx) => {
-                    const realIdx = list.length - 1 - idx;
-                    const itemsHtml = (o.items || []).map(it => `<div class="item-row"><span>${it.p} (T:${it.sz})</span><b>x${it.q}</b></div>`).join('');
-                    const actionBtn = o.st!=='done' ? `<button class="btn btn-sec" onclick="App.Actions.changeStatus(${realIdx})"><i class="fa-solid fa-arrows-rotate"></i> CAMBIAR ESTADO</button>` : '';
-                    return `<div class="card"><div style="display:flex; justify-content:space-between; margin-bottom:5px;">${App.Helpers.getStatusLabel(o.st)}<div><i class="fa-solid fa-pen" style="color:#334155; margin-right:10px; cursor:pointer;" onclick="App.Actions.modalOrder(${realIdx})"></i><i class="fa-solid fa-trash" style="color:#cbd5e1; cursor:pointer;" onclick="App.Actions.delOrd(${realIdx})"></i></div></div><h3 style="margin:0;">${o.c}</h3>${o.fac ? `<small style="color:var(--success); font-weight:bold;">FAC: ${o.fac} | ${o.date||''}</small>` : ''}<div style="background:#f8fafc; padding:8px; border-radius:8px; margin:10px 0; border:1px dashed #cbd5e1;">${itemsHtml}</div>${actionBtn}</div>`;
-                }).join('');
+                try {
+                    const el = document.getElementById('list-ordenes');
+                    const list = App.db.ord || [];
+                    if(list.length === 0) { el.innerHTML = '<div style="text-align:center;color:#94a3b8;margin-top:20px;">Sin pedidos activos.</div>'; return; }
+                    el.innerHTML = list.slice().reverse().map((o, idx) => {
+                        const realIdx = list.length - 1 - idx;
+                        const itemsHtml = (o.items || []).map(it => `<div class="item-row"><span>${it.p} (T:${it.sz})</span><b>x${it.q}</b></div>`).join('');
+                        const actionBtn = o.st!=='done' ? `<button class="btn btn-sec" onclick="App.Actions.changeStatus(${realIdx})"><i class="fa-solid fa-arrows-rotate"></i> CAMBIAR ESTADO</button>` : '';
+                        return `<div class="card"><div style="display:flex; justify-content:space-between; margin-bottom:5px;">${App.Helpers.getStatusLabel(o.st)}<div><i class="fa-solid fa-pen" style="color:#334155; margin-right:10px; cursor:pointer;" onclick="App.Actions.modalOrder(${realIdx})"></i><i class="fa-solid fa-trash" style="color:#cbd5e1; cursor:pointer;" onclick="App.Actions.delOrd(${realIdx})"></i></div></div><h3 style="margin:0;">${o.c}</h3>${o.fac ? `<small style="color:var(--success); font-weight:bold;">FAC: ${o.fac} | ${o.date||''}</small>` : ''}<div style="background:#f8fafc; padding:8px; border-radius:8px; margin:10px 0; border:1px dashed #cbd5e1;">${itemsHtml}</div>${actionBtn}</div>`;
+                    }).join('');
+                } catch(e) { console.error("Error Render Ordenes:", e); }
             }
         },
 
@@ -237,8 +271,7 @@
                 const p = App.db.inv[i];
                 if((await Swal.fire({title:'¿BORRAR PRODUCTO?', text:`Eliminar "${p.n}"`, icon:'warning', showCancelButton:true, confirmButtonColor:'#ef4444', confirmButtonText:'SÍ, BORRAR'})).isConfirmed) {
                     App.db.inv.splice(i, 1);
-                    const k = `${new Date().getDate()}-${new Date().getMonth()}-${new Date().getFullYear()}`;
-                    App.db.log[k] = (App.db.log[k] || '') + `🗑️ Eliminado Prod: ${p.n}\n`;
+                    App.Helpers.addToLog(`🗑️ Eliminado Prod: ${p.n}`);
                     App.save(); App.Render.bodega(); Swal.fire('Eliminado', '', 'success');
                 }
             },
@@ -254,22 +287,86 @@
                 }
             },
             async modalProd(i = null) {
-                const isNew = i === null;
-                const item = isNew ? {n:'', s:{}, sku: App.Helpers.getNextSKU()} : App.db.inv[i];
-                // FIX: Fallback seguro
-                const sTxt = Object.entries(item.s||{}).map(([k,v])=>`${k}:${v}`).join(', ');
-                const {value} = await Swal.fire({
-                    title: isNew ? 'PRODUCTO' : 'EDITAR',
-                    html: `<div style="text-align:right;"><small>SKU: ${item.sku}</small></div><input id="sw-n" class="swal2-input" placeholder="Nombre" value="${item.n}"><input id="sw-s" class="swal2-input" placeholder="Talla:Cant (ej: S:10, M:20)" value="${sTxt}">`,
-                    preConfirm: () => {
-                        const n = document.getElementById('sw-n').value.toUpperCase();
-                        const s = {}; document.getElementById('sw-s').value.split(',').forEach(x => { const [k,v] = x.split(':'); if(k && v) s[k.trim().toUpperCase()] = Number(v); });
-                        return {n, s, sku: item.sku};
+                try {
+                    const isNew = i === null;
+                    if (!App.db.inv) App.db.inv = [];
+                    
+                    let item;
+                    // Guardar estado original para comparar
+                    let oldStockStr = "";
+
+                    if (isNew) {
+                        item = { n:'', s:{}, sku: App.Helpers.getNextSKU() };
+                    } else {
+                        item = App.db.inv[i];
+                        if (!item) throw new Error("Producto no encontrado");
+                        oldStockStr = JSON.stringify(item.s || {}); // FOTO DEL STOCK ANTES DE EDITAR
                     }
-                });
-                if(value) {
-                    if(!isNew) App.db.inv[i] = value; else App.db.inv.push(value);
-                    App.save(); App.Render.bodega();
+                    
+                    const sTxt = Object.entries(item.s||{}).map(([k,v])=>`${k}:${v}`).join(', ');
+                    
+                    const {value} = await Swal.fire({
+                        title: isNew ? 'NUEVO PRODUCTO' : 'EDITAR',
+                        html: `
+                            <div style="text-align:right; margin-bottom:5px; color:#64748b; font-family:monospace;">SKU: ${item.sku}</div>
+                            <input id="sw-n" class="swal2-input" placeholder="Nombre" value="${item.n || ''}">
+                            <input id="sw-s" class="swal2-input" placeholder="Cant (Ej: 100) o Talla:Cant (S:10)" value="${sTxt}">
+                            <div style="font-size:0.7rem; color:#64748b; margin-top:5px;">Tip: Pon solo el número si es Talla Única.</div>
+                        `,
+                        preConfirm: () => {
+                            const n = document.getElementById('sw-n').value.toUpperCase().trim();
+                            if(!n) return Swal.showValidationMessage('El nombre es obligatorio');
+                            
+                            const s = {}; 
+                            const sVal = document.getElementById('sw-s').value;
+                            if(sVal) {
+                                sVal.split(',').forEach(x => {
+                                    x = x.trim();
+                                    // LOGICA INTELIGENTE (V134)
+                                    if(x.includes(':')) {
+                                        const parts = x.split(':');
+                                        if(parts.length >= 2) {
+                                            const k = parts[0].trim().toUpperCase();
+                                            const v = parseInt(parts[1]);
+                                            if(k && !isNaN(v)) s[k] = v;
+                                        }
+                                    } else {
+                                        const v = parseInt(x);
+                                        if(!isNaN(v)) s['UNICA'] = (s['UNICA']||0) + v;
+                                    }
+                                });
+                            }
+                            return {n, s, sku: item.sku};
+                        }
+                    });
+
+                    if(value) {
+                        // --- AQUÍ ESTÁ LA MAGIA DE LA V135 INTEGRADA ---
+                        // Si no es nuevo Y el stock cambió, preguntamos POR QUÉ.
+                        const newStockStr = JSON.stringify(value.s);
+                        
+                        if (!isNew && oldStockStr !== newStockStr) {
+                             const { value: reason } = await Swal.fire({
+                                title: '📋 MOTIVO DEL AJUSTE',
+                                input: 'text',
+                                text: 'El stock ha cambiado. ¿Cuál es el motivo?',
+                                inputPlaceholder: 'Ej: Ingreso taller, Devolución, Merma...',
+                                confirmButtonText: 'GUARDAR CAMBIO',
+                                allowOutsideClick: false,
+                                inputValidator: (val) => {
+                                    if (!val) return '¡Necesitamos una razón para la auditoría!';
+                                }
+                            });
+                            App.Helpers.addToLog(`✏️ Modificado ${value.n}: ${reason}`);
+                        }
+
+                        if(!isNew) App.db.inv[i] = value; else App.db.inv.push(value);
+                        App.save(); 
+                        App.Render.bodega();
+                        Swal.fire({title: 'Guardado', icon: 'success', timer: 1000, showConfirmButton: false});
+                    }
+                } catch(e) {
+                    Swal.fire("Error", e.message, "error");
                 }
             },
             async modalOrder(i = null) {
@@ -279,7 +376,7 @@
                 window.delCartItem = (idx) => { cart.splice(idx,1); document.getElementById('cart-div').innerHTML = cart.map((x,ix)=>`<div>${x.p} (${x.sz}) x${x.q} <span onclick="delCartItem(${ix})" style="color:red;cursor:pointer;">X</span></div>`).join(''); };
                 await Swal.fire({
                     title: 'PEDIDO', width: 600,
-                    html: `<input id="sw-c" class="swal2-input" placeholder="Cliente" value="${ord.c}"><div style="background:#f1f5f9; padding:10px; margin:10px 0;"><input id="sw-p" list="dl" class="swal2-input" placeholder="Producto"><datalist id="dl">${prodOpts}</datalist><input id="sw-sz" class="swal2-input" placeholder="Talla" style="width:40%"> <input id="sw-q" type="number" class="swal2-input" value="1" style="width:20%"> <button class="btn btn-pri" style="margin-top:10px;" onclick="const p=document.getElementById('sw-p').value.toUpperCase(), s=document.getElementById('sw-sz').value.toUpperCase(), q=Number(document.getElementById('sw-q').value); if(p&&s&&q>0){ cart.push({p,sz:s,q}); delCartItem(-1); document.getElementById('sw-p').value=''; }">+ AGREGAR</button></div><div id="cart-div">${cart.map((x,ix)=>`<div>${x.p} (${x.sz}) x${x.q}</div>`).join('')}</div>`,
+                    html: `<input id="sw-c" class="swal2-input" placeholder="Cliente" value="${ord.c}"><div style="background:#f1f5f9; padding:10px; margin:10px 0;"><input id="sw-p" list="dl" class="swal2-input" placeholder="Producto"><datalist id="dl">${prodOpts}</datalist><input id="sw-sz" class="swal2-input" placeholder="Talla (Dejar vacío para UNICA)" style="width:40%"> <input id="sw-q" type="number" class="swal2-input" value="1" style="width:20%"> <button class="btn btn-pri" style="margin-top:10px;" onclick="const p=document.getElementById('sw-p').value.toUpperCase(); let s=document.getElementById('sw-sz').value.toUpperCase(); const q=Number(document.getElementById('sw-q').value); if(!s) s='UNICA'; if(p&&q>0){ cart.push({p,sz:s,q}); delCartItem(-1); document.getElementById('sw-p').value=''; }">+ AGREGAR</button></div><div id="cart-div">${cart.map((x,ix)=>`<div>${x.p} (${x.sz}) x${x.q}</div>`).join('')}</div>`,
                     preConfirm: () => { const c = document.getElementById('sw-c').value.toUpperCase(); return (c && cart.length) ? {c, items:cart} : false; }
                 }).then(r => {
                     if(r.isConfirmed && r.value) {
@@ -297,20 +394,15 @@
                     const o = App.db.ord[i];
                     o.st='done'; o.fac=f; o.date = new Date().toLocaleDateString();
                     
-                    // 1. DESCONTAR STOCK (Con seguridad si p.s es undefined)
                     o.items.forEach(it => { 
                         const p = App.db.inv.find(x=>x.n===it.p); 
                         if(p) {
-                            if(!p.s) p.s = {}; // Asegurar existencia
+                            if(!p.s) p.s = {};
                             if(p.s[it.sz] !== undefined) p.s[it.sz] -= it.q; 
                         }
                     });
 
-                    // 2. AGREGAR AL CALENDARIO (REQUERIDO)
-                    const now = new Date();
-                    const k = `${now.getDate()}-${now.getMonth()}-${now.getFullYear()}`;
-                    App.db.log[k] = (App.db.log[k] || '') + `✅ Despachado: ${o.c} (Fac:${f})\n`;
-
+                    App.Helpers.addToLog(`✅ Despachado: ${o.c} (Fac:${f})`);
                     App.save();
                     Swal.fire('Despachado', 'Inventario actualizado y anotado en agenda.', 'success');
                 }
@@ -362,7 +454,7 @@
                                 if(n && q > 0) {
                                     let p = App.db.inv.find(x => x.n === n);
                                     if(!p){ p={n, s:{}, sku: App.Helpers.getNextSKU()}; App.db.inv.push(p); }
-                                    if(!p.s) p.s = {}; // FIX: Inicializar siempre
+                                    if(!p.s) p.s = {};
                                     
                                     if(clientName) { if(!ordersMap[clientName]) ordersMap[clientName] = []; ordersMap[clientName].push({p:n, sz:sz, q:q}); }
                                     else { p.s[sz] = (p.s[sz]||0) + q; }
@@ -371,6 +463,7 @@
                             }
                         }
                         Object.keys(ordersMap).forEach(client => App.db.ord.push({c:client, items:ordersMap[client], st:'bodega', fac:null}));
+                        App.Helpers.addToLog(`📂 Importación masiva: ${cnt} items`);
                         App.save(); Swal.fire('Éxito', `${cnt} items procesados.`, 'success');
                     };
                     reader.readAsArrayBuffer(f);
@@ -385,15 +478,12 @@
             generatePDF() {
                 try {
                     Swal.fire({title:'Generando PDF...', didOpen:()=>{Swal.showLoading()}});
-                    
                     if (!window.jspdf) throw new Error("La librería PDF no cargó correctamente.");
                     const { jsPDF } = window.jspdf;
                     const doc = new jsPDF();
-                    
                     if (typeof doc.autoTable !== 'function') throw new Error("Error librerías.");
 
                     const now = new Date().toLocaleDateString();
-                    
                     doc.setFillColor(15, 23, 42); doc.rect(0, 0, 210, 40, 'F');
                     doc.setTextColor(255, 255, 255); doc.setFont("helvetica", "bold"); doc.setFontSize(22);
                     doc.text("IDEAS TEXTILES SPA", 105, 20, { align: "center" });
@@ -401,13 +491,10 @@
                     doc.text(`REPORTE DE GESTIÓN AL ${now}`, 105, 30, { align: "center" });
 
                     let y = 50;
-                    
                     doc.setTextColor(15, 23, 42); doc.setFontSize(14); doc.setFont("helvetica", "bold");
                     doc.text("1. INVENTARIO ACTUAL", 14, y); y+=5; doc.setLineWidth(0.5); doc.line(14, y, 196, y); y+=5;
                     
-                    // FIX: Asegurar p.s antes de Object.entries
                     const bodyInv = (App.db.inv||[]).map(p => [p.sku, p.n, Object.entries(p.s || {}).map(([k, v]) => `${k}:${v}`).join(', ')]);
-                    
                     doc.autoTable({ startY: y, head: [['SKU', 'PRODUCTO', 'STOCK']], body: bodyInv, theme: 'striped', headStyles:{fillColor:[59, 130, 246]} });
                     y = doc.lastAutoTable.finalY + 15;
 
@@ -454,7 +541,7 @@
                 document.getElementById('cal-days').innerHTML = html;
             },
             async open(k) {
-                const { value } = await Swal.fire({ title: `NOTA ${k.replace(/-/g,'/')}`, input: 'textarea', inputValue: App.db.log[k] || '' });
+                const { value } = await Swal.fire({ title: `BITÁCORA ${k.replace(/-/g,'/')}`, input: 'textarea', inputValue: App.db.log[k] || '' });
                 if (value !== undefined) { App.db.log[k] = value; App.save(); }
             }
         }
