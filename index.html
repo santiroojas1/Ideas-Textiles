@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>IDEAS TEXTILES SPA </title>
+    <title>IDEAS TEXTILES | V112 FINAL</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
@@ -59,7 +59,7 @@
         .day.has-note::after { content: ''; position: absolute; bottom: 4px; width: 6px; height: 6px; background: var(--accent); border-radius: 50%; }
 
         /* BOTONES */
-        .btn { width: 100%; padding: 12px; border: none; border-radius: 10px; font-weight: 700; font-size: 0.8rem; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px; margin-top: 5px; }
+        .btn { width: 100%; padding: 12px; border: none; border-radius: 10px; font-weight: 700; font-size: 0.8rem; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px; margin-top: 5px; transition: 0.2s; }
         .btn-pri { background: var(--dark); color: white; }
         .btn-sec { background: white; border: 1px solid #cbd5e1; color: var(--dark); }
         .btn-pdf { background: var(--danger); color: white; }
@@ -76,7 +76,7 @@
 <header>
     <div class="brand">
         <h1>IDEAS TEXTILES</h1>
-        <span>WORKWEAR AND CORPORATE</span>
+        <span>V112 FINAL</span>
     </div>
     <button class="btn-scan" onclick="App.IA.trigger()">
         <i class="fa-solid fa-wand-magic-sparkles"></i> IA IMPORT
@@ -282,9 +282,21 @@ const App = {
                 `,
                 didOpen: () => {
                     renderCart();
-                    document.getElementById('btn-add-smart').addEventListener('click', () => {
-                        const pName = document.getElementById('sw-p').value.toUpperCase().trim();
-                        const sz = document.getElementById('sw-sz').value.toUpperCase().trim();
+                    const btn = document.getElementById('btn-add-smart');
+                    const inpP = document.getElementById('sw-p');
+                    const inpS = document.getElementById('sw-sz');
+                    let forceAdd = false;
+
+                    // Resetear el botón si cambian el texto
+                    [inpP, inpS].forEach(el => el.addEventListener('input', () => {
+                        btn.innerText = '+ AGREGAR';
+                        btn.style.background = 'var(--dark)';
+                        forceAdd = false;
+                    }));
+
+                    btn.addEventListener('click', () => {
+                        const pName = inpP.value.toUpperCase().trim();
+                        const sz = inpS.value.toUpperCase().trim();
                         const q = Number(document.getElementById('sw-q').value);
                         
                         if(!pName || !sz || q <= 0) return Swal.showValidationMessage('⚠️ Faltan datos');
@@ -292,18 +304,25 @@ const App = {
                         const invItem = App.db.inv.find(x => x.n === pName);
                         const stockActual = (invItem && invItem.s[sz] !== undefined) ? invItem.s[sz] : 0;
                         
-                        // --- SOLUCIÓN: Usar confirm() nativo para no cerrar el modal ---
-                        if(q > stockActual) {
-                            if(!confirm(`⚠️ STOCK INSUFICIENTE\n\nSolo tienes ${stockActual} unidades.\n¿Deseas agregar ${q} unidades de todas formas?`)) return;
+                        // --- NUEVA LÓGICA SIN POPUP ---
+                        // Si no hay stock y NO hemos forzado aún:
+                        if(q > stockActual && !forceAdd) {
+                            btn.innerText = `⚠️ STOCK: ${stockActual} - ¿AGREGAR IGUAL?`;
+                            btn.style.background = '#f59e0b'; // Naranja
+                            forceAdd = true; // Activar modo forzar para el siguiente click
+                            return; // Detener aquí para que el usuario lea
                         }
-                        
+
+                        // Agregar al carrito (Ya sea porque hay stock O porque forceAdd es true)
                         cart.push({p: pName, sz: sz, q: q});
                         renderCart();
-                        // Limpieza y foco
-                        document.getElementById('sw-p').value = ''; 
-                        document.getElementById('sw-sz').value = ''; 
-                        document.getElementById('sw-q').value = '1'; 
-                        document.getElementById('sw-p').focus();
+
+                        // Limpiar y resetear botón
+                        inpP.value = ''; inpS.value = ''; document.getElementById('sw-q').value = '1'; 
+                        inpP.focus();
+                        btn.innerText = '+ AGREGAR';
+                        btn.style.background = 'var(--dark)';
+                        forceAdd = false;
                     });
                 },
                 preConfirm: () => {
