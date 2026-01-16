@@ -3,107 +3,106 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>IDEAS TEXTILES</title>
+    <title>IDEAS TEXTILES Spa</title>
     
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
     <script src="https://unpkg.com/tesseract.js@4.0.2/dist/tesseract.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
     <style>
         :root {
-            --dark: #0f172a; --dark-light: #1e293b;
-            --blue: #2563eb; --blue-soft: #dbeafe;
-            --green: #059669; --green-soft: #d1fae5;
-            --red: #e11d48; --red-soft: #ffe4e6;
-            --amber: #d97706; --amber-soft: #fef3c7;
-            --purple: #7c3aed; --purple-soft: #ede9fe;
-            --bg: #f8fafc;
+            --dark: #0f172a; --primary: #3b82f6; --accent: #6366f1;
+            --success: #10b981; --danger: #ef4444; --warn: #f59e0b;
+            --bg: #f1f5f9; --card-bg: #ffffff;
         }
         
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); color: var(--dark); margin: 0; padding-bottom: 110px; }
+        * { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--dark); margin: 0; padding-bottom: 120px; }
 
         /* HEADER */
-        header { background: var(--dark); color: white; padding: 15px 20px; position: sticky; top: 0; z-index: 999; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        .brand h1 { font-size: 1rem; font-weight: 800; margin: 0; }
-        .brand small { color: var(--blue); font-weight: 700; font-size: 0.6rem; letter-spacing: 1px; }
-
-        /* NAV DOCK */
-        .dock { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--dark); padding: 12px 30px; border-radius: 30px; display: flex; gap: 30px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); z-index: 1000; }
-        .dock i { font-size: 1.4rem; color: #64748b; transition: 0.2s; cursor: pointer; }
-        .dock i.active { color: white; transform: translateY(-3px); text-shadow: 0 0 10px var(--blue); }
+        header { background: var(--dark); color: white; padding: 15px 20px; position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 15px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; }
+        .brand h1 { font-size: 1.1rem; font-weight: 800; margin: 0; letter-spacing: -0.5px; }
+        .brand span { color: var(--primary); font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
+        
+        /* BOTON IA ESCANER */
+        .btn-scan { background: linear-gradient(135deg, var(--primary), var(--accent)); border: none; padding: 8px 12px; border-radius: 8px; color: white; font-size: 0.8rem; font-weight: 700; display: flex; align-items: center; gap: 6px; box-shadow: 0 0 10px rgba(59, 130, 246, 0.5); cursor: pointer; }
+        .btn-scan:active { transform: scale(0.95); }
 
         /* VISTAS */
-        .view { display: none; padding: 20px; max-width: 800px; margin: 0 auto; animation: fadeUp 0.3s ease; }
+        .view { display: none; padding: 20px; max-width: 900px; margin: 0 auto; animation: slideIn 0.3s ease; }
         .view.active { display: block; }
-        @keyframes fadeUp { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+        @keyframes slideIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
 
-        /* TARJETAS */
-        .card { background: white; border-radius: 16px; padding: 16px; margin-bottom: 15px; border: 1px solid #e2e8f0; box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
+        /* CARDS */
+        .card { background: var(--card-bg); border-radius: 12px; padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.04); border: 1px solid #e2e8f0; position: relative; }
         
-        /* CHIPS */
-        .chip { display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 8px; font-size: 0.65rem; font-weight: 800; text-transform: uppercase; margin-bottom: 10px; }
-        .c-bodega { background: var(--amber-soft); color: var(--amber); }
-        .c-pack { background: var(--purple-soft); color: var(--purple); }
-        .c-done { background: var(--green-soft); color: var(--green); }
+        /* STATUS CHIPS */
+        .status { display: inline-block; padding: 4px 8px; border-radius: 6px; font-size: 0.65rem; font-weight: 800; text-transform: uppercase; margin-bottom: 8px; }
+        .st-1 { background: #fff7ed; color: var(--warn); border: 1px solid #fed7aa; } /* Bodega */
+        .st-2 { background: #eff6ff; color: var(--primary); border: 1px solid #bfdbfe; } /* Empaquetado */
+        .st-3 { background: #ecfdf5; color: var(--success); border: 1px solid #a7f3d0; } /* Despachado */
 
-        /* LISTA DE ITEMS DENTRO DE LA TARJETA */
-        .order-items { background: #f8fafc; border-radius: 8px; padding: 10px; margin: 10px 0; border: 1px dashed #cbd5e1; }
-        .order-row { display: flex; justify-content: space-between; font-size: 0.85rem; border-bottom: 1px solid #e2e8f0; padding: 5px 0; }
-        .order-row:last-child { border-bottom: none; }
-        .order-row strong { color: var(--dark); }
+        /* LISTAS INTERNAS (ITEMS PEDIDO) */
+        .item-list { background: #f8fafc; border-radius: 8px; padding: 8px; margin: 10px 0; border: 1px dashed #cbd5e1; }
+        .item-row { display: flex; justify-content: space-between; font-size: 0.8rem; padding: 4px 0; border-bottom: 1px solid #eee; }
+        .item-row:last-child { border: none; }
+        .item-row b { color: var(--dark); }
 
-        /* BOTONES */
-        .btn-act { width: 100%; padding: 12px; border-radius: 10px; border: none; font-weight: 800; font-size: 0.75rem; margin-top: 5px; cursor: pointer; display: flex; justify-content: center; gap: 8px; align-items: center; transition: 0.2s; }
-        .b-dark { background: var(--dark-light); color: white; }
-        .b-blue { background: var(--blue); color: white; }
-        .b-wsp { background: #25D366; color: white; }
-        .b-pdf { background: #ef4444; color: white; }
-
-        .search-box { width: 100%; padding: 12px; border-radius: 12px; border: 1px solid #cbd5e1; font-weight: 600; margin-bottom: 15px; }
-
-        /* ESTILOS MODAL MEJORADA */
-        .input-group { margin-bottom: 10px; text-align: left; }
-        .input-group label { font-size: 0.75rem; font-weight: 700; color: #64748b; display: block; margin-bottom: 4px; }
-        .custom-input { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 8px; font-family: inherit; }
+        /* ACCIONES */
+        .action-row { display: flex; gap: 8px; margin-top: 10px; }
+        .btn { flex: 1; padding: 10px; border: none; border-radius: 8px; font-weight: 700; font-size: 0.75rem; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 5px; transition: 0.2s; }
+        .btn-pri { background: var(--dark); color: white; }
+        .btn-sec { background: white; border: 1px solid #cbd5e1; color: var(--dark); }
+        .btn-done { background: var(--success); color: white; }
+        .btn-edit { background: var(--primary); color: white; width: auto; flex: unset; padding: 0 12px; }
         
-        .temp-list { max-height: 150px; overflow-y: auto; background: #f1f5f9; border-radius: 8px; padding: 5px; margin-top: 10px; }
-        .temp-item { background: white; padding: 8px; margin-bottom: 5px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+        /* SEARCH & INPUTS */
+        .search-bar { width: 100%; padding: 14px; border-radius: 12px; border: 1px solid #cbd5e1; font-weight: 600; font-size: 0.9rem; margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.03); }
 
-        /* CALENDARIO SIMPLE */
-        .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; margin-top: 15px; }
-        .cal-day { aspect-ratio: 1; border: 1px solid #e2e8f0; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.8rem; background: white; cursor: pointer; position: relative; }
-        .cal-day.has-note { border: 2px solid var(--blue); color: var(--blue); background: var(--blue-soft); }
+        /* MODAL CARRITO */
+        .cart-grid { display: grid; grid-template-columns: 1.5fr 1fr 0.5fr; gap: 8px; align-items: end; }
+        .swal-input-group label { display: block; text-align: left; font-size: 0.7rem; font-weight: 700; color: #64748b; margin-bottom: 3px; }
+        .swal-input-group input, .swal-input-group select { width: 100%; padding: 8px; border: 1px solid #cbd5e1; border-radius: 6px; }
+
+        /* DOCK NAVEGACION */
+        .dock { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--dark); padding: 12px 30px; border-radius: 40px; display: flex; gap: 35px; box-shadow: 0 10px 30px rgba(0,0,0,0.4); z-index: 999; }
+        .dock i { font-size: 1.4rem; color: #94a3b8; transition: 0.2s; cursor: pointer; }
+        .dock i.active { color: white; transform: translateY(-3px); text-shadow: 0 0 15px var(--primary); }
     </style>
 </head>
 <body>
 
 <header>
     <div class="brand">
-        <h1>IDEAS TEXTILES Spa</h1>
-        <small>Workwer and Corporate</small>
+        <h1>IDEAS TEXTILES</h1>
+        <span>Workwear and Corporate</span>
     </div>
-    <button class="btn-ai" style="background:none; border:none; color:white; font-size:1.2rem;" onclick="App.Backup.downloadPDF()">
-        <i class="fa-solid fa-file-pdf"></i>
+    <button class="btn-scan" onclick="App.IA.trigger()">
+        <i class="fa-solid fa-wand-magic-sparkles"></i> IA IMPORT
     </button>
 </header>
 
 <section id="v-bodega" class="view active">
-    <input type="text" id="search" class="search-box" placeholder="🔍 Buscar producto..." oninput="App.Render.bodega()">
-    <button class="btn-act b-dark" onclick="App.Actions.modalProd()">+ CREAR PRODUCTO</button>
-    <br><br>
+    <input type="text" id="search-inv" class="search-bar" placeholder="🔍 Buscar tela, producto, talla..." oninput="App.Render.bodega()">
+    <button class="btn btn-pri" style="width:100%; margin-bottom:20px;" onclick="App.Actions.modalProd()">
+        <i class="fa-solid fa-plus-circle"></i> AGREGAR PRODUCTO MANUAL
+    </button>
     <div id="list-bodega"></div>
 </section>
 
 <section id="v-ordenes" class="view">
-    <h2 style="font-size:1.2rem; font-weight:800; margin-bottom:15px;">PEDIDOS ACTIVOS</h2>
-    
-    <button class="btn-act b-blue" style="margin-bottom:20px; box-shadow: 0 4px 15px rgba(37,99,235,0.3);" onclick="App.Actions.modalNewOrder()">
-        <i class="fa-solid fa-cart-shopping"></i> NUEVO PEDIDO (VARIOS ITEMS)
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+        <h2 style="margin:0; font-size:1.2rem;">PEDIDOS</h2>
+        <small style="color:#64748b;" id="order-count">0 Activos</small>
+    </div>
+
+    <button class="btn btn-pri" style="width:100%; background: var(--primary); margin-bottom:20px; box-shadow:0 4px 10px rgba(59,130,246,0.3);" onclick="App.Actions.modalOrder()">
+        <i class="fa-solid fa-cart-shopping"></i> CREAR ORDEN MULTI-PRODUCTO
     </button>
     
     <div id="list-ordenes"></div>
@@ -111,42 +110,50 @@
 
 <section id="v-agenda" class="view">
     <div class="card">
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-            <button onclick="App.Calendar.move(-1)" style="border:none;background:none;"><i class="fa-solid fa-chevron-left"></i></button>
-            <h3 id="cal-title" style="margin:0;">MES</h3>
-            <button onclick="App.Calendar.move(1)" style="border:none;background:none;"><i class="fa-solid fa-chevron-right"></i></button>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+            <button class="btn-sec" style="width:auto; padding:5px 10px;" onclick="App.Calendar.move(-1)"><i class="fa-solid fa-chevron-left"></i></button>
+            <h3 id="cal-title" style="margin:0; text-transform:uppercase;">MES</h3>
+            <button class="btn-sec" style="width:auto; padding:5px 10px;" onclick="App.Calendar.move(1)"><i class="fa-solid fa-chevron-right"></i></button>
         </div>
-        <div id="cal-grid" class="cal-grid"></div>
-        <p style="text-align:center; font-size:0.7rem; color:#94a3b8; margin-top:10px;">Los despachos se guardan aquí automáticamente.</p>
+        <div id="cal-grid" style="display:grid; grid-template-columns:repeat(7,1fr); gap:5px; text-align:center;"></div>
     </div>
-    
-    <div class="card" style="text-align:center;">
-        <i class="fa-solid fa-file-pdf" style="font-size:3rem; color:var(--red); margin-bottom:10px;"></i>
-        <h3>REPORTES & BACKUP</h3>
-        <p style="font-size:0.8rem; color:#64748b;">Descarga todo tu sistema en un PDF visual o JSON.</p>
-        <button class="btn-act b-pdf" onclick="App.Backup.downloadPDF()">DESCARGAR REPORTE PDF</button>
-        <button class="btn-act b-dark" onclick="App.Backup.downloadJSON()">BACKUP DATOS (JSON)</button>
+
+    <div class="card" style="text-align:center; border: 2px solid var(--dark);">
+        <i class="fa-solid fa-file-invoice" style="font-size:2.5rem; color:var(--dark); margin-bottom:10px;"></i>
+        <h3 style="margin:0;">CENTRO DE REPORTES</h3>
+        <p style="font-size:0.8rem; color:#64748b;">Genera backups profesionales y reportes de gestión.</p>
+        
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:15px;">
+            <button class="btn btn-pri" onclick="App.Backup.generatePDF()">
+                <i class="fa-solid fa-file-pdf"></i> REPORTE PDF
+            </button>
+            <button class="btn btn-sec" onclick="App.Backup.exportJSON()">
+                <i class="fa-solid fa-download"></i> BACKUP DATOS
+            </button>
+        </div>
         <div style="margin-top:10px;">
-             <label style="font-size:0.7rem; color:var(--blue); font-weight:bold; cursor:pointer;">
-                <input type="file" hidden onchange="App.Backup.restoreJSON(this)">
-                <i class="fa-solid fa-upload"></i> RESTAURAR RESPALDO
+            <label class="btn btn-sec" style="border-style:dashed;">
+                <input type="file" hidden onchange="App.Backup.importJSON(this)">
+                <i class="fa-solid fa-upload"></i> RESTAURAR COPIA
             </label>
         </div>
     </div>
 </section>
 
 <nav class="dock">
-    <i class="fa-solid fa-boxes-stacked active" onclick="App.UI.go('bodega', this)"></i>
-    <i class="fa-solid fa-clipboard-list" onclick="App.UI.go('ordenes', this)"></i>
+    <i class="fa-solid fa-warehouse active" onclick="App.UI.go('bodega', this)"></i>
+    <i class="fa-solid fa-clipboard-check" onclick="App.UI.go('ordenes', this)"></i>
     <i class="fa-solid fa-calendar-days" onclick="App.UI.go('agenda', this)"></i>
 </nav>
+
+<input type="file" id="ai-input" hidden accept="image/*,.xlsx,.xls,.csv">
 
 <script>
 const App = {
     db: {
         inv: JSON.parse(localStorage.getItem('db_inv')) || [],
         ord: JSON.parse(localStorage.getItem('db_ord')) || [],
-        log: JSON.parse(localStorage.getItem('db_log')) || {}, 
+        log: JSON.parse(localStorage.getItem('db_log')) || {},
         date: new Date()
     },
 
@@ -160,7 +167,7 @@ const App = {
         localStorage.setItem('db_inv', JSON.stringify(this.db.inv));
         localStorage.setItem('db_ord', JSON.stringify(this.db.ord));
         localStorage.setItem('db_log', JSON.stringify(this.db.log));
-        this.Render.bodega(); this.Render.ordenes(); this.Calendar.render();
+        this.init();
     },
 
     UI: {
@@ -174,378 +181,387 @@ const App = {
 
     Render: {
         bodega() {
-            const q = document.getElementById('search').value.toUpperCase();
-            const list = App.db.inv.filter(i => i.n.includes(q));
-            document.getElementById('list-bodega').innerHTML = list.map((p, i) => `
+            const q = document.getElementById('search-inv').value.toUpperCase();
+            const list = App.db.inv.filter(i => i.n.toUpperCase().includes(q));
+            
+            document.getElementById('list-bodega').innerHTML = list.map((p, idx) => {
+                // Generar string de tallas
+                const sizes = Object.entries(p.s).map(([k,v]) => `<span style="background:#e2e8f0; padding:2px 6px; border-radius:4px; font-size:0.75rem;"><b>${k}:</b>${v}</span>`).join(' ');
+                
+                return `
                 <div class="card">
-                    <div style="display:flex; justify-content:space-between;">
-                        <h3 style="margin:0;">${p.n}</h3>
-                        <i class="fa-solid fa-pen" onclick="App.Actions.modalProd(${i})" style="color:var(--blue); cursor:pointer;"></i>
+                    <div style="display:flex; justify-content:space-between; align-items:start;">
+                        <div>
+                            <h3 style="margin:0; font-size:1rem;">${p.n}</h3>
+                            <div style="margin-top:8px; display:flex; flex-wrap:wrap; gap:4px;">${sizes}</div>
+                        </div>
+                        <i class="fa-solid fa-pen-to-square" style="color:var(--primary); font-size:1.2rem; cursor:pointer; padding:5px;" onclick="App.Actions.modalProd(${App.db.inv.indexOf(p)})"></i>
                     </div>
-                    <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:10px;">
-                        ${Object.entries(p.s).map(([k,v]) => 
-                            `<span style="background:#f1f5f9; padding:4px 8px; border-radius:6px; font-size:0.75rem;"><b>${k}:</b> ${v}</span>`
-                        ).join('')}
-                    </div>
-                </div>
-            `).join('') || '<div style="text-align:center;color:#94a3b8">Sin inventario</div>';
+                </div>`;
+            }).join('') || '<div style="text-align:center;color:#94a3b8;margin-top:20px;">Sin resultados</div>';
         },
 
         ordenes() {
-            const list = document.getElementById('list-ordenes');
-            // Filtrar o arreglar datos viejos si existen
-            const validOrders = App.db.ord.filter(o => o.items && Array.isArray(o.items));
-            
-            if(validOrders.length === 0) return list.innerHTML = '<div style="text-align:center;padding:20px;color:#94a3b8">No hay pedidos activos</div>';
-            
-            list.innerHTML = validOrders.slice().reverse().map((o, idx) => {
-                const realIdx = App.db.ord.indexOf(o); // Encontrar índice real para acciones
+            const list = App.db.ord; // Mostrar todos (o filtrar si se desea)
+            document.getElementById('order-count').innerText = `${list.filter(o=>o.st!=='done').length} Activos`;
+
+            document.getElementById('list-ordenes').innerHTML = list.slice().reverse().map((o, idx) => {
+                const realIdx = list.length - 1 - idx;
                 
-                let stBadge = o.st==='done' ? '<span class="chip c-done">DESPACHADO</span>' : 
-                              (o.st==='pack' ? '<span class="chip c-pack">EMPAQUETADO</span>' : '<span class="chip c-bodega">EN PROCESO</span>');
-                
-                // Generar lista HTML de items
-                const itemsHtml = o.items.map(it => `
-                    <div class="order-row">
-                        <span>${it.p}</span>
-                        <span>Talla: <b>${it.sz}</b> x${it.q}</span>
-                    </div>
-                `).join('');
+                // Estados
+                let stClass = 'st-1', stText = 'EN PROCESO';
+                if(o.st === 'pack') { stClass = 'st-2'; stText = 'EMPAQUETADO'; }
+                if(o.st === 'done') { stClass = 'st-3'; stText = 'DESPACHADO'; }
+
+                const itemsHtml = o.items.map(it => `<div class="item-row"><span>${it.p} (T:${it.sz})</span><b>x${it.q}</b></div>`).join('');
 
                 return `
-                <div class="card" style="border-left:5px solid ${o.st==='done'?'var(--green)':'var(--blue)'}">
-                    <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                <div class="card">
+                    <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
+                        <span class="status ${stClass}">${stText}</span>
                         <div>
-                            ${stBadge}
-                            <h3 style="margin:5px 0 0; font-size:1.1rem;">${o.c}</h3>
-                            ${o.fac ? `<small style="background:var(--dark); color:white; padding:2px 6px; border-radius:4px;">FAC: ${o.fac}</small>` : ''}
+                            <button class="btn-edit" onclick="App.Actions.modalOrder(${realIdx})"><i class="fa-solid fa-pen"></i></button>
+                            <i class="fa-solid fa-trash" style="color:#cbd5e1; margin-left:10px; cursor:pointer;" onclick="App.Actions.delOrd(${realIdx})"></i>
                         </div>
-                        <i class="fa-solid fa-trash" style="color:#cbd5e1; cursor:pointer;" onclick="App.Actions.delOrd(${realIdx})"></i>
                     </div>
+                    
+                    <h3 style="margin:0;">${o.c}</h3>
+                    ${o.fac ? `<small style="color:var(--success); font-weight:700;">FACTURA: ${o.fac}</small>` : ''}
+                    
+                    <div class="item-list">${itemsHtml}</div>
 
-                    <div class="order-items">
-                        ${itemsHtml}
+                    <div class="action-row">
+                        ${o.st === 'bodega' ? `<button class="btn btn-pri" onclick="App.Actions.setStatus(${realIdx}, 'pack')">EMPAQUETAR <i class="fa-solid fa-box"></i></button>` : ''}
+                        ${o.st === 'pack' ? `<button class="btn btn-pri" style="background:var(--primary)" onclick="App.Actions.despachar(${realIdx})">DESPACHAR <i class="fa-solid fa-truck"></i></button>` : ''}
+                        ${o.st === 'pack' ? `<button class="btn btn-sec" onclick="App.Actions.setStatus(${realIdx}, 'bodega')">🔙</button>` : ''}
                     </div>
-
-                    ${o.st === 'bodega' ? `<button class="btn-act b-dark" onclick="App.Actions.cycle(${realIdx})">MARCAR EMPAQUETADO <i class="fa-solid fa-box"></i></button>` : ''}
-                    ${o.st === 'pack' ? `<button class="btn-act b-blue" onclick="App.Actions.cycle(${realIdx})">DESPACHAR <i class="fa-solid fa-truck"></i></button>` : ''}
                 </div>`;
             }).join('');
         }
     },
 
     Actions: {
-        // --- MODAL FLEXIBLE PARA PEDIDOS ---
-        async modalNewOrder() {
-            // Lista de productos para autocompletar
-            const prods = App.db.inv.map(i => `<option value="${i.n}">`).join('');
-            let cart = [];
+        // --- 1. EDICIÓN DE INVENTARIO ---
+        async modalProd(idx = null) {
+            const item = idx !== null ? App.db.inv[idx] : {n:'', s:{}};
+            const sizesText = Object.entries(item.s).map(([k,v])=>`${k}:${v}`).join(', ');
 
-            const updateCartHTML = () => {
-                const cDiv = document.getElementById('temp-cart-list');
-                if(!cart.length) return cDiv.innerHTML = '<small style="display:block;text-align:center;color:#94a3b8;padding:10px;">Nada agregado aún</small>';
-                cDiv.innerHTML = cart.map((it, ix) => `
-                    <div class="temp-item">
-                        <span><b>${it.p}</b> (T: ${it.sz})</span>
-                        <span>x${it.q} <i class="fa-solid fa-times" style="color:red; margin-left:5px; cursor:pointer;" onclick="window.delCartItem(${ix})"></i></span>
-                    </div>
-                `).join('');
-            };
-
-            window.delCartItem = (ix) => { cart.splice(ix,1); updateCartHTML(); };
-
-            await Swal.fire({
-                title: 'NUEVO PEDIDO MULTI-ITEM',
-                width: 600,
+            const {value:res} = await Swal.fire({
+                title: idx!==null ? 'EDITAR PRODUCTO' : 'NUEVO PRODUCTO',
                 html: `
-                    <div class="input-group">
-                        <label>NOMBRE CLIENTE</label>
-                        <input id="new-client" class="custom-input" placeholder="Ej: Maria Perez">
+                    <div class="swal-input-group">
+                        <label>Nombre del Producto</label>
+                        <input id="sw-n" value="${item.n}" placeholder="Ej: POLERA PIQUE">
                     </div>
-                    
-                    <div style="background:#f8fafc; padding:10px; border-radius:8px; border:1px solid #e2e8f0; margin-bottom:10px;">
-                        <div class="input-group">
-                            <label>PRODUCTO</label>
-                            <input id="add-prod" class="custom-input" list="dl-prods" placeholder="Busca o escribe...">
-                            <datalist id="dl-prods">${prods}</datalist>
-                        </div>
-                        <div style="display:flex; gap:10px;">
-                            <div class="input-group" style="flex:2;">
-                                <label>TALLA (LIBRE)</label>
-                                <input id="add-size" class="custom-input" placeholder="Ej: 42, XXL, Única...">
-                            </div>
-                            <div class="input-group" style="flex:1;">
-                                <label>CANT.</label>
-                                <input id="add-qty" type="number" class="custom-input" value="1">
-                            </div>
-                        </div>
-                        <button type="button" id="btn-add-item" class="btn-act b-dark" style="margin-top:0;">
-                            <i class="fa-solid fa-plus"></i> AGREGAR
-                        </button>
+                    <div class="swal-input-group" style="margin-top:10px;">
+                        <label>Stock (Formato: Talla:Cant, Talla:Cant)</label>
+                        <input id="sw-s" value="${sizesText}" placeholder="Ej: S:10, M:5, XL:2">
                     </div>
-
-                    <div id="temp-cart-list" class="temp-list"></div>
                 `,
                 showCancelButton: true,
-                confirmButtonText: 'GUARDAR PEDIDO COMPLETO',
-                didOpen: () => {
-                    updateCartHTML();
-                    document.getElementById('btn-add-item').onclick = () => {
-                        const p = document.getElementById('add-prod').value.toUpperCase();
-                        const sz = document.getElementById('add-size').value.toUpperCase();
-                        const q = Number(document.getElementById('add-qty').value);
-
-                        if(!p || !sz || q <= 0) return Swal.showValidationMessage('Faltan datos del producto');
-                        
-                        cart.push({p, sz, q});
-                        // Limpiar campos items
-                        document.getElementById('add-prod').value = '';
-                        document.getElementById('add-size').value = '';
-                        document.getElementById('add-qty').value = '1';
-                        updateCartHTML();
-                    };
-                },
-                preConfirm: () => {
-                    const c = document.getElementById('new-client').value.toUpperCase();
-                    if(!c) return Swal.showValidationMessage('¡Falta el nombre del cliente!');
-                    if(!cart.length) return Swal.showValidationMessage('¡No has agregado productos!');
-                    return { c, items: cart };
-                }
-            }).then((res) => {
-                if(res.isConfirmed) {
-                    App.db.ord.push({
-                        c: res.value.c,
-                        items: res.value.items,
-                        st: 'bodega',
-                        fac: null,
-                        date: new Date().toLocaleDateString()
-                    });
-                    App.save();
-                    Swal.fire('¡Creado!', 'El pedido ha sido registrado.', 'success');
-                }
-            });
-        },
-
-        async modalProd(i=null) {
-            const item = i!==null ? App.db.inv[i] : {n:'', s:{}};
-            // Convertir objeto tallas a texto para editar facil
-            const sizeStr = Object.entries(item.s).map(([k,v])=>`${k}:${v}`).join(', ');
-            
-            const {value:form} = await Swal.fire({
-                title: i!==null?'Editar':'Nuevo',
-                html: `
-                    <label>Nombre Producto</label>
-                    <input id="sw-n" class="swal2-input" value="${item.n}">
-                    <label>Inventario (Formato: Talla:Cant, Talla:Cant)</label>
-                    <input id="sw-s" class="swal2-input" value="${sizeStr}" placeholder="Ej: S:10, M:5, 42:2">
-                `,
+                confirmButtonText: 'GUARDAR',
                 preConfirm: () => {
                     const n = document.getElementById('sw-n').value.toUpperCase();
                     const sRaw = document.getElementById('sw-s').value;
-                    // Parsear texto a objeto
                     const s = {};
-                    sRaw.split(',').forEach(x => {
-                        const [k,v] = x.split(':');
-                        if(k && v) s[k.trim().toUpperCase()] = Number(v);
-                    });
+                    if(sRaw) {
+                        sRaw.split(',').forEach(part => {
+                            const [k,v] = part.split(':');
+                            if(k && v) s[k.trim().toUpperCase()] = parseInt(v) || 0;
+                        });
+                    }
                     return {n,s};
                 }
             });
 
-            if(form) {
-                if(i!==null) App.db.inv[i] = form;
-                else App.db.inv.push(form);
+            if(res) {
+                if(idx!==null) App.db.inv[idx] = res;
+                else App.db.inv.push(res);
                 App.save();
+                Swal.fire('Guardado', '', 'success');
             }
         },
 
-        async cycle(i) {
+        // --- 2. EDICIÓN DE ORDENES (MEJORADA "CARRITO") ---
+        async modalOrder(idx = null) {
+            const isEdit = idx !== null;
+            let currentOrder = isEdit ? JSON.parse(JSON.stringify(App.db.ord[idx])) : { c: '', items: [], st: 'bodega', fac: null };
+            let cart = currentOrder.items;
+
+            // Lista productos para datalist
+            const prodList = App.db.inv.map(i => `<option value="${i.n}">`).join('');
+
+            const renderCart = () => {
+                const el = document.getElementById('cart-display');
+                if(!el) return;
+                if(cart.length === 0) el.innerHTML = '<small style="color:#94a3b8; display:block; text-align:center;">Carrito vacío</small>';
+                else el.innerHTML = cart.map((it, i) => `
+                    <div style="background:white; border-bottom:1px solid #eee; padding:5px; display:flex; justify-content:space-between; font-size:0.8rem;">
+                        <span>${it.p} (${it.sz})</span>
+                        <span>x${it.q} <i class="fa-solid fa-times" style="color:var(--danger); cursor:pointer; margin-left:5px;" onclick="window.delCart(${i})"></i></span>
+                    </div>
+                `).join('');
+            };
+
+            window.delCart = (i) => { cart.splice(i,1); renderCart(); };
+
+            await Swal.fire({
+                title: isEdit ? 'EDITAR ORDEN' : 'NUEVA ORDEN',
+                width: 600,
+                html: `
+                    <div class="swal-input-group">
+                        <label>NOMBRE CLIENTE</label>
+                        <input id="ord-c" value="${currentOrder.c}" placeholder="Ej: JUAN PEREZ">
+                    </div>
+                    
+                    <div style="background:#f1f5f9; padding:10px; border-radius:8px; margin-top:10px; border:1px solid #cbd5e1;">
+                        <label style="font-size:0.7rem; font-weight:800; color:var(--primary);">AGREGAR ITEMS</label>
+                        <div class="cart-grid">
+                            <div class="swal-input-group">
+                                <label>PRODUCTO</label>
+                                <input id="add-p" list="dl-prods" placeholder="Buscar...">
+                                <datalist id="dl-prods">${prodList}</datalist>
+                            </div>
+                            <div class="swal-input-group">
+                                <label>TALLA</label>
+                                <input id="add-s" placeholder="Ej: 42, M...">
+                            </div>
+                            <div class="swal-input-group">
+                                <label>CANT</label>
+                                <input id="add-q" type="number" value="1">
+                            </div>
+                        </div>
+                        <button type="button" id="btn-add" class="btn btn-dark" style="background:var(--dark); color:white; width:100%; margin-top:5px; padding:8px;">
+                            <i class="fa-solid fa-plus"></i> AGREGAR
+                        </button>
+                    </div>
+
+                    <div id="cart-display" style="max-height:150px; overflow-y:auto; margin-top:10px; border:1px solid #e2e8f0; border-radius:4px; background:#fafafa;"></div>
+                `,
+                didOpen: () => {
+                    renderCart();
+                    document.getElementById('btn-add').onclick = () => {
+                        const p = document.getElementById('add-p').value.toUpperCase();
+                        const sz = document.getElementById('add-s').value.toUpperCase();
+                        const q = parseInt(document.getElementById('add-q').value);
+                        if(p && sz && q > 0) {
+                            cart.push({p, sz, q});
+                            document.getElementById('add-p').value = '';
+                            document.getElementById('add-s').value = '';
+                            document.getElementById('add-q').value = 1;
+                            renderCart();
+                        }
+                    };
+                },
+                preConfirm: () => {
+                    const c = document.getElementById('ord-c').value.toUpperCase();
+                    if(!c || cart.length === 0) return Swal.showValidationMessage('Falta cliente o productos');
+                    return {c, items: cart};
+                }
+            }).then((res) => {
+                if(res.isConfirmed) {
+                    currentOrder.c = res.value.c;
+                    currentOrder.items = res.value.items;
+                    
+                    if(isEdit) App.db.ord[idx] = currentOrder;
+                    else App.db.ord.push(currentOrder);
+                    
+                    App.save();
+                    Swal.fire('Guardado', '', 'success');
+                }
+            });
+        },
+
+        setStatus(i, st) { App.db.ord[i].st = st; App.save(); },
+        delOrd(i) { Swal.fire({title:'¿Eliminar?', icon:'warning', showCancelButton:true}).then(r=>{ if(r.isConfirmed){App.db.ord.splice(i,1); App.save();} }); },
+
+        async despachar(i) {
             const o = App.db.ord[i];
-            
-            if(o.st === 'bodega') {
-                o.st = 'pack';
-                App.save();
-            } 
-            else if(o.st === 'pack') {
-                const {value:fac} = await Swal.fire({
-                    title: 'DESPACHO',
-                    text: 'Ingresa Número de Factura:',
-                    input: 'text',
-                    inputPlaceholder: 'Ej: 1045'
+            const {value:f} = await Swal.fire({title:'N° FACTURA', input:'text'});
+            if(f) {
+                o.st = 'done'; o.fac = f;
+                
+                // Descontar inventario (inteligente)
+                let logs = [];
+                o.items.forEach(it => {
+                    const p = App.db.inv.find(x => x.n === it.p);
+                    if(p && p.s[it.sz] !== undefined) {
+                        p.s[it.sz] -= it.q;
+                        logs.push(`✅ ${it.p} ${it.sz}: Stock actualizado`);
+                    } else logs.push(`⚠️ ${it.p} ${it.sz}: Producto no inventariado, solo registrado`);
                 });
 
-                if(fac) {
-                    // Descontar inventario (intento de match)
-                    let stockLog = [];
-                    o.items.forEach(it => {
-                        const prod = App.db.inv.find(x => x.n === it.p);
-                        if(prod && prod.s[it.sz] !== undefined) {
-                            prod.s[it.sz] -= it.q;
-                            stockLog.push(`✅ ${it.p} (${it.sz}): Stock descontado.`);
-                        } else {
-                            stockLog.push(`⚠️ ${it.p} (${it.sz}): No se encontró stock exacto, no se descontó.`);
+                // Escribir en calendario
+                const today = new Date();
+                const k = `${today.getDate()}-${today.getMonth()}-${today.getFullYear()}`;
+                App.db.log[k] = (App.db.log[k] || '') + `🚚 FAC ${f}: ${o.c} (${o.items.length} items)\n`;
+
+                App.save();
+                Swal.fire('Despachado', logs.join('<br>'), 'success');
+            }
+        }
+    },
+
+    IA: {
+        trigger() { document.getElementById('ai-input').click(); },
+        async process(file) {
+            if(!file) return;
+            const name = file.name.toLowerCase();
+
+            // 1. MODO EXCEL (RAPIDÍSIMO)
+            if(name.endsWith('xlsx') || name.endsWith('xls') || name.endsWith('csv')) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, {type: 'array'});
+                    const sheet = workbook.Sheets[workbook.SheetNames[0]];
+                    const json = XLSX.utils.sheet_to_json(sheet, {header:1});
+                    
+                    // Lógica simple: Buscar filas con [Producto, Talla, Cantidad]
+                    let added = 0;
+                    json.forEach(row => {
+                        if(row.length >= 3 && typeof row[2] === 'number') {
+                            // Asumimos col 0=Nombre, 1=Talla, 2=Cant
+                            const n = String(row[0]).toUpperCase();
+                            const sz = String(row[1]).toUpperCase();
+                            const q = row[2];
+                            
+                            let prod = App.db.inv.find(p=>p.n===n);
+                            if(!prod) { prod={n, s:{}}; App.db.inv.push(prod); }
+                            prod.s[sz] = (prod.s[sz]||0) + q;
+                            added++;
                         }
                     });
-
-                    o.st = 'done';
-                    o.fac = fac;
-                    o.outDate = new Date();
-
-                    // Escribir en Calendario
-                    const k = `${o.outDate.getDate()}-${o.outDate.getMonth()}-${o.outDate.getFullYear()}`;
-                    const entry = `📦 FAC ${fac}: ${o.c} (Items: ${o.items.length})\n`;
-                    App.db.log[k] = (App.db.log[k] || '') + entry;
-
                     App.save();
-                    Swal.fire('Despachado', stockLog.join('<br>'), 'success');
+                    Swal.fire('Excel Procesado', `Se detectaron ${added} registros.`, 'success');
+                };
+                reader.readAsArrayBuffer(file);
+            }
+            // 2. MODO IMAGEN (Tesseract OCR)
+            else {
+                Swal.fire({
+                    title: 'Escaneando Imagen...',
+                    html: 'La IA está leyendo el texto. Espere...',
+                    didOpen: () => Swal.showLoading()
+                });
+
+                try {
+                    const worker = await Tesseract.createWorker();
+                    await worker.loadLanguage('spa');
+                    await worker.initialize('spa');
+                    const { data: { text } } = await worker.recognize(file);
+                    await worker.terminate();
+
+                    // Mostrar texto para que usuario decida qué hacer
+                    Swal.fire({
+                        title: 'Texto Detectado',
+                        input: 'textarea',
+                        inputValue: text,
+                        footer: 'Copia lo útil y úsalo para crear productos.',
+                        confirmButtonText: 'OK'
+                    });
+                } catch (err) {
+                    Swal.fire('Error IA', 'No se pudo leer la imagen', 'error');
                 }
             }
-        },
-
-        delOrd(i) {
-            Swal.fire({title:'¿Borrar?', icon:'warning', showCancelButton:true}).then(r=>{
-                if(r.isConfirmed){ App.db.ord.splice(i,1); App.save(); }
-            });
         }
     },
 
     Backup: {
-        // GENERAR PDF VISUAL Y BONITO
-        downloadPDF() {
+        generatePDF() {
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
             
-            // TITULO
-            doc.setFillColor(15, 23, 42); // --dark
-            doc.rect(0, 0, 210, 20, 'F');
-            doc.setTextColor(255, 255, 255);
-            doc.setFontSize(14);
-            doc.text("IDEAS TEXTILES - REPORTE GENERAL", 10, 13);
-            doc.setFontSize(8);
-            doc.text(`Generado: ${new Date().toLocaleString()}`, 150, 13);
+            // Header
+            doc.setFillColor(15, 23, 42); 
+            doc.rect(0,0,210,30,'F');
+            doc.setTextColor(255,255,255);
+            doc.setFontSize(18);
+            doc.text("IDEAS TEXTILES", 14, 18);
+            doc.setFontSize(10);
+            doc.text("REPORTE MAESTRO DE GESTIÓN", 14, 24);
+            doc.text(`Fecha: ${new Date().toLocaleDateString()}`, 160, 20);
 
-            let y = 30;
+            let y = 40;
 
-            // 1. INVENTARIO
+            // METRICAS
+            const totalStock = App.db.inv.reduce((acc,p)=>acc+Object.values(p.s).reduce((a,b)=>a+b,0),0);
+            const pending = App.db.ord.filter(o=>o.st!=='done').length;
+            const done = App.db.ord.filter(o=>o.st==='done').length;
+
             doc.setTextColor(0,0,0);
-            doc.setFontSize(12);
-            doc.text("INVENTARIO ACTUAL", 14, y);
-            y += 5;
-            
-            const invBody = App.db.inv.map(i => [
-                i.n, 
-                Object.entries(i.s).map(([k,v]) => `${k}:${v}`).join(', ')
-            ]);
+            doc.setFontSize(10);
+            doc.text(`STOCK TOTAL: ${totalStock} uds  |  PENDIENTES: ${pending}  |  DESPACHADOS: ${done}`, 14, y);
+            y+=10;
 
+            // TABLA INVENTARIO
+            doc.setFontSize(14); doc.text("1. INVENTARIO", 14, y); y+=5;
+            const bodyInv = App.db.inv.map(p => [p.n, Object.entries(p.s).map(([k,v])=>`${k}:${v}`).join(', ')]);
             doc.autoTable({
                 startY: y,
-                head: [['Producto', 'Stock Detallado']],
-                body: invBody,
+                head: [['Producto', 'Detalle Tallas']],
+                body: bodyInv,
                 theme: 'grid',
-                headStyles: { fillColor: [37, 99, 235] }
+                headStyles: {fillColor:[59, 130, 246]}
             });
-
             y = doc.lastAutoTable.finalY + 15;
 
-            // 2. PEDIDOS ACTIVOS
-            doc.text("PEDIDOS EN CURSO (Pendientes y Empaquetados)", 14, y);
-            y += 5;
-
-            const ordBody = App.db.ord
-                .filter(o => o.st !== 'done')
-                .map(o => [
-                    o.c,
-                    o.items.map(it => `${it.p} (${it.sz}) x${it.q}`).join('\n'),
-                    o.st.toUpperCase()
-                ]);
-
+            // TABLA PEDIDOS ACTIVOS
+            doc.setFontSize(14); doc.text("2. PEDIDOS EN CURSO", 14, y); y+=5;
+            const bodyOrd = App.db.ord.filter(o=>o.st!=='done').map(o=>[o.c, o.items.map(i=>`${i.p} (${i.sz})`).join(', '), o.st.toUpperCase()]);
             doc.autoTable({
                 startY: y,
-                head: [['Cliente', 'Items', 'Estado']],
-                body: ordBody,
+                head: [['Cliente', 'Productos', 'Estado']],
+                body: bodyOrd,
                 theme: 'striped',
-                headStyles: { fillColor: [217, 119, 6] } // Amber
+                headStyles: {fillColor:[245, 158, 11]}
             });
 
-            y = doc.lastAutoTable.finalY + 15;
-
-            // 3. ULTIMOS DESPACHOS
-            doc.text("ULTIMOS DESPACHOS (Con Factura)", 14, y);
-            y += 5;
-
-            const doneBody = App.db.ord
-                .filter(o => o.st === 'done')
-                .slice(-10) // Ultimos 10
-                .map(o => [
-                    o.fac || 'S/N',
-                    o.c,
-                    o.items.map(it => `${it.p} (${it.sz}) x${it.q}`).join(', ')
-                ]);
-
-            doc.autoTable({
-                startY: y,
-                head: [['Factura', 'Cliente', 'Detalle']],
-                body: doneBody,
-                theme: 'striped',
-                headStyles: { fillColor: [5, 150, 105] } // Green
-            });
-
-            doc.save(`REPORTE_IDEAS_${new Date().toLocaleDateString().replace(/\//g,'-')}.pdf`);
+            doc.save('REPORTE_IDEAS_MASTER.pdf');
         },
-
-        downloadJSON() {
+        exportJSON() {
             const data = JSON.stringify(App.db);
-            const blob = new Blob([data], {type: "application/json"});
-            const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
-            a.href = url;
-            a.download = "BACKUP_DATA.json";
-            document.body.appendChild(a);
+            a.href = URL.createObjectURL(new Blob([data], {type:"application/json"}));
+            a.download = `BACKUP_${new Date().getTime()}.json`;
             a.click();
-            document.body.removeChild(a);
         },
-
-        restoreJSON(input) {
-            const file = input.files[0];
-            if(!file) return;
+        importJSON(el) {
             const reader = new FileReader();
             reader.onload = (e) => {
-                try {
-                    App.db = JSON.parse(e.target.result);
-                    App.save();
-                    Swal.fire('Restaurado', 'Tus datos han sido cargados.', 'success');
-                } catch(e) { Swal.fire('Error', 'Archivo inválido', 'error'); }
+                try { App.db = JSON.parse(e.target.result); App.save(); Swal.fire('Éxito','Datos restaurados','success'); }
+                catch { Swal.fire('Error','Archivo corrupto','error'); }
             };
-            reader.readAsText(file);
+            reader.readAsText(el.files[0]);
         }
     },
 
     Calendar: {
-        move(dir) { App.db.date.setMonth(App.db.date.getMonth() + dir); this.render(); },
+        move(dir) { App.db.date.setMonth(App.db.date.getMonth()+dir); this.render(); },
         render() {
             const d = App.db.date;
-            const mNames = ["ENERO","FEBRERO","MARZO","ABRIL","MAYO","JUNIO","JULIO","AGOSTO","SEPTIEMBRE","OCTUBRE","NOVIEMBRE","DICIEMBRE"];
+            const mNames = ["ENE","FEB","MAR","ABR","MAY","JUN","JUL","AGO","SEP","OCT","NOV","DIC"];
             document.getElementById('cal-title').innerText = `${mNames[d.getMonth()]} ${d.getFullYear()}`;
             
             const first = new Date(d.getFullYear(), d.getMonth(), 1).getDay();
             const days = new Date(d.getFullYear(), d.getMonth()+1, 0).getDate();
+            
             let html = '';
-
-            for(let i=0; i<first; i++) html += '<div></div>';
-            for(let i=1; i<=days; i++) {
+            for(let i=0;i<first;i++) html+='<div></div>';
+            for(let i=1;i<=days;i++) {
                 const k = `${i}-${d.getMonth()}-${d.getFullYear()}`;
-                const hasNote = App.db.log[k];
-                html += `<div class="cal-day ${hasNote?'has-note':''}" onclick="App.Calendar.show('${k}')">${i}</div>`;
+                const hasLog = App.db.log[k] ? 'background:#dbeafe; color:var(--primary); font-weight:bold; border:1px solid var(--primary);' : 'background:white;';
+                html += `<div style="padding:10px; border-radius:8px; cursor:pointer; ${hasLog}" onclick="App.Calendar.show('${k}')">${i}</div>`;
             }
             document.getElementById('cal-grid').innerHTML = html;
         },
         show(k) {
-            const txt = App.db.log[k] || 'Sin actividad.';
-            Swal.fire({ title: `Día ${k}`, text: txt });
+            Swal.fire({ title: `Bitácora ${k}`, html: (App.db.log[k]||'Sin registros').replace(/\n/g,'<br>'), confirmButtonText:'Cerrar'});
         }
     }
 };
 
+document.getElementById('ai-input').addEventListener('change', (e) => App.IA.process(e.target.files[0]));
 window.onload = () => App.init();
 </script>
 </body>
