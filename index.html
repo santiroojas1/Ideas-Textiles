@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>IDEAS TEXTILES SPA</title>
+    <title>IDEAS TEXTILES SPA </title>
     
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
@@ -76,10 +76,10 @@
 <header>
     <div class="brand">
         <h1>IDEAS TEXTILES</h1>
-        <span>WORKWEAR AND CORPORATE</span>
+        <span>WORKWEAR AND CORPORATE </span>
     </div>
     <button class="btn-scan" onclick="App.IA.trigger()">
-        <i class="fa-solid fa-wand-magic-sparkles"></i> IMPORTAR ARCHIVO 
+        <i class="fa-solid fa-wand-magic-sparkles"></i> IMPORTAR ARCHIVO
     </button>
 </header>
 
@@ -237,31 +237,18 @@ const App = {
             const isNew = i === null;
             const item = isNew ? {n:'', s:{}, sku: App.Helpers.getNextSKU()} : App.db.inv[i];
             const sTxt = Object.entries(item.s).map(([k,v])=>`${k}:${v}`).join(', ');
-            
             const {value} = await Swal.fire({
                 title: isNew ? 'NUEVO PRODUCTO' : 'EDITAR PRODUCTO',
-                html: `
-                    <div style="text-align:right; margin-bottom:10px;"><span class="sku-badge">SKU: ${item.sku}</span></div>
-                    <input id="sw-n" class="swal2-input" placeholder="Nombre" value="${item.n}">
-                    <input id="sw-s" class="swal2-input" placeholder="Talla:Cant, Talla:Cant" value="${sTxt}">
-                `,
+                html: `<div style="text-align:right; margin-bottom:10px;"><span class="sku-badge">SKU: ${item.sku}</span></div><input id="sw-n" class="swal2-input" placeholder="Nombre" value="${item.n}"><input id="sw-s" class="swal2-input" placeholder="Talla:Cant, Talla:Cant" value="${sTxt}">`,
                 preConfirm: () => {
                     const n = document.getElementById('sw-n').value.toUpperCase();
                     const s = {}; document.getElementById('sw-s').value.split(',').forEach(x => { const [k,v]=x.split(':'); if(k&&v) s[k.trim().toUpperCase()]=Number(v); });
                     return {n, s, sku: item.sku};
                 }
             });
-
             if(value) {
                 if(!isNew) App.db.inv[i]=value; else App.db.inv.push(value);
-                const {value:reason} = await Swal.fire({
-                    title: 'REGISTRO DE OPERACIÓN',
-                    text: '¿Motivo del cambio? (Para bitácora)',
-                    input: 'text',
-                    inputPlaceholder: 'Ej: Llegada de mercadería...',
-                    confirmButtonText: 'GUARDAR',
-                    allowOutsideClick: false
-                });
+                const {value:reason} = await Swal.fire({title: 'REGISTRO DE OPERACIÓN', text: '¿Motivo del cambio?', input: 'text', confirmButtonText: 'GUARDAR', allowOutsideClick: false});
                 if(reason) {
                     const opID = Math.floor(Math.random() * 9000) + 1000;
                     const d = new Date(); const k = `${d.getDate()}-${d.getMonth()}-${d.getFullYear()}`;
@@ -350,16 +337,14 @@ const App = {
     IA: {
         trigger(){ document.getElementById('ai-input').click(); },
         
-        // --- FUNCIÓN INTELIGENTE DE DETECCIÓN DE COLUMNAS (THE BEST IN THE WORLD) ---
+        // --- MOTOR DE DETECCION INTELIGENTE (COLUMNAS + AGRUPACION) ---
         detectHeadersAndMap(jsonSheet) {
-            // Valores por defecto (basado en lo que vimos en el PDF)
-            let mapping = { prod: 4, size: 5, qty: 6 }; 
+            let mapping = { prod: 4, size: 5, qty: 6, client: -1 }; 
             let headerRowIndex = 0;
 
-            // Buscamos fila por fila si encontramos palabras clave
             for(let i=0; i<Math.min(jsonSheet.length, 10); i++) {
                 const row = jsonSheet[i];
-                let foundP = -1, foundS = -1, foundQ = -1;
+                let foundP = -1, foundS = -1, foundQ = -1, foundC = -1;
 
                 row.forEach((cell, idx) => {
                     if(!cell) return;
@@ -367,12 +352,18 @@ const App = {
                     if(txt.includes('PRODUCTO') || txt.includes('DESCRIPCION') || txt.includes('ITEM')) foundP = idx;
                     if(txt.includes('TALLA') || txt.includes('SIZE') || txt.includes('MEDIDA')) foundS = idx;
                     if(txt.includes('CANT') || txt.includes('SOLICITADA') || txt.includes('CTD')) foundQ = idx;
+                    // Detectar Cliente
+                    if(txt.includes('CLIENTE') || txt.includes('NOMBRE') || txt.includes('DESTINATARIO') || txt.includes('TIENDA')) foundC = idx;
                 });
 
-                // Si encontramos al menos 2 de 3, asumimos que esta es la fila de encabezados
                 if(foundP !== -1 && (foundS !== -1 || foundQ !== -1)) {
-                    mapping = { prod: foundP, size: foundS !== -1 ? foundS : foundP+1, qty: foundQ !== -1 ? foundQ : foundP+2 };
-                    headerRowIndex = i + 1; // Los datos empiezan en la siguiente
+                    mapping = { 
+                        prod: foundP, 
+                        size: foundS !== -1 ? foundS : foundP+1, 
+                        qty: foundQ !== -1 ? foundQ : foundP+2,
+                        client: foundC // Puede ser -1 si no existe columna cliente
+                    };
+                    headerRowIndex = i + 1;
                     break;
                 }
             }
@@ -395,45 +386,78 @@ const App = {
 
         async process(f) {
             if(!f) return;
-            // EXCEL / CSV (SÚPER INTELIGENTE AHORA)
             if(f.name.match(/\.(xlsx|xls|csv)$/i)) {
                 const reader = new FileReader();
                 reader.onload = (e) => {
                     const wb = XLSX.read(e.target.result, {type:'array'});
                     const js = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], {header:1});
                     
-                    // USAR DETECTOR INTELIGENTE
                     const { mapping, headerRowIndex } = this.detectHeadersAndMap(js);
-                    let cnt=0;
+                    
+                    // --- LOGICA DE AGRUPACIÓN (SPLITTER) ---
+                    let ordersMap = {}; // Clave: Cliente, Valor: Array de Items
+                    let stockItems = []; // Items sin cliente (Stock)
+                    let cnt = 0;
 
                     for(let i = headerRowIndex; i < js.length; i++) {
                         const row = js[i];
-                        // Verificamos que existan las celdas en los índices detectados
                         if(row[mapping.prod] && row[mapping.qty]) {
                             const n = String(row[mapping.prod]).toUpperCase().trim();
                             const sz = row[mapping.size] ? String(row[mapping.size]).toUpperCase().trim() : 'UNICA';
                             const q = parseInt(row[mapping.qty]);
+                            
+                            // Detectar nombre cliente si existe la columna
+                            let clientName = null;
+                            if(mapping.client !== -1 && row[mapping.client]) {
+                                clientName = String(row[mapping.client]).toUpperCase().trim();
+                            }
 
                             if(n && q > 0) {
+                                // Asegurar que el producto exista en DB (Aunque no sumemos stock aún)
                                 let p = App.db.inv.find(x => x.n === n);
                                 if(!p){ p={n, s:{}, sku: App.Helpers.getNextSKU()}; App.db.inv.push(p); }
-                                p.s[sz] = (p.s[sz]||0) + q;
+                                
+                                if(clientName) {
+                                    // Es un PEDIDO
+                                    if(!ordersMap[clientName]) ordersMap[clientName] = [];
+                                    ordersMap[clientName].push({p:n, sz:sz, q:q});
+                                } else {
+                                    // Es STOCK (Inventario directo)
+                                    p.s[sz] = (p.s[sz]||0) + q;
+                                }
                                 cnt++;
                             }
                         }
                     }
-                    App.save(); Swal.fire('Importado', `${cnt} registros encontrados.\n(Columnas detectadas: Prod:${mapping.prod}, Talla:${mapping.size}, Cant:${mapping.qty})`, 'success');
+
+                    // GENERAR PEDIDOS
+                    Object.keys(ordersMap).forEach(client => {
+                        App.db.ord.push({
+                            c: client,
+                            items: ordersMap[client],
+                            st: 'bodega',
+                            fac: null
+                        });
+                    });
+
+                    App.save(); 
+                    
+                    let msg = `Procesados ${cnt} registros.\n`;
+                    const ordCount = Object.keys(ordersMap).length;
+                    if(ordCount > 0) msg += `✅ Se crearon ${ordCount} Pedidos nuevos.`;
+                    else msg += `✅ Se agregaron al Stock (Sin cliente detectado).`;
+
+                    Swal.fire('Importación Inteligente', msg, 'success');
                 };
                 reader.readAsArrayBuffer(f);
             } 
-            // FOTO (MANTENEMOS LA MEJORA DE VELOCIDAD)
             else {
                 Swal.fire({title:'Procesando...', text:'Optimizando imagen...', allowOutsideClick:false, didOpen:()=>{Swal.showLoading()}});
                 try {
                     const resizedImgUrl = await this.resizeImage(f);
                     const {data:{text}} = await Tesseract.recognize(resizedImgUrl, 'spa');
                     const cleanText = text.split('\n').map(l=>l.trim()).filter(l=>l.length>3).join('\n');
-                    Swal.fire({ title: 'Lectura IA', input: 'textarea', inputValue: cleanText, footer: 'Copia las líneas útiles' });
+                    Swal.fire({ title: 'Lectura IA', input: 'textarea', inputValue: cleanText, footer: 'Para múltiples pedidos usa Excel.' });
                 } catch (err) { Swal.fire('Error', 'No se pudo leer', 'error'); }
             }
         }
