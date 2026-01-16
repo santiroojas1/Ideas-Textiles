@@ -3,495 +3,317 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>IDEAS TEXTILES | Enterprise Management System v27.0</title>
+    <title>IDEAS TEXTILES | Neural Stock v33</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://unpkg.com/tesseract.js@v2.1.0/dist/tesseract.min.js"></script>
 
     <style>
         :root {
-            --brand-primary: #0062ff;
-            --brand-secondary: #7c3aed;
-            --bg-ultra-dark: #020617;
-            --bg-card: #0f172a;
-            --bg-input: #1e293b;
-            --border-color: rgba(255, 255, 255, 0.08);
-            --text-heading: #f8fafc;
-            --text-body: #94a3b8;
-            --success: #10b981;
-            --warning: #f59e0b;
-            --danger: #ef4444;
-            --radius-main: 16px;
+            --brand: #00d4ff; --bg: #030712; --card: #111827; 
+            --input: #1f2937; --text: #f9fafb; --dim: #9ca3af; 
+            --success: #10b981; --warn: #f59e0b; --danger: #ef4444; --ai: #8b5cf6;
         }
+        * { margin:0; padding:0; box-sizing:border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+        body { background: var(--bg); color: var(--text); min-height: 100vh; padding-bottom: 120px; }
 
-        /* Reset y Scrollbar Industrial */
-        * { margin:0; padding:0; box-sizing:border-box; font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: var(--bg-ultra-dark); }
-        ::-webkit-scrollbar-thumb { background: var(--bg-input); border-radius: 10px; }
+        /* Login */
+        #login-screen { position: fixed; inset: 0; background: var(--bg); z-index: 10000; display: flex; align-items: center; justify-content: center; }
+        .login-box { background: var(--card); padding: 40px; border-radius: 30px; border: 1px solid var(--brand); text-align: center; width: 90%; max-width: 400px; }
 
-        body { 
-            background: var(--bg-ultra-dark); 
-            color: var(--text-heading); 
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            padding-bottom: 90px; /* Espacio para el Dock en móvil */
-        }
-
-        /* Layout Principal */
-        .app-shell { display: flex; flex-direction: column; flex: 1; }
-
-        /* Header Corporativo */
-        header {
-            background: rgba(15, 23, 42, 0.8);
-            backdrop-filter: blur(20px);
-            padding: 30px 40px;
-            border-bottom: 1px solid var(--border-color);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .brand { display: flex; align-items: center; gap: 15px; }
-        .logo-box { 
-            width: 45px; height: 45px; background: var(--brand-primary); 
-            border-radius: 12px; display: flex; align-items: center; justify-content: center;
-            box-shadow: 0 0 20px rgba(0, 98, 255, 0.4);
-        }
-        .brand h1 { font-size: 1.5rem; font-weight: 800; letter-spacing: -1px; }
-
-        /* Barra de Búsqueda Robusta */
-        .search-container {
-            padding: 20px 40px;
-            max-width: 1400px;
-            width: 100%;
-            margin: 0 auto;
-        }
-        .search-box {
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: 14px;
-            padding: 12px 25px;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            transition: 0.3s;
-        }
-        .search-box:focus-within { border-color: var(--brand-primary); box-shadow: 0 0 0 4px rgba(0, 98, 255, 0.15); }
-        .search-box input { 
-            background: transparent; border: none; color: white; width: 100%; 
-            outline: none; font-size: 1rem; font-weight: 500;
-        }
-
-        /* Contenedores de Vistas */
-        .main-content { flex: 1; padding: 0 40px 40px; max-width: 1400px; width: 100%; margin: 0 auto; }
-        .view { display: none; animation: fadeIn 0.4s ease; }
+        header { background: rgba(17, 24, 39, 0.9); backdrop-filter: blur(15px); padding: 20px 30px; border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-between; align-items: center; position: sticky; top:0; z-index: 100; }
+        
+        .main-container { padding: 20px; max-width: 1400px; margin: 0 auto; }
+        .view { display: none; animation: fadeIn 0.3s ease; }
         .view.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* Módulos de Inventario */
-        .inventory-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; }
-        .card { 
-            background: var(--bg-card); border-radius: var(--radius-main); 
-            border: 1px solid var(--border-color); padding: 25px; 
-            transition: 0.3s;
-        }
-        .card:hover { transform: translateY(-5px); border-color: rgba(255,255,255,0.2); }
-        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        
-        .stock-table { width: 100%; border-collapse: separate; border-spacing: 0 8px; }
-        .stock-table td { padding: 12px; background: rgba(255,255,255,0.03); border-radius: 8px; }
-        .talla-label { font-weight: 700; color: var(--brand-primary); width: 60px; }
-        .qty-val { font-weight: 800; font-size: 1.1rem; text-align: right; }
+        /* Stock Cards */
+        .card { background: var(--card); border-radius: 24px; border: 1px solid rgba(255,255,255,0.05); padding: 20px; margin-bottom: 20px; }
+        .stock-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 15px; }
+        .talla-item { background: var(--input); padding: 12px; border-radius: 12px; text-align: center; cursor: pointer; border: 1px solid transparent; }
+        .talla-item:active { border-color: var(--brand); }
+        .talla-item b { display: block; font-size: 0.6rem; color: var(--brand); text-transform: uppercase; }
 
-        /* Controles de Acción */
-        .btn-group { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
-        .btn { 
-            padding: 14px; border-radius: 12px; border: none; font-weight: 700; 
-            cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px;
-            transition: 0.2s; font-size: 0.9rem;
-        }
-        .btn-primary { background: var(--brand-primary); color: white; }
-        .btn-outline { background: var(--bg-input); color: white; border: 1px solid var(--border-color); }
-        .btn:active { transform: scale(0.95); }
+        /* Botones */
+        .btn { padding: 14px 20px; border-radius: 14px; border: none; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; font-size: 0.85rem; }
+        .btn-brand { background: var(--brand); color: #000; }
+        .btn-ai { background: linear-gradient(135deg, var(--ai), var(--brand)); color: white; box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4); }
 
-        /* Módulo OCR Avanzado */
-        .ocr-zone {
-            background: linear-gradient(135deg, rgba(124, 58, 237, 0.1), rgba(0, 98, 255, 0.1));
-            border: 2px dashed var(--brand-secondary);
-            border-radius: 20px;
-            padding: 60px 20px;
-            text-align: center;
-            margin-bottom: 40px;
-            cursor: pointer;
-        }
-        .ocr-zone i { font-size: 3rem; margin-bottom: 20px; color: var(--brand-secondary); }
+        /* AI Scanner Overlay */
+        #ai-loader { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.8); z-index:20000; align-items:center; justify-content:center; flex-direction:column; color:white; }
+        .scanner-line { width: 250px; height: 2px; background: var(--brand); position: relative; animation: scan 2s infinite; box-shadow: 0 0 15px var(--brand); }
+        @keyframes scan { 0% { top: -100px; } 50% { top: 100px; } 100% { top: -100px; } }
 
-        /* Tabla de Órdenes Robusta */
-        .table-container { 
-            background: var(--bg-card); border-radius: var(--radius-main); 
-            overflow: hidden; border: 1px solid var(--border-color);
-        }
-        table { width: 100%; border-collapse: collapse; }
-        th { background: rgba(0,0,0,0.2); padding: 20px; text-align: left; font-size: 0.75rem; color: var(--text-body); text-transform: uppercase; letter-spacing: 1px; }
-        td { padding: 20px; border-bottom: 1px solid var(--border-color); vertical-align: middle; }
-        
-        .badge { 
-            padding: 6px 12px; border-radius: 8px; font-size: 0.7rem; font-weight: 800; 
-            text-transform: uppercase; border: 1px solid transparent;
-        }
-        .badge-bodega { background: rgba(0, 98, 255, 0.15); color: var(--brand-primary); border-color: var(--brand-primary); }
-        .badge-confeccion { background: rgba(245, 158, 11, 0.15); color: var(--warning); border-color: var(--warning); }
-        .badge-nostock { background: rgba(239, 68, 68, 0.15); color: var(--danger); border-color: var(--danger); }
+        /* Dock */
+        .dock { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); width: 92%; max-width: 500px; background: rgba(17, 24, 39, 0.95); backdrop-filter: blur(20px); border-radius: 30px; padding: 12px; display: flex; justify-content: space-around; border: 1px solid rgba(255,255,255,0.1); z-index: 1000; }
+        .nav-item { background: none; border: none; color: var(--dim); display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; }
+        .nav-item.active { color: var(--brand); }
+        .nav-item i { font-size: 1.3rem; }
 
-        /* Calendario Corporativo */
-        .calendar-wrapper { display: grid; grid-template-columns: 1fr 350px; gap: 30px; }
-        .calendar-grid { 
-            background: var(--bg-card); padding: 25px; border-radius: 20px;
-            display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px;
-        }
-        .cal-day {
-            aspect-ratio: 1; border-radius: 12px; background: var(--bg-input);
-            display: flex; flex-direction: column; padding: 10px; cursor: pointer; border: 2px solid transparent;
-            transition: 0.2s;
-        }
-        .cal-day.active-day { border-color: var(--brand-primary); background: rgba(0, 98, 255, 0.1); }
-        .day-num { font-weight: 800; font-size: 1rem; }
-        .day-indicator { width: 6px; height: 6px; border-radius: 50%; background: var(--brand-secondary); margin-top: auto; }
-
-        /* Navegación Móvil (Dock) */
-        .dock {
-            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
-            width: 92%; max-width: 500px; background: rgba(15, 23, 42, 0.9);
-            backdrop-filter: blur(20px); border-radius: 24px; padding: 12px;
-            display: flex; justify-content: space-around; align-items: center;
-            border: 1px solid var(--border-color); box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
-            z-index: 1000;
-        }
-        .nav-link { 
-            color: var(--text-body); text-decoration: none; font-size: 0.65rem; 
-            font-weight: 700; text-transform: uppercase; display: flex; 
-            flex-direction: column; align-items: center; gap: 5px;
-            background: none; border: none; cursor: pointer;
-        }
-        .nav-link.active { color: var(--brand-primary); }
-        .nav-link i { font-size: 1.4rem; }
-
-        /* Adaptabilidad */
-        @media (max-width: 768px) {
-            header { padding: 20px; }
-            .search-container { padding: 15px 20px; }
-            .main-content { padding: 0 20px 20px; }
-            .calendar-wrapper { grid-template-columns: 1fr; }
-            .brand h1 { font-size: 1.2rem; }
-            .qty-val { font-size: 0.9rem; }
-        }
+        .status-badge { padding: 4px 8px; border-radius: 6px; font-size: 0.6rem; font-weight: 800; text-transform: uppercase; }
+        .st-confeccion { background: rgba(245, 158, 11, 0.2); color: var(--warn); }
+        .st-bodega { background: rgba(0, 212, 255, 0.2); color: var(--brand); }
+        .st-despachado { background: rgba(16, 185, 129, 0.2); color: var(--success); }
     </style>
 </head>
 <body>
 
-<div class="app-shell">
-    <header>
-        <div class="brand">
-            <div class="logo-box"><i class="fa-solid fa-microchip" style="color:white"></i></div>
-            <div>
-                <h1>IDEAS TEXTILES</h1>
-                <p style="font-size: 0.65rem; font-weight: 700; color: var(--brand-primary); letter-spacing: 1px;">ERP CORPORATE OS v27.0</p>
-            </div>
-        </div>
-        <div id="connection-status" style="font-size: 0.7rem; color: var(--success); display: flex; align-items: center; gap: 5px;">
-            <i class="fa-solid fa-circle"></i> SINCRO: ONLINE
-        </div>
-    </header>
-
-    <div class="search-container">
-        <div class="search-box">
-            <i class="fa-solid fa-magnifying-glass"></i>
-            <input type="text" id="globalSearch" placeholder="Buscar por OC, Cliente, Producto o Talla..." oninput="Core.search(this.value)">
-        </div>
+<div id="ai-loader">
+    <div style="border: 2px solid white; padding: 50px; position: relative;">
+        <div class="scanner-line"></div>
+        <i class="fa-solid fa-brain" style="font-size: 3rem; margin-top: 20px;"></i>
     </div>
-
-    <main class="main-content">
-        
-        <section id="view-inventory" class="view active">
-            <div class="inventory-grid" id="inventoryContainer">
-                </div>
-        </section>
-
-        <section id="view-orders" class="view">
-            <div class="ocr-zone" onclick="document.getElementById('ocrInput').click()">
-                <i class="fa-solid fa-wand-magic-sparkles"></i>
-                <h2>Procesamiento Masivo IA</h2>
-                <p>Cargue múltiples fotos o PDFs para extracción de datos inteligente</p>
-                <input type="file" id="ocrInput" multiple hidden onchange="Core.processOCR(this)">
-            </div>
-
-            <div class="table-container">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Identificador</th>
-                            <th>Cliente Corporativo</th>
-                            <th>Producto / SKU</th>
-                            <th>Talla</th>
-                            <th>Cantidad</th>
-                            <th>Estado Operativo</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody id="ordersContainer">
-                        </tbody>
-                </table>
-            </div>
-        </section>
-
-        <section id="view-calendar" class="view">
-            <div class="calendar-wrapper">
-                <div class="calendar-grid" id="calendarGrid">
-                    </div>
-                <div class="card" id="calendarDetails">
-                    <h3 id="selectedDateTitle">Seleccione un día</h3>
-                    <hr style="opacity:0.1; margin: 15px 0;">
-                    <div id="notesContainer">
-                        <p style="color:var(--text-body); font-size: 0.85rem;">No hay notas para este día.</p>
-                    </div>
-                    <button class="btn btn-primary" style="margin-top: 20px; width: 100%;" onclick="Core.addNote()">
-                        <i class="fa-solid fa-plus"></i> Añadir Nota
-                    </button>
-                </div>
-            </div>
-        </section>
-
-    </main>
+    <p style="margin-top:20px; font-weight:800; letter-spacing:2px;">IA PROCESANDO IMAGEN...</p>
 </div>
 
+<div id="login-screen">
+    <div class="login-box">
+        <h2 style="margin-bottom:10px">IDEAS TEXTILES OS</h2>
+        <input type="text" id="userIn" placeholder="Nombre de Operador" style="width:100%; padding:15px; border-radius:12px; background:var(--input); border:1px solid var(--brand); color:white; margin-bottom:20px; text-align:center; outline:none">
+        <button class="btn btn-brand" style="width:100%; justify-content:center" onclick="Core.login()">ACCEDER AL NÚCLEO</button>
+    </div>
+</div>
+
+<header>
+    <div style="display:flex; align-items:center; gap:10px">
+        <div style="background:var(--brand); color:black; padding:8px; border-radius:8px;"><i class="fa-solid fa-vest"></i></div>
+        <h1 style="font-size:1.1rem; font-weight:800">SISTEMA NEURAL</h1>
+    </div>
+    <div id="user-display" style="font-size:0.7rem; font-weight:800; color:var(--brand)"></div>
+</header>
+
+<main class="main-container">
+
+    <section id="view-stock" class="view active">
+        <div style="display:flex; justify-content:space-between; margin-bottom:25px">
+            <h2>Inventario Inteligente</h2>
+            <button class="btn btn-ai" onclick="Core.neuralScanner()"><i class="fa-solid fa-camera-retro"></i> SCAN IA</button>
+        </div>
+        <div id="inv-list"></div>
+    </section>
+
+    <section id="view-orders" class="view">
+        <div style="display:flex; justify-content:space-between; margin-bottom:25px">
+            <h2>Gestión de OC</h2>
+            <button class="btn btn-brand" onclick="Core.newOC()">NUEVA OC</button>
+        </div>
+        <div id="ord-list"></div>
+    </section>
+
+</main>
+
 <nav class="dock">
-    <button class="nav-link active" onclick="Core.switchView('inventory', this)">
-        <i class="fa-solid fa-boxes-stacked"></i><span>Stock</span>
-    </button>
-    <button class="nav-link" onclick="Core.switchView('orders', this)">
-        <i class="fa-solid fa-file-invoice"></i><span>Órdenes</span>
-    </button>
-    <button class="nav-link" onclick="Core.switchView('calendar', this)">
-        <i class="fa-solid fa-calendar-alt"></i><span>Agenda</span>
-    </button>
-    <button class="nav-link" onclick="Core.openSettings()">
-        <i class="fa-solid fa-shield-halved"></i><span>Admin</span>
-    </button>
+    <button class="nav-item active" onclick="Core.nav('stock', this)"><i class="fa-solid fa-box-open"></i><span>Stock</span></button>
+    <button class="nav-item" onclick="Core.nav('orders', this)"><i class="fa-solid fa-receipt"></i><span>Órdenes</span></button>
 </nav>
 
 <script>
-/**
- * CORE ENGINE V27.0 - IDEAS TEXTILES
- * Arquitectura de nivel corporativo para manejo de estado masivo.
- */
 const Core = {
-    // ESTADO INICIAL (Simulación de DB)
-    state: {
-        inventory: [
-            { id: 101, name: "Pantalón Popelín Pro", tallas: { "S": 25, "M": 40, "L": 110, "XL": 15, "2XL": 8, "3XL": 12, "4XL": 20, "5XL": 5 } },
-            { id: 102, name: "Delantal Técnico Industrial", tallas: { "M": 15, "L": 45, "XL": 20, "2XL": 10, "5XL": 18 } },
-            { id: 103, name: "Overol Alta Visibilidad", tallas: { "S": 10, "L": 30, "XL": 50, "4XL": 15 } }
-        ],
-        orders: [
-            { id: "OC-45001", client: "Minera Pelambres", product: "Pantalón Popelín Pro", talla: "4XL", qty: 15, status: "confeccion" },
-            { id: "OC-45002", client: "Constructora Echeverría", product: "Delantal Técnico Industrial", talla: "M", qty: 25, status: "nostock" },
-            { id: "OC-45003", client: "Transportes RM", product: "Overol Alta Visibilidad", talla: "XL", qty: 10, status: "bodega" }
-        ],
-        notes: JSON.parse(localStorage.getItem('it_v27_notes')) || {},
-        currentDate: new Date()
+    user: localStorage.getItem('it_user_v33'),
+    inv: JSON.parse(localStorage.getItem('it_inv_v33')) || [],
+    ord: JSON.parse(localStorage.getItem('it_ord_v33')) || [],
+
+    login() {
+        const u = document.getElementById('userIn').value;
+        if(u) { this.user = u.toUpperCase(); localStorage.setItem('it_user_v33', this.user); this.init(); }
     },
 
     init() {
-        this.renderInventory();
-        this.renderOrders();
-        this.renderCalendar();
-        console.log("Enterprise Core Initialized...");
+        if(!this.user) return;
+        document.getElementById('login-screen').style.display = 'none';
+        document.getElementById('user-display').innerText = `OP: ${this.user}`;
+        this.renderAll();
     },
 
-    switchView(viewId, btn) {
-        document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-        document.getElementById('view-' + viewId).classList.add('active');
-        document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+    nav(v, btn) {
+        document.querySelectorAll('.view').forEach(x => x.classList.remove('active'));
+        document.getElementById('view-'+v).classList.add('active');
+        document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
         btn.classList.add('active');
     },
 
-    renderInventory() {
-        const container = document.getElementById('inventoryContainer');
-        container.innerHTML = this.state.inventory.map(prod => `
+    // --- MOTOR NEURAL OCR ---
+    async neuralScanner() {
+        const { value: file } = await Swal.fire({
+            title: 'IA Visual',
+            text: 'Tome foto de nota de pedido o producto',
+            input: 'file',
+            inputAttributes: { 'accept': 'image/*', 'capture': 'camera' }
+        });
+
+        if(file) {
+            document.getElementById('ai-loader').style.display = 'flex';
+            
+            try {
+                // Tesseract analiza la imagen
+                const result = await Tesseract.recognize(file, 'spa', { logger: m => console.log(m) });
+                const fullText = result.data.text;
+                
+                // Lógica de búsqueda de palabras clave y números
+                const lines = fullText.split('\n');
+                let foundProd = "";
+                let foundQty = 0;
+
+                // Buscamos líneas que contengan texto (producto) y números (cantidad)
+                for (let line of lines) {
+                    const numMatch = line.match(/\d+/);
+                    if(line.length > 5 && numMatch) {
+                        foundProd = line.replace(/\d+/g, '').trim();
+                        foundQty = parseInt(numMatch[0]);
+                        break;
+                    }
+                }
+
+                document.getElementById('ai-loader').style.display = 'none';
+
+                if(foundProd) {
+                    this.matchOrAdd(foundProd, foundQty);
+                } else {
+                    Swal.fire('IA Confundida', 'No logré leer un producto claro. ¿Deseas ingresarlo manualmente?', 'question')
+                        .then(r => { if(r.isConfirmed) this.newProdManual(); });
+                }
+            } catch (e) {
+                document.getElementById('ai-loader').style.display = 'none';
+                Swal.fire('Error IA', 'No se pudo procesar la imagen', 'error');
+            }
+        }
+    },
+
+    matchOrAdd(name, qty) {
+        // Buscamos similitud (si el nombre detectado está contenido en algún producto existente)
+        const existing = this.inv.find(p => name.toLowerCase().includes(p.name.toLowerCase()) || p.name.toLowerCase().includes(name.toLowerCase()));
+
+        if(existing) {
+            Swal.fire({
+                title: 'Producto Identificado',
+                text: `He detectado "${name}". Se parece a "${existing.name}". ¿Deseas sumar ${qty} unidades?`,
+                icon: 'success',
+                showCancelButton: true,
+                confirmButtonText: 'Sí, sumar stock'
+            }).then(r => {
+                if(r.isConfirmed) this.askTallaForNeural(this.inv.indexOf(existing), qty);
+            });
+        } else {
+            Swal.fire({
+                title: 'Nuevo Producto Detectado',
+                text: `La IA leyó: "${name}". No está en tu base de datos. ¿Deseas crearlo con ${qty} unidades de ingreso?`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Sí, dar de alta'
+            }).then(r => {
+                if(r.isConfirmed) {
+                    const newIdx = this.inv.push({ name: name, tallas: {"S":0,"M":0,"L":0,"XL":0,"4XL":0,"5XL":0} }) - 1;
+                    this.askTallaForNeural(newIdx, qty);
+                }
+            });
+        }
+    },
+
+    async askTallaForNeural(idx, qty) {
+        const { value: t } = await Swal.fire({
+            title: 'Seleccionar Talla para el ingreso',
+            input: 'select',
+            inputOptions: {"S":"S","M":"M","L":"L","XL":"XL","4XL":"4XL","5XL":"5XL"},
+            confirmButtonText: 'Confirmar Ingreso'
+        });
+        if(t) {
+            this.inv[idx].tallas[t] += qty;
+            this.save();
+            Swal.fire('Actualizado', `${qty} unidades añadidas a ${this.inv[idx].name}`, 'success');
+        }
+    },
+
+    // --- GESTIÓN TRADICIONAL ---
+    async adjustStock(pIdx, t) {
+        const { value: q } = await Swal.fire({ title: `Ajuste ${t}`, input: 'number' });
+        if(q) { this.inv[pIdx].tallas[t] = parseInt(q); this.save(); }
+    },
+
+    newProdManual() {
+        Swal.fire({ title: 'Nombre Producto', input: 'text' }).then(r => {
+            if(r.value) { this.inv.push({name: r.value, tallas: {"S":0,"M":0,"L":0,"XL":0,"4XL":0,"5XL":0}}); this.save(); }
+        });
+    },
+
+    async newOC() {
+        if(this.inv.length === 0) return Swal.fire('Error', 'No hay productos', 'error');
+        const { value: f } = await Swal.fire({
+            title: 'Nueva OC',
+            html: `
+                <input id="oc-id" class="swal2-input" placeholder="N° Orden">
+                <input id="oc-cli" class="swal2-input" placeholder="Cliente">
+                <select id="oc-p" class="swal2-input">${this.inv.map(i=>`<option>${i.name}</option>`)}</select>
+                <select id="oc-t" class="swal2-input"><option>S</option><option>M</option><option>XL</option><option>5XL</option></select>
+                <input id="oc-q" type="number" class="swal2-input" placeholder="Cantidad">
+            `,
+            preConfirm: () => ({ id: document.getElementById('oc-id').value, cli: document.getElementById('oc-cli').value, p: document.getElementById('oc-p').value, t: document.getElementById('oc-t').value, q: parseInt(document.getElementById('oc-q').value) })
+        });
+        if(f && f.id) { this.ord.push({...f, status: 'confeccion'}); this.save(); }
+    },
+
+    async setStatus(idx, st) {
+        const o = this.ord[idx];
+        if(st === 'despachado') {
+            const p = this.inv.find(i => i.name === o.p);
+            if(p && p.tallas[o.t] >= o.q) {
+                p.tallas[o.t] -= o.q; o.status = 'despachado'; this.save();
+                Swal.fire('Éxito', 'Despachado correctamente', 'success');
+            } else {
+                o.status = 'sin_stock'; this.save();
+                Swal.fire('Falta Stock', 'La orden pasó a estado pendiente por falta de stock', 'warning');
+            }
+        } else { this.ord[idx].status = st; this.save(); }
+    },
+
+    // --- RENDER ---
+    renderAll() {
+        const invL = document.getElementById('inv-list');
+        invL.innerHTML = this.inv.map((p, i) => `
             <div class="card">
-                <div class="card-header">
-                    <h3 style="font-size:1.1rem">${prod.name}</h3>
-                    <i class="fa-solid fa-box-open" style="color:var(--brand-primary)"></i>
+                <div style="display:flex; justify-content:space-between">
+                    <h3 style="font-size:1rem">${p.name}</h3>
+                    <i class="fa-solid fa-circle-check" style="color:var(--brand); font-size:0.8rem"></i>
                 </div>
-                <table class="stock-table">
-                    ${Object.entries(prod.tallas).map(([t, q]) => `
-                        <tr>
-                            <td class="talla-label">${t}</td>
-                            <td class="qty-val" style="color: ${q < 10 ? 'var(--danger)' : 'white'}">${q} <span style="font-size:0.6rem; opacity:0.5">UDS</span></td>
-                            <td style="width:40px; text-align:right">
-                                <i class="fa-solid fa-chevron-right" style="font-size:0.7rem; opacity:0.3"></i>
-                            </td>
-                        </tr>
+                <div class="stock-grid">
+                    ${Object.entries(p.tallas).map(([t, q]) => `
+                        <div class="talla-item" onclick="Core.adjustStock(${i},'${t}')">
+                            <b>${t}</b>
+                            <span style="font-weight:800; color:${q<=0?'var(--danger)':'white'}">${q}</span>
+                        </div>
                     `).join('')}
-                </table>
-                <div class="btn-group">
-                    <button class="btn btn-outline" onclick="Core.modifyStock(${prod.id}, 'ingreso')"><i class="fa-solid fa-plus"></i> Entrada</button>
-                    <button class="btn btn-outline" onclick="Core.modifyStock(${prod.id}, 'egreso')"><i class="fa-solid fa-minus"></i> Salida</button>
                 </div>
             </div>
-        `).join('');
-    },
+        `).reverse().join('');
 
-    renderOrders() {
-        const container = document.getElementById('ordersContainer');
-        container.innerHTML = this.state.orders.map((o, idx) => `
-            <tr>
-                <td style="font-weight:800; color:var(--brand-primary)">${o.id}</td>
-                <td style="font-weight:600">${o.client}</td>
-                <td style="color:var(--text-body)">${o.product}</td>
-                <td><span class="badge" style="background:#1e293b">${o.talla}</span></td>
-                <td style="font-weight:800">${o.qty}</td>
-                <td>
-                    <select class="badge badge-${o.status}" onchange="Core.updateOrderStatus(${idx}, this.value)">
-                        <option value="confeccion" ${o.status === 'confeccion' ? 'selected' : ''}>En Confección</option>
-                        <option value="bodega" ${o.status === 'bodega' ? 'selected' : ''}>En Bodega</option>
-                        <option value="nostock" ${o.status === 'nostock' ? 'selected' : ''}>Sin Stock</option>
-                    </select>
-                </td>
-                <td>
-                    <button class="btn btn-primary" style="padding: 10px;" onclick="Core.finalizeOrder(${idx})">
-                        <i class="fa-solid fa-truck"></i> Despachar
-                    </button>
-                </td>
-            </tr>
-        `).join('');
-    },
-
-    async finalizeOrder(idx) {
-        const o = this.state.orders[idx];
-        
-        const { value: nroFactura } = await Swal.fire({
-            title: 'Confirmar Despacho',
-            html: `Va a despachar <b>${o.qty}</b> de <b>${o.product}</b> para <b>${o.client}</b>.`,
-            input: 'text',
-            inputLabel: 'Ingrese Número de Factura o Guía',
-            inputPlaceholder: 'FAC-XXXXXX',
-            showCancelButton: true,
-            confirmButtonColor: '#0062ff',
-            confirmButtonText: 'Procesar Despacho'
-        });
-
-        if (nroFactura) {
-            // Lógica de Descuento en Inventario Real
-            const prod = this.state.inventory.find(p => p.name === o.product);
-            if (prod && prod.tallas[o.talla] >= o.qty) {
-                prod.tallas[o.talla] -= o.qty;
-                this.sendWspReport(o, nroFactura);
-                this.state.orders.splice(idx, 1); // Remover de la lista activa
-                this.renderInventory();
-                this.renderOrders();
-                Swal.fire('¡Éxito!', 'Orden despachada y stock actualizado.', 'success');
-            } else {
-                Swal.fire('Error', 'Stock insuficiente para completar el despacho.', 'error');
-            }
-        }
-    },
-
-    sendWspReport(o, fact) {
-        const phone = "56987654321"; // Configurable en Admin
-        const text = encodeURIComponent(`*REPORTE ERP IDEAS TEXTILES*\n---------------------------\n📦 *DESPACHO FINALIZADO*\n✅ *OC:* ${o.id}\n🏢 *Cliente:* ${o.client}\n👕 *Producto:* ${o.product}\n📏 *Talla:* ${o.talla}\n🔢 *Cant:* ${o.qty}\n🧾 *Factura:* ${fact}\n---------------------------\n_Procesado desde la Central OS_`);
-        window.open(`https://wa.me/${phone}?text=${text}`);
-    },
-
-    processOCR(input) {
-        if(input.files.length === 0) return;
-        
-        Swal.fire({
-            title: 'IA Procesando...',
-            text: `Analizando ${input.files.length} documentos.`,
-            allowOutsideClick: false,
-            didOpen: () => Swal.showLoading()
-        });
-
-        // Simulación de Potencia de Procesamiento IA
-        setTimeout(() => {
-            for(let i=0; i < input.files.length; i++) {
-                const newOc = {
-                    id: "OC-" + Math.floor(10000 + Math.random() * 90000),
-                    client: "CLIENTE DETECTADO POR IA",
-                    product: "Pantalón Popelín Pro",
-                    talla: "L",
-                    qty: Math.floor(Math.random() * 100) + 1,
-                    status: "confeccion"
-                };
-                this.state.orders.unshift(newOc);
-            }
-            this.renderOrders();
-            Swal.close();
-            Swal.fire('IA Exitosa', 'Los documentos fueron extraídos y añadidos a la tabla.', 'success');
-        }, 2000);
-    },
-
-    renderCalendar() {
-        const grid = document.getElementById('calendarGrid');
-        grid.innerHTML = "";
-        const daysInMonth = 31; // Simplificado para enero 2026
-        
-        for(let i = 1; i <= daysInMonth; i++) {
-            const hasNote = this.state.notes[i] ? 'has-event' : '';
-            grid.innerHTML += `
-                <div class="cal-day ${hasNote}" onclick="Core.showDayNotes(${i}, this)">
-                    <span class="day-num">${i}</span>
-                    ${this.state.notes[i] ? '<div class="day-indicator"></div>' : ''}
+        const ordL = document.getElementById('ord-list');
+        ordL.innerHTML = this.ord.map((o, idx) => `
+            <div class="card">
+                <div style="display:flex; justify-content:space-between; margin-bottom:10px">
+                    <b style="color:var(--brand)">OC #${o.id}</b>
+                    <span class="status-badge st-${o.status}">${o.status}</span>
                 </div>
-            `;
-        }
+                <p style="font-size:0.85rem">${o.cli} - ${o.p} [${o.t}] x ${o.q}</p>
+                <select class="swal2-input" style="margin-top:10px; height:40px; font-size:0.75rem" onchange="Core.setStatus(${idx}, this.value)">
+                    <option value="confeccion" ${o.status=='confeccion'?'selected':''}>Confección</option>
+                    <option value="bodega" ${o.status=='bodega'?'selected':''}>Bodega</option>
+                    <option value="despachado" ${o.status=='despachado'?'selected':''}>Despachar</option>
+                </select>
+            </div>
+        `).reverse().join('');
     },
 
-    showDayNotes(day, el) {
-        document.querySelectorAll('.cal-day').forEach(d => d.classList.remove('active-day'));
-        el.classList.add('active-day');
-        document.getElementById('selectedDateTitle').innerText = "Día " + day + " de Enero";
-        const container = document.getElementById('notesContainer');
-        const note = this.state.notes[day];
-        
-        container.innerHTML = note 
-            ? `<div style="background:var(--bg-input); padding:15px; border-radius:10px; font-size:0.9rem">${note}</div>`
-            : `<p style="opacity:0.5; font-size:0.8rem">Sin anotaciones.</p>`;
-        
-        this.selectedDay = day;
-    },
-
-    async addNote() {
-        if(!this.selectedDay) return Swal.fire('Aviso', 'Seleccione un día del calendario primero.', 'info');
-        
-        const { value: text } = await Swal.fire({
-            title: 'Anotación Operativa',
-            input: 'textarea',
-            inputLabel: 'Escriba recordatorios o hitos',
-            inputPlaceholder: 'Ej: Llegada de insumos, cita con cliente...',
-            inputValue: this.state.notes[this.selectedDay] || ""
-        });
-
-        if(text !== undefined) {
-            this.state.notes[this.selectedDay] = text;
-            localStorage.setItem('it_v27_notes', JSON.stringify(this.state.notes));
-            this.renderCalendar();
-            this.showDayNotes(this.selectedDay, document.querySelector('.active-day'));
-        }
+    save() {
+        localStorage.setItem('it_inv_v33', JSON.stringify(this.inv));
+        localStorage.setItem('it_ord_v33', JSON.stringify(this.ord));
+        this.renderAll();
     }
 };
 
-// INICIALIZACIÓN GLOBAL
 window.onload = () => Core.init();
 </script>
-
 </body>
 </html>
