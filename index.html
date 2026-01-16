@@ -10,8 +10,7 @@
 
     <style>
         :root {
-            --primary: #1e3a8a; 
-            --accent: #2563eb; 
+            --primary: #1e3a8a; --accent: #2563eb; 
             --dark: #0f172a; --bg: #f8fafc;
             --white: #ffffff; --border: #e2e8f0;
             --success: #059669; --warning: #d97706; --danger: #dc2626;
@@ -22,7 +21,7 @@
         .container { max-width: 600px; margin: 0 auto; padding: 15px; width: 100%; flex: 1; }
         .hidden { display: none !important; }
 
-        /* --- LOGIN --- */
+        /* LOGIN */
         #loginScreen { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 90vh; text-align: center; padding: 30px; background: white; }
         .login-logo-circle { width: 90px; height: 90px; background: linear-gradient(135deg, var(--primary), var(--accent)); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; box-shadow: 0 10px 25px rgba(30, 58, 138, 0.25); }
         .login-logo-icon { font-size: 2.2em; color: white; }
@@ -33,24 +32,18 @@
         .user-btn { background: white; border: 2px solid var(--border); padding: 18px; border-radius: 12px; font-size: 1.1em; font-weight: 700; color: var(--dark); cursor: pointer; display: flex; align-items: center; justify-content: flex-start; gap: 15px; transition: 0.2s; box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
         .user-btn:active { border-color: var(--primary); background: #eff6ff; transform: scale(0.98); }
 
-        /* --- HEADER PRINCIPAL --- */
-        .pro-header {
-            background: var(--dark); color: white; padding: 25px 20px;
-            border-radius: 24px; text-align: center; margin-bottom: 20px;
-            position: relative; overflow: hidden; box-shadow: 0 20px 40px -10px rgba(15, 23, 42, 0.3);
-        }
+        /* HEADER */
+        .pro-header { background: var(--dark); color: white; padding: 25px 20px; border-radius: 24px; text-align: center; margin-bottom: 20px; position: relative; overflow: hidden; box-shadow: 0 20px 40px -10px rgba(15, 23, 42, 0.3); }
         .pro-header::before { content: '\f275'; font-family: "Font Awesome 6 Free"; font-weight: 900; position: absolute; top: -30%; right: -10%; font-size: 12em; opacity: 0.03; color: white; transform: rotate(-15deg); }
-        
         .header-top-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; position: relative; z-index: 2;}
         .brand-small { font-size: 0.7em; font-weight: 800; letter-spacing: 1px; color: #94a3b8; text-transform: uppercase; }
         .refresh-btn { color: #94a3b8; font-size: 1.2em; cursor: pointer; }
-
         .main-logo-icon { font-size: 2.2em; color: #60a5fa; margin-bottom: 5px; display: inline-block; position: relative; z-index: 2; }
         .welcome-text { font-size: 1.5em; font-weight: 800; margin: 0; position: relative; z-index: 2; }
         .welcome-text span { color: #60a5fa; }
         .logout-text { font-size: 0.4em; color: #f87171; text-decoration: underline; cursor: pointer; vertical-align: middle; margin-left: 5px; }
 
-        /* --- KPI & BUSCADOR --- */
+        /* KPI & BUSCADOR */
         .kpi-container { display: flex; gap: 10px; margin-bottom: 20px; }
         .kpi-box { flex: 1; background: white; padding: 12px; border-radius: 14px; text-align: center; border: 1px solid var(--border); box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
         .kpi-num { display: block; font-size: 1.5em; font-weight: 900; color: var(--dark); line-height: 1.1; }
@@ -61,26 +54,17 @@
         .search-input:focus { border-color: var(--primary); box-shadow: 0 4px 20px rgba(37, 99, 235, 0.1); }
         .search-icon { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: #94a3b8; font-size: 1.1em; }
 
-        /* --- TARJETA PEDIDO (LIMPIA) --- */
+        /* TARJETAS LIMPIAS */
         .card { background: white; border-radius: 18px; margin-bottom: 15px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.04); border: 1px solid var(--border); }
-        
-        .card-top { padding: 15px; background: #ffffff; border-bottom: 1px solid #f1f5f9; display: flex; justify-content: space-between; align-items: start; }
+        .card-top { padding: 18px; background: #ffffff; border-bottom: 1px solid #f1f5f9; display: flex; justify-content: space-between; align-items: start; }
         .client { font-size: 0.75em; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; }
         .order { font-size: 1.1em; font-weight: 900; color: var(--dark); margin-top: 3px; line-height: 1.2; }
         .price { background: #eff6ff; color: var(--primary); padding: 5px 10px; border-radius: 8px; font-weight: 800; font-size: 0.85em; }
 
-        /* SECCIÓN NÚMEROS (SIN BARRA) */
-        .stats-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 5px; padding: 15px; background: #f8fafc; border-bottom: 1px solid #e2e8f0; text-align: center; }
-        .stat-box { padding: 5px; }
-        .stat-label { display: block; font-size: 0.65em; font-weight: 700; color: #64748b; text-transform: uppercase; margin-bottom: 4px; }
-        .stat-val { font-size: 1.2em; font-weight: 900; color: var(--dark); }
-        .val-red { color: var(--danger); }
-        .val-green { color: var(--success); }
-
         /* TABLA */
-        .table-wrap { padding: 5px 15px 15px 15px; }
+        .table-wrap { padding: 5px 18px 18px 18px; }
         table { width: 100%; border-collapse: collapse; margin-top: 5px; }
-        td { padding: 10px 0; border-bottom: 1px solid #f1f5f9; font-size: 0.9em; vertical-align: middle; }
+        td { padding: 12px 0; border-bottom: 1px solid #f1f5f9; font-size: 0.9em; vertical-align: middle; }
         .prod { font-weight: 700; color: var(--dark); display: block; }
         .size { background: #f1f5f9; padding: 2px 7px; border-radius: 5px; font-size: 0.8em; color: #64748b; font-weight: 600; }
         
@@ -95,7 +79,10 @@
         .btn-wa { background: #25D366; color: white; }
         .btn-edit { background: var(--dark); color: white; }
 
-        /* --- CALENDARIO --- */
+        /* FOOTER */
+        .footer-tm { text-align: center; font-size: 0.65em; color: #cbd5e1; margin-top: 30px; margin-bottom: 20px; font-weight: 500; }
+
+        /* CALENDARIO & NOTAS */
         #calendarView { padding: 10px; }
         .calendar-card { background: white; border-radius: 18px; padding: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.03); border: 1px solid var(--border); }
         .cal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
@@ -106,7 +93,6 @@
         .cal-today { background: var(--primary); color: white; box-shadow: 0 4px 10px rgba(37, 99, 235, 0.3); }
         .cal-empty { background: transparent; }
 
-        /* --- NOTAS --- */
         #notesView { padding: 0 15px; }
         .notebook { width: 100%; height: 70vh; border: none; background: #fffbeb; border-radius: 18px; padding: 25px; font-size: 1.1em; line-height: 1.6; color: #4b5563; outline: none; resize: none; box-shadow: inset 0 0 0 2px #fcd34d; }
         .notes-title { font-weight: 900; color: #b45309; margin-bottom: 15px; display: block; font-size: 1.1em; }
@@ -126,16 +112,15 @@
     <div class="login-logo-circle"><i class="fa-solid fa-industry login-logo-icon"></i></div>
     <h1 class="login-title">IDEAS TEXTILES<sup class="login-tm">®</sup></h1>
     <span style="font-size:0.8em; font-weight:600; color:#64748b; letter-spacing:1px; margin-bottom:30px; display:block;">WORKWEAR AND CORPORATE</span>
-    
     <div class="user-grid">
         <button class="user-btn" onclick="login('ALEJANDRO')"><i class="fa-solid fa-user-gear"></i> Alejandro</button>
         <button class="user-btn" onclick="login('RICARDO')"><i class="fa-solid fa-user-tie"></i> Ricardo</button>
         <button class="user-btn" onclick="login('RENATO')"><i class="fa-solid fa-user-pen"></i> Renato</button>
     </div>
+    <div class="footer-tm" style="margin-top:50px;">© 2026 Ideas Textiles SpA. Todos los derechos reservados.</div>
 </div>
 
 <div id="mainApp" class="hidden">
-    
     <div class="container">
         <div class="pro-header">
             <div class="header-top-row">
@@ -150,17 +135,19 @@
     <div id="ordersView" class="container">
         <div class="kpi-container">
             <div class="kpi-box"><span class="kpi-num" id="statTotal">0</span><span class="kpi-label">Prendas</span></div>
-            <div class="kpi-box"><span class="kpi-num" style="color:var(--success)" id="statDone">0</span><span class="kpi-label">Listas</span></div>
-            <div class="kpi-box"><span class="kpi-num" style="color:var(--warning)" id="statPend">0</span><span class="kpi-label">Pendientes</span></div>
+            <div class="kpi-box"><span class="kpi-num" style="color:var(--success)" id="statDone">0</span><span class="kpi-label">Entregadas</span></div>
+            <div class="kpi-box"><span class="kpi-num" style="color:var(--warning)" id="statPend">0</span><span class="kpi-label">Faltan</span></div>
         </div>
 
         <div class="search-box">
             <i class="fa-solid fa-magnifying-glass search-icon"></i>
-            <input type="text" id="search" class="search-input" placeholder="Buscar orden, cliente, producto..." onkeyup="filter()">
+            <input type="text" id="search" class="search-input" placeholder="Buscar orden, cliente..." onkeyup="filter()">
         </div>
 
         <div id="loading"><i class="fa-solid fa-spinner fa-spin"></i> Cargando producción...</div>
         <div id="list"></div>
+        
+        <div class="footer-tm">Ideas Textiles SpA ® - Sistema de Gestión Interno</div>
     </div>
 
     <div id="calendarView" class="container hidden">
@@ -180,19 +167,12 @@
         <span class="notes-title"><i class="fa-solid fa-clipboard-list"></i> ASPECTOS CLAVES</span>
         <textarea id="myNotes" class="notebook" placeholder="Bitácora de ideas, recordatorios y pendientes..."></textarea>
     </div>
-
 </div>
 
 <div id="navBar" class="nav-bar hidden">
-    <button class="nav-item active" onclick="go('orders', this)">
-        <i class="fa-solid fa-list-check"></i> PEDIDOS
-    </button>
-    <button class="nav-item" onclick="go('calendar', this)">
-        <i class="fa-regular fa-calendar-days"></i> AGENDA
-    </button>
-    <button class="nav-item" onclick="go('notes', this)">
-        <i class="fa-solid fa-pen-to-square"></i> BITÁCORA
-    </button>
+    <button class="nav-item active" onclick="go('orders', this)"><i class="fa-solid fa-list-check"></i> PEDIDOS</button>
+    <button class="nav-item" onclick="go('calendar', this)"><i class="fa-regular fa-calendar-days"></i> AGENDA</button>
+    <button class="nav-item" onclick="go('notes', this)"><i class="fa-solid fa-pen-to-square"></i> BITÁCORA</button>
 </div>
 
 <script>
@@ -274,21 +254,6 @@
                 <div class="card-top">
                     <div><div class="client">${o.client}</div><div class="order">${o.name}</div></div>
                     <div class="price">${o.price}</div>
-                </div>
-
-                <div class="stats-grid">
-                    <div class="stat-box">
-                        <span class="stat-label">Solicitado</span>
-                        <span class="stat-val">${total}</span>
-                    </div>
-                    <div class="stat-box">
-                        <span class="stat-label">Listas</span>
-                        <span class="stat-val val-green">${ent}</span>
-                    </div>
-                    <div class="stat-box">
-                        <span class="stat-label">Faltan</span>
-                        <span class="stat-val val-red">${missing}</span>
-                    </div>
                 </div>
 
                 <div class="table-wrap">
