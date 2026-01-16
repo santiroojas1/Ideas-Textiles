@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>IDEAS TEXTILES | Master OS v37</title>
+    <title>IDEAS TEXTILES | Master Enterprise v38</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
@@ -20,7 +20,6 @@
         * { margin:0; padding:0; box-sizing:border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
         body { background: var(--bg); color: var(--text); min-height: 100vh; padding-bottom: 110px; }
 
-        /* Login */
         #login-screen { position: fixed; inset: 0; background: var(--bg); z-index: 10000; display: flex; align-items: center; justify-content: center; }
         .login-box { background: var(--card); padding: 40px; border-radius: 30px; border: 1px solid var(--brand); text-align: center; width: 90%; max-width: 400px; }
 
@@ -31,44 +30,44 @@
         .view.active { display: block; animation: slideUp 0.3s ease; }
         @keyframes slideUp { from { transform: translateY(10px); opacity:0; } to { transform: translateY(0); opacity:1; } }
 
-        /* Card de Producto */
-        .card { background: var(--card); border-radius: 20px; border: 1px solid rgba(255,255,255,0.05); padding: 20px; margin-bottom: 15px; }
-        .stock-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 15px; }
-        .talla-item { background: var(--input); padding: 12px; border-radius: 12px; text-align: center; }
-        .talla-item b { display: block; font-size: 0.6rem; color: var(--brand); text-transform: uppercase; }
+        .card { background: var(--card); border-radius: 20px; border: 1px solid rgba(255,255,255,0.05); padding: 18px; margin-bottom: 15px; position: relative; }
+        .stock-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 15px; }
+        .talla-item { background: var(--input); padding: 10px; border-radius: 12px; text-align: center; font-size: 0.8rem; }
+        .talla-item b { display: block; font-size: 0.6rem; color: var(--brand); }
 
-        /* Botonera */
-        .btn { padding: 15px; border-radius: 15px; border: none; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 0.8rem; }
+        .btn { padding: 14px; border-radius: 14px; border: none; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 0.8rem; }
         .btn-brand { background: var(--brand); color: #000; }
         .btn-ai { background: linear-gradient(135deg, var(--ai), var(--brand)); color: #fff; }
-        .btn-icon { background: rgba(255,255,255,0.1); width: 35px; height: 35px; border-radius: 8px; color: white; }
+        .btn-edit { background: rgba(255,255,255,0.1); width: 32px; height: 32px; border-radius: 8px; color: white; border: none; }
 
-        /* Calendario */
         .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; }
-        .cal-day { aspect-ratio: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 10px; background: var(--input); cursor: pointer; font-size: 0.8rem; position: relative; }
-        .cal-day.today { border: 2px solid var(--brand); }
+        .cal-day { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; border-radius: 10px; background: var(--input); cursor: pointer; font-size: 0.8rem; position: relative; }
         .cal-dot { width: 5px; height: 5px; background: var(--warn); border-radius: 50%; position: absolute; bottom: 5px; }
+        .today { border: 2px solid var(--brand); color: var(--brand); }
 
-        /* Dock */
-        .dock { position: fixed; bottom: 15px; left: 50%; transform: translateX(-50%); width: 92%; max-width: 500px; background: rgba(17, 26, 45, 0.98); border-radius: 25px; padding: 12px; display: flex; justify-content: space-around; border: 1px solid rgba(255,255,255,0.1); z-index: 1000; }
-        .nav-link { background: none; border: none; color: var(--dim); display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; text-transform: uppercase; font-size: 0.6rem; font-weight: 800; }
+        .dock { position: fixed; bottom: 15px; left: 50%; transform: translateX(-50%); width: 92%; max-width: 500px; background: rgba(17, 26, 45, 0.98); border-radius: 25px; padding: 12px; display: flex; justify-content: space-around; border: 1px solid rgba(255,255,255,0.1); z-index: 1000; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .nav-link { background: none; border: none; color: var(--dim); display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; font-size: 0.6rem; font-weight: 800; }
         .nav-link.active { color: var(--brand); }
+
+        .st-badge { padding: 4px 8px; border-radius: 6px; font-size: 0.6rem; font-weight: 900; text-transform: uppercase; }
+        .st-confeccion { background: rgba(163, 102, 255, 0.2); color: var(--ai); }
+        .st-despachado { background: rgba(0, 255, 136, 0.2); color: var(--success); }
+        .st-error { background: rgba(255, 68, 68, 0.2); color: var(--danger); }
     </style>
 </head>
 <body>
 
 <div id="login-screen">
     <div class="login-box">
-        <i class="fa-solid fa-vest" style="font-size:3rem; color:var(--brand); margin-bottom:20px;"></i>
-        <h2>IDEAS TEXTILES OS</h2>
-        <input type="text" id="userIn" placeholder="OPERADOR" style="width:100%; padding:18px; border-radius:15px; background:var(--input); border:1px solid var(--brand); color:white; text-align:center; outline:none; font-weight:800; margin: 20px 0;">
+        <h2 style="margin-bottom:20px;">IDEAS TEXTILES OS</h2>
+        <input type="text" id="userIn" placeholder="NOMBRE OPERADOR" style="width:100%; padding:18px; border-radius:15px; background:var(--input); border:1px solid var(--brand); color:white; text-align:center; outline:none; font-weight:800; margin-bottom:20px;">
         <button class="btn btn-brand" style="width:100%;" onclick="Core.login()">ACCEDER</button>
     </div>
 </div>
 
 <header>
     <div>
-        <h1 style="font-size:0.9rem; font-weight:800;">NEURAL MASTER v37</h1>
+        <h1 style="font-size:0.9rem; font-weight:800;">MASTER ENTERPRISE</h1>
         <p id="op-display" style="font-size:0.6rem; color:var(--brand); font-weight:900;"></p>
     </div>
     <button class="btn btn-ai" onclick="Core.runIA()"><i class="fa-solid fa-camera"></i> SCAN IA</button>
@@ -78,14 +77,22 @@
     <section id="v-stock" class="view active">
         <div style="display:flex; justify-content:space-between; margin-bottom:20px">
             <h2>Inventario</h2>
-            <button class="btn btn-brand" style="padding:5px 15px" onclick="Core.openMatrix()">+ Nuevo Item</button>
+            <button class="btn btn-brand" style="padding:5px 15px" onclick="Core.openMatrix()">+ Nuevo</button>
         </div>
         <div id="list-inv"></div>
     </section>
 
+    <section id="v-orders" class="view">
+        <div style="display:flex; justify-content:space-between; margin-bottom:20px">
+            <h2>Órdenes (OC)</h2>
+            <button class="btn btn-brand" onclick="Core.newOC()">CREAR OC</button>
+        </div>
+        <div id="list-ord"></div>
+    </section>
+
     <section id="v-cal" class="view">
         <div class="card">
-            <h3 style="margin-bottom:15px">Agenda de Producción</h3>
+            <h3 style="margin-bottom:15px">Agenda Time-Machine</h3>
             <div class="cal-grid" id="cal-body"></div>
         </div>
         <div id="cal-details"></div>
@@ -93,21 +100,23 @@
 </main>
 
 <nav class="dock">
-    <button class="nav-link active" onclick="Core.nav('stock', this)"><i class="fa-solid fa-box-open"></i><span>Stock</span></button>
-    <button class="nav-link" onclick="Core.nav('cal', this)"><i class="fa-solid fa-calendar-alt"></i><span>Agenda</span></button>
-    <button class="nav-link" onclick="Core.backup()"><i class="fa-solid fa-download"></i><span>Copia</span></button>
+    <button class="nav-link active" onclick="Core.nav('stock', this)"><i class="fa-solid fa-boxes-stacked"></i><span>Stock</span></button>
+    <button class="nav-link" onclick="Core.nav('orders', this)"><i class="fa-solid fa-file-invoice"></i><span>OC</span></button>
+    <button class="nav-link" onclick="Core.nav('cal', this)"><i class="fa-solid fa-calendar-day"></i><span>Agenda</span></button>
+    <button class="nav-link" onclick="Core.backup()"><i class="fa-solid fa-cloud-download"></i><span>Copia</span></button>
 </nav>
 
 <script>
 const Core = {
-    user: localStorage.getItem('it_user_v37'),
-    inv: JSON.parse(localStorage.getItem('it_inv_v37')) || [],
-    agenda: JSON.parse(localStorage.getItem('it_agenda_v37')) || {},
+    user: localStorage.getItem('it_user_v38'),
+    inv: JSON.parse(localStorage.getItem('it_inv_v38')) || [],
+    ord: JSON.parse(localStorage.getItem('it_ord_v38')) || [],
+    agenda: JSON.parse(localStorage.getItem('it_agenda_v38')) || {},
     worker: null,
 
     async login() {
         const u = document.getElementById('userIn').value;
-        if(u) { this.user = u.toUpperCase(); localStorage.setItem('it_user_v37', this.user); this.init(); }
+        if(u) { this.user = u.toUpperCase(); localStorage.setItem('it_user_v38', this.user); this.init(); }
     },
 
     init() {
@@ -132,167 +141,193 @@ const Core = {
         if(v === 'cal') this.renderCal();
     },
 
-    // --- FUNCIONALIDAD: MATRIZ AGIL (Carga múltiples tallas) ---
+    // --- MÓDULO STOCK AGIL & EDICIÓN ---
     async openMatrix(pIdx = null) {
         const isEdit = pIdx !== null;
         const p = isEdit ? this.inv[pIdx] : { name: '', tallas: { "S":0,"M":0,"L":0,"XL":0,"4XL":0,"5XL":0 } };
 
         const { value: form } = await Swal.fire({
-            title: isEdit ? 'Editar Producto / Stock' : 'Nuevo Producto / Stock',
+            title: isEdit ? 'Editar / Cargar Stock' : 'Nuevo Producto',
             html: `
-                <input id="m-name" class="swal2-input" placeholder="Nombre del Producto" value="${p.name}">
-                <p style="margin-top:15px; font-weight:800; font-size:0.7rem; color:var(--brand)">CANTIDADES POR TALLA</p>
-                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:10px">
+                <input id="m-name" class="swal2-input" placeholder="Nombre" value="${p.name}">
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; margin-top:15px">
                     ${Object.keys(p.tallas).map(t => `
-                        <div style="display:flex; align-items:center; gap:5px; background:var(--input); padding:5px; border-radius:8px">
-                            <b style="width:40px; font-size:0.7rem">${t}:</b>
-                            <input id="m-${t}" type="number" class="swal2-input" style="margin:0; height:35px; font-size:0.8rem" placeholder="0" value="${isEdit ? p.tallas[t] : ''}">
+                        <div style="background:var(--input); padding:8px; border-radius:10px">
+                            <label style="font-size:0.6rem; color:var(--brand)">TALLA ${t}</label>
+                            <input id="m-${t}" type="number" class="swal2-input" style="margin:0; height:35px; width:100%" value="${p.tallas[t]}">
                         </div>
                     `).join('')}
                 </div>
             `,
             showCancelButton: true,
-            confirmButtonText: isEdit ? 'Actualizar Todo' : 'Crear e Ingresar',
             preConfirm: () => {
                 const name = document.getElementById('m-name').value;
-                if(!name) return Swal.showValidationMessage('El nombre es obligatorio');
+                if(!name) return Swal.showValidationMessage('Nombre requerido');
                 const result = { name: name.toUpperCase(), tallas: {} };
-                Object.keys(p.tallas).forEach(t => {
-                    result.tallas[t] = parseInt(document.getElementById(`m-${t}`).value) || 0;
-                });
+                Object.keys(p.tallas).forEach(t => result.tallas[t] = parseInt(document.getElementById(`m-${t}`).value) || 0);
                 return result;
             }
         });
 
         if(form) {
-            if(isEdit) {
-                this.inv[pIdx] = form;
-                this.log(`Edición total: ${form.name}`);
-            } else {
-                this.inv.push(form);
-                this.log(`Carga inicial: ${form.name}`);
-            }
+            if(isEdit) this.inv[pIdx] = form; else this.inv.push(form);
             this.save();
         }
     },
 
-    // --- FUNCIONALIDAD: IA CON SELECTOR DE GALERIA ---
+    // --- MÓDULO ÓRDENES DE COMPRA (OC) ---
+    async newOC() {
+        if(this.inv.length === 0) return Swal.fire('Error', 'Primero crea productos en Stock', 'error');
+        const { value: f } = await Swal.fire({
+            title: 'Nueva OC',
+            html: `
+                <input id="sw-id" class="swal2-input" placeholder="N° OC">
+                <input id="sw-cl" class="swal2-input" placeholder="Cliente">
+                <select id="sw-p" class="swal2-input">${this.inv.map(i=>`<option>${i.name}</option>`)}</select>
+                <select id="sw-t" class="swal2-input"><option>S</option><option>M</option><option>L</option><option>XL</option><option>4XL</option><option>5XL</option></select>
+                <input id="sw-q" type="number" class="swal2-input" placeholder="Cantidad">
+            `,
+            preConfirm: () => ({ id: document.getElementById('sw-id').value, cli: document.getElementById('sw-cl').value, p: document.getElementById('sw-p').value, t: document.getElementById('sw-t').value, q: parseInt(document.getElementById('sw-q').value) })
+        });
+        if(f && f.id) {
+            this.ord.push({...f, status: 'confeccion', date: new Date().toLocaleDateString()});
+            this.save();
+        }
+    },
+
+    async setOCStatus(idx, st) {
+        const o = this.ord[idx];
+        if(st === 'despachado') {
+            const p = this.inv.find(i => i.name === o.p);
+            if(p && p.tallas[o.t] >= o.q) {
+                const { value: fac } = await Swal.fire({ title: 'N° Factura/Guía', input: 'text' });
+                if(fac) {
+                    p.tallas[o.t] -= o.q; o.status = 'despachado'; o.fac = fac;
+                    this.save();
+                    this.sendWSP(o);
+                }
+            } else {
+                o.status = 'nostock'; this.save();
+                Swal.fire('Atención', 'No hay stock suficiente. Elija proceso de producción.', 'warning');
+            }
+        } else { o.status = st; this.save(); }
+    },
+
+    async runProd(idx, type) {
+        Swal.fire({ title: `Procesando ${type}...`, timer: 1000, showConfirmButton: false });
+        setTimeout(() => {
+            const o = this.ord[idx];
+            const pIdx = this.inv.findIndex(i => i.name === o.p);
+            this.inv[pIdx].tallas[o.t] += o.q;
+            o.status = 'bodega';
+            this.save();
+            Swal.fire('Listo', `${type} terminado y cargado a bodega`, 'success');
+        }, 1200);
+    },
+
+    sendWSP(o) {
+        const msg = encodeURIComponent(`*IDEAS TEXTILES - DESPACHO*\n✅ OC: ${o.id}\n🏢 Cliente: ${o.cli}\n📦 Item: ${o.p} [${o.t}]\n🔢 Cant: ${o.q}\n🧾 Guía: ${o.fac}\n👤 Op: ${this.user}`);
+        window.open(`https://wa.me/569XXXXXXXX?text=${msg}`);
+    },
+
+    // --- IA SCANNER (Cámara o Galería) ---
     async runIA() {
         const { value: file } = await Swal.fire({
-            title: 'Escanear Cuaderno o Nota',
-            text: 'Selecciona desde Cámara o Galería',
+            title: 'IA Visual',
+            text: 'Cámara o Galería',
             input: 'file',
-            inputAttributes: { 'accept': 'image/*', 'capture': 'camera' } // Esto activa la opción dual en celulares
+            inputAttributes: { 'accept': 'image/*', 'capture': 'camera' }
         });
-
         if(file) {
-            Swal.fire({ title: 'IA Procesando...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+            Swal.fire({ title: 'IA Leyendo...', didOpen: () => Swal.showLoading() });
             const { data: { text } } = await this.worker.recognize(file);
             Swal.close();
             
-            // Lógica simple de extracción
             const lines = text.split('\n');
-            let detName = "", detQty = 0;
-            for(let l of lines) {
-                const n = l.match(/\d+/);
-                if(l.length > 3 && n) { detName = l.replace(/\d+/g, '').trim(); detQty = parseInt(n[0]); break; }
-            }
-            
-            // Abrir matriz con lo que la IA encontró para que el usuario complete
-            const pIdx = this.inv.findIndex(p => p.name.toLowerCase().includes(detName.toLowerCase()));
+            let dN = ""; for(let l of lines) { if(l.length > 4) { dN = l.replace(/\d+/g, '').trim(); break; } }
+            const pIdx = this.inv.findIndex(p => p.name.toLowerCase().includes(dN.toLowerCase()));
             this.openMatrix(pIdx !== -1 ? pIdx : null);
         }
     },
 
-    // --- FUNCIONALIDAD: CALENDARIO TIEMPO REAL (Pasado y Futuro) ---
+    // --- AGENDA TIME MACHINE ---
     renderCal() {
-        const body = document.getElementById('cal-body');
-        body.innerHTML = "";
+        const body = document.getElementById('cal-body'); body.innerHTML = "";
         const now = new Date();
-        const month = now.getMonth();
-        const year = now.getFullYear();
-
-        // Generar 31 días (simplificado para este ejemplo)
         for(let i=1; i<=31; i++) {
-            const dateStr = `${i}/${month+1}/${year}`;
-            const hasData = this.agenda[dateStr];
-            body.innerHTML += `
-                <div class="cal-day ${i === now.getDate() ? 'today' : ''}" onclick="Core.openAgenda('${dateStr}')">
-                    ${i}
-                    ${hasData ? '<div class="cal-dot"></div>' : ''}
-                </div>
-            `;
+            const dStr = `${i}/${now.getMonth()+1}/${now.getFullYear()}`;
+            body.innerHTML += `<div class="cal-day ${i===now.getDate()?'today':''}" onclick="Core.openAgenda('${dStr}')">${i}${this.agenda[dStr]?'<div class="cal-dot"></div>':''}</div>`;
         }
     },
 
     async openAgenda(date) {
-        const currentNote = this.agenda[date] || "";
         const { value: note } = await Swal.fire({
             title: `Agenda: ${date}`,
             input: 'textarea',
-            inputLabel: 'Escribe notas, compromisos o recordatorios de stock',
-            inputValue: currentNote,
-            showCancelButton: true,
-            confirmButtonText: 'Guardar en el tiempo'
+            inputValue: this.agenda[date] || "",
+            showCancelButton: true
         });
-
         if(note !== undefined) {
-            if(note.trim() === "") delete this.agenda[date];
-            else this.agenda[date] = note;
-            
-            localStorage.setItem('it_agenda_v37', JSON.stringify(this.agenda));
+            if(note.trim()==="") delete this.agenda[date]; else this.agenda[date] = note;
+            localStorage.setItem('it_agenda_v38', JSON.stringify(this.agenda));
             this.renderCal();
-            this.showDayNote(date);
+            this.showNote(date);
         }
     },
 
-    showDayNote(date) {
-        const n = this.agenda[date];
-        document.getElementById('cal-details').innerHTML = n ? `
-            <div class="card" style="border-left:4px solid var(--warn)">
-                <small style="color:var(--dim)">Nota para el ${date}:</small>
-                <p style="margin-top:5px; font-size:0.9rem">${n}</p>
-            </div>
-        ` : "";
+    showNote(date) {
+        document.getElementById('cal-details').innerHTML = this.agenda[date] ? `<div class="card" style="border-left:4px solid var(--warn)"><b>Nota ${date}:</b><p>${this.agenda[date]}</p></div>` : "";
     },
 
-    // --- CORE ---
-    log(msg) {
-        console.log(`[${new Date().toLocaleTimeString()}] ${msg} - POR: ${this.user}`);
-    },
-
+    // --- RENDER & SAVE ---
     renderAll() {
-        const container = document.getElementById('list-inv');
-        container.innerHTML = this.inv.map((p, i) => `
+        document.getElementById('list-inv').innerHTML = this.inv.map((p, i) => `
             <div class="card">
-                <div style="display:flex; justify-content:space-between; align-items:center">
-                    <b style="font-size:1.1rem">${p.name}</b>
-                    <button class="btn-icon" onclick="Core.openMatrix(${i})"><i class="fa-solid fa-pen"></i></button>
+                <div style="display:flex; justify-content:space-between">
+                    <b>${p.name}</b>
+                    <button class="btn-edit" onclick="Core.openMatrix(${i})"><i class="fa-solid fa-pen-to-square"></i></button>
                 </div>
                 <div class="stock-grid">
-                    ${Object.entries(p.tallas).map(([t, q]) => `
-                        <div class="talla-item">
-                            <b>${t}</b>
-                            <span style="font-weight:900; color:${q<=0?'var(--danger)':'white'}">${q}</span>
-                        </div>
-                    `).join('')}
+                    ${Object.entries(p.tallas).map(([t, q]) => `<div class="talla-item"><b>${t}</b>${q}</div>`).join('')}
                 </div>
+            </div>
+        `).reverse().join('');
+
+        document.getElementById('list-ord').innerHTML = this.ord.map((o, idx) => `
+            <div class="card" style="border-left:4px solid ${o.status==='despachado'?'var(--success)':'var(--ai)'}">
+                <div style="display:flex; justify-content:space-between">
+                    <span class="st-badge st-${o.status==='nostock'?'error':o.status}">${o.status}</span>
+                    <small>${o.date}</small>
+                </div>
+                <p style="margin:10px 0;"><b>OC #${o.id}</b> - ${o.cli}<br><small>${o.p} [${o.t}] x ${o.q}</small></p>
+                ${o.status === 'nostock' ? `
+                    <div style="display:flex; gap:5px">
+                        <button class="btn btn-brand" style="flex:1; padding:8px" onclick="Core.runProd(${idx},'CONFECCIÓN')">CONFECCIÓN</button>
+                        <button class="btn btn-ai" style="flex:1; padding:8px" onclick="Core.runProd(${idx},'BORDADO')">BORDADO</button>
+                    </div>
+                ` : `
+                    <select class="swal2-input" style="margin:0; height:38px; font-size:0.7rem" onchange="Core.setOCStatus(${idx}, this.value)">
+                        <option value="confeccion" ${o.status==='confeccion'?'selected':''}>🔨 Confección</option>
+                        <option value="bodega" ${o.status==='bodega'?'selected':''}>📦 Bodega</option>
+                        <option value="despachado" ${o.status==='despachado'?'selected':''}>🚚 DESPACHAR</option>
+                    </select>
+                `}
             </div>
         `).reverse().join('');
     },
 
     save() {
-        localStorage.setItem('it_inv_v37', JSON.stringify(this.inv));
+        localStorage.setItem('it_inv_v38', JSON.stringify(this.inv));
+        localStorage.setItem('it_ord_v38', JSON.stringify(this.ord));
         this.renderAll();
     },
 
     backup() {
-        const data = JSON.stringify({inv:this.inv, agenda:this.agenda});
+        const data = JSON.stringify({inv:this.inv, ord:this.ord, agenda:this.agenda});
         const blob = new Blob([data], {type: 'application/json'});
-        const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `SISTEMA_TEXTIL_V37.json`; a.click();
+        const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `SISTEMA_V38.json`; a.click();
     }
 };
-
 window.onload = () => Core.init();
 </script>
 </body>
