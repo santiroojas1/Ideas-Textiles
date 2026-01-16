@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>IDEAS TEXTILES SPA | ERP TITAN V50</title>
+    <title>IDEAS TEXTILES SPA | ERP INDUSTRIAL</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
@@ -15,362 +15,303 @@
 
     <style>
         :root {
-            --p-blue: #0044cc;
-            --p-blue-dark: #003399;
-            --p-sky: #38bdf8;
-            --bg-main: #f8fafc;
-            --bg-card: #ffffff;
-            --txt-main: #0f172a;
-            --txt-muted: #64748b;
-            --accent-purple: #8b5cf6;
-            --accent-orange: #f59e0b;
-            --accent-green: #10b981;
-            --accent-red: #ef4444;
-            --safe-area-bottom: 120px;
-            --shadow-premium: 0 10px 25px -5px rgba(0, 68, 204, 0.12), 0 8px 10px -6px rgba(0, 68, 204, 0.12);
+            --slate-900: #0f172a;
+            --slate-800: #1e293b;
+            --blue-600: #2563eb;
+            --blue-500: #3b82f6;
+            --emerald: #10b981;
+            --rose: #f43f5e;
+            --amber: #f59e0b;
+            --bg-app: #f1f5f9;
+            --glass: rgba(255, 255, 255, 0.9);
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            --safe-bottom: 110px;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
-            background-color: var(--bg-main);
-            color: var(--txt-main);
-            line-height: 1.6;
-            overflow-x: hidden;
+            background-color: var(--bg-app);
+            color: var(--slate-900);
+            line-height: 1.5;
+            min-height: 100vh;
         }
 
-        /* --- SISTEMA DE CAPAS (Z-INDEX) --- */
-        #loading-screen { z-index: 9999; }
-        .swal2-container { z-index: 9000 !important; }
-        .dock-nav { z-index: 5000; }
-        header { z-index: 4000; }
-
-        /* --- ANIMACIONES --- */
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .anim-fade { animation: fadeIn 0.4s ease-out forwards; }
-
-        /* --- HEADER --- */
+        /* --- HEADER PROFESIONAL --- */
         header {
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(12px);
-            padding: 20px;
-            border-bottom: 1px solid #e2e8f0;
-            position: sticky; top: 0;
-            display: flex; justify-content: space-between; align-items: center;
+            background: var(--slate-900);
+            color: white;
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: var(--shadow-md);
         }
 
-        .logo-section { display: flex; align-items: center; gap: 12px; }
-        .logo-section i { 
-            background: var(--p-blue); color: white; 
-            padding: 10px; border-radius: 12px; font-size: 1.2rem;
+        .header-brand h1 { font-size: 1.1rem; font-weight: 800; letter-spacing: -0.5px; }
+        .header-brand p { font-size: 0.65rem; color: var(--blue-500); font-weight: 700; text-transform: uppercase; }
+
+        .btn-ai-trigger {
+            background: linear-gradient(135deg, var(--blue-600), #8b5cf6);
+            color: white; border: none; padding: 10px 18px; border-radius: 12px;
+            font-weight: 700; font-size: 0.8rem; cursor: pointer;
+            display: flex; align-items: center; gap: 8px;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
         }
-        .logo-text h1 { font-size: 1.1rem; font-weight: 800; letter-spacing: -0.5px; color: var(--p-blue); }
-        .logo-text span { font-size: 0.7rem; font-weight: 700; color: var(--txt-muted); text-transform: uppercase; }
 
         /* --- CONTENEDOR PRINCIPAL --- */
-        .app-container {
-            max-width: 1100px;
+        .main-view {
+            max-width: 1000px;
             margin: 0 auto;
             padding: 20px;
-            padding-bottom: var(--safe-area-bottom);
+            padding-bottom: var(--safe-bottom);
         }
 
-        .view { display: none; }
-        .view.active { display: block; }
+        .section { display: none; animation: slideUp 0.3s ease-out; }
+        .section.active { display: block; }
 
-        /* --- TARJETAS PREMIUM --- */
-        .card {
-            background: var(--bg-card);
-            border-radius: 24px;
-            padding: 24px;
-            margin-bottom: 20px;
-            border: 1px solid rgba(226, 232, 240, 0.8);
-            box-shadow: var(--shadow-premium);
-            transition: transform 0.2s ease;
+        @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* --- BUSCADOR Y FILTROS --- */
+        .tool-bar {
+            display: flex; gap: 12px; margin-bottom: 24px;
+        }
+        .search-wrapper {
+            flex: 1; background: white; border-radius: 16px;
+            padding: 12px 20px; display: flex; align-items: center; gap: 12px;
+            border: 1px solid #e2e8f0; box-shadow: var(--shadow-sm);
+        }
+        .search-wrapper input { border: none; outline: none; width: 100%; font-weight: 600; color: var(--slate-800); }
+
+        /* --- TARJETAS DE INVENTARIO --- */
+        .inventory-grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px;
         }
 
-        .card:active { transform: scale(0.99); }
+        .product-card {
+            background: white; border-radius: 24px; padding: 20px;
+            border: 1px solid #e2e8f0; box-shadow: var(--shadow-sm);
+            transition: all 0.2s ease; position: relative;
+        }
 
-        .card-title {
-            display: flex; justify-content: space-between; align-items: center;
-            margin-bottom: 18px;
-        }
-        .card-title h3 { font-size: 1rem; font-weight: 800; color: var(--p-blue); text-transform: uppercase; }
+        .product-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); }
 
-        /* --- GRILLA DE TALLAS --- */
-        .size-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 10px;
+        .card-actions {
+            position: absolute; top: 20px; right: 20px; display: flex; gap: 8px;
         }
-        .size-item {
-            background: #f1f5f9;
-            padding: 12px 5px;
-            border-radius: 16px;
-            text-align: center;
-            border: 1px solid transparent;
+        .btn-icon {
+            width: 36px; height: 36px; border-radius: 10px; border: none;
+            display: flex; align-items: center; justify-content: center; cursor: pointer;
+            transition: 0.2s;
         }
-        .size-item.has-stock { border-color: var(--p-sky); background: #f0f9ff; }
-        .size-item span { display: block; font-size: 0.65rem; font-weight: 800; color: var(--p-blue); opacity: 0.7; }
-        .size-item b { font-size: 1.1rem; font-weight: 800; }
+        .btn-edit { background: #eff6ff; color: var(--blue-600); }
+        .btn-delete { background: #fff1f2; color: var(--rose); }
 
-        /* --- BUSCADOR --- */
-        .search-bar {
-            background: white; border: 2px solid #e2e8f0;
-            border-radius: 16px; padding: 12px 20px;
-            display: flex; align-items: center; gap: 10px;
-            margin-bottom: 20px;
-        }
-        .search-bar input { border: none; outline: none; width: 100%; font-weight: 600; font-size: 1rem; }
+        .product-title { margin-bottom: 16px; }
+        .product-title h3 { font-size: 1rem; font-weight: 800; color: var(--slate-900); }
+        .product-title span { font-size: 0.7rem; color: var(--slate-500); font-weight: 600; }
 
-        /* --- BOTONES --- */
-        .btn {
-            padding: 12px 24px; border-radius: 16px; border: none;
-            font-weight: 800; cursor: pointer; display: flex; align-items: center; gap: 8px;
-            transition: all 0.3s ease;
+        .size-matrix {
+            display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;
         }
-        .btn-p { background: var(--p-blue); color: white; }
-        .btn-p:hover { background: var(--p-blue-dark); box-shadow: 0 5px 15px rgba(0,68,204,0.3); }
-        .btn-s { background: white; border: 2px solid var(--p-blue); color: var(--p-blue); }
-        .btn-ai { background: linear-gradient(135deg, var(--accent-purple), var(--p-sky)); color: white; }
+        .size-box {
+            background: #f8fafc; border-radius: 14px; padding: 10px 4px;
+            text-align: center; border: 1px solid #f1f5f9;
+        }
+        .size-box.in-stock { background: #f0f9ff; border-color: var(--blue-500); }
+        .size-box span { display: block; font-size: 0.6rem; font-weight: 800; color: var(--slate-400); margin-bottom: 2px; }
+        .size-box b { font-size: 1rem; font-weight: 800; color: var(--slate-900); }
 
         /* --- DOCK DE NAVEGACIÓN --- */
         .dock-nav {
-            position: fixed; bottom: 25px; left: 50%;
-            transform: translateX(-50%);
-            width: 92%; max-width: 550px;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            border-radius: 30px;
-            padding: 12px 5px;
-            display: flex; justify-content: space-around;
-            border: 1px solid #e2e8f0;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%);
+            width: 90%; max-width: 500px; background: var(--slate-900);
+            border-radius: 28px; padding: 12px; display: flex; justify-content: space-around;
+            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.2); z-index: 999;
         }
-        .dock-btn {
-            background: none; border: none; color: var(--txt-muted);
-            display: flex; flex-direction: column; align-items: center; gap: 4px;
-            font-size: 0.65rem; font-weight: 800; text-transform: uppercase;
-            width: 20%; cursor: pointer;
+        .nav-item {
+            color: #94a3b8; display: flex; flex-direction: column; align-items: center;
+            gap: 4px; cursor: pointer; transition: 0.3s; width: 20%;
         }
-        .dock-btn i { font-size: 1.4rem; transition: 0.3s; }
-        .dock-btn.active { color: var(--p-blue); }
-        .dock-btn.active i { transform: translateY(-5px); }
+        .nav-item i { font-size: 1.4rem; }
+        .nav-item span { font-size: 0.6rem; font-weight: 700; text-transform: uppercase; }
+        .nav-item.active { color: white; }
+        .nav-item.active i { transform: translateY(-4px); color: var(--blue-500); }
+
+        /* --- ESTILOS PARA EL MODAL DE CARGA --- */
+        .modal-entry-row {
+            background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 18px;
+            padding: 16px; margin-bottom: 12px; animation: fadeIn 0.3s;
+        }
+        .modal-grid-input {
+            display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 12px;
+        }
+        .input-qty-wrap {
+            background: white; border: 1px solid #cbd5e1; border-radius: 8px; padding: 4px;
+        }
+        .input-qty-wrap label { font-size: 0.55rem; font-weight: 800; color: var(--blue-600); display: block; text-align: center; }
+        .input-qty-wrap input { width: 100%; border: none; text-align: center; font-weight: 700; outline: none; }
 
         /* --- CALENDARIO --- */
-        .cal-ctrl { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; }
-        .cal-cell {
-            aspect-ratio: 1; background: white; border-radius: 10px;
-            display: flex; align-items: center; justify-content: center;
-            font-weight: 800; font-size: 0.8rem; border: 1px solid #f1f5f9;
-            cursor: pointer; position: relative;
+        .cal-container { background: white; border-radius: 24px; padding: 24px; box-shadow: var(--shadow-sm); }
+        .cal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .cal-header h2 { font-size: 1.1rem; font-weight: 800; color: var(--slate-900); }
+        .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
+        .cal-day {
+            aspect-ratio: 1; border-radius: 12px; border: 1px solid #f1f5f9;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            font-weight: 700; font-size: 0.85rem; cursor: pointer; transition: 0.2s;
         }
-        .cal-cell.today { background: var(--p-blue); color: white; }
-        .cal-cell.has-note::after {
-            content: ''; width: 4px; height: 4px; background: var(--accent-orange);
-            border-radius: 50%; position: absolute; bottom: 4px;
-        }
+        .cal-day:hover { background: #f8fafc; border-color: var(--blue-500); }
+        .cal-day.is-today { background: var(--blue-600); color: white; }
+        .cal-day.has-content::after { content: ''; width: 4px; height: 4px; background: var(--amber); border-radius: 50%; margin-top: 2px; }
 
-        /* --- MODALES Y FORMS --- */
-        .matrix-input-row {
-            background: #f8fafc; border: 1px solid #e2e8f0;
-            padding: 15px; border-radius: 18px; margin-bottom: 10px;
-        }
-
-        /* --- LOGIN --- */
-        #login-overlay {
-            position: fixed; inset: 0; background: white; z-index: 10000;
-            display: flex; align-items: center; justify-content: center;
-            padding: 20px;
-        }
     </style>
 </head>
 <body>
 
-<div id="login-overlay">
-    <div style="width: 100%; max-width: 400px; text-align: center;" class="anim-fade">
-        <i class="fa-solid fa-scissors" style="font-size: 4rem; color: var(--p-blue); margin-bottom: 20px;"></i>
-        <h1 style="color: var(--p-blue); font-weight: 900; font-size: 2.2rem; margin-bottom: 5px;">APEX TITAN</h1>
-        <p style="color: var(--txt-muted); font-weight: 700; margin-bottom: 40px; text-transform: uppercase; letter-spacing: 2px;">Ideas Textiles SPA</p>
-        
-        <input type="text" id="input-operator" placeholder="CÓDIGO OPERADOR" 
-               style="width: 100%; padding: 20px; border-radius: 18px; border: 2px solid #e2e8f0; text-align: center; font-weight: 800; font-size: 1.2rem; margin-bottom: 20px; outline: none;">
-        
-        <button class="btn btn-p" style="width: 100%; height: 65px; justify-content: center; font-size: 1.1rem;" onclick="App.Core.auth()">
-            ACCEDER AL SISTEMA <i class="fa-solid fa-arrow-right"></i>
-        </button>
-    </div>
-</div>
-
 <header>
-    <div class="logo-section">
-        <i class="fa-solid fa-shirt"></i>
-        <div class="logo-text">
-            <h1>IDEAS TEXTILES SPA</h1>
-            <span id="display-op">OPERADOR: NO IDENTIFICADO</span>
-        </div>
+    <div class="header-brand">
+        <h1>IDEAS TEXTILES SPA</h1>
+        <p id="operator-id">PANEL DE CONTROL INDUSTRIAL</p>
     </div>
-    <button class="btn btn-ai" style="padding: 10px 15px; font-size: 0.75rem;" onclick="App.IO.trigger()">
-        <i class="fa-solid fa-wand-magic-sparkles"></i> IA / CARGA
+    <button class="btn-ai-trigger" onclick="App.Actions.startImport()">
+        <i class="fa-solid fa-wand-magic-sparkles"></i> CARGA IA / DOCS
     </button>
 </header>
 
-<main class="app-container">
-    
-    <section id="view-inventory" class="view active anim-fade">
-        <div class="search-bar">
-            <i class="fa-solid fa-magnifying-glass" style="color: var(--txt-muted);"></i>
-            <input type="text" id="search-inv" placeholder="Buscar por producto o SKU..." oninput="App.UI.renderInventory()">
-        </div>
+<main class="main-view">
 
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-            <h2 style="font-weight: 900; color: var(--p-blue);">CONTROL STOCK</h2>
-            <button class="btn btn-p" onclick="App.UI.modalAddProduct()">
-                <i class="fa-solid fa-plus-circle"></i> NUEVO
+    <section id="view-inventory" class="section active">
+        <div class="tool-bar">
+            <div class="search-wrapper">
+                <i class="fa-solid fa-magnifying-glass" style="color: #94a3b8;"></i>
+                <input type="text" id="inventory-search" placeholder="Filtrar por producto, SKU o categoría..." oninput="App.Render.inventory()">
+            </div>
+            <button class="btn-ai-trigger" style="background: var(--slate-900); border: 1px solid var(--slate-800);" onclick="App.Actions.showProductModal()">
+                <i class="fa-solid fa-plus"></i> NUEVO
             </button>
         </div>
         
-        <div id="draw-inventory">
+        <div id="inventory-container" class="inventory-grid">
             </div>
     </section>
 
-    <section id="view-orders" class="view anim-fade">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
-            <h2 style="font-weight: 900; color: var(--p-blue);">ÓRDENES ACTIVAS</h2>
-            <button class="btn btn-s" onclick="App.OC.createManual()">
-                <i class="fa-solid fa-file-circle-plus"></i> NUEVA OC
-            </button>
+    <section id="view-orders" class="section">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h2 style="font-weight: 800; font-size: 1.3rem;">ÓRDENES ACTIVAS</h2>
         </div>
-        <div id="draw-orders"></div>
+        <div id="orders-container" class="inventory-grid">
+            </div>
     </section>
 
-    <section id="view-agenda" class="view anim-fade">
-        <div class="card">
-            <div class="cal-ctrl">
-                <button class="btn btn-s" onclick="App.Calendar.move(-1)"><i class="fa-solid fa-chevron-left"></i></button>
-                <h2 id="cal-month-name" style="font-weight: 900; color: var(--p-blue); text-transform: uppercase;">ENERO 2026</h2>
-                <button class="btn btn-s" onclick="App.Calendar.move(1)"><i class="fa-solid fa-chevron-right"></i></button>
+    <section id="view-agenda" class="section">
+        <div class="cal-container">
+            <div class="cal-header">
+                <button class="btn-icon btn-edit" onclick="App.Calendar.changeMonth(-1)"><i class="fa-solid fa-chevron-left"></i></button>
+                <h2 id="calendar-month-year">ENERO 2026</h2>
+                <button class="btn-icon btn-edit" onclick="App.Calendar.changeMonth(1)"><i class="fa-solid fa-chevron-right"></i></button>
             </div>
-            <div class="cal-grid" id="draw-calendar"></div>
+            <div class="cal-grid" id="calendar-grid"></div>
         </div>
-        <div id="draw-day-logs"></div>
+        <div id="day-details" style="margin-top: 20px;"></div>
     </section>
 
 </main>
 
 <nav class="dock-nav">
-    <button class="dock-btn active" id="nav-inv" onclick="App.UI.switchTab('inventory', this)">
+    <div class="nav-item active" onclick="App.UI.switchTab('inventory', this)">
         <i class="fa-solid fa-warehouse"></i><span>Bodega</span>
-    </button>
-    <button class="dock-btn" onclick="App.UI.switchTab('orders', this)">
-        <i class="fa-solid fa-clipboard-list"></i><span>Órdenes</span>
-    </button>
-    <button class="dock-btn" onclick="App.UI.switchTab('agenda', this)">
-        <i class="fa-solid fa-calendar-alt"></i><span>Bitácora</span>
-    </button>
-    <button class="dock-btn" onclick="App.Core.exportData()">
-        <i class="fa-solid fa-file-export"></i><span>Exportar</span>
-    </button>
+    </div>
+    <div class="nav-item" onclick="App.UI.switchTab('orders', this)">
+        <i class="fa-solid fa-file-invoice"></i><span>Órdenes</span>
+    </div>
+    <div class="nav-item" onclick="App.UI.switchTab('agenda', this)">
+        <i class="fa-solid fa-calendar-days"></i><span>Agenda</span>
+    </div>
+    <div class="nav-item" onclick="App.Actions.exportData()">
+        <i class="fa-solid fa-cloud-arrow-down"></i><span>Respaldo</span>
+    </div>
 </nav>
 
-<input type="file" id="file-master" hidden multiple accept="image/*,.pdf,.xlsx,.xls">
+<input type="file" id="global-file-input" hidden multiple accept=".pdf,image/*,.xlsx,.xls">
 
 <script>
 /**
- * SISTEMA APEX TITAN V50 - LÓGICA DE NEGOCIO TEXTIL
+ * TITANIUM MATRIX V70 - IDEAS TEXTILES SPA
+ * Motor Lógico de Alta Robustez
  */
+
 const App = {
     state: {
-        op: localStorage.getItem('titan_op') || null,
-        inventory: JSON.parse(localStorage.getItem('titan_inv')) || [],
-        orders: JSON.parse(localStorage.getItem('titan_ord')) || [],
-        logs: JSON.parse(localStorage.getItem('titan_log')) || {},
+        inventory: JSON.parse(localStorage.getItem('idx_inv')) || [],
+        orders: JSON.parse(localStorage.getItem('idx_ord')) || [],
+        logs: JSON.parse(localStorage.getItem('idx_log')) || {},
         currentDate: new Date(),
-        worker: null // IA Tesseract Worker
+        tesseractWorker: null
     },
 
-    Core: {
-        auth() {
-            const val = document.getElementById('input-operator').value.trim().toUpperCase();
-            if(val.length >= 3) {
-                App.state.op = val;
-                localStorage.setItem('titan_op', val);
-                document.getElementById('login-overlay').style.display = 'none';
-                App.Core.init();
-            } else {
-                Swal.fire('ERROR', 'Identificación de operador inválida.', 'error');
-            }
-        },
+    init() {
+        this.Render.inventory();
+        this.Render.orders();
+        this.Calendar.init();
+        
+        document.getElementById('global-file-input').onchange = (e) => this.IA.process(e.target.files);
+    },
 
-        init() {
-            document.getElementById('display-op').innerText = `OPERADOR: ${App.state.op}`;
-            App.UI.renderAll();
-            
-            // Setup Listeners
-            document.getElementById('file-master').onchange = (e) => App.IO.process(e.target.files);
-            
-            if(App.state.op) document.getElementById('login-overlay').style.display = 'none';
-        },
-
+    db: {
         save() {
-            localStorage.setItem('titan_inv', JSON.stringify(App.state.inventory));
-            localStorage.setItem('titan_ord', JSON.stringify(App.state.orders));
-            localStorage.setItem('titan_log', JSON.stringify(App.state.logs));
-            App.UI.renderAll();
-        },
-
-        exportData() {
-            const blob = new Blob([JSON.stringify(App.state)], {type: 'application/json'});
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `RESPALDO_TEXTILES_${new Date().getTime()}.json`;
-            a.click();
+            localStorage.setItem('idx_inv', JSON.stringify(App.state.inventory));
+            localStorage.setItem('idx_ord', JSON.stringify(App.state.orders));
+            localStorage.setItem('idx_log', JSON.stringify(App.state.logs));
+            App.Render.inventory();
+            App.Render.orders();
         }
     },
 
     UI: {
-        switchTab(viewId, btn) {
-            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-            document.querySelectorAll('.dock-btn').forEach(b => b.classList.remove('active'));
+        switchTab(tabId, el) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
             
-            document.getElementById(`view-${viewId}`).classList.add('active');
-            btn.classList.add('active');
+            document.getElementById(`view-${tabId}`).classList.add('active');
+            el.classList.add('active');
             
-            if(viewId === 'agenda') App.Calendar.render();
+            if(tabId === 'agenda') App.Calendar.render();
             window.scrollTo({top: 0, behavior: 'smooth'});
-        },
+        }
+    },
 
-        renderAll() {
-            this.renderInventory();
-            this.renderOrders();
-        },
-
-        renderInventory() {
-            const query = document.getElementById('search-inv').value.toLowerCase();
-            const cont = document.getElementById('draw-inventory');
+    Render: {
+        inventory() {
+            const container = document.getElementById('inventory-container');
+            const q = document.getElementById('inventory-search').value.toLowerCase();
             
-            const filtered = App.state.inventory.filter(i => i.name.toLowerCase().includes(query));
+            const filtered = App.state.inventory.filter(i => i.name.toLowerCase().includes(q));
             
             if(filtered.length === 0) {
-                cont.innerHTML = `<div style="text-align:center; padding:50px; opacity:0.3;">Sin resultados.</div>`;
+                container.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 60px; opacity: 0.5;">No se encontraron productos en bodega.</div>`;
                 return;
             }
 
-            cont.innerHTML = filtered.map((item, idx) => `
-                <div class="card anim-fade">
-                    <div class="card-title">
-                        <h3>${item.name}</h3>
-                        <div style="display:flex; gap:10px;">
-                            <button class="btn btn-s" style="padding:5px 10px;" onclick="App.Inventory.edit(${idx})"><i class="fa-solid fa-pen"></i></button>
-                            <button class="btn btn-s" style="padding:5px 10px; color:var(--accent-red);" onclick="App.Inventory.delete(${idx})"><i class="fa-solid fa-trash"></i></button>
-                        </div>
+            container.innerHTML = filtered.map((item, idx) => `
+                <div class="product-card anim-fade">
+                    <div class="card-actions">
+                        <button class="btn-icon btn-edit" onclick="App.Actions.showProductModal(${idx})"><i class="fa-solid fa-pen"></i></button>
+                        <button class="btn-icon btn-delete" onclick="App.Actions.deleteProduct(${idx})"><i class="fa-solid fa-trash"></i></button>
                     </div>
-                    <div class="size-grid">
-                        ${Object.entries(item.tallas).map(([t,q]) => `
-                            <div class="size-item ${q > 0 ? 'has-stock' : ''}">
+                    <div class="product-title">
+                        <span>SKU: IT-${2000 + idx}</span>
+                        <h3>${item.name}</h3>
+                    </div>
+                    <div class="size-matrix">
+                        ${Object.entries(item.tallas).map(([t, q]) => `
+                            <div class="size-box ${q > 0 ? 'in-stock' : ''}">
                                 <span>${t}</span>
                                 <b>${q}</b>
                             </div>
@@ -380,51 +321,51 @@ const App = {
             `).reverse().join('');
         },
 
-        renderOrders() {
-            const cont = document.getElementById('draw-orders');
+        orders() {
+            const container = document.getElementById('orders-container');
             if(App.state.orders.length === 0) {
-                cont.innerHTML = `<div style="text-align:center; padding:50px; opacity:0.3;">No hay órdenes pendientes.</div>`;
+                container.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 60px; opacity: 0.5;">Sin órdenes de compra activas.</div>`;
                 return;
             }
 
-            cont.innerHTML = App.state.orders.map((o, idx) => `
-                <div class="card anim-fade" style="border-left: 8px solid var(--accent-${this.mapColor(o.status)})">
-                    <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
-                        <span style="font-weight:900; color:var(--p-blue);">${o.id}</span>
-                        <span style="font-weight:800; font-size:0.7rem;">${o.date}</span>
+            container.innerHTML = App.state.orders.map((o, idx) => `
+                <div class="product-card" style="border-left: 6px solid ${o.status === 'produccion' ? 'var(--amber)' : 'var(--emerald)'}">
+                    <div class="card-actions">
+                        <i class="fa-solid fa-trash" style="color: var(--rose); cursor:pointer;" onclick="App.Actions.deleteOrder(${idx})"></i>
                     </div>
-                    <h4 style="font-weight:800; font-size:1.1rem; margin-bottom:5px;">${o.cli}</h4>
-                    <p style="font-weight:700; color:var(--txt-muted); margin-bottom:15px;">${o.p} [${o.t}] x ${o.q} UN.</p>
-                    
-                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-                        <select onchange="App.OC.updateStatus(${idx}, this.value)" class="btn btn-s" style="font-size:0.8rem;">
-                            <option value="" disabled selected>${o.status.toUpperCase()}</option>
-                            <option value="confeccion">CONFECCIÓN</option>
-                            <option value="bodega">EN BODEGA</option>
-                            <option value="despacho">ENTREGADO</option>
-                        </select>
-                        <button class="btn btn-p" style="font-size:0.8rem; justify-content:center;" onclick="App.OC.notify('${o.cli}', '${o.id}')">
-                            <i class="fa-brands fa-whatsapp"></i> AVISAR
+                    <div class="product-title">
+                        <span>${o.date} | ${o.id}</span>
+                        <h3 style="color: var(--blue-600)">${o.cli}</h3>
+                        <p style="font-weight: 700; margin-top: 5px;">${o.p} | TALLA ${o.t} | ${o.q} UNID.</p>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px;">
+                        <button class="btn-ai-trigger" style="padding: 8px; font-size: 0.7rem; background: var(--slate-800);" onclick="App.Actions.notifyOrder('${o.cli}', '${o.p}')">
+                            <i class="fa-brands fa-whatsapp"></i> NOTIFICAR
                         </button>
+                        <select onchange="App.Actions.updateOrderStatus(${idx}, this.value)" style="border-radius: 12px; border: 1px solid #ddd; padding: 5px; font-weight: 700; font-size: 0.7rem;">
+                            <option value="produccion" ${o.status === 'produccion' ? 'selected' : ''}>PRODUCCIÓN</option>
+                            <option value="entregado" ${o.status === 'entregado' ? 'selected' : ''}>ENTREGADO</option>
+                        </select>
                     </div>
                 </div>
             `).reverse().join('');
-        },
+        }
+    },
 
-        mapColor(status) {
-            const maps = { 'confeccion': 'purple', 'bodega': 'orange', 'despacho': 'green' };
-            return maps[status] || 'gray';
-        },
+    Actions: {
+        async showProductModal(editIdx = null) {
+            const isEdit = editIdx !== null;
+            const item = isEdit ? App.state.inventory[editIdx] : { name: '', tallas: { S:0, M:0, L:0, XL:0, '2XL':0, '3XL':0, '4XL':0, '5XL':0 } };
 
-        async modalAddProduct() {
-            const rowTpl = () => `
-                <div class="matrix-input-row">
-                    <input class="swal2-input m-name" placeholder="NOMBRE PRODUCTO" style="width:100%; margin:0 0 10px 0; font-weight:800; border-radius:12px;">
-                    <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap:8px;">
-                        ${['S','M','L','XL','2XL','3XL','4XL','5XL'].map(t => `
-                            <div style="background:white; padding:8px; border-radius:12px; border:1px solid #e2e8f0; text-align:center;">
-                                <small style="font-weight:800; color:var(--p-blue);">${t}</small>
-                                <input type="number" class="m-qty" data-t="${t}" value="0" style="width:100%; border:none; text-align:center; font-weight:900; outline:none;">
+            const createRow = (d) => `
+                <div class="modal-entry-row">
+                    <input type="text" class="swal-p-name" placeholder="NOMBRE DEL PRODUCTO / TELA" value="${d.name}" 
+                           style="width: 100%; padding: 12px; border-radius: 12px; border: 1.5px solid #e2e8f0; font-weight: 800; margin-bottom: 12px;">
+                    <div class="modal-grid-input">
+                        ${Object.entries(d.tallas).map(([t, v]) => `
+                            <div class="input-qty-wrap">
+                                <label>${t}</label>
+                                <input type="number" class="swal-p-qty" data-t="${t}" value="${v}">
                             </div>
                         `).join('')}
                     </div>
@@ -432,216 +373,250 @@ const App = {
             `;
 
             const { value: formRes } = await Swal.fire({
-                title: 'INGRESO DE STOCK',
-                html: `<div id="swal-matrix-cont" style="max-height: 60vh; overflow-y:auto;">${rowTpl()}</div>
-                       <button class="btn btn-s" style="width:100%; margin-top:10px; border-style: dashed;" onclick="document.getElementById('swal-matrix-cont').insertAdjacentHTML('beforeend', \`${rowTpl().replace(/\n/g,'')}\`)">+ AÑADIR OTRO</button>`,
+                title: isEdit ? 'MODIFICAR REGISTRO' : 'INGRESO MULTI-PRODUCTO',
+                html: `<div id="swal-items-container">${createRow(item)}</div>
+                       ${isEdit ? '' : `<button class="btn-ai-trigger" style="width:100%; margin-top:10px; background:var(--slate-800);" onclick="App.Actions.addModalRow()">+ AÑADIR OTRO ÍTEM</button>`}`,
                 width: '600px',
-                confirmButtonText: 'GUARDAR TODO',
-                confirmButtonColor: '#0044cc',
                 showCancelButton: true,
+                confirmButtonText: 'CONFIRMAR Y GUARDAR',
+                confirmButtonColor: '#2563eb',
                 preConfirm: () => {
-                    const items = [];
-                    document.querySelectorAll('.matrix-input-row').forEach(row => {
-                        const name = row.querySelector('.m-name').value.toUpperCase().trim();
+                    const results = [];
+                    document.querySelectorAll('.modal-entry-row').forEach(row => {
+                        const name = row.querySelector('.swal-p-name').value.toUpperCase().trim();
                         if(name) {
                             const tallas = {};
-                            row.querySelectorAll('.m-qty').forEach(q => tallas[q.dataset.t] = parseInt(q.value) || 0);
-                            items.push({ name, tallas });
+                            row.querySelectorAll('.swal-p-qty').forEach(input => {
+                                tallas[input.dataset.t] = parseInt(input.value) || 0;
+                            });
+                            results.push({ name, tallas });
                         }
                     });
-                    return items;
+                    return results;
                 }
             });
 
-            if(formRes && formRes.length > 0) {
-                formRes.forEach(item => App.Inventory.upsert(item));
-                App.Core.save();
-                Swal.fire('ÉXITO', 'Inventario actualizado.', 'success');
-            }
-        }
-    },
-
-    Inventory: {
-        upsert(newItem) {
-            const ex = App.state.inventory.find(i => i.name === newItem.name);
-            if(ex) {
-                Object.keys(newItem.tallas).forEach(t => ex.tallas[t] += newItem.tallas[t]);
-            } else {
-                App.state.inventory.push(newItem);
-            }
-        },
-        delete(idx) {
-            Swal.fire({ title: '¿Eliminar?', icon: 'warning', showCancelButton: true }).then(r => {
-                if(r.isConfirmed) { App.state.inventory.splice(idx,1); App.Core.save(); }
-            });
-        }
-    },
-
-    OC: {
-        updateStatus(idx, status) {
-            const o = App.state.orders[idx];
-            if(status === 'despacho') {
-                const p = App.state.inventory.find(i => i.name === o.p);
-                if(p && p.tallas[o.t] >= o.q) {
-                    p.tallas[o.t] -= o.q;
-                    o.status = 'despacho';
-                    App.Core.save();
-                    Swal.fire('ENTREGADO', 'Stock rebajado de bodega.', 'success');
+            if(formRes) {
+                if(isEdit) {
+                    App.state.inventory[editIdx] = formRes[0];
                 } else {
-                    Swal.fire('ERROR STOCK', 'No hay suficientes unidades para despachar.', 'error');
+                    formRes.forEach(newItem => {
+                        const existing = App.state.inventory.find(i => i.name === newItem.name);
+                        if(existing) {
+                            Object.keys(newItem.tallas).forEach(t => existing.tallas[t] += newItem.tallas[t]);
+                        } else {
+                            App.state.inventory.push(newItem);
+                        }
+                    });
+                }
+                App.db.save();
+                Swal.fire('ÉXITO', 'Datos actualizados en la base central.', 'success');
+            }
+        },
+
+        addModalRow() {
+            const container = document.getElementById('swal-items-container');
+            const empty = { name: '', tallas: { S:0, M:0, L:0, XL:0, '2XL':0, '3XL':0, '4XL':0, '5XL':0 } };
+            
+            // Función auxiliar dentro del scope del modal
+            const tpl = (d) => `
+                <div class="modal-entry-row">
+                    <input type="text" class="swal-p-name" placeholder="NOMBRE DEL PRODUCTO / TELA" value="" style="width: 100%; padding: 12px; border-radius: 12px; border: 1.5px solid #e2e8f0; font-weight: 800; margin-bottom: 12px;">
+                    <div class="modal-grid-input">
+                        ${Object.entries(d.tallas).map(([t, v]) => `<div class="input-qty-wrap"><label>${t}</label><input type="number" class="swal-p-qty" data-t="${t}" value="0"></div>`).join('')}
+                    </div>
+                </div>
+            `;
+            container.insertAdjacentHTML('beforeend', tpl(empty));
+        },
+
+        deleteProduct(idx) {
+            Swal.fire({ title: '¿Eliminar de Bodega?', text: 'Se perderá el registro de stock permanentemente', icon: 'warning', showCancelButton: true, confirmButtonColor: '#f43f5e' })
+                .then(r => { if(r.isConfirmed) { App.state.inventory.splice(idx, 1); App.db.save(); } });
+        },
+
+        deleteOrder(idx) {
+            App.state.orders.splice(idx, 1);
+            App.db.save();
+        },
+
+        updateOrderStatus(idx, status) {
+            const order = App.state.orders[idx];
+            if(status === 'entregado') {
+                // Validación de stock antes de descontar
+                const prod = App.state.inventory.find(i => i.name === order.p);
+                if(prod && prod.tallas[order.t] >= order.q) {
+                    prod.tallas[order.t] -= order.q;
+                    order.status = 'entregado';
+                    App.db.save();
+                    Swal.fire('PEDIDO ENTREGADO', 'Se ha descontado el stock de la bodega automáticamente.', 'success');
+                } else {
+                    Swal.fire('STOCK INSUFICIENTE', 'No hay suficientes unidades en bodega para completar este despacho.', 'error');
+                    App.Render.orders(); // Reset select
                 }
             } else {
-                o.status = status;
-                App.Core.save();
+                order.status = status;
+                App.db.save();
             }
         },
 
-        notify(cli, id) {
-            const msg = encodeURIComponent(`Hola ${cli}, te informamos de Ideas Textiles que tu orden ${id} está lista para retiro.`);
-            window.open(`https://wa.me/569?text=${msg}`);
+        notifyOrder(cli, prod) {
+            const msg = encodeURIComponent(`Hola ${cli}, te informamos de Ideas Textiles que tu pedido de ${prod} está listo para ser retirado. ¡Saludos!`);
+            window.open(`https://wa.me/?text=${msg}`);
         },
 
-        async createManual(defP = "", defQ = 1) {
-            const { value: res } = await Swal.fire({
-                title: 'REGISTRO OC',
-                html: `
-                    <input id="f-cli" class="swal2-input" placeholder="Nombre Cliente">
-                    <input id="f-prod" class="swal2-input" placeholder="Producto" value="${defP}">
-                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-                        <select id="f-t" class="swal2-input"><option>S</option><option selected>M</option><option>L</option><option>XL</option><option>2XL</option></select>
-                        <input id="f-q" type="number" class="swal2-input" value="${defQ}">
-                    </div>
-                `,
-                preConfirm: () => ({
-                    id: `OC-${Math.floor(Math.random()*9000)+1000}`,
-                    cli: document.getElementById('f-cli').value || 'CLIENTE FINAL',
-                    p: document.getElementById('f-prod').value.toUpperCase(),
-                    t: document.getElementById('f-t').value,
-                    q: parseInt(document.getElementById('f-q').value) || 1,
-                    status: 'confeccion',
-                    date: new Date().toLocaleDateString()
-                })
-            });
-            if(res) { App.state.orders.push(res); App.Core.save(); }
+        startImport() { document.getElementById('global-file-input').click(); },
+
+        exportData() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(App.state));
+            const downloadAnchorNode = document.createElement('a');
+            downloadAnchorNode.setAttribute("href", dataStr);
+            downloadAnchorNode.setAttribute("download", "IDEAS_TEXTILES_BACKUP_" + new Date().toLocaleDateString() + ".json");
+            document.body.appendChild(downloadAnchorNode);
+            downloadAnchorNode.click();
+            downloadAnchorNode.remove();
         }
     },
 
-    Calendar: {
-        move(dir) { App.state.currentDate.setMonth(App.state.currentDate.getMonth() + dir); this.render(); },
-        render() {
-            const cont = document.getElementById('draw-calendar');
-            const d = App.state.currentDate;
-            const months = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
-            document.getElementById('cal-month-name').innerText = `${months[d.getMonth()]} ${d.getFullYear()}`;
-            
-            cont.innerHTML = '';
-            const first = new Date(d.getFullYear(), d.getMonth(), 1).getDay();
-            const days = new Date(d.getFullYear(), d.getMonth()+1, 0).getDate();
-
-            for(let e=0; e<first; e++) cont.innerHTML += `<div></div>`;
-            for(let i=1; i<=days; i++) {
-                const key = `${i}-${d.getMonth()}-${d.getFullYear()}`;
-                const isToday = i === new Date().getDate() && d.getMonth() === new Date().getMonth();
-                cont.innerHTML += `
-                    <div class="cal-cell ${isToday ? 'today' : ''} ${App.state.logs[key] ? 'has-note' : ''}" onclick="App.Calendar.openLog('${key}', ${i})">
-                        ${i}
-                    </div>
-                `;
-            }
-        },
-        async openLog(key, n) {
-            const { value: text } = await Swal.fire({
-                title: `Día ${n}`,
-                input: 'textarea',
-                inputValue: App.state.logs[key] || '',
-                confirmButtonText: 'Guardar Nota'
-            });
-            if(text !== undefined) { App.state.logs[key] = text; App.Core.save(); this.render(); }
-        }
-    },
-
-    IO: {
-        trigger() { document.getElementById('file-master').click(); },
+    IA: {
         async process(files) {
-            Swal.fire({ title: 'ANALIZANDO DOCUMENTOS', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+            Swal.fire({ title: 'PROCESANDO DOCUMENTOS', text: 'Analizando patrones con IA...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
             
-            for(let f of files) {
-                const ext = f.name.split('.').pop().toLowerCase();
-                if(['xlsx','xls'].includes(ext)) await this.readExcel(f);
-                else if(['jpg','png','jpeg'].includes(ext)) await this.readIA(f);
-                else if(ext === 'pdf') await this.readPDF(f);
+            for (let file of files) {
+                const ext = file.name.split('.').pop().toLowerCase();
+                
+                if (ext === 'xlsx' || ext === 'xls') await this.readExcel(file);
+                else if (ext === 'pdf') await this.readPDF(file);
+                else if (['jpg', 'png', 'jpeg'].includes(ext)) await this.readOCR(file);
             }
             
             Swal.close();
-            Swal.fire('PROCESO COMPLETADO', 'Los datos han sido integrados al sistema.', 'success');
-        },
-
-        async readIA(file) {
-            if(!App.state.worker) {
-                App.state.worker = await Tesseract.createWorker();
-                await App.state.worker.loadLanguage('spa');
-                await App.state.worker.initialize('spa');
-            }
-            const { data: { text } } = await App.state.worker.recognize(file);
-            this.heuristicParser(text);
+            App.db.save();
+            Swal.fire('PROCESO FINALIZADO', 'Los datos se han integrado al sistema.', 'success');
         },
 
         async readExcel(file) {
             const data = await file.arrayBuffer();
-            const wb = XLSX.read(data);
-            const json = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);
+            const workbook = XLSX.read(data);
+            const sheet = workbook.Sheets[workbook.SheetNames[0]];
+            const json = XLSX.utils.sheet_to_json(sheet);
+            
             json.forEach(row => {
-                const name = (row.PRODUCTO || row.ITEM || row.Nombre || "").toUpperCase();
+                const name = (row.PRODUCTO || row.TELA || row.Nombre || "").toUpperCase().trim();
                 if(name) {
-                    const tallas = { 'S': row.S||0, 'M': row.M||0, 'L': row.L||0, 'XL': row.XL||0, '2XL': row['2XL']||0 };
-                    App.Inventory.upsert({ name, tallas });
+                    const tallas = {
+                        S: row.S || 0, M: row.M || 0, L: row.L || 0, XL: row.XL || 0,
+                        '2XL': row['2XL'] || row.XXL || 0, '3XL': row['3XL'] || 0,
+                        '4XL': row['4XL'] || 0, '5XL': row['5XL'] || 0
+                    };
+                    const ex = App.state.inventory.find(i => i.name === name);
+                    if(ex) Object.keys(tallas).forEach(t => ex.tallas[t] += tallas[t]);
+                    else App.state.inventory.push({ name, tallas });
                 }
             });
-            App.Core.save();
+        },
+
+        async readOCR(file) {
+            if(!App.state.tesseractWorker) {
+                App.state.tesseractWorker = await Tesseract.createWorker('spa');
+            }
+            const { data: { text } } = await App.state.tesseractWorker.recognize(file);
+            this.heuristicParser(text);
         },
 
         async readPDF(file) {
             const reader = new FileReader();
             reader.onload = async function() {
-                const typed = new Uint8Array(this.result);
-                const pdf = await pdfjsLib.getDocument(typed).promise;
+                const typedarray = new Uint8Array(this.result);
+                const pdf = await pdfjsLib.getDocument(typedarray).promise;
                 let fullText = "";
                 for(let i=1; i<=pdf.numPages; i++) {
                     const page = await pdf.getPage(i);
-                    const txt = await page.getTextContent();
-                    fullText += txt.items.map(s => s.str).join(' ');
+                    const content = await page.getTextContent();
+                    fullText += content.items.map(s => s.str).join(' ');
                 }
-                App.IO.heuristicParser(fullText);
+                App.IA.heuristicParser(fullText);
             };
             reader.readAsArrayBuffer(file);
         },
 
         heuristicParser(text) {
-            // IA HEURÍSTICA: Busca patrones de Órdenes de Compra y Productos
-            console.log("IA Analysis Target:", text);
             const clean = text.toUpperCase();
-            
-            // Busca cantidades (ej: "10 unidades", "Cant: 5")
-            const qtyMatch = clean.match(/(CANT|CANTIDAD|CANT:)\s*(\d+)/) || clean.match(/(\d+)\s*(UNIDADES|UNID|PCS)/);
-            const qty = qtyMatch ? parseInt(qtyMatch[2] || qtyMatch[1]) : 1;
-            
-            // Busca tallas
-            const tallaMatch = clean.match(/\b(S|M|L|XL|2XL|3XL|XXL)\b/);
-            const talla = tallaMatch ? tallaMatch[1] : "M";
+            console.log("IA Analysis Input:", clean);
 
-            // Busca posibles productos (líneas que tengan palabras textiles)
-            const keywords = ["POLERA", "PANTALON", "POLERON", "GORRO", "CHAQUETA", "PECHERA"];
-            let prod = "PRODUCTO DETECTADO";
-            keywords.forEach(k => { if(clean.includes(k)) prod = k; });
+            // Patrones comunes en OCs textiles: "POLERA M 50 UNIDADES"
+            const products = ["POLERA", "POLERON", "PANTALON", "GORRO", "CHAQUETA", "PECHERA", "DELANTAL"];
+            const tallas = [" S ", " M ", " L ", " XL ", " 2XL ", " XXL ", " 3XL "];
 
-            App.OC.createManual(prod, qty);
+            products.forEach(p => {
+                if(clean.includes(p)) {
+                    // Intentar extraer cantidad cercana
+                    const slice = clean.substring(clean.indexOf(p), clean.indexOf(p) + 50);
+                    const qtyMatch = slice.match(/\b(\d{1,4})\b/);
+                    const tallaMatch = tallas.find(t => slice.includes(t)) || " M ";
+                    
+                    if(qtyMatch) {
+                        App.state.orders.push({
+                            id: 'IA-' + Math.floor(Math.random()*1000),
+                            cli: 'CLIENTE DETECTADO (IA)',
+                            p: p,
+                            t: tallaMatch.trim(),
+                            q: parseInt(qtyMatch[1]),
+                            status: 'produccion',
+                            date: new Date().toLocaleDateString()
+                        });
+                    }
+                }
+            });
+        }
+    },
+
+    Calendar: {
+        init() { this.render(); },
+        changeMonth(dir) { App.state.currentDate.setMonth(App.state.currentDate.getMonth() + dir); this.render(); },
+        render() {
+            const grid = document.getElementById('calendar-grid');
+            const label = document.getElementById('calendar-month-year');
+            const d = App.state.currentDate;
+            const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+            
+            label.innerText = `${monthNames[d.getMonth()]} ${d.getFullYear()}`;
+            grid.innerHTML = '';
+
+            const firstDay = new Date(d.getFullYear(), d.getMonth(), 1).getDay();
+            const daysInMonth = new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate();
+
+            for(let i=0; i<firstDay; i++) grid.innerHTML += '<div></div>';
+            
+            for(let i=1; i<=daysInMonth; i++) {
+                const key = `${i}-${d.getMonth()}-${d.getFullYear()}`;
+                const isToday = i === new Date().getDate() && d.getMonth() === new Date().getMonth();
+                const hasLog = App.state.logs[key];
+                
+                grid.innerHTML += `
+                    <div class="cal-day ${isToday ? 'is-today' : ''} ${hasLog ? 'has-content' : ''}" onclick="App.Calendar.openNote('${key}', ${i})">
+                        ${i}
+                    </div>
+                `;
+            }
+        },
+        async openNote(key, day) {
+            const { value: text } = await Swal.fire({
+                title: `Notas del ${day}`,
+                input: 'textarea',
+                inputValue: App.state.logs[key] || '',
+                confirmButtonText: 'Guardar'
+            });
+            if(text !== undefined) {
+                App.state.logs[key] = text;
+                App.db.save();
+                this.render();
+            }
         }
     }
 };
 
-// INICIO AUTOMÁTICO
-window.onload = () => App.Core.init();
-
+window.onload = () => App.init();
 </script>
 </body>
 </html>
