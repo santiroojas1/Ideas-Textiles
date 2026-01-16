@@ -2,12 +2,11 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>IDEAS TEXTILES SPA | ERP INDUSTRIAL</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>IDEAS TEXTILES | MASTERPIECE V100</title>
     
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://unpkg.com/tesseract.js@4.0.2/dist/tesseract.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -15,607 +14,394 @@
 
     <style>
         :root {
-            --slate-900: #0f172a;
-            --slate-800: #1e293b;
-            --blue-600: #2563eb;
-            --blue-500: #3b82f6;
-            --emerald: #10b981;
-            --rose: #f43f5e;
-            --amber: #f59e0b;
-            --bg-app: #f1f5f9;
-            --glass: rgba(255, 255, 255, 0.9);
-            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
-            --safe-bottom: 110px;
+            --dark: #0f172a; --dark-light: #1e293b;
+            --blue: #2563eb; --blue-soft: #dbeafe;
+            --green: #059669; --green-soft: #d1fae5;
+            --red: #e11d48; --red-soft: #ffe4e6;
+            --amber: #d97706; --amber-soft: #fef3c7;
+            --purple: #7c3aed; --purple-soft: #ede9fe;
+            --bg: #f8fafc;
         }
+        
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); color: var(--dark); margin: 0; padding-bottom: 100px; }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        /* HEADER */
+        header { background: var(--dark); color: white; padding: 15px 20px; position: sticky; top: 0; z-index: 999; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .brand h1 { font-size: 1rem; font-weight: 800; margin: 0; }
+        .brand small { color: var(--blue); font-weight: 700; font-size: 0.6rem; letter-spacing: 1px; }
+        
+        .btn-ai { background: linear-gradient(135deg, var(--blue), #4f46e5); border: none; padding: 8px 14px; border-radius: 10px; color: white; font-weight: 700; font-size: 0.7rem; display: flex; align-items: center; gap: 6px; box-shadow: 0 0 10px rgba(37, 99, 235, 0.4); }
 
-        body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            background-color: var(--bg-app);
-            color: var(--slate-900);
-            line-height: 1.5;
-            min-height: 100vh;
-        }
+        /* NAV DOCK */
+        .dock { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--dark); padding: 12px 30px; border-radius: 30px; display: flex; gap: 30px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); z-index: 1000; }
+        .dock i { font-size: 1.4rem; color: #64748b; transition: 0.2s; cursor: pointer; }
+        .dock i.active { color: white; transform: translateY(-3px); text-shadow: 0 0 10px var(--blue); }
 
-        /* --- HEADER PROFESIONAL --- */
-        header {
-            background: var(--slate-900);
-            color: white;
-            padding: 16px 24px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            box-shadow: var(--shadow-md);
-        }
+        /* SECCIONES */
+        .view { display: none; padding: 20px; max-width: 800px; margin: 0 auto; animation: fadeUp 0.3s ease; }
+        .view.active { display: block; }
+        @keyframes fadeUp { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
 
-        .header-brand h1 { font-size: 1.1rem; font-weight: 800; letter-spacing: -0.5px; }
-        .header-brand p { font-size: 0.65rem; color: var(--blue-500); font-weight: 700; text-transform: uppercase; }
+        /* CARDS */
+        .card { background: white; border-radius: 16px; padding: 16px; margin-bottom: 15px; border: 1px solid #e2e8f0; box-shadow: 0 2px 5px rgba(0,0,0,0.02); position: relative; }
+        
+        /* CHIPS DE ESTADO */
+        .chip { display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 8px; font-size: 0.65rem; font-weight: 800; text-transform: uppercase; margin-bottom: 10px; }
+        .c-bodega { background: var(--amber-soft); color: var(--amber); }
+        .c-sinstock { background: var(--red-soft); color: var(--red); animation: pulse 1.5s infinite; }
+        .c-pack { background: var(--purple-soft); color: var(--purple); }
+        .c-done { background: var(--green-soft); color: var(--green); }
+        
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.6; } 100% { opacity: 1; } }
 
-        .btn-ai-trigger {
-            background: linear-gradient(135deg, var(--blue-600), #8b5cf6);
-            color: white; border: none; padding: 10px 18px; border-radius: 12px;
-            font-weight: 700; font-size: 0.8rem; cursor: pointer;
-            display: flex; align-items: center; gap: 8px;
-            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
-        }
+        .inv-row { display: flex; justify-content: space-between; align-items: center; }
+        .inv-sizes { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; margin-top: 10px; }
+        .size-box { background: #f1f5f9; text-align: center; padding: 5px; border-radius: 8px; border: 1px solid #e2e8f0; }
+        .size-box b { display: block; font-size: 0.9rem; color: var(--dark); }
+        .size-box span { font-size: 0.6rem; color: #94a3b8; font-weight: 700; }
 
-        /* --- CONTENEDOR PRINCIPAL --- */
-        .main-view {
-            max-width: 1000px;
-            margin: 0 auto;
-            padding: 20px;
-            padding-bottom: var(--safe-bottom);
-        }
+        /* FACTURA LABEL */
+        .factura-tag { display: inline-block; background: var(--dark); color: white; font-size: 0.6rem; font-weight: 700; padding: 2px 6px; border-radius: 4px; margin-top: 5px; }
 
-        .section { display: none; animation: slideUp 0.3s ease-out; }
-        .section.active { display: block; }
+        /* CALENDARIO */
+        .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; margin-top: 15px; }
+        .cal-day { aspect-ratio: 1; border: 1px solid #e2e8f0; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.8rem; background: white; cursor: pointer; }
+        .cal-day.today { background: var(--blue); color: white; border-color: var(--blue); }
+        .cal-day.has-note { border-bottom: 3px solid var(--amber); }
 
-        @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        /* BOTONES ACCION */
+        .btn-act { width: 100%; padding: 10px; border-radius: 10px; border: none; font-weight: 700; font-size: 0.75rem; margin-top: 10px; cursor: pointer; display: flex; justify-content: center; gap: 5px; align-items: center; }
+        .b-dark { background: var(--dark-light); color: white; }
+        .b-wsp { background: #25D366; color: white; }
+        .b-done { background: transparent; color: var(--green); border: 1px solid var(--green); cursor: default; }
 
-        /* --- BUSCADOR Y FILTROS --- */
-        .tool-bar {
-            display: flex; gap: 12px; margin-bottom: 24px;
-        }
-        .search-wrapper {
-            flex: 1; background: white; border-radius: 16px;
-            padding: 12px 20px; display: flex; align-items: center; gap: 12px;
-            border: 1px solid #e2e8f0; box-shadow: var(--shadow-sm);
-        }
-        .search-wrapper input { border: none; outline: none; width: 100%; font-weight: 600; color: var(--slate-800); }
-
-        /* --- TARJETAS DE INVENTARIO --- */
-        .inventory-grid {
-            display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px;
-        }
-
-        .product-card {
-            background: white; border-radius: 24px; padding: 20px;
-            border: 1px solid #e2e8f0; box-shadow: var(--shadow-sm);
-            transition: all 0.2s ease; position: relative;
-        }
-
-        .product-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); }
-
-        .card-actions {
-            position: absolute; top: 20px; right: 20px; display: flex; gap: 8px;
-        }
-        .btn-icon {
-            width: 36px; height: 36px; border-radius: 10px; border: none;
-            display: flex; align-items: center; justify-content: center; cursor: pointer;
-            transition: 0.2s;
-        }
-        .btn-edit { background: #eff6ff; color: var(--blue-600); }
-        .btn-delete { background: #fff1f2; color: var(--rose); }
-
-        .product-title { margin-bottom: 16px; }
-        .product-title h3 { font-size: 1rem; font-weight: 800; color: var(--slate-900); }
-        .product-title span { font-size: 0.7rem; color: var(--slate-500); font-weight: 600; }
-
-        .size-matrix {
-            display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;
-        }
-        .size-box {
-            background: #f8fafc; border-radius: 14px; padding: 10px 4px;
-            text-align: center; border: 1px solid #f1f5f9;
-        }
-        .size-box.in-stock { background: #f0f9ff; border-color: var(--blue-500); }
-        .size-box span { display: block; font-size: 0.6rem; font-weight: 800; color: var(--slate-400); margin-bottom: 2px; }
-        .size-box b { font-size: 1rem; font-weight: 800; color: var(--slate-900); }
-
-        /* --- DOCK DE NAVEGACIÓN --- */
-        .dock-nav {
-            position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%);
-            width: 90%; max-width: 500px; background: var(--slate-900);
-            border-radius: 28px; padding: 12px; display: flex; justify-content: space-around;
-            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.2); z-index: 999;
-        }
-        .nav-item {
-            color: #94a3b8; display: flex; flex-direction: column; align-items: center;
-            gap: 4px; cursor: pointer; transition: 0.3s; width: 20%;
-        }
-        .nav-item i { font-size: 1.4rem; }
-        .nav-item span { font-size: 0.6rem; font-weight: 700; text-transform: uppercase; }
-        .nav-item.active { color: white; }
-        .nav-item.active i { transform: translateY(-4px); color: var(--blue-500); }
-
-        /* --- ESTILOS PARA EL MODAL DE CARGA --- */
-        .modal-entry-row {
-            background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 18px;
-            padding: 16px; margin-bottom: 12px; animation: fadeIn 0.3s;
-        }
-        .modal-grid-input {
-            display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 12px;
-        }
-        .input-qty-wrap {
-            background: white; border: 1px solid #cbd5e1; border-radius: 8px; padding: 4px;
-        }
-        .input-qty-wrap label { font-size: 0.55rem; font-weight: 800; color: var(--blue-600); display: block; text-align: center; }
-        .input-qty-wrap input { width: 100%; border: none; text-align: center; font-weight: 700; outline: none; }
-
-        /* --- CALENDARIO --- */
-        .cal-container { background: white; border-radius: 24px; padding: 24px; box-shadow: var(--shadow-sm); }
-        .cal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .cal-header h2 { font-size: 1.1rem; font-weight: 800; color: var(--slate-900); }
-        .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
-        .cal-day {
-            aspect-ratio: 1; border-radius: 12px; border: 1px solid #f1f5f9;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            font-weight: 700; font-size: 0.85rem; cursor: pointer; transition: 0.2s;
-        }
-        .cal-day:hover { background: #f8fafc; border-color: var(--blue-500); }
-        .cal-day.is-today { background: var(--blue-600); color: white; }
-        .cal-day.has-content::after { content: ''; width: 4px; height: 4px; background: var(--amber); border-radius: 50%; margin-top: 2px; }
-
+        /* SEARCH BAR */
+        .search-box { width: 100%; padding: 12px; border-radius: 12px; border: 1px solid #cbd5e1; font-weight: 600; margin-bottom: 15px; }
     </style>
 </head>
 <body>
 
 <header>
-    <div class="header-brand">
-        <h1>IDEAS TEXTILES SPA</h1>
-        <p id="operator-id">PANEL DE CONTROL INDUSTRIAL</p>
+    <div class="brand">
+        <h1>IDEAS TEXTILES</h1>
+        <small>MASTERPIECE V100</small>
     </div>
-    <button class="btn-ai-trigger" onclick="App.Actions.startImport()">
-        <i class="fa-solid fa-wand-magic-sparkles"></i> CARGA IA / DOCS
+    <button class="btn-ai" onclick="App.AI.trigger()">
+        <i class="fa-solid fa-brain"></i> IA SCAN
     </button>
 </header>
 
-<main class="main-view">
+<section id="v-bodega" class="view active">
+    <input type="text" id="search" class="search-box" placeholder="🔍 Buscar TELA, SKU o PRODUCTO..." oninput="App.Render.bodega()">
+    <button class="btn-act b-dark" onclick="App.Actions.modalProd()">+ NUEVO PRODUCTO MANUAL</button>
+    <br><br>
+    <div id="list-bodega"></div>
+</section>
 
-    <section id="view-inventory" class="section active">
-        <div class="tool-bar">
-            <div class="search-wrapper">
-                <i class="fa-solid fa-magnifying-glass" style="color: #94a3b8;"></i>
-                <input type="text" id="inventory-search" placeholder="Filtrar por producto, SKU o categoría..." oninput="App.Render.inventory()">
-            </div>
-            <button class="btn-ai-trigger" style="background: var(--slate-900); border: 1px solid var(--slate-800);" onclick="App.Actions.showProductModal()">
-                <i class="fa-solid fa-plus"></i> NUEVO
-            </button>
+<section id="v-ordenes" class="view">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+        <h2 style="font-size:1.2rem; font-weight:800;">PEDIDOS</h2>
+        <button class="btn-ai" style="background: var(--dark);" onclick="App.Actions.reporteWsp()">
+            <i class="fa-brands fa-whatsapp"></i> REPORTE
+        </button>
+    </div>
+    <button class="btn-act" style="background:white; border:2px dashed #cbd5e1; color:#64748b; margin-bottom:20px;" onclick="App.Actions.modalOrder()">+ INGRESAR ORDEN MANUAL</button>
+    <div id="list-ordenes"></div>
+</section>
+
+<section id="v-agenda" class="view">
+    <div class="card">
+        <div class="inv-row">
+            <button onclick="App.Calendar.move(-1)" style="border:none; background:none; font-size:1.2rem;"><i class="fa-solid fa-chevron-left"></i></button>
+            <h3 id="cal-title" style="margin:0; font-weight:800;">ENERO 2026</h3>
+            <button onclick="App.Calendar.move(1)" style="border:none; background:none; font-size:1.2rem;"><i class="fa-solid fa-chevron-right"></i></button>
         </div>
-        
-        <div id="inventory-container" class="inventory-grid">
-            </div>
-    </section>
-
-    <section id="view-orders" class="section">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-            <h2 style="font-weight: 800; font-size: 1.3rem;">ÓRDENES ACTIVAS</h2>
+        <div id="cal-grid" class="cal-grid"></div>
+    </div>
+    <div class="card" style="text-align:center;">
+        <i class="fa-solid fa-server" style="font-size:2rem; color:var(--blue); margin-bottom:10px;"></i>
+        <h4 style="margin:0;">ZONA DE SEGURIDAD</h4>
+        <p style="font-size:0.7rem; color:#64748b;">Snapshot guarda una foto exacta de Bodega, Órdenes y Agenda.</p>
+        <div style="display:flex; gap:10px; margin-top:10px;">
+            <button class="btn-act b-dark" onclick="App.Backup.saveSnap()">CREAR SNAPSHOT</button>
+            <button class="btn-act" style="background:#e2e8f0;" onclick="App.Backup.loadSnap()">RESTAURAR</button>
         </div>
-        <div id="orders-container" class="inventory-grid">
-            </div>
-    </section>
+    </div>
+</section>
 
-    <section id="view-agenda" class="section">
-        <div class="cal-container">
-            <div class="cal-header">
-                <button class="btn-icon btn-edit" onclick="App.Calendar.changeMonth(-1)"><i class="fa-solid fa-chevron-left"></i></button>
-                <h2 id="calendar-month-year">ENERO 2026</h2>
-                <button class="btn-icon btn-edit" onclick="App.Calendar.changeMonth(1)"><i class="fa-solid fa-chevron-right"></i></button>
-            </div>
-            <div class="cal-grid" id="calendar-grid"></div>
-        </div>
-        <div id="day-details" style="margin-top: 20px;"></div>
-    </section>
-
-</main>
-
-<nav class="dock-nav">
-    <div class="nav-item active" onclick="App.UI.switchTab('inventory', this)">
-        <i class="fa-solid fa-warehouse"></i><span>Bodega</span>
-    </div>
-    <div class="nav-item" onclick="App.UI.switchTab('orders', this)">
-        <i class="fa-solid fa-file-invoice"></i><span>Órdenes</span>
-    </div>
-    <div class="nav-item" onclick="App.UI.switchTab('agenda', this)">
-        <i class="fa-solid fa-calendar-days"></i><span>Agenda</span>
-    </div>
-    <div class="nav-item" onclick="App.Actions.exportData()">
-        <i class="fa-solid fa-cloud-arrow-down"></i><span>Respaldo</span>
-    </div>
+<nav class="dock">
+    <i class="fa-solid fa-boxes-stacked active" onclick="App.UI.go('bodega', this)"></i>
+    <i class="fa-solid fa-clipboard-list" onclick="App.UI.go('ordenes', this)"></i>
+    <i class="fa-solid fa-calendar-days" onclick="App.UI.go('agenda', this)"></i>
 </nav>
 
-<input type="file" id="global-file-input" hidden multiple accept=".pdf,image/*,.xlsx,.xls">
+<input type="file" id="file-in" hidden multiple accept="image/*,.pdf,.xlsx,.xls">
 
 <script>
-/**
- * TITANIUM MATRIX V70 - IDEAS TEXTILES SPA
- * Motor Lógico de Alta Robustez
- */
-
 const App = {
-    state: {
-        inventory: JSON.parse(localStorage.getItem('idx_inv')) || [],
-        orders: JSON.parse(localStorage.getItem('idx_ord')) || [],
-        logs: JSON.parse(localStorage.getItem('idx_log')) || {},
-        currentDate: new Date(),
-        tesseractWorker: null
+    // BASE DE DATOS LOCAL
+    db: {
+        inv: JSON.parse(localStorage.getItem('db_inv')) || [],
+        ord: JSON.parse(localStorage.getItem('db_ord')) || [],
+        log: JSON.parse(localStorage.getItem('db_log')) || {}, // Agenda
+        date: new Date()
     },
 
     init() {
-        this.Render.inventory();
-        this.Render.orders();
-        this.Calendar.init();
-        
-        document.getElementById('global-file-input').onchange = (e) => this.IA.process(e.target.files);
+        this.Render.bodega();
+        this.Render.ordenes();
+        this.Calendar.render();
+        // Listener de sincronización entre pestañas
+        window.addEventListener('storage', () => {
+            App.db.inv = JSON.parse(localStorage.getItem('db_inv')) || [];
+            App.db.ord = JSON.parse(localStorage.getItem('db_ord')) || [];
+            App.db.log = JSON.parse(localStorage.getItem('db_log')) || {};
+            App.Render.bodega(); App.Render.ordenes(); App.Calendar.render();
+        });
+        // Precarga de IA
+        this.AI.worker = Tesseract.createWorker();
     },
 
-    db: {
-        save() {
-            localStorage.setItem('idx_inv', JSON.stringify(App.state.inventory));
-            localStorage.setItem('idx_ord', JSON.stringify(App.state.orders));
-            localStorage.setItem('idx_log', JSON.stringify(App.state.logs));
-            App.Render.inventory();
-            App.Render.orders();
-        }
+    save() {
+        localStorage.setItem('db_inv', JSON.stringify(this.db.inv));
+        localStorage.setItem('db_ord', JSON.stringify(this.db.ord));
+        localStorage.setItem('db_log', JSON.stringify(this.db.log));
+        this.Render.bodega(); this.Render.ordenes(); this.Calendar.render();
     },
 
     UI: {
-        switchTab(tabId, el) {
-            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            
-            document.getElementById(`view-${tabId}`).classList.add('active');
+        go(id, el) {
+            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+            document.querySelectorAll('.dock i').forEach(i => i.classList.remove('active'));
+            document.getElementById('v-'+id).classList.add('active');
             el.classList.add('active');
-            
-            if(tabId === 'agenda') App.Calendar.render();
-            window.scrollTo({top: 0, behavior: 'smooth'});
+            window.scrollTo({top:0, behavior:'smooth'});
         }
     },
 
     Render: {
-        inventory() {
-            const container = document.getElementById('inventory-container');
-            const q = document.getElementById('inventory-search').value.toLowerCase();
-            
-            const filtered = App.state.inventory.filter(i => i.name.toLowerCase().includes(q));
-            
-            if(filtered.length === 0) {
-                container.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 60px; opacity: 0.5;">No se encontraron productos en bodega.</div>`;
-                return;
-            }
-
-            container.innerHTML = filtered.map((item, idx) => `
-                <div class="product-card anim-fade">
-                    <div class="card-actions">
-                        <button class="btn-icon btn-edit" onclick="App.Actions.showProductModal(${idx})"><i class="fa-solid fa-pen"></i></button>
-                        <button class="btn-icon btn-delete" onclick="App.Actions.deleteProduct(${idx})"><i class="fa-solid fa-trash"></i></button>
+        bodega() {
+            const q = document.getElementById('search').value.toUpperCase();
+            const list = App.db.inv.filter(i => i.n.includes(q));
+            document.getElementById('list-bodega').innerHTML = list.map((p, i) => `
+                <div class="card">
+                    <div class="inv-row">
+                        <h3 style="margin:0; font-size:1rem;">${p.n}</h3>
+                        <i class="fa-solid fa-pen" style="color:var(--blue); cursor:pointer;" onclick="App.Actions.modalProd(${i})"></i>
                     </div>
-                    <div class="product-title">
-                        <span>SKU: IT-${2000 + idx}</span>
-                        <h3>${item.name}</h3>
-                    </div>
-                    <div class="size-matrix">
-                        ${Object.entries(item.tallas).map(([t, q]) => `
-                            <div class="size-box ${q > 0 ? 'in-stock' : ''}">
-                                <span>${t}</span>
-                                <b>${q}</b>
-                            </div>
-                        `).join('')}
+                    <div class="inv-sizes">
+                        ${Object.entries(p.s).map(([k,v])=>`<div class="size-box"><b>${v}</b><span>${k}</span></div>`).join('')}
                     </div>
                 </div>
-            `).reverse().join('');
+            `).join('') || '<div style="text-align:center;color:#94a3b8">Sin resultados</div>';
         },
 
-        orders() {
-            const container = document.getElementById('orders-container');
-            if(App.state.orders.length === 0) {
-                container.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 60px; opacity: 0.5;">Sin órdenes de compra activas.</div>`;
-                return;
-            }
-
-            container.innerHTML = App.state.orders.map((o, idx) => `
-                <div class="product-card" style="border-left: 6px solid ${o.status === 'produccion' ? 'var(--amber)' : 'var(--emerald)'}">
-                    <div class="card-actions">
-                        <i class="fa-solid fa-trash" style="color: var(--rose); cursor:pointer;" onclick="App.Actions.deleteOrder(${idx})"></i>
-                    </div>
-                    <div class="product-title">
-                        <span>${o.date} | ${o.id}</span>
-                        <h3 style="color: var(--blue-600)">${o.cli}</h3>
-                        <p style="font-weight: 700; margin-top: 5px;">${o.p} | TALLA ${o.t} | ${o.q} UNID.</p>
-                    </div>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px;">
-                        <button class="btn-ai-trigger" style="padding: 8px; font-size: 0.7rem; background: var(--slate-800);" onclick="App.Actions.notifyOrder('${o.cli}', '${o.p}')">
-                            <i class="fa-brands fa-whatsapp"></i> NOTIFICAR
-                        </button>
-                        <select onchange="App.Actions.updateOrderStatus(${idx}, this.value)" style="border-radius: 12px; border: 1px solid #ddd; padding: 5px; font-weight: 700; font-size: 0.7rem;">
-                            <option value="produccion" ${o.status === 'produccion' ? 'selected' : ''}>PRODUCCIÓN</option>
-                            <option value="entregado" ${o.status === 'entregado' ? 'selected' : ''}>ENTREGADO</option>
-                        </select>
-                    </div>
-                </div>
-            `).reverse().join('');
-        }
-    },
-
-    Actions: {
-        async showProductModal(editIdx = null) {
-            const isEdit = editIdx !== null;
-            const item = isEdit ? App.state.inventory[editIdx] : { name: '', tallas: { S:0, M:0, L:0, XL:0, '2XL':0, '3XL':0, '4XL':0, '5XL':0 } };
-
-            const createRow = (d) => `
-                <div class="modal-entry-row">
-                    <input type="text" class="swal-p-name" placeholder="NOMBRE DEL PRODUCTO / TELA" value="${d.name}" 
-                           style="width: 100%; padding: 12px; border-radius: 12px; border: 1.5px solid #e2e8f0; font-weight: 800; margin-bottom: 12px;">
-                    <div class="modal-grid-input">
-                        ${Object.entries(d.tallas).map(([t, v]) => `
-                            <div class="input-qty-wrap">
-                                <label>${t}</label>
-                                <input type="number" class="swal-p-qty" data-t="${t}" value="${v}">
-                            </div>
-                        `).join('')}
-                    </div>
-                </div>
-            `;
-
-            const { value: formRes } = await Swal.fire({
-                title: isEdit ? 'MODIFICAR REGISTRO' : 'INGRESO MULTI-PRODUCTO',
-                html: `<div id="swal-items-container">${createRow(item)}</div>
-                       ${isEdit ? '' : `<button class="btn-ai-trigger" style="width:100%; margin-top:10px; background:var(--slate-800);" onclick="App.Actions.addModalRow()">+ AÑADIR OTRO ÍTEM</button>`}`,
-                width: '600px',
-                showCancelButton: true,
-                confirmButtonText: 'CONFIRMAR Y GUARDAR',
-                confirmButtonColor: '#2563eb',
-                preConfirm: () => {
-                    const results = [];
-                    document.querySelectorAll('.modal-entry-row').forEach(row => {
-                        const name = row.querySelector('.swal-p-name').value.toUpperCase().trim();
-                        if(name) {
-                            const tallas = {};
-                            row.querySelectorAll('.swal-p-qty').forEach(input => {
-                                tallas[input.dataset.t] = parseInt(input.value) || 0;
-                            });
-                            results.push({ name, tallas });
-                        }
-                    });
-                    return results;
-                }
-            });
-
-            if(formRes) {
-                if(isEdit) {
-                    App.state.inventory[editIdx] = formRes[0];
-                } else {
-                    formRes.forEach(newItem => {
-                        const existing = App.state.inventory.find(i => i.name === newItem.name);
-                        if(existing) {
-                            Object.keys(newItem.tallas).forEach(t => existing.tallas[t] += newItem.tallas[t]);
-                        } else {
-                            App.state.inventory.push(newItem);
-                        }
-                    });
-                }
-                App.db.save();
-                Swal.fire('ÉXITO', 'Datos actualizados en la base central.', 'success');
-            }
-        },
-
-        addModalRow() {
-            const container = document.getElementById('swal-items-container');
-            const empty = { name: '', tallas: { S:0, M:0, L:0, XL:0, '2XL':0, '3XL':0, '4XL':0, '5XL':0 } };
+        ordenes() {
+            const list = document.getElementById('list-ordenes');
+            if(App.db.ord.length === 0) return list.innerHTML = '<div style="text-align:center;padding:20px;color:#94a3b8">No hay pedidos pendientes</div>';
             
-            // Función auxiliar dentro del scope del modal
-            const tpl = (d) => `
-                <div class="modal-entry-row">
-                    <input type="text" class="swal-p-name" placeholder="NOMBRE DEL PRODUCTO / TELA" value="" style="width: 100%; padding: 12px; border-radius: 12px; border: 1.5px solid #e2e8f0; font-weight: 800; margin-bottom: 12px;">
-                    <div class="modal-grid-input">
-                        ${Object.entries(d.tallas).map(([t, v]) => `<div class="input-qty-wrap"><label>${t}</label><input type="number" class="swal-p-qty" data-t="${t}" value="0"></div>`).join('')}
+            list.innerHTML = App.db.ord.slice().reverse().map((o, idx) => {
+                const realIdx = App.db.ord.length - 1 - idx;
+                let statusInfo = '', actionBtn = '';
+
+                if(o.st === 'bodega') {
+                    statusInfo = `<span class="chip c-bodega"><i class="fa-solid fa-warehouse"></i> EN BODEGA</span>`;
+                    actionBtn = `<button class="btn-act b-dark" onclick="App.Actions.cycle(${realIdx})">EMPAQUETAR <i class="fa-solid fa-box"></i></button>`;
+                } else if(o.st === 'sinstock') {
+                    statusInfo = `<span class="chip c-sinstock"><i class="fa-solid fa-triangle-exclamation"></i> SIN STOCK</span>`;
+                    actionBtn = `<button class="btn-act b-wsp" onclick="App.Actions.askTaller('${o.p}','${o.sz}')">PEDIR A TALLER <i class="fa-brands fa-whatsapp"></i></button>`;
+                } else if(o.st === 'pack') {
+                    statusInfo = `<span class="chip c-pack"><i class="fa-solid fa-tape"></i> EMPAQUETADO</span>`;
+                    actionBtn = `<button class="btn-act" style="background:var(--green); color:white;" onclick="App.Actions.cycle(${realIdx})">DESPACHAR <i class="fa-solid fa-truck"></i></button>`;
+                } else if(o.st === 'done') {
+                    statusInfo = `<span class="chip c-done"><i class="fa-solid fa-check-double"></i> DESPACHADO</span>`;
+                    actionBtn = `<button class="btn-act b-done">Factura #${o.fac}</button>`;
+                }
+
+                return `
+                <div class="card" style="border-left:5px solid ${o.st==='sinstock'?'var(--red)':(o.st==='done'?'var(--green)':'var(--blue)')}">
+                    <div style="display:flex; justify-content:space-between;">
+                        ${statusInfo}
+                        <i class="fa-solid fa-trash" style="color:#cbd5e1; cursor:pointer;" onclick="App.Actions.delOrd(${realIdx})"></i>
                     </div>
-                </div>
-            `;
-            container.insertAdjacentHTML('beforeend', tpl(empty));
-        },
-
-        deleteProduct(idx) {
-            Swal.fire({ title: '¿Eliminar de Bodega?', text: 'Se perderá el registro de stock permanentemente', icon: 'warning', showCancelButton: true, confirmButtonColor: '#f43f5e' })
-                .then(r => { if(r.isConfirmed) { App.state.inventory.splice(idx, 1); App.db.save(); } });
-        },
-
-        deleteOrder(idx) {
-            App.state.orders.splice(idx, 1);
-            App.db.save();
-        },
-
-        updateOrderStatus(idx, status) {
-            const order = App.state.orders[idx];
-            if(status === 'entregado') {
-                // Validación de stock antes de descontar
-                const prod = App.state.inventory.find(i => i.name === order.p);
-                if(prod && prod.tallas[order.t] >= order.q) {
-                    prod.tallas[order.t] -= order.q;
-                    order.status = 'entregado';
-                    App.db.save();
-                    Swal.fire('PEDIDO ENTREGADO', 'Se ha descontado el stock de la bodega automáticamente.', 'success');
-                } else {
-                    Swal.fire('STOCK INSUFICIENTE', 'No hay suficientes unidades en bodega para completar este despacho.', 'error');
-                    App.Render.orders(); // Reset select
-                }
-            } else {
-                order.status = status;
-                App.db.save();
-            }
-        },
-
-        notifyOrder(cli, prod) {
-            const msg = encodeURIComponent(`Hola ${cli}, te informamos de Ideas Textiles que tu pedido de ${prod} está listo para ser retirado. ¡Saludos!`);
-            window.open(`https://wa.me/?text=${msg}`);
-        },
-
-        startImport() { document.getElementById('global-file-input').click(); },
-
-        exportData() {
-            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(App.state));
-            const downloadAnchorNode = document.createElement('a');
-            downloadAnchorNode.setAttribute("href", dataStr);
-            downloadAnchorNode.setAttribute("download", "IDEAS_TEXTILES_BACKUP_" + new Date().toLocaleDateString() + ".json");
-            document.body.appendChild(downloadAnchorNode);
-            downloadAnchorNode.click();
-            downloadAnchorNode.remove();
-        }
-    },
-
-    IA: {
-        async process(files) {
-            Swal.fire({ title: 'PROCESANDO DOCUMENTOS', text: 'Analizando patrones con IA...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
-            
-            for (let file of files) {
-                const ext = file.name.split('.').pop().toLowerCase();
-                
-                if (ext === 'xlsx' || ext === 'xls') await this.readExcel(file);
-                else if (ext === 'pdf') await this.readPDF(file);
-                else if (['jpg', 'png', 'jpeg'].includes(ext)) await this.readOCR(file);
-            }
-            
-            Swal.close();
-            App.db.save();
-            Swal.fire('PROCESO FINALIZADO', 'Los datos se han integrado al sistema.', 'success');
-        },
-
-        async readExcel(file) {
-            const data = await file.arrayBuffer();
-            const workbook = XLSX.read(data);
-            const sheet = workbook.Sheets[workbook.SheetNames[0]];
-            const json = XLSX.utils.sheet_to_json(sheet);
-            
-            json.forEach(row => {
-                const name = (row.PRODUCTO || row.TELA || row.Nombre || "").toUpperCase().trim();
-                if(name) {
-                    const tallas = {
-                        S: row.S || 0, M: row.M || 0, L: row.L || 0, XL: row.XL || 0,
-                        '2XL': row['2XL'] || row.XXL || 0, '3XL': row['3XL'] || 0,
-                        '4XL': row['4XL'] || 0, '5XL': row['5XL'] || 0
-                    };
-                    const ex = App.state.inventory.find(i => i.name === name);
-                    if(ex) Object.keys(tallas).forEach(t => ex.tallas[t] += tallas[t]);
-                    else App.state.inventory.push({ name, tallas });
-                }
-            });
-        },
-
-        async readOCR(file) {
-            if(!App.state.tesseractWorker) {
-                App.state.tesseractWorker = await Tesseract.createWorker('spa');
-            }
-            const { data: { text } } = await App.state.tesseractWorker.recognize(file);
-            this.heuristicParser(text);
-        },
-
-        async readPDF(file) {
-            const reader = new FileReader();
-            reader.onload = async function() {
-                const typedarray = new Uint8Array(this.result);
-                const pdf = await pdfjsLib.getDocument(typedarray).promise;
-                let fullText = "";
-                for(let i=1; i<=pdf.numPages; i++) {
-                    const page = await pdf.getPage(i);
-                    const content = await page.getTextContent();
-                    fullText += content.items.map(s => s.str).join(' ');
-                }
-                App.IA.heuristicParser(fullText);
-            };
-            reader.readAsArrayBuffer(file);
-        },
-
-        heuristicParser(text) {
-            const clean = text.toUpperCase();
-            console.log("IA Analysis Input:", clean);
-
-            // Patrones comunes en OCs textiles: "POLERA M 50 UNIDADES"
-            const products = ["POLERA", "POLERON", "PANTALON", "GORRO", "CHAQUETA", "PECHERA", "DELANTAL"];
-            const tallas = [" S ", " M ", " L ", " XL ", " 2XL ", " XXL ", " 3XL "];
-
-            products.forEach(p => {
-                if(clean.includes(p)) {
-                    // Intentar extraer cantidad cercana
-                    const slice = clean.substring(clean.indexOf(p), clean.indexOf(p) + 50);
-                    const qtyMatch = slice.match(/\b(\d{1,4})\b/);
-                    const tallaMatch = tallas.find(t => slice.includes(t)) || " M ";
-                    
-                    if(qtyMatch) {
-                        App.state.orders.push({
-                            id: 'IA-' + Math.floor(Math.random()*1000),
-                            cli: 'CLIENTE DETECTADO (IA)',
-                            p: p,
-                            t: tallaMatch.trim(),
-                            q: parseInt(qtyMatch[1]),
-                            status: 'produccion',
-                            date: new Date().toLocaleDateString()
-                        });
-                    }
-                }
-            });
+                    <div style="margin-top:5px;">
+                        <h3 style="margin:0; color:var(--dark);">${o.c}</h3>
+                        <p style="margin:2px 0; font-size:0.85rem; color:#64748b;">${o.p} | Talla: ${o.sz} | Cant: ${o.q}</p>
+                        ${o.fac ? `<span class="factura-tag">FAC: ${o.fac}</span>` : ''}
+                    </div>
+                    ${actionBtn}
+                    ${o.st!=='done' ? `<div style="text-align:right; margin-top:5px;"><small onclick="App.Actions.noStock(${realIdx})" style="color:var(--red); cursor:pointer; font-weight:700;">Marcar SIN STOCK</small></div>` : ''}
+                </div>`;
+            }).join('');
         }
     },
 
     Calendar: {
-        init() { this.render(); },
-        changeMonth(dir) { App.state.currentDate.setMonth(App.state.currentDate.getMonth() + dir); this.render(); },
+        move(dir) { App.db.date.setMonth(App.db.date.getMonth() + dir); this.render(); },
         render() {
-            const grid = document.getElementById('calendar-grid');
-            const label = document.getElementById('calendar-month-year');
-            const d = App.state.currentDate;
-            const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+            const d = App.db.date;
+            const mNames = ["ENE","FEB","MAR","ABR","MAY","JUN","JUL","AGO","SEP","OCT","NOV","DIC"];
+            document.getElementById('cal-title').innerText = `${mNames[d.getMonth()]} ${d.getFullYear()}`;
             
-            label.innerText = `${monthNames[d.getMonth()]} ${d.getFullYear()}`;
-            grid.innerHTML = '';
+            const first = new Date(d.getFullYear(), d.getMonth(), 1).getDay();
+            const days = new Date(d.getFullYear(), d.getMonth()+1, 0).getDate();
+            let html = '';
 
-            const firstDay = new Date(d.getFullYear(), d.getMonth(), 1).getDay();
-            const daysInMonth = new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate();
+            for(let i=0; i<first; i++) html += '<div></div>';
+            for(let i=1; i<=days; i++) {
+                const k = `${i}-${d.getMonth()}-${d.getFullYear()}`;
+                const isToday = i===new Date().getDate() && d.getMonth()===new Date().getMonth();
+                const hasNote = App.db.log[k];
+                html += `<div class="cal-day ${isToday?'today':''} ${hasNote?'has-note':''}" onclick="App.Calendar.edit('${k}', ${i})">${i}</div>`;
+            }
+            document.getElementById('cal-grid').innerHTML = html;
+        },
+        async edit(k, n) {
+            const {value:t} = await Swal.fire({title:`Bitácora Día ${n}`, input:'textarea', inputValue:App.db.log[k]||''});
+            if(t!==undefined) { App.db.log[k]=t; App.save(); }
+        }
+    },
 
-            for(let i=0; i<firstDay; i++) grid.innerHTML += '<div></div>';
-            
-            for(let i=1; i<=daysInMonth; i++) {
-                const key = `${i}-${d.getMonth()}-${d.getFullYear()}`;
-                const isToday = i === new Date().getDate() && d.getMonth() === new Date().getMonth();
-                const hasLog = App.state.logs[key];
-                
-                grid.innerHTML += `
-                    <div class="cal-day ${isToday ? 'is-today' : ''} ${hasLog ? 'has-content' : ''}" onclick="App.Calendar.openNote('${key}', ${i})">
-                        ${i}
-                    </div>
-                `;
+    Actions: {
+        async modalProd(i=null) {
+            const item = i!==null ? App.db.inv[i] : {n:'', s:{S:0,M:0,L:0,XL:0}};
+            const {value:f} = await Swal.fire({
+                title: i!==null?'Editar':'Nuevo',
+                html: `<input id="sw-n" class="swal2-input" placeholder="Nombre" value="${item.n}">
+                       <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;">
+                       ${Object.keys(item.s).map(k=>`<div><label>${k}</label><input type="number" id="sw-${k}" class="swal2-input" style="height:40px;margin:0" value="${item.s[k]}"></div>`).join('')}</div>`,
+                preConfirm:()=>{
+                    const n=document.getElementById('sw-n').value.toUpperCase();
+                    const s={}; Object.keys(item.s).forEach(k=>s[k]=Number(document.getElementById('sw-'+k).value));
+                    return {n,s};
+                }
+            });
+            if(f && f.n) { if(i!==null) App.db.inv[i]=f; else App.db.inv.push(f); App.save(); }
+        },
+
+        async modalOrder() {
+            const prods = [...new Set(App.db.inv.map(i=>i.n))].map(p=>`<option value="${p}">`).join('');
+            const {value:f} = await Swal.fire({
+                title: 'Nueva Orden',
+                html: `<input id="mo-c" class="swal2-input" placeholder="Cliente">
+                       <input id="mo-p" class="swal2-input" list="dl-p" placeholder="Producto"><datalist id="dl-p">${prods}</datalist>
+                       <div style="display:flex;gap:10px"><select id="mo-s" class="swal2-input"><option>S</option><option>M</option><option>L</option><option>XL</option></select>
+                       <input id="mo-q" type="number" class="swal2-input" value="1"></div>`,
+                preConfirm:()=>({
+                    c:document.getElementById('mo-c').value.toUpperCase(),
+                    p:document.getElementById('mo-p').value.toUpperCase(),
+                    sz:document.getElementById('mo-s').value,
+                    q:Number(document.getElementById('mo-q').value),
+                    st:'bodega', fac:null
+                })
+            });
+            if(f && f.c) { App.db.ord.push(f); App.save(); }
+        },
+
+        async cycle(i) {
+            const o = App.db.ord[i];
+            if(o.st === 'bodega') {
+                o.st = 'pack'; App.save();
+            } else if(o.st === 'pack') {
+                const {value:fac} = await Swal.fire({
+                    title:'DESPACHO', text:'Ingrese N° Factura OBLIGATORIO:', input:'text',
+                    inputValidator: (v) => !v && '¡Necesitas el número de factura!'
+                });
+                if(fac) {
+                    const prod = App.db.inv.find(p => p.n === o.p);
+                    if(prod && prod.s[o.sz] >= o.q) {
+                        prod.s[o.sz] -= o.q;
+                        o.st = 'done'; o.fac = fac;
+                        App.save();
+                        Swal.fire('¡DESPACHADO!','Stock descontado y factura registrada.','success');
+                    } else {
+                        Swal.fire('ERROR DE STOCK','No hay suficientes unidades físicas.','error');
+                    }
+                }
             }
         },
-        async openNote(key, day) {
-            const { value: text } = await Swal.fire({
-                title: `Notas del ${day}`,
-                input: 'textarea',
-                inputValue: App.state.logs[key] || '',
-                confirmButtonText: 'Guardar'
+
+        noStock(i) { App.db.ord[i].st = 'sinstock'; App.save(); },
+        delOrd(i) { App.db.ord.splice(i,1); App.save(); },
+        
+        askTaller(p,s) { window.open(`https://wa.me/?text=${encodeURIComponent(`⚠️ PEDIDO URGENTE TALLER: ${p} Talla ${s}. Confirmar fecha.`)}`); },
+        
+        reporteWsp() {
+            const h = App.db.ord.filter(o=>o.st==='done');
+            if(!h.length) return Swal.fire('Vacío','No hay despachos hoy','info');
+            const t = `*REPORTE DESPACHOS*\n\n` + h.map(o=>`✅ Fac:${o.fac} - ${o.c} (${o.p} x${o.q})`).join('\n');
+            window.open(`https://wa.me/?text=${encodeURIComponent(t)}`);
+        }
+    },
+
+    Backup: {
+        saveSnap() {
+            localStorage.setItem('snap_inv', JSON.stringify(App.db.inv));
+            localStorage.setItem('snap_ord', JSON.stringify(App.db.ord));
+            localStorage.setItem('snap_log', JSON.stringify(App.db.log));
+            Swal.fire('SNAPSHOT GUARDADO', 'Copia de seguridad local lista.', 'success');
+        },
+        loadSnap() {
+            Swal.fire({title:'¿Restaurar?', text:'Se perderá lo actual', showCancelButton:true}).then(r=>{
+                if(r.isConfirmed) {
+                    if(localStorage.getItem('snap_inv')) {
+                        App.db.inv=JSON.parse(localStorage.getItem('snap_inv'));
+                        App.db.ord=JSON.parse(localStorage.getItem('snap_ord'));
+                        App.db.log=JSON.parse(localStorage.getItem('snap_log'));
+                        App.save();
+                        Swal.fire('RESTAURADO','','success');
+                    } else Swal.fire('Error','No existe snapshot','error');
+                }
             });
-            if(text !== undefined) {
-                App.state.logs[key] = text;
-                App.db.save();
-                this.render();
+        }
+    },
+
+    AI: {
+        trigger() { document.getElementById('file-in').click(); },
+        async process(files) {
+            Swal.fire({title:'Analizando...', didOpen:()=>Swal.showLoading()});
+            for(let f of files) {
+                let txt = '';
+                if(f.name.endsWith('xlsx') || f.name.endsWith('xls')) {
+                    const d = await f.arrayBuffer();
+                    const wb = XLSX.read(d);
+                    const j = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);
+                    j.forEach(r => {
+                        const n=(r.PRODUCTO||r.TELA||r.Nombre||'').toUpperCase();
+                        if(n) {
+                            const ex=App.db.inv.find(i=>i.n===n);
+                            const s={S:r.S||0, M:r.M||0, L:r.L||0, XL:r.XL||0};
+                            if(ex) Object.keys(s).forEach(k=>ex.s[k]+=s[k]);
+                            else App.db.inv.push({n,s});
+                        }
+                    });
+                } else if(f.type.includes('image')) {
+                    const {data:{text}} = await (await Tesseract.createWorker()).recognize(f);
+                    txt = text;
+                } else if(f.name.endsWith('pdf')) {
+                    const p = await pdfjsLib.getDocument(new Uint8Array(await f.arrayBuffer())).promise;
+                    for(let i=1;i<=p.numPages;i++) txt+=(await (await p.getPage(i)).getTextContent()).items.map(s=>s.str).join(' ');
+                }
+
+                // Heuristica Simple para Texto (OCR/PDF)
+                if(txt) {
+                    const clean = txt.toUpperCase();
+                    if(clean.includes('POLERA') || clean.includes('PANTALON')) {
+                         App.db.ord.push({
+                             c: 'CLIENTE DETECTADO (IA)',
+                             p: clean.includes('POLERA')?'POLERA':'PANTALON',
+                             sz: 'M', q: 10, st: 'bodega', fac: null
+                         });
+                    }
+                }
             }
+            Swal.close(); App.save(); Swal.fire('PROCESADO','Datos integrados','success');
         }
     }
 };
 
+document.getElementById('file-in').onchange = (e) => App.AI.process(e.target.files);
 window.onload = () => App.init();
 </script>
 </body>
