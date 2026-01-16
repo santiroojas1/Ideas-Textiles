@@ -3,16 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>IDEAS TEXTILES | V129 PDF FIX</title>
+    <title>IDEAS TEXTILES </title>
     
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
-    
     <script src="https://unpkg.com/tesseract.js@4.0.2/dist/tesseract.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
@@ -152,6 +150,13 @@
                     App.db.inv = data.inv || [];
                     App.db.ord = data.ord || [];
                     App.db.log = data.log || {};
+                    
+                    // FIX: SANITIZAR DATOS PARA EVITAR ERROR 'ENTRIES NULL'
+                    App.db.inv.forEach(p => {
+                        if (!p.s) p.s = {}; // Si no hay tallas, crear objeto vacío
+                        if (!p.n) p.n = "Sin Nombre";
+                    });
+
                 } else {
                     App.db.inv = []; App.db.ord = []; App.db.log = {};
                 }
@@ -196,6 +201,7 @@
                 const list = (App.db.inv || []).filter(i => (i.n||'').toUpperCase().includes(q) || (i.sku||'').includes(q));
                 if(list.length === 0) { el.innerHTML = '<div style="text-align:center;color:#94a3b8;margin-top:20px;">Inventario vacío.</div>'; return; }
                 el.innerHTML = list.map((p, i) => {
+                    // FIX: Asegurar que p.s existe con (p.s || {})
                     const sizes = Object.entries(p.s || {}).map(([k,v]) => `<span style="background:#f1f5f9; padding:2px 6px; border-radius:4px; font-size:0.75rem;"><b>${k}:</b>${v}</span>`).join(' ');
                     return `
                     <div class="card">
@@ -231,8 +237,8 @@
                 const p = App.db.inv[i];
                 if((await Swal.fire({title:'¿BORRAR PRODUCTO?', text:`Eliminar "${p.n}"`, icon:'warning', showCancelButton:true, confirmButtonColor:'#ef4444', confirmButtonText:'SÍ, BORRAR'})).isConfirmed) {
                     App.db.inv.splice(i, 1);
-                    const k = new Date().toISOString().split('T')[0];
-                    App.db.log[k] = (App.db.log[k] || '') + `🗑️ Eliminado Producto: ${p.n}\n`;
+                    const k = `${new Date().getDate()}-${new Date().getMonth()}-${new Date().getFullYear()}`;
+                    App.db.log[k] = (App.db.log[k] || '') + `🗑️ Eliminado Prod: ${p.n}\n`;
                     App.save(); App.Render.bodega(); Swal.fire('Eliminado', '', 'success');
                 }
             },
@@ -250,6 +256,7 @@
             async modalProd(i = null) {
                 const isNew = i === null;
                 const item = isNew ? {n:'', s:{}, sku: App.Helpers.getNextSKU()} : App.db.inv[i];
+                // FIX: Fallback seguro
                 const sTxt = Object.entries(item.s||{}).map(([k,v])=>`${k}:${v}`).join(', ');
                 const {value} = await Swal.fire({
                     title: isNew ? 'PRODUCTO' : 'EDITAR',
@@ -262,8 +269,6 @@
                 });
                 if(value) {
                     if(!isNew) App.db.inv[i] = value; else App.db.inv.push(value);
-                    const {value:reason} = await Swal.fire({title: 'MOTIVO CAMBIO', input: 'text'});
-                    if(reason) { const k = new Date().toISOString().split('T')[0]; App.db.log[k] = (App.db.log[k] || '') + `⚙️ ${value.n}: ${reason}\n`; }
                     App.save(); App.Render.bodega();
                 }
             },
@@ -285,14 +290,32 @@
                 });
             },
             delOrd(i){ Swal.fire({title:'¿Borrar Pedido?', showCancelButton:true}).then(r=>{if(r.isConfirmed){App.db.ord.splice(i,1); App.save();}}); },
+            
             async despachar(i){
                 const {value:f} = await Swal.fire({title:'N° FACTURA', input:'text'});
                 if(f) {
-                    const o = App.db.ord[i]; o.st='done'; o.fac=f; o.date = new Date().toLocaleDateString();
-                    o.items.forEach(it => { const p=App.db.inv.find(x=>x.n===it.p); if(p && p.s && p.s[it.sz]!==undefined) p.s[it.sz]-=it.q; });
+                    const o = App.db.ord[i];
+                    o.st='done'; o.fac=f; o.date = new Date().toLocaleDateString();
+                    
+                    // 1. DESCONTAR STOCK (Con seguridad si p.s es undefined)
+                    o.items.forEach(it => { 
+                        const p = App.db.inv.find(x=>x.n===it.p); 
+                        if(p) {
+                            if(!p.s) p.s = {}; // Asegurar existencia
+                            if(p.s[it.sz] !== undefined) p.s[it.sz] -= it.q; 
+                        }
+                    });
+
+                    // 2. AGREGAR AL CALENDARIO (REQUERIDO)
+                    const now = new Date();
+                    const k = `${now.getDate()}-${now.getMonth()}-${now.getFullYear()}`;
+                    App.db.log[k] = (App.db.log[k] || '') + `✅ Despachado: ${o.c} (Fac:${f})\n`;
+
                     App.save();
+                    Swal.fire('Despachado', 'Inventario actualizado y anotado en agenda.', 'success');
                 }
             },
+            
             async factoryReset() {
                 if((await Swal.fire({title:'¿RESET TOTAL?', text:'Se borrará TODO en la nube.', icon:'warning', showCancelButton:true})).isConfirmed) {
                     db.ref('/').set({inv:[], ord:[], log:{}}); Swal.fire('Listo','','success');
@@ -339,6 +362,8 @@
                                 if(n && q > 0) {
                                     let p = App.db.inv.find(x => x.n === n);
                                     if(!p){ p={n, s:{}, sku: App.Helpers.getNextSKU()}; App.db.inv.push(p); }
+                                    if(!p.s) p.s = {}; // FIX: Inicializar siempre
+                                    
                                     if(clientName) { if(!ordersMap[clientName]) ordersMap[clientName] = []; ordersMap[clientName].push({p:n, sz:sz, q:q}); }
                                     else { p.s[sz] = (p.s[sz]||0) + q; }
                                     cnt++;
@@ -365,9 +390,7 @@
                     const { jsPDF } = window.jspdf;
                     const doc = new jsPDF();
                     
-                    if (typeof doc.autoTable !== 'function') {
-                        throw new Error("El complemento de Tablas no se ha cargado.");
-                    }
+                    if (typeof doc.autoTable !== 'function') throw new Error("Error librerías.");
 
                     const now = new Date().toLocaleDateString();
                     
@@ -381,7 +404,10 @@
                     
                     doc.setTextColor(15, 23, 42); doc.setFontSize(14); doc.setFont("helvetica", "bold");
                     doc.text("1. INVENTARIO ACTUAL", 14, y); y+=5; doc.setLineWidth(0.5); doc.line(14, y, 196, y); y+=5;
-                    const bodyInv = (App.db.inv||[]).map(p => [p.sku, p.n, Object.entries(p.s).map(([k, v]) => `${k}:${v}`).join(', ')]);
+                    
+                    // FIX: Asegurar p.s antes de Object.entries
+                    const bodyInv = (App.db.inv||[]).map(p => [p.sku, p.n, Object.entries(p.s || {}).map(([k, v]) => `${k}:${v}`).join(', ')]);
+                    
                     doc.autoTable({ startY: y, head: [['SKU', 'PRODUCTO', 'STOCK']], body: bodyInv, theme: 'striped', headStyles:{fillColor:[59, 130, 246]} });
                     y = doc.lastAutoTable.finalY + 15;
 
