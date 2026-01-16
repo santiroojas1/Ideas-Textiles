@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>IDEAS TEXTILES | V109 FINAL</title>
+    <title>IDEAS TEXTILES | V111 STABLE</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
@@ -63,6 +63,7 @@
         .btn-pri { background: var(--dark); color: white; }
         .btn-sec { background: white; border: 1px solid #cbd5e1; color: var(--dark); }
         .btn-pdf { background: var(--danger); color: white; }
+        .btn-reset { background: white; border: 2px solid var(--danger); color: var(--danger); font-weight: 800; margin-top: 20px; }
 
         .dock { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--dark); padding: 12px 30px; border-radius: 40px; display: flex; gap: 35px; box-shadow: 0 10px 30px rgba(0,0,0,0.4); z-index: 999; }
         .dock i { font-size: 1.4rem; color: #94a3b8; transition: 0.2s; cursor: pointer; }
@@ -75,7 +76,7 @@
 <header>
     <div class="brand">
         <h1>IDEAS TEXTILES</h1>
-        <span>V109 FINAL</span>
+        <span>V111 STABLE</span>
     </div>
     <button class="btn-scan" onclick="App.IA.trigger()">
         <i class="fa-solid fa-wand-magic-sparkles"></i> IA IMPORT
@@ -84,7 +85,7 @@
 
 <section id="v-bodega" class="view active">
     <input type="text" id="search-inv" class="search-bar" style="width:100%; padding:12px; border-radius:10px; border:1px solid #cbd5e1; margin-bottom:15px;" placeholder="🔍 Buscar por nombre o SKU..." oninput="App.Render.bodega()">
-    <button class="btn btn-pri" onclick="App.Actions.modalProd()">+ AGREGAR PRODUCTO</button>
+    <button class="btn btn-pri" onclick="App.Actions.modalProd()">+ AGREGAR PRODUCTO MANUAL</button>
     <br><br>
     <div id="list-bodega"></div>
 </section>
@@ -117,17 +118,21 @@
         </div>
         <div id="cal-days" class="cal-grid" style="margin-top:5px;"></div>
     </div>
+    
     <div class="card" style="margin-top:20px; text-align:center; border:2px dashed #cbd5e1;">
-        <h3>REPORTES</h3>
+        <h3>CONFIGURACIÓN</h3>
         <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-            <button class="btn btn-pdf" onclick="App.Backup.generatePDF()"><i class="fa-solid fa-file-pdf"></i> PDF</button>
-            <button class="btn btn-pri" onclick="App.Backup.exportJSON()"><i class="fa-solid fa-download"></i> JSON</button>
+            <button class="btn btn-pdf" onclick="App.Backup.generatePDF()"><i class="fa-solid fa-file-pdf"></i> REPORTE PDF</button>
+            <button class="btn btn-pri" onclick="App.Backup.exportJSON()"><i class="fa-solid fa-download"></i> BACKUP JSON</button>
         </div>
-        <div style="margin-top:10px;">
+        <div style="margin-top:15px;">
             <label style="color:var(--primary); font-size:0.8rem; font-weight:bold; cursor:pointer;">
-                <input type="file" hidden onchange="App.Backup.importJSON(this)"><u>Restaurar Respaldo</u>
+                <input type="file" hidden onchange="App.Backup.importJSON(this)"><u>Restaurar Copia Seguridad</u>
             </label>
         </div>
+        <button class="btn btn-reset" onclick="App.Actions.factoryReset()">
+            <i class="fa-solid fa-skull"></i> BORRAR TODO (RESET DE FÁBRICA)
+        </button>
     </div>
 </section>
 
@@ -149,10 +154,7 @@ const App = {
     },
 
     init() {
-        // Garantizar SKUs retroactivos
-        this.db.inv.forEach((p, idx) => {
-            if(!p.sku) p.sku = String(idx + 1).padStart(3, '0');
-        });
+        this.db.inv.forEach((p, idx) => { if(!p.sku) p.sku = String(idx + 1).padStart(3, '0'); });
         this.Render.bodega();
         this.Render.ordenes();
         this.Calendar.render();
@@ -259,7 +261,7 @@ const App = {
 
             const renderCart = () => {
                 const d = document.getElementById('cart-div');
-                if(d) d.innerHTML = !cart.length ? '<small>Vacío</small>' : cart.map((x,ix)=>`<div>${x.p} (${x.sz}) x${x.q} <span onclick="window.delCartItem(${ix})" style="color:red;cursor:pointer;margin-left:5px;">X</span></div>`).join('');
+                if(d) d.innerHTML = !cart.length ? '<small>Carrito Vacío</small>' : cart.map((x,ix)=>`<div>${x.p} (${x.sz}) x${x.q} <span onclick="window.delCartItem(${ix})" style="color:red;cursor:pointer;margin-left:5px;">X</span></div>`).join('');
             };
             window.delCartItem = (idx) => { cart.splice(idx,1); renderCart(); };
 
@@ -280,37 +282,27 @@ const App = {
                 `,
                 didOpen: () => {
                     renderCart();
-                    document.getElementById('btn-add-smart').addEventListener('click', async () => {
+                    document.getElementById('btn-add-smart').addEventListener('click', () => {
                         const pName = document.getElementById('sw-p').value.toUpperCase().trim();
                         const sz = document.getElementById('sw-sz').value.toUpperCase().trim();
                         const q = Number(document.getElementById('sw-q').value);
                         
                         if(!pName || !sz || q <= 0) return Swal.showValidationMessage('⚠️ Faltan datos');
 
-                        // --- LÓGICA DE CONTROL DE STOCK ---
                         const invItem = App.db.inv.find(x => x.n === pName);
                         const stockActual = (invItem && invItem.s[sz] !== undefined) ? invItem.s[sz] : 0;
                         
-                        // Si pide más de lo que hay
+                        // --- SOLUCIÓN: Usar confirm() nativo para no cerrar el modal ---
                         if(q > stockActual) {
-                            const {isConfirmed} = await Swal.fire({
-                                title: '⚠️ Stock Insuficiente',
-                                html: `Solo tienes <b>${stockActual}</b> unidades de <b>${pName} Talla ${sz}</b>.<br>Estás pidiendo <b>${q}</b>.<br><br>¿Deseas agregarlo de todas formas?`,
-                                icon: 'warning',
-                                showCancelButton: true,
-                                confirmButtonText: 'SÍ, AGREGAR IGUAL',
-                                cancelButtonText: 'CANCELAR',
-                                confirmButtonColor: '#f59e0b'
-                            });
-                            if(!isConfirmed) return; // Si cancela, no agrega nada
+                            if(!confirm(`⚠️ STOCK INSUFICIENTE\n\nSolo tienes ${stockActual} unidades.\n¿Deseas agregar ${q} unidades de todas formas?`)) return;
                         }
                         
-                        // Si pasa, agregamos
                         cart.push({p: pName, sz: sz, q: q});
                         renderCart();
-                        document.getElementById('sw-p').value = '';
-                        document.getElementById('sw-sz').value = '';
-                        document.getElementById('sw-q').value = '1';
+                        // Limpieza y foco
+                        document.getElementById('sw-p').value = ''; 
+                        document.getElementById('sw-sz').value = ''; 
+                        document.getElementById('sw-q').value = '1'; 
                         document.getElementById('sw-p').focus();
                     });
                 },
@@ -340,6 +332,21 @@ const App = {
                 const d = new Date(); const k = `${d.getDate()}-${d.getMonth()}-${d.getFullYear()}`;
                 App.db.log[k] = (App.db.log[k]||'') + `[AUTO] Despacho ${o.c} (FAC ${f})\n`;
                 App.save(); Swal.fire('Listo','','success');
+            }
+        },
+        
+        async factoryReset() {
+            const {isConfirmed} = await Swal.fire({
+                title: '¿ESTÁS SEGURO?',
+                text: 'Se borrarán TODOS los datos de Inventario, Pedidos y Calendario. Esta acción es irreversible.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#ef4444',
+                confirmButtonText: 'SÍ, BORRAR TODO'
+            });
+            if(isConfirmed) {
+                localStorage.clear();
+                location.reload();
             }
         }
     },
@@ -421,8 +428,25 @@ const App = {
         },
         async openDay(k) {
             const currentVal = App.db.log[k] || '';
-            const { value: text } = await Swal.fire({ title: `Notas ${k}`, input: 'textarea', inputValue: currentVal, showCancelButton: true });
-            if (text !== undefined) { App.db.log[k] = text; App.save(); }
+            const { isConfirmed, isDenied, value } = await Swal.fire({
+                title: `Notas ${k.replace(/-/g,'/')}`,
+                input: 'textarea',
+                inputValue: currentVal,
+                showCancelButton: true,
+                showDenyButton: true,
+                confirmButtonText: 'GUARDAR',
+                denyButtonText: '🗑️ BORRAR NOTA',
+                denyButtonColor: '#ef4444',
+                cancelButtonText: 'CERRAR'
+            });
+            if (isConfirmed) {
+                App.db.log[k] = value;
+                App.save();
+            } else if (isDenied) {
+                delete App.db.log[k];
+                App.save();
+                Swal.fire('Nota eliminada', '', 'success');
+            }
         }
     }
 };
