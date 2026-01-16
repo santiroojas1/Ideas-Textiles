@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>IDEAS TEXTILES | Master Enterprise v38</title>
+    <title>IDEAS TEXTILES SPA | Enterprise V43</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
@@ -12,323 +12,984 @@
     <script src="https://unpkg.com/tesseract.js@4.0.2/dist/tesseract.min.js"></script>
 
     <style>
+        /* =========================================
+           DEFINICIÓN DE VARIABLES DE COLOR (TEMA CELESTE)
+           ========================================= */
         :root {
-            --brand: #00f2ff; --bg: #050a15; --card: #111a2d; 
-            --input: #1e293b; --text: #ffffff; --dim: #94a3b8; 
-            --success: #00ff88; --warn: #ffbb00; --danger: #ff4444; --ai: #a366ff;
+            --brand: #38bdf8;       /* Celeste claro vibrante para acentos y botones */
+            --brand-dark: #0044cc;  /* AZUL SÓLIDO para texto corporativo */
+            --bg: #f0f9ff;          /* Fondo general muy claro (cielo pálido) */
+            --card: #ffffff;        /* Fondo de tarjetas (blanco puro) */
+            --input: #e0f2fe;       /* Fondo de inputs (celeste muy suave) */
+            --text: #334155;        /* Color de texto principal (gris azulado oscuro para contraste) */
+            --text-light: #64748b;  /* Texto secundario */
+            
+            /* Estados del sistema */
+            --success: #22c55e; 
+            --warn: #f59e0b; 
+            --danger: #ef4444; 
+            --ai: #8b5cf6; /* Color para funciones de IA */
+            
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.1);
+            --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1);
         }
-        * { margin:0; padding:0; box-sizing:border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
-        body { background: var(--bg); color: var(--text); min-height: 100vh; padding-bottom: 110px; }
 
-        #login-screen { position: fixed; inset: 0; background: var(--bg); z-index: 10000; display: flex; align-items: center; justify-content: center; }
-        .login-box { background: var(--card); padding: 40px; border-radius: 30px; border: 1px solid var(--brand); text-align: center; width: 90%; max-width: 400px; }
-
-        header { background: rgba(17, 26, 45, 0.9); backdrop-filter: blur(10px); padding: 20px; border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-between; align-items: center; position: sticky; top:0; z-index: 100; }
+        /* RESET Y ESTILOS BASE */
+        * { margin:0; padding:0; box-sizing:border-box; font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { background: var(--bg); color: var(--text); min-height: 100vh; padding-bottom: 120px; overflow-x: hidden; }
         
-        .main-container { padding: 15px; max-width: 1200px; margin: 0 auto; }
+        /* =========================================
+           COMPONENTES DE INTERFAZ
+           ========================================= */
+
+        /* PANTALLA DE LOGIN */
+        #login-screen { position: fixed; inset: 0; background: linear-gradient(135deg, #e0f2fe 0%, #f0f9ff 100%); z-index: 10000; display: flex; align-items: center; justify-content: center; }
+        .login-box { background: var(--card); padding: 50px; border-radius: 30px; border: 2px solid var(--input); text-align: center; width: 90%; max-width: 420px; box-shadow: 0 20px 40px rgba(56, 189, 248, 0.15); }
+
+        /* PANTALLA DE CARGA IA */
+        #ai-loader { display:none; position:fixed; inset:0; background:rgba(255,255,255,0.9); z-index:20000; align-items:center; justify-content:center; flex-direction:column; backdrop-filter: blur(5px); }
+        .spinner { width: 60px; height: 60px; border: 6px solid var(--input); border-top-color: var(--brand); border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* HEADER PRINCIPAL */
+        header { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(12px); padding: 20px 25px; border-bottom: 2px solid var(--input); display: flex; justify-content: space-between; align-items: center; position: sticky; top:0; z-index: 100; box-shadow: var(--shadow-sm); }
+        .brand-title { font-size: 1rem; font-weight: 900; color: var(--brand-dark); letter-spacing: 0.5px; }
+        .operator-badge { font-size: 0.7rem; color: var(--text-light); font-weight: 700; background: var(--input); padding: 4px 10px; border-radius: 20px; }
+
+        /* CONTENEDORES Y VISTAS */
+        .main-container { padding: 25px; max-width: 900px; margin: 0 auto; }
         .view { display: none; }
-        .view.active { display: block; animation: slideUp 0.3s ease; }
-        @keyframes slideUp { from { transform: translateY(10px); opacity:0; } to { transform: translateY(0); opacity:1; } }
+        .view.active { display: block; animation: fadeSlideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+        @keyframes fadeSlideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
-        .card { background: var(--card); border-radius: 20px; border: 1px solid rgba(255,255,255,0.05); padding: 18px; margin-bottom: 15px; position: relative; }
-        .stock-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 15px; }
-        .talla-item { background: var(--input); padding: 10px; border-radius: 12px; text-align: center; font-size: 0.8rem; }
-        .talla-item b { display: block; font-size: 0.6rem; color: var(--brand); }
+        /* TARJETAS (CARDS) */
+        .card { background: var(--card); border-radius: 24px; border: 1px solid var(--input); padding: 25px; margin-bottom: 20px; box-shadow: var(--shadow-md); transition: transform 0.2s; }
+        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .card-title { font-size: 1.1rem; font-weight: 800; color: var(--brand-dark); }
 
-        .btn { padding: 14px; border-radius: 14px; border: none; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 0.8rem; }
-        .btn-brand { background: var(--brand); color: #000; }
-        .btn-ai { background: linear-gradient(135deg, var(--ai), var(--brand)); color: #fff; }
-        .btn-edit { background: rgba(255,255,255,0.1); width: 32px; height: 32px; border-radius: 8px; color: white; border: none; }
+        /* GRID DE STOCK MULTITALLA */
+        .stock-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)); gap: 12px; margin-top: 20px; }
+        .talla-badge { background: var(--input); padding: 12px; border-radius: 16px; text-align: center; border: 2px solid transparent; transition: 0.2s; }
+        .talla-badge b { display: block; font-size: 0.7rem; color: var(--brand-dark); text-transform: uppercase; margin-bottom: 4px; }
+        .talla-value { font-size: 1.2rem; font-weight: 800; color: var(--text); }
 
-        .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; }
-        .cal-day { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; border-radius: 10px; background: var(--input); cursor: pointer; font-size: 0.8rem; position: relative; }
-        .cal-dot { width: 5px; height: 5px; background: var(--warn); border-radius: 50%; position: absolute; bottom: 5px; }
-        .today { border: 2px solid var(--brand); color: var(--brand); }
+        /* BOTONES ROBUSTOS */
+        .btn { padding: 16px 24px; border-radius: 16px; border: none; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 0.9rem; transition: 0.3s; box-shadow: var(--shadow-sm); }
+        .btn:active { transform: scale(0.97); }
+        .btn-brand { background: var(--brand); color: white; }
+        .btn-brand:hover { background: var(--brand-dark); }
+        .btn-ai { background: linear-gradient(135deg, var(--ai), var(--brand)); color: white; }
+        .btn-ghost { background: var(--input); color: var(--brand-dark); }
+        .btn-icon { width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; cursor: pointer; background: var(--input); color: var(--brand-dark); border: none; transition: 0.2s; }
+        .btn-icon:hover { background: var(--brand); color: white; }
 
-        .dock { position: fixed; bottom: 15px; left: 50%; transform: translateX(-50%); width: 92%; max-width: 500px; background: rgba(17, 26, 45, 0.98); border-radius: 25px; padding: 12px; display: flex; justify-content: space-around; border: 1px solid rgba(255,255,255,0.1); z-index: 1000; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        .nav-link { background: none; border: none; color: var(--dim); display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; font-size: 0.6rem; font-weight: 800; }
-        .nav-link.active { color: var(--brand); }
+        /* CALENDARIO */
+        .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; }
+        .cal-day { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; border-radius: 12px; background: var(--input); font-size: 0.9rem; font-weight: 700; cursor: pointer; position: relative; color: var(--text); transition: 0.2s; }
+        .cal-day:hover { background: var(--brand); color: white; }
+        .cal-day.today { border: 3px solid var(--brand); color: var(--brand-dark); }
+        .cal-dot { width: 6px; height: 6px; background: var(--warn); border-radius: 50%; position: absolute; bottom: 6px; }
 
-        .st-badge { padding: 4px 8px; border-radius: 6px; font-size: 0.6rem; font-weight: 900; text-transform: uppercase; }
-        .st-confeccion { background: rgba(163, 102, 255, 0.2); color: var(--ai); }
-        .st-despachado { background: rgba(0, 255, 136, 0.2); color: var(--success); }
-        .st-error { background: rgba(255, 68, 68, 0.2); color: var(--danger); }
+        /* DOCK DE NAVEGACIÓN INFERIOR */
+        .dock { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); width: 94%; max-width: 550px; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(20px); border-radius: 30px; padding: 15px; display: flex; justify-content: space-around; border: 2px solid var(--input); z-index: 1000; box-shadow: 0 20px 50px rgba(56, 189, 248, 0.25); }
+        .nav-link { background: none; border: none; color: var(--text-light); display: flex; flex-direction: column; align-items: center; gap: 6px; cursor: pointer; font-size: 0.65rem; font-weight: 800; text-transform: uppercase; transition: 0.3s; }
+        .nav-link.active { color: var(--brand-dark); transform: translateY(-3px); }
+        .nav-link i { font-size: 1.4rem; }
+
+        /* ETIQUETAS DE ESTADO (CHIPS) */
+        .status-tag { padding: 6px 12px; border-radius: 10px; font-size: 0.65rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px; }
+        .st-confeccion { background: #ede9fe; color: var(--ai); }
+        .st-bodega { background: #ffedd5; color: var(--warn); }
+        .st-despachado { background: #dcfce7; color: var(--success); }
+        .st-error { background: #fee2e2; color: var(--danger); }
+
+        /* Overrides para SweetAlert en tema claro */
+        .swal2-popup { border-radius: 24px !important; padding: 25px !important; }
+        .swal2-title { color: var(--brand-dark) !important; font-weight: 800 !important; }
+        .swal2-input, .swal2-textarea, .swal2-select { border-radius: 12px !important; border: 2px solid var(--input) !important; background: var(--bg) !important; color: var(--text) !important; font-weight: 600 !important; }
+        .swal2-input:focus { border-color: var(--brand) !important; box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.2) !important; }
     </style>
 </head>
 <body>
 
+<div id="ai-loader">
+    <div class="spinner"></div>
+    <p id="ai-status" style="margin-top:25px; font-weight:800; color:var(--brand-dark); letter-spacing:1px;">IA ANALIZANDO DOCUMENTO...</p>
+</div>
+
 <div id="login-screen">
     <div class="login-box">
-        <h2 style="margin-bottom:20px;">IDEAS TEXTILES OS</h2>
-        <input type="text" id="userIn" placeholder="NOMBRE OPERADOR" style="width:100%; padding:18px; border-radius:15px; background:var(--input); border:1px solid var(--brand); color:white; text-align:center; outline:none; font-weight:800; margin-bottom:20px;">
-        <button class="btn btn-brand" style="width:100%;" onclick="Core.login()">ACCEDER</button>
+        <i class="fa-solid fa-shirt" style="font-size:4rem; color:var(--brand); margin-bottom:25px; filter: drop-shadow(0 10px 15px rgba(56, 189, 248, 0.3));"></i>
+        <h2 style="margin-bottom:10px; color:var(--brand-dark); font-weight:900;">IDEAS TEXTILES SPA</h2>
+        <p style="color:var(--text-light); margin-bottom:30px; font-weight:600;">Sistema Operativo V43</p>
+        
+        <input type="text" id="userIn" placeholder="INGRESE CÓDIGO O NOMBRE DE OPERADOR" 
+               style="width:100%; padding:18px; border-radius:16px; background:var(--input); border:2px solid transparent; color:var(--text); text-align:center; outline:none; font-weight:700; margin-bottom:25px; transition:0.3s;" 
+               onfocus="this.style.borderColor='var(--brand)'; this.style.background='var(--card)'" 
+               onblur="this.style.borderColor='transparent'; this.style.background='var(--input)'">
+        
+        <button class="btn btn-brand" style="width:100%; font-size:1rem;" onclick="Core.login()">
+            <i class="fa-solid fa-right-to-bracket"></i> ACCEDER AL SISTEMA
+        </button>
     </div>
 </div>
 
 <header>
-    <div>
-        <h1 style="font-size:0.9rem; font-weight:800;">MASTER ENTERPRISE</h1>
-        <p id="op-display" style="font-size:0.6rem; color:var(--brand); font-weight:900;"></p>
+    <div style="display:flex; align-items:center; gap:12px">
+        <div style="background:var(--input); width:45px; height:45px; border-radius:14px; display:flex; align-items:center; justify-content:center; color:var(--brand-dark);">
+            <i class="fa-solid fa-layer-group fa-lg"></i>
+        </div>
+        <div>
+            <h1 class="brand-title">IDEAS TEXTILES SPA</h1>
+            <span id="op-name" class="operator-badge">Iniciando...</span>
+        </div>
     </div>
-    <button class="btn btn-ai" onclick="Core.runIA()"><i class="fa-solid fa-camera"></i> SCAN IA</button>
+    <button class="btn btn-ai" style="padding:12px 20px; font-size:0.8rem;" onclick="Core.runIA()">
+        <i class="fa-solid fa-wand-magic-sparkles"></i> SCAN IA
+    </button>
 </header>
 
 <main class="main-container">
+
     <section id="v-stock" class="view active">
-        <div style="display:flex; justify-content:space-between; margin-bottom:20px">
-            <h2>Inventario</h2>
-            <button class="btn btn-brand" style="padding:5px 15px" onclick="Core.openMatrix()">+ Nuevo</button>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:25px">
+            <h2 style="color:var(--brand-dark); font-weight:800;">Inventario General</h2>
+            <button class="btn btn-brand" style="padding:10px 20px; font-size:0.8rem;" onclick="Core.openMatrix()">
+                <i class="fa-solid fa-plus-circle"></i> Nuevo Producto
+            </button>
         </div>
-        <div id="list-inv"></div>
+        <div id="list-inv">
+            </div>
     </section>
 
     <section id="v-orders" class="view">
-        <div style="display:flex; justify-content:space-between; margin-bottom:20px">
-            <h2>Órdenes (OC)</h2>
-            <button class="btn btn-brand" onclick="Core.newOC()">CREAR OC</button>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:25px">
+            <h2 style="color:var(--brand-dark); font-weight:800;">Gestión de Órdenes</h2>
+            <button class="btn btn-ghost" style="padding:10px 20px; font-size:0.8rem; border:2px solid var(--input);" onclick="Core.newOCManual()">
+                <i class="fa-solid fa-pen-nib"></i> Carga Manual OC
+            </button>
         </div>
-        <div id="list-ord"></div>
+        <div id="list-ord">
+            </div>
     </section>
 
     <section id="v-cal" class="view">
         <div class="card">
-            <h3 style="margin-bottom:15px">Agenda Time-Machine</h3>
-            <div class="cal-grid" id="cal-body"></div>
+            <div class="card-header">
+                <h3 class="card-title"><i class="fa-solid fa-calendar-days" style="margin-right:10px; color:var(--brand);"></i>Agenda Operativa</h3>
+            </div>
+            <div class="cal-grid" id="cal-body">
+                </div>
         </div>
-        <div id="cal-details"></div>
+        <div id="cal-log" style="animation: fadeIn 0.5s ease;">
+            </div>
     </section>
+
 </main>
 
 <nav class="dock">
-    <button class="nav-link active" onclick="Core.nav('stock', this)"><i class="fa-solid fa-boxes-stacked"></i><span>Stock</span></button>
-    <button class="nav-link" onclick="Core.nav('orders', this)"><i class="fa-solid fa-file-invoice"></i><span>OC</span></button>
-    <button class="nav-link" onclick="Core.nav('cal', this)"><i class="fa-solid fa-calendar-day"></i><span>Agenda</span></button>
-    <button class="nav-link" onclick="Core.backup()"><i class="fa-solid fa-cloud-download"></i><span>Copia</span></button>
+    <button class="nav-link active" onclick="Core.nav('stock', this)">
+        <i class="fa-solid fa-boxes-stacked"></i><span>Bodega</span>
+    </button>
+    <button class="nav-link" onclick="Core.nav('orders', this)">
+        <i class="fa-solid fa-file-invoice-dollar"></i><span>Órdenes</span>
+    </button>
+    <button class="nav-link" onclick="Core.nav('cal', this)">
+        <i class="fa-regular fa-calendar-check"></i><span>Agenda</span>
+    </button>
+    <button class="nav-link" onclick="Core.backupSystem()">
+        <i class="fa-solid fa-cloud-arrow-down"></i><span>Respaldo</span>
+    </button>
 </nav>
 
 <script>
+/**
+ * CORE SYSTEM V43 - IDEAS TEXTILES SPA
+ * Arquitectura monolítica robusta con validaciones extendidas y manejo de estado persistente.
+ */
 const Core = {
-    user: localStorage.getItem('it_user_v38'),
-    inv: JSON.parse(localStorage.getItem('it_inv_v38')) || [],
-    ord: JSON.parse(localStorage.getItem('it_ord_v38')) || [],
-    agenda: JSON.parse(localStorage.getItem('it_agenda_v38')) || {},
-    worker: null,
+    // --- ESTADO DEL SISTEMA (Persistencia en LocalStorage) ---
+    user: localStorage.getItem('it_user_v43') || null,
+    inv: JSON.parse(localStorage.getItem('it_inv_v43')) || [],     // Inventario principal
+    ord: JSON.parse(localStorage.getItem('it_ord_v43')) || [],     // Lista de Órdenes
+    agenda: JSON.parse(localStorage.getItem('it_agenda_v43')) || {}, // Notas de calendario
+    worker: null, // Instancia del motor OCR Tesseract
 
-    async login() {
-        const u = document.getElementById('userIn').value;
-        if(u) { this.user = u.toUpperCase(); localStorage.setItem('it_user_v38', this.user); this.init(); }
-    },
-
+    /**
+     * Inicialización del sistema y verificación de sesión.
+     */
     init() {
-        if(!this.user) return;
-        document.getElementById('login-screen').style.display = 'none';
-        document.getElementById('op-display').innerText = `OPERADOR: ${this.user}`;
-        this.renderAll();
-        this.warmUpIA();
+        if (this.user) {
+            // Si hay usuario guardado, saltar login
+            document.getElementById('login-screen').style.display = 'none';
+            this.updateOperatorDisplay();
+            this.renderAllViews(); // Renderizado inicial de toda la UI
+            this.warmUpEngineIA(); // Pre-carga silenciosa del motor IA
+        } else {
+            // Si no, mostrar login y enfocar input
+            setTimeout(() => document.getElementById('userIn').focus(), 500);
+        }
     },
 
-    async warmUpIA() {
-        this.worker = await Tesseract.createWorker();
-        await this.worker.loadLanguage('spa');
-        await this.worker.initialize('spa');
+    /**
+     * Proceso de inicio de sesión seguro.
+     */
+    async login() {
+        const userInput = document.getElementById('userIn');
+        const userName = userInput.value.trim().toUpperCase();
+
+        if (userName.length >= 3) {
+            this.user = userName;
+            localStorage.setItem('it_user_v43', this.user);
+            
+            // Animación de entrada exitosa
+            userInput.style.borderColor = 'var(--success)';
+            await Swal.fire({
+                icon: 'success',
+                title: `¡Bienvenido, ${this.user}!`,
+                text: 'Cargando panel de control...',
+                timer: 1500,
+                showConfirmButton: false,
+                backdrop: `rgba(240, 249, 255, 0.9)`
+            });
+
+            document.getElementById('login-screen').style.display = 'none';
+            this.updateOperatorDisplay();
+            this.renderAllViews();
+            this.warmUpEngineIA();
+
+        } else {
+            // Feedback de error en login
+            userInput.style.borderColor = 'var(--danger)';
+            Swal.fire({
+                icon: 'error',
+                title: 'Acceso Denegado',
+                text: 'El nombre de operador debe tener al menos 3 caracteres.',
+                confirmButtonColor: 'var(--brand-dark)'
+            });
+        }
     },
 
-    nav(v, btn) {
-        document.querySelectorAll('.view').forEach(x => x.classList.remove('active'));
-        document.getElementById('v-'+v).classList.add('active');
+    updateOperatorDisplay() {
+        document.getElementById('op-name').innerText = `Operador activo: ${this.user}`;
+    },
+
+    /**
+     * Inicialización en segundo plano del motor OCR para respuestas rápidas.
+     */
+    async warmUpEngineIA() {
+        if (this.worker) return; // Evitar doble inicialización
+        console.log("[SYSTEM] Inicializando Motor Neural Tesseract...");
+        try {
+            this.worker = await Tesseract.createWorker();
+            await this.worker.loadLanguage('spa');
+            await this.worker.initialize('spa');
+            console.log("[SYSTEM] Motor Neural listo.");
+        } catch (error) {
+            console.error("[ERROR] Fallo al cargar IA:", error);
+            this.alert("Error al cargar el módulo de IA. Revise su conexión.", "error");
+        }
+    },
+
+    /**
+     * Sistema de navegación entre vistas (Tabs).
+     */
+    nav(viewId, btnElement) {
+        // Desactivar todas las vistas y botones
+        document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
         document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
-        btn.classList.add('active');
-        if(v === 'cal') this.renderCal();
+        
+        // Activar la seleccionada
+        document.getElementById(`v-${viewId}`).classList.add('active');
+        btnElement.classList.add('active');
+
+        // Si es calendario, forzar re-render para actualizar puntos
+        if (viewId === 'cal') this.renderCalendarView();
     },
 
-    // --- MÓDULO STOCK AGIL & EDICIÓN ---
-    async openMatrix(pIdx = null) {
-        const isEdit = pIdx !== null;
-        const p = isEdit ? this.inv[pIdx] : { name: '', tallas: { "S":0,"M":0,"L":0,"XL":0,"4XL":0,"5XL":0 } };
+    // =================================================================
+    // MÓDULO 1: GESTIÓN DE INVENTARIO (MATRIZ ÁGIL)
+    // =================================================================
 
-        const { value: form } = await Swal.fire({
-            title: isEdit ? 'Editar / Cargar Stock' : 'Nuevo Producto',
+    /**
+     * Abre el modal de Matriz para Crear o Editar productos con múltiples tallas.
+     * @param {number|null} productIndex - Índice del producto a editar (null para nuevo).
+     */
+    async openMatrix(productIndex = null) {
+        const isEditMode = productIndex !== null;
+        // Objeto base para producto nuevo o existente
+        const productData = isEditMode ? this.inv[productIndex] : { 
+            name: '', 
+            tallas: { "S":0,"M":0,"L":0,"XL":0,"2XL":0,"3XL":0,"4XL":0,"5XL":0 } // Tallas extendidas
+        };
+
+        // Generación dinámica de los inputs de talla
+        const tallasInputsHtml = Object.keys(productData.tallas).map(tallaKey => `
+            <div style="background:var(--input); padding:12px; border-radius:16px; display:flex; flex-direction:column; align-items:center; border:2px solid transparent; transition:0.2s;" onmouseover="this.style.borderColor='var(--brand)'" onmouseout="this.style.borderColor='transparent'">
+                <b style="font-size:0.7rem; color:var(--brand-dark); margin-bottom:5px;">TALLA ${tallaKey}</b>
+                <input id="matrix-${tallaKey}" type="number" min="0" class="swal2-input" style="margin:0; height:40px; width:100%; text-align:center; font-size:1.1rem; font-weight:700;" placeholder="0" value="${productData.tallas[tallaKey]}">
+            </div>
+        `).join('');
+
+        // Modal Robustecido
+        const { value: formData } = await Swal.fire({
+            title: isEditMode ? 'EDITAR PRODUCTO MAESTRO' : 'NUEVO REGISTRO DE INVENTARIO',
             html: `
-                <input id="m-name" class="swal2-input" placeholder="Nombre" value="${p.name}">
-                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; margin-top:15px">
-                    ${Object.keys(p.tallas).map(t => `
-                        <div style="background:var(--input); padding:8px; border-radius:10px">
-                            <label style="font-size:0.6rem; color:var(--brand)">TALLA ${t}</label>
-                            <input id="m-${t}" type="number" class="swal2-input" style="margin:0; height:35px; width:100%" value="${p.tallas[t]}">
-                        </div>
-                    `).join('')}
+                <div style="text-align:left; margin-bottom:20px;">
+                    <label style="font-weight:700; color:var(--text-light); font-size:0.8rem;">NOMBRE DEL PRODUCTO / SKU</label>
+                    <input id="matrix-name" class="swal2-input" placeholder="Ej: POLERA PIQUÉ CORP" value="${productData.name}" style="width:100%; margin-top:5px; font-weight:700; text-transform:uppercase;">
+                </div>
+                <label style="font-weight:700; color:var(--text-light); font-size:0.8rem; display:block; text-align:left; margin-bottom:10px;">MATRIZ DE STOCK POR TALLA</label>
+                <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap:10px; max-height:300px; overflow-y:auto; padding:5px;">
+                    ${tallasInputsHtml}
                 </div>
             `,
+            width: 600,
             showCancelButton: true,
+            confirmButtonText: isEditMode ? '<i class="fa-solid fa-save"></i> GUARDAR CAMBIOS' : '<i class="fa-solid fa-plus"></i> REGISTRAR AHORA',
+            cancelButtonText: 'Cancelar',
+            confirmButtonColor: 'var(--brand)',
+            cancelButtonColor: 'var(--text-light)',
+            focusConfirm: false,
+            // Validación robusta antes de confirmar
             preConfirm: () => {
-                const name = document.getElementById('m-name').value;
-                if(!name) return Swal.showValidationMessage('Nombre requerido');
-                const result = { name: name.toUpperCase(), tallas: {} };
-                Object.keys(p.tallas).forEach(t => result.tallas[t] = parseInt(document.getElementById(`m-${t}`).value) || 0);
-                return result;
+                const nameInput = document.getElementById('matrix-name').value.trim();
+                if (!nameInput) {
+                    Swal.showValidationMessage('⚠️ El Nombre del Producto es OBLIGATORIO.');
+                    return false;
+                }
+                
+                // Recolectar y validar tallas
+                const newTallasState = {};
+                let totalStock = 0;
+                Object.keys(productData.tallas).forEach(t => {
+                    const val = parseInt(document.getElementById(`matrix-${t}`).value) || 0;
+                    if (val < 0) {
+                        Swal.showValidationMessage(`⚠️ La cantidad en talla ${t} no puede ser negativa.`);
+                        return false;
+                    }
+                    newTallasState[t] = val;
+                    totalStock += val;
+                });
+
+                // Opcional: Validar que se ingrese al menos 1 unidad en total si es nuevo
+                if (!isEditMode && totalStock === 0) {
+                     // Podríamos bloquear, pero a veces se crean productos con stock 0 para OC futuras.
+                     // Dejamos pasar con stock 0.
+                }
+
+                return { name: nameInput.toUpperCase(), tallas: newTallasState, lastUpdate: new Date().toLocaleString() };
             }
         });
 
-        if(form) {
-            if(isEdit) this.inv[pIdx] = form; else this.inv.push(form);
-            this.save();
+        // Guardado de datos si la validación pasó
+        if (formData) {
+            if (isEditMode) {
+                this.inv[productIndex] = formData;
+                this.logSystemAction(`Inventario editado: ${formData.name}`);
+            } else {
+                // Verificar duplicados por nombre antes de insertar
+                const duplicate = this.inv.find(p => p.name === formData.name);
+                if (duplicate) {
+                     return Swal.fire('Error de Duplicidad', `El producto "${formData.name}" ya existe. Use la función editar.`, 'error');
+                }
+                this.inv.push(formData);
+                this.logSystemAction(`Nuevo producto creado: ${formData.name}`);
+            }
+            this.saveSystemState(); // Persistencia inmediata
+            this.alert("Base de datos de inventario actualizada correctamente.");
         }
     },
 
-    // --- MÓDULO ÓRDENES DE COMPRA (OC) ---
-    async newOC() {
-        if(this.inv.length === 0) return Swal.fire('Error', 'Primero crea productos en Stock', 'error');
-        const { value: f } = await Swal.fire({
-            title: 'Nueva OC',
-            html: `
-                <input id="sw-id" class="swal2-input" placeholder="N° OC">
-                <input id="sw-cl" class="swal2-input" placeholder="Cliente">
-                <select id="sw-p" class="swal2-input">${this.inv.map(i=>`<option>${i.name}</option>`)}</select>
-                <select id="sw-t" class="swal2-input"><option>S</option><option>M</option><option>L</option><option>XL</option><option>4XL</option><option>5XL</option></select>
-                <input id="sw-q" type="number" class="swal2-input" placeholder="Cantidad">
-            `,
-            preConfirm: () => ({ id: document.getElementById('sw-id').value, cli: document.getElementById('sw-cl').value, p: document.getElementById('sw-p').value, t: document.getElementById('sw-t').value, q: parseInt(document.getElementById('sw-q').value) })
+    // =================================================================
+    // MÓDULO 2: INTELIGENCIA ARTIFICIAL (OCR Y AUTO-CREACIÓN)
+    // =================================================================
+
+    /**
+     * Ejecuta el flujo de escaneo IA (Cámara/Galería -> OCR -> Detección -> Confirmación).
+     */
+    async runIA() {
+        // 1. Selector de archivo nativo (Cámara o Galería en móviles)
+        const { value: file } = await Swal.fire({
+            title: 'ESCANER IA V43',
+            text: 'Seleccione una imagen de Orden de Compra, Nota o Cuaderno.',
+            input: 'file',
+            inputAttributes: { 
+                'accept': 'image/*', 
+                'capture': 'environment' // Intenta forzar cámara trasera en móviles
+            },
+            confirmButtonText: 'Procesar Imagen',
+            showCancelButton: true,
+            cancelButtonText: 'Cancelar'
         });
-        if(f && f.id) {
-            this.ord.push({...f, status: 'confeccion', date: new Date().toLocaleDateString()});
-            this.save();
+
+        if (file) {
+            // 2. Mostrar loader mientras Tesseract trabaja
+            document.getElementById('ai-loader').style.display = 'flex';
+            document.getElementById('ai-status').innerText = "IA LEYENDO DOCUMENTO... POR FAVOR ESPERE.";
+            
+            try {
+                if (!this.worker) await this.warmUpEngineIA(); // Asegurar worker
+
+                // Procesamiento OCR
+                const { data: { text } } = await this.worker.recognize(file);
+                document.getElementById('ai-loader').style.display = 'none';
+
+                console.log("[IA RAW TEXT]", text); // Debug
+
+                // 3. Lógica Heurística de Extracción (Intenta hallar Patrón: Texto largo + Número)
+                const lines = text.split('\n');
+                let detectedProduct = "";
+                let detectedQty = 1; // Default
+
+                for (let line of lines) {
+                    const cleanedLine = line.trim();
+                    // Busca líneas con texto sustancial y al menos un dígito
+                    if (cleanedLine.length > 5 && /\d/.test(cleanedLine)) {
+                        // Extraer nombres (todo lo que no sea dígito o símbolo extremo)
+                        detectedProduct = cleanedLine.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s%]/g, '').trim().toUpperCase();
+                        
+                        // Extraer el primer número encontrado como cantidad probable
+                        const qtyMatch = cleanedLine.match(/\d+/);
+                        if (qtyMatch) {
+                            detectedQty = parseInt(qtyMatch[0]);
+                        }
+                        
+                        // Si encontramos un candidato potable, rompemos el bucle (heurística simple)
+                        if(detectedProduct.length > 3) break; 
+                    }
+                }
+
+                if (!detectedProduct) detectedProduct = "PRODUCTO NO IDENTIFICADO POR IA";
+
+                // 4. Pasar los datos detectados al formulario de confirmación de OC
+                this.confirmOCData(detectedProduct, detectedQty);
+
+            } catch (error) {
+                document.getElementById('ai-loader').style.display = 'none';
+                console.error("[IA ERROR]", error);
+                Swal.fire('Error de Lectura IA', 'No se pudo procesar la imagen. Intente con mejor iluminación o ingrese manualmente.', 'error');
+            }
         }
     },
 
-    async setOCStatus(idx, st) {
-        const o = this.ord[idx];
-        if(st === 'despachado') {
-            const p = this.inv.find(i => i.name === o.p);
-            if(p && p.tallas[o.t] >= o.q) {
-                const { value: fac } = await Swal.fire({ title: 'N° Factura/Guía', input: 'text' });
-                if(fac) {
-                    p.tallas[o.t] -= o.q; o.status = 'despachado'; o.fac = fac;
-                    this.save();
-                    this.sendWSP(o);
+    // =================================================================
+    // MÓDULO 3: GESTIÓN DE ÓRDENES DE COMPRA (OC) PROACTIVAS
+    // =================================================================
+
+    /**
+     * Formulario universal para crear OC (usado por IA y modo manual).
+     * Implementa la lógica de "Auto-Creación de Producto" si no existe.
+     */
+    async confirmOCData(defaultProdName = "", defaultQty = 1) {
+        // Generar ID de OC sugerido
+        const suggestedId = `OC-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`;
+
+        const { value: ocForm } = await Swal.fire({
+            title: 'REGISTRAR ORDEN DE COMPRA',
+            html: `
+                <div style="display:grid; grid-template-columns: 1fr 2fr; gap:10px; margin-bottom:10px;">
+                    <input id="oc-id" class="swal2-input" placeholder="N° OC" value="${suggestedId}" style="margin:0;">
+                    <input id="oc-cli" class="swal2-input" placeholder="Nombre del Cliente" style="margin:0;">
+                </div>
+                <label style="font-weight:700; color:var(--text-light); font-size:0.8rem; display:block; text-align:left;">PRODUCTO DETECTADO / A INGRESAR</label>
+                <input id="oc-p" class="swal2-input" placeholder="Ej: POLERA EJECUTIVA" value="${defaultProdName}" style="width:100%; margin-top:5px; font-weight:700; text-transform:uppercase;">
+                
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:15px;">
+                    <div>
+                        <label style="font-weight:700; color:var(--text-light); font-size:0.8rem;">TALLA</label>
+                        <select id="oc-t" class="swal2-select" style="width:100%; margin-top:5px;">
+                            <option value="S">S</option><option value="M" selected>M</option><option value="L">L</option>
+                            <option value="XL">XL</option><option value="2XL">2XL</option><option value="3XL">3XL</option>
+                            <option value="4XL">4XL</option><option value="5XL">5XL</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label style="font-weight:700; color:var(--text-light); font-size:0.8rem;">CANTIDAD</label>
+                        <input id="oc-q" type="number" min="1" class="swal2-input" placeholder="Cant." value="${defaultQty}" style="width:100%; margin-top:5px;">
+                    </div>
+                </div>
+            `,
+            confirmButtonText: '<i class="fa-solid fa-check"></i> PROCESAR ORDEN',
+            showCancelButton: true,
+            focusConfirm: false,
+            preConfirm: () => {
+                // Validación robusta de campos de OC
+                const id = document.getElementById('oc-id').value.trim();
+                const cli = document.getElementById('oc-cli').value.trim();
+                const p = document.getElementById('oc-p').value.trim().toUpperCase();
+                const q = parseInt(document.getElementById('oc-q').value);
+                
+                if (!id || !cli || !p || !q || q <= 0) {
+                    Swal.showValidationMessage('⚠️ Todos los campos son obligatorios y la cantidad debe ser mayor a 0.');
+                    return false;
+                }
+
+                return { id, cli, p, t: document.getElementById('oc-t').value, q };
+            }
+        });
+
+        if (ocForm) {
+            // --- LÓGICA PROACTIVA: AUTO-CREACIÓN DE PRODUCTO ---
+            // Verificar si el producto existe en el inventario maestro
+            const productExists = this.inv.some(item => item.name === ocForm.p);
+
+            if (!productExists) {
+                // Si no existe, se crea automáticamente con stock 0 para no bloquear la operación
+                this.inv.push({ 
+                    name: ocForm.p, 
+                    tallas: { "S":0,"M":0,"L":0,"XL":0,"2XL":0,"3XL":0,"4XL":0,"5XL":0 },
+                    autoCreated: true // Marca interna para auditoría
+                });
+                this.logSystemAction(`SISTEMA: Producto "${ocForm.p}" auto-creado por ingreso de OC.`);
+                // Notificación no intrusiva
+                this.alert(`Producto "${ocForm.p}" añadido al catálogo automáticamente.`, 'info');
+            }
+
+            // Registrar la OC con estado inicial "Confección"
+            this.ord.push({
+                ...ocForm,
+                status: 'confeccion',
+                creationDate: new Date().toLocaleString(),
+                operator: this.user
+            });
+            
+            this.saveSystemState();
+            this.alert("Orden de Compra registrada exitosamente.");
+            // Redirigir a la vista de órdenes para ver el resultado
+            this.nav('orders', document.querySelectorAll('.nav-link')[1]);
+        }
+    },
+
+    /**
+     * Wrapper para crear una OC manualmente (sin datos de IA).
+     */
+    newOCManual() {
+        this.confirmOCData("", 1);
+    },
+
+    /**
+     * Motor de cambio de estados de OC con validación de stock y protocolo de crisis.
+     */
+    async changeOCStatus(orderIndex, newStatus) {
+        const order = this.ord[orderIndex];
+        
+        // Flujo crítico: DESPACHO
+        if (newStatus === 'despachado') {
+            // 1. Verificar Stock Real
+            const productInInv = this.inv.find(i => i.name === order.p);
+            
+            if (productInInv && productInInv.tallas[order.t] >= order.q) {
+                // STOCK DISPONIBLE: Proceder al despacho
+                const { value: facturaNum } = await Swal.fire({
+                    title: 'FINALIZAR DESPACHO',
+                    html: `Se descontarán <b>${order.q} unidades</b> de ${order.p} [${order.t}] del inventario.`,
+                    input: 'text',
+                    inputPlaceholder: 'Ingrese N° de Factura o Guía de Despacho',
+                    inputAttributes: { autocapitalize: 'characters' },
+                    confirmButtonText: 'CONFIRMAR SALIDA',
+                    showCancelButton: true,
+                    preConfirm: (val) => val ? val : Swal.showValidationMessage('El número de documento es obligatorio para despachar.')
+                });
+
+                if (facturaNum) {
+                    // Ejecutar resta de inventario
+                    productInInv.tallas[order.t] -= order.q;
+                    // Actualizar orden
+                    order.status = 'despachado';
+                    order.factura = facturaNum;
+                    order.dispatchDate = new Date().toLocaleString();
+                    
+                    this.logSystemAction(`DESPACHO: OC ${order.id} completada con Fac ${facturaNum}.`);
+                    this.saveSystemState();
+                    
+                    // Lanzar WhatsApp
+                    this.launchWhatsApp(order);
+                    
+                    await Swal.fire('Despacho Exitoso', 'Inventario actualizado y reporte generado.', 'success');
                 }
             } else {
-                o.status = 'nostock'; this.save();
-                Swal.fire('Atención', 'No hay stock suficiente. Elija proceso de producción.', 'warning');
+                // STOCK INSUFICIENTE: Activar Protocolo de Crisis
+                order.status = 'nostock'; // Estado crítico
+                this.saveSystemState();
+                
+                await Swal.fire({
+                    title: '⚠️ QUIEBRE DE STOCK DETECTADO',
+                    html: `No hay suficientes unidades de <b>${order.p} Talla ${order.t}</b> en bodega.<br><br>La orden ha pasado a estado <b>CRÍTICO (Sin Stock)</b>.<br>Debe iniciar un protocolo de producción (Confección o Bordado) desde la tarjeta de la orden.`,
+                    icon: 'warning',
+                    confirmButtonText: 'Entendido, gestionar producción',
+                    confirmButtonColor: 'var(--danger)'
+                });
             }
-        } else { o.status = st; this.save(); }
-    },
-
-    async runProd(idx, type) {
-        Swal.fire({ title: `Procesando ${type}...`, timer: 1000, showConfirmButton: false });
-        setTimeout(() => {
-            const o = this.ord[idx];
-            const pIdx = this.inv.findIndex(i => i.name === o.p);
-            this.inv[pIdx].tallas[o.t] += o.q;
-            o.status = 'bodega';
-            this.save();
-            Swal.fire('Listo', `${type} terminado y cargado a bodega`, 'success');
-        }, 1200);
-    },
-
-    sendWSP(o) {
-        const msg = encodeURIComponent(`*IDEAS TEXTILES - DESPACHO*\n✅ OC: ${o.id}\n🏢 Cliente: ${o.cli}\n📦 Item: ${o.p} [${o.t}]\n🔢 Cant: ${o.q}\n🧾 Guía: ${o.fac}\n👤 Op: ${this.user}`);
-        window.open(`https://wa.me/569XXXXXXXX?text=${msg}`);
-    },
-
-    // --- IA SCANNER (Cámara o Galería) ---
-    async runIA() {
-        const { value: file } = await Swal.fire({
-            title: 'IA Visual',
-            text: 'Cámara o Galería',
-            input: 'file',
-            inputAttributes: { 'accept': 'image/*', 'capture': 'camera' }
-        });
-        if(file) {
-            Swal.fire({ title: 'IA Leyendo...', didOpen: () => Swal.showLoading() });
-            const { data: { text } } = await this.worker.recognize(file);
-            Swal.close();
-            
-            const lines = text.split('\n');
-            let dN = ""; for(let l of lines) { if(l.length > 4) { dN = l.replace(/\d+/g, '').trim(); break; } }
-            const pIdx = this.inv.findIndex(p => p.name.toLowerCase().includes(dN.toLowerCase()));
-            this.openMatrix(pIdx !== -1 ? pIdx : null);
+        } else {
+            // Flujos normales (Confección <-> Bodega)
+            order.status = newStatus;
+            this.saveSystemState();
+            this.alert(`Estado de OC ${order.id} actualizado a: ${newStatus.toUpperCase()}`);
         }
     },
 
-    // --- AGENDA TIME MACHINE ---
-    renderCal() {
-        const body = document.getElementById('cal-body'); body.innerHTML = "";
+    /**
+     * Ejecuta protocolos de producción para órdenes sin stock.
+     * Simula el proceso y carga el stock automáticamente al finalizar.
+     */
+    async runProductionProtocol(orderIndex, protocolType) {
+        const order = this.ord[orderIndex];
+
+        // Confirmación de inicio de protocolo
+        const confirm = await Swal.fire({
+            title: `INICIAR ${protocolType}?`,
+            text: `Se enviarán a producir ${order.q} unidades de ${order.p}. Al finalizar, se cargarán automáticamente a bodega.`,
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: `Sí, iniciar ${protocolType.toLowerCase()}`,
+            confirmButtonColor: 'var(--ai)'
+        });
+
+        if (confirm.isConfirmed) {
+            // Simulación de proceso (Loader)
+            Swal.fire({
+                title: `PROCESANDO ${protocolType}...`,
+                html: 'Por favor espere mientras se registra la producción.',
+                timer: 2000,
+                timerProgressBar: true,
+                didOpen: () => Swal.showLoading(),
+                allowOutsideClick: false
+            }).then(() => {
+                // Finalización del protocolo: Cargar stock y mover a bodega
+                const pIdx = this.inv.findIndex(i => i.name === order.p);
+                if(pIdx > -1) {
+                    this.inv[pIdx].tallas[order.t] += order.q; // Suma automática
+                    order.status = 'bodega'; // Orden lista
+                    this.logSystemAction(`PRODUCCIÓN: Protocolo ${protocolType} finalizado para OC ${order.id}. Stock cargado.`);
+                    this.saveSystemState();
+                    Swal.fire('Producción Finalizada', `Las unidades han sido ingresadas a la Bodega Principal exitosamente.`, 'success');
+                } else {
+                     // Caso extremo: producto borrado mientras estaba en nostock
+                     Swal.fire('Error Crítico', 'El producto asociado ya no existe en el maestro.', 'error');
+                }
+            });
+        }
+    },
+
+    /**
+     * Genera y abre el enlace de WhatsApp con el reporte de despacho estructurado.
+     */
+    launchWhatsApp(order) {
+        const phone = "569XXXXXXXX"; // NÚMERO DEL JEFE/ENCARGADO (Configurar aquí)
+        const message = 
+`*REPORTE DE SALIDA - IDEAS TEXTILES SPA*
+━━━━━━━━━━━━━━━━━━
+✅ *ESTADO:* DESPACHADO
+📄 *N° OC:* ${order.id}
+🏢 *CLIENTE:* ${order.cli}
+
+📦 *DETALLE DEL PRODUCTO:*
+Item: ${order.p}
+Talla: ${order.t}
+Cantidad: ${order.q} unidades
+
+🧾 *DOCUMENTO TRIBUTARIO:*
+Factura/Guía N°: ${order.factura}
+
+👤 *OPERADOR RESPONSABLE:*
+${this.user}
+📅 *FECHA:* ${order.dispatchDate}
+━━━━━━━━━━━━━━━━━━
+_Sistema Operativo V43 Enterprise_`;
+
+        const encodedMsg = encodeURIComponent(message);
+        // Usar ventana nueva para no salir de la app
+        window.open(`https://wa.me/${phone}?text=${encodedMsg}`, '_blank');
+    },
+
+    // =================================================================
+    // MÓDULO 4: AGENDA "TIME MACHINE" (Registro Histórico y Futuro)
+    // =================================================================
+
+    /**
+     * Renderiza la cuadrícula del calendario del mes actual.
+     */
+    renderCalendarView() {
+        const calBody = document.getElementById('cal-body');
+        calBody.innerHTML = ""; // Limpiar
+        
         const now = new Date();
-        for(let i=1; i<=31; i++) {
-            const dStr = `${i}/${now.getMonth()+1}/${now.getFullYear()}`;
-            body.innerHTML += `<div class="cal-day ${i===now.getDate()?'today':''}" onclick="Core.openAgenda('${dStr}')">${i}${this.agenda[dStr]?'<div class="cal-dot"></div>':''}</div>`;
+        const currentMonth = now.getMonth();
+        const currentYear = now.getFullYear();
+        // Obtener días reales del mes
+        const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+
+        for (let i = 1; i <= daysInMonth; i++) {
+            // Crear clave de fecha única: DD/MM/YYYY
+            const dateKey =`${String(i).padStart(2,'0')}/${String(currentMonth+1).padStart(2,'0')}/${currentYear}`;
+            const hasNote = this.agenda[dateKey] && this.agenda[dateKey].trim().length > 0;
+            const isToday = i === now.getDate();
+
+            calBody.innerHTML += `
+                <div class="cal-day ${isToday ? 'today' : ''}" onclick="Core.openDayAgenda('${dateKey}')">
+                    ${i}
+                    ${hasNote ? '<div class="cal-dot"></div>' : ''}
+                </div>
+            `;
         }
+        // Limpiar vista de detalles al redibujar
+        document.getElementById('cal-log').innerHTML = '<p style="text-align:center; color:var(--text-light); font-size:0.8rem; margin-top:20px;">Seleccione un día para ver o registrar actividad.</p>';
     },
 
-    async openAgenda(date) {
-        const { value: note } = await Swal.fire({
-            title: `Agenda: ${date}`,
+    /**
+     * Abre el editor de notas para una fecha específica (pasada o futura).
+     */
+    async openDayAgenda(dateKey) {
+        const existingNote = this.agenda[dateKey] || "";
+
+        const { value: newNote } = await Swal.fire({
+            title: `BITÁCORA DEL ${dateKey}`,
             input: 'textarea',
-            inputValue: this.agenda[date] || "",
-            showCancelButton: true
+            inputLabel: 'Registro de actividades, recordatorios o compromisos:',
+            inputPlaceholder: 'Ej: Recepción de tela denim, Despacho grande a Minera...',
+            inputValue: existingNote,
+            showCancelButton: true,
+            confirmButtonText: '<i class="fa-solid fa-floppy-disk"></i> GUARDAR REGISTRO',
+            cancelButtonText: 'Cerrar',
+            confirmButtonColor: 'var(--brand-dark)',
+            customClass: { input: 'swal2-textarea-agenda' } // Clase para estilo específico si se desea
         });
-        if(note !== undefined) {
-            if(note.trim()==="") delete this.agenda[date]; else this.agenda[date] = note;
-            localStorage.setItem('it_agenda_v38', JSON.stringify(this.agenda));
-            this.renderCal();
-            this.showNote(date);
+
+        if (newNote !== undefined) {
+            // Si la nota está vacía, eliminar la entrada para no dejar puntos fantasmas
+            if (newNote.trim() === "") {
+                delete this.agenda[dateKey];
+            } else {
+                this.agenda[dateKey] = newNote.trim();
+                // Si es el día de hoy y no había nota, loguear la creación
+                if(dateKey === new Date().toLocaleDateString('es-ES', {day:'2-digit', month:'2-digit', year:'numeric'})) {
+                     this.logSystemAction("Nota de agenda diaria actualizada.");
+                }
+            }
+            this.saveSystemState();
+            this.renderCalendarView(); // Actualizar puntos en el calendario
+            this.showDayDetails(dateKey); // Mostrar la nota recién guardada
         }
     },
 
-    showNote(date) {
-        document.getElementById('cal-details').innerHTML = this.agenda[date] ? `<div class="card" style="border-left:4px solid var(--warn)"><b>Nota ${date}:</b><p>${this.agenda[date]}</p></div>` : "";
-    },
-
-    // --- RENDER & SAVE ---
-    renderAll() {
-        document.getElementById('list-inv').innerHTML = this.inv.map((p, i) => `
-            <div class="card">
-                <div style="display:flex; justify-content:space-between">
-                    <b>${p.name}</b>
-                    <button class="btn-edit" onclick="Core.openMatrix(${i})"><i class="fa-solid fa-pen-to-square"></i></button>
-                </div>
-                <div class="stock-grid">
-                    ${Object.entries(p.tallas).map(([t, q]) => `<div class="talla-item"><b>${t}</b>${q}</div>`).join('')}
-                </div>
-            </div>
-        `).reverse().join('');
-
-        document.getElementById('list-ord').innerHTML = this.ord.map((o, idx) => `
-            <div class="card" style="border-left:4px solid ${o.status==='despachado'?'var(--success)':'var(--ai)'}">
-                <div style="display:flex; justify-content:space-between">
-                    <span class="st-badge st-${o.status==='nostock'?'error':o.status}">${o.status}</span>
-                    <small>${o.date}</small>
-                </div>
-                <p style="margin:10px 0;"><b>OC #${o.id}</b> - ${o.cli}<br><small>${o.p} [${o.t}] x ${o.q}</small></p>
-                ${o.status === 'nostock' ? `
-                    <div style="display:flex; gap:5px">
-                        <button class="btn btn-brand" style="flex:1; padding:8px" onclick="Core.runProd(${idx},'CONFECCIÓN')">CONFECCIÓN</button>
-                        <button class="btn btn-ai" style="flex:1; padding:8px" onclick="Core.runProd(${idx},'BORDADO')">BORDADO</button>
+    /**
+     * Muestra el detalle de la nota seleccionada debajo del calendario.
+     */
+    showDayDetails(dateKey) {
+        const noteContent = this.agenda[dateKey];
+        const container = document.getElementById('cal-log');
+        
+        if (noteContent) {
+            container.innerHTML = `
+                <div class="card" style="border-left: 4px solid var(--warn); animation: fadeIn 0.3s ease;">
+                    <div class="card-header" style="margin-bottom:10px;">
+                         <h3 class="card-title" style="font-size:1rem;"><i class="fa-regular fa-note-sticky" style="margin-right:8px;"></i>Registro del ${dateKey}</h3>
                     </div>
-                ` : `
-                    <select class="swal2-input" style="margin:0; height:38px; font-size:0.7rem" onchange="Core.setOCStatus(${idx}, this.value)">
-                        <option value="confeccion" ${o.status==='confeccion'?'selected':''}>🔨 Confección</option>
-                        <option value="bodega" ${o.status==='bodega'?'selected':''}>📦 Bodega</option>
-                        <option value="despachado" ${o.status==='despachado'?'selected':''}>🚚 DESPACHAR</option>
-                    </select>
-                `}
-            </div>
-        `).reverse().join('');
+                    <p style="font-weight:500; line-height:1.5; white-space: pre-wrap;">${noteContent}</p>
+                </div>
+            `;
+        } else {
+             container.innerHTML = `<p style="text-align:center; color:var(--text-light); font-size:0.8rem; margin-top:20px;">Sin registros para el ${dateKey}.</p>`;
+        }
     },
 
-    save() {
-        localStorage.setItem('it_inv_v38', JSON.stringify(this.inv));
-        localStorage.setItem('it_ord_v38', JSON.stringify(this.ord));
-        this.renderAll();
+    // =================================================================
+    // MÓDULO NÚCLEO: PERSISTENCIA, LOGS Y RENDERIZADO
+    // =================================================================
+
+    /**
+     * Guarda el estado completo del sistema en LocalStorage.
+     * Es el "Punto de Guardado" único.
+     */
+    saveSystemState() {
+        try {
+            localStorage.setItem('it_inv_v43', JSON.stringify(this.inv));
+            localStorage.setItem('it_ord_v43', JSON.stringify(this.ord));
+            localStorage.setItem('it_agenda_v43', JSON.stringify(this.agenda));
+            this.renderAllViews(); // Actualizar la UI con los nuevos datos
+        } catch (e) {
+            console.error("Error crítico al guardar estado:", e);
+            Swal.fire('Error de Sistema', 'No se pudo guardar la información en el almacenamiento local. Verifique espacio en disco.', 'error');
+        }
     },
 
-    backup() {
-        const data = JSON.stringify({inv:this.inv, ord:this.ord, agenda:this.agenda});
-        const blob = new Blob([data], {type: 'application/json'});
-        const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `SISTEMA_V38.json`; a.click();
+    /**
+     * Renderiza todas las vistas principales (Inventario y Órdenes).
+     * Se llama después de cualquier cambio de estado.
+     */
+    renderAllViews() {
+        // --- RENDER INVENTARIO (VISTA STOCK) ---
+        const invContainer = document.getElementById('list-inv');
+        if (this.inv.length === 0) {
+            invContainer.innerHTML = `<div style="text-align:center; padding:40px; color:var(--text-light);"><i class="fa-solid fa-box-open fa-3x" style="margin-bottom:20px; opacity:0.5;"></i><p>La bodega está vacía.</p><p style="font-size:0.8rem;">Use "+ Nuevo Producto" o "SCAN IA" para comenzar.</p></div>`;
+        } else {
+            invContainer.innerHTML = this.inv.map((prod, idx) => `
+                <div class="card">
+                    <div class="card-header">
+                        <div style="display:flex; align-items:center; gap:10px;">
+                            <i class="fa-solid fa-shirt" style="color:var(--brand);"></i>
+                            <h3 class="card-title" style="letter-spacing:0.5px;">${prod.name}</h3>
+                        </div>
+                        <button class="btn-icon" onclick="Core.openMatrix(${idx})" title="Editar Producto Maestro">
+                            <i class="fa-solid fa-pen-to-square"></i>
+                        </button>
+                    </div>
+                    <div class="stock-grid">
+                        ${Object.entries(prod.tallas).map(([talla, qty]) => `
+                            <div class="talla-badge" style="${qty <= 0 ? 'background:var(--bg); opacity:0.6;' : ''}; ${qty > 0 ? 'border-color:var(--input);box-shadow:var(--shadow-sm);' : ''}">
+                                <b>${talla}</b>
+                                <span class="talla-value" style="color:${qty <= 0 ? 'var(--danger)' : 'var(--brand-dark)'}">${qty}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <div style="margin-top:15px; font-size:0.65rem; color:var(--text-light); text-align:right;">
+                        Total uds: ${Object.values(prod.tallas).reduce((a,b)=>a+b, 0)}
+                    </div>
+                </div>
+            `).reverse().join(''); // Mostrar los más nuevos primero
+        }
+
+        // --- RENDER ÓRDENES (VISTA OC) ---
+        const ordContainer = document.getElementById('list-ord');
+        if (this.ord.length === 0) {
+             ordContainer.innerHTML = `<div style="text-align:center; padding:40px; color:var(--text-light);"><i class="fa-solid fa-clipboard-list fa-3x" style="margin-bottom:20px; opacity:0.5;"></i><p>No hay órdenes registradas.</p></div>`;
+        } else {
+            ordContainer.innerHTML = this.ord.map((order, idx) => {
+                // Determinar clase y color según estado
+                let statusClass = 'st-confeccion';
+                let borderStyle = `border-left: 5px solid var(--ai);`;
+                if(order.status === 'bodega') { statusClass = 'st-bodega'; borderStyle = `border-left: 5px solid var(--warn);`; }
+                if(order.status === 'despachado') { statusClass = 'st-despachado'; borderStyle = `border-left: 5px solid var(--success);`; }
+                if(order.status === 'nostock') { statusClass = 'st-error'; borderStyle = `border-left: 5px solid var(--danger); background:#fff1f2;`; } // Fondo rojizo suave para error
+
+                return `
+                <div class="card" style="${borderStyle}">
+                    <div class="card-header" style="margin-bottom:10px;">
+                        <span class="status-tag ${statusClass}">
+                            <i class="fa-solid fa-circle" style="font-size:0.5rem; margin-right:5px;"></i>${order.status.replace('nostock', 'CRÍTICO: SIN STOCK')}
+                        </span>
+                        <small style="color:var(--text-light); font-weight:700;"><i class="fa-regular fa-calendar" style="margin-right:5px;"></i>${order.creationDate.split(' ')[0]}</small>
+                    </div>
+                    <h3 class="card-title" style="margin-bottom:5px;">OC #${order.id}</h3>
+                    <p style="font-weight:700; color:var(--brand-dark); margin-bottom:5px;"><i class="fa-solid fa-building-user" style="margin-right:5px; color:var(--text-light);"></i>${order.cli}</p>
+                    <div style="background:var(--input); padding:10px; border-radius:12px; margin-bottom:15px;">
+                        <p style="font-size:0.85rem; color:var(--text);"><i class="fa-solid fa-box" style="margin-right:5px; color:var(--brand);"></i> <b>${order.p}</b></p>
+                        <p style="font-size:0.85rem; color:var(--text); margin-top:5px;"><i class="fa-solid fa-ruler-combined" style="margin-right:5px; color:var(--brand);"></i> Talla: <b>${order.t}</b> | Cantidad: <b>${order.q}</b></p>
+                    </div>
+                    
+                    ${order.status === 'nostock' ? `
+                        <div style="background:rgba(239, 68, 68, 0.1); padding:15px; border-radius:16px; border:1px solid var(--danger);">
+                            <p style="font-size:0.75rem; font-weight:800; color:var(--danger); margin-bottom:10px;"><i class="fa-solid fa-triangle-exclamation"></i> ACCIÓN REQUERIDA: INICIAR PRODUCCIÓN</p>
+                            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                                <button class="btn" style="background:var(--ai); color:white; padding:10px; font-size:0.75rem;" onclick="Core.runProductionProtocol(${idx}, 'CONFECCIÓN')"><i class="fa-solid fa-scissors"></i> CONFECCIÓN</button>
+                                <button class="btn" style="background:var(--warn); color:white; padding:10px; font-size:0.75rem;" onclick="Core.runProductionProtocol(${idx}, 'BORDADO')"><i class="fa-solid fa-print"></i> BORDADO</button>
+                            </div>
+                        </div>
+                    ` : order.status === 'despachado' ? `
+                        <div style="margin-top:10px; font-size:0.8rem; color:var(--success); font-weight:700;">
+                            <i class="fa-solid fa-check-double"></i> Despachado con Fac/Guía: ${order.factura}
+                        </div>
+                    ` : `
+                        <label style="font-size:0.7rem; font-weight:700; color:var(--text-light);">CAMBIAR ESTADO OPERATIVO:</label>
+                        <select class="swal2-select" style="margin:5px 0 0 0; height:45px; width:100%; font-size:0.85rem; border-radius:14px;" onchange="Core.changeOCStatus(${idx}, this.value)">
+                            <option value="confeccion" ${order.status==='confeccion'?'selected':''}>🔨 EN TALLER / CONFECCIÓN</option>
+                            <option value="bodega" ${order.status==='bodega'?'selected':''}>📦 LISTO EN BODEGA</option>
+                            <option value="despachado" ${order.status==='despachado'?'selected':''}>🚚 REALIZAR DESPACHO</option>
+                        </select>
+                    `}
+                </div>
+            `;
+            }).reverse().join('');
+        }
+
+        // Si la vista activa es el calendario, refrescarlo también
+        if(document.querySelector('#v-cal').classList.contains('active')) {
+            this.renderCalendarView();
+        }
+    },
+
+    /**
+     * Registra acciones del sistema en la agenda del día actual automáticamente.
+     * (Función auxiliar para auditoría pasiva).
+     */
+    logSystemAction(actionText) {
+        const now = new Date();
+        const dateKey = now.toLocaleDateString('es-ES', {day:'2-digit', month:'2-digit', year:'numeric'});
+        const time = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+        
+        let currentLog = this.agenda[dateKey] || "";
+        // Agregar nueva línea al log existente
+        this.agenda[dateKey] = currentLog + (currentLog ? "\n" : "") + `[${time}] ${actionText} (OP: ${this.user})`;
+        
+        // No llamamos a saveSystemState() aquí para evitar bucles infinitos si se llama desde save(),
+        // solo guardamos la agenda en localStorage.
+        localStorage.setItem('it_agenda_v43', JSON.stringify(this.agenda));
+    },
+
+    /**
+     * Muestra alertas tipo "Toast" no intrusivas.
+     */
+    alert(title, icon='success') {
+        Swal.mixin({
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true,
+            didOpen: (toast) => {
+                toast.addEventListener('mouseenter', Swal.stopTimer)
+                toast.addEventListener('mouseleave', Swal.resumeTimer)
+            }
+        }).fire({ icon, title });
+    },
+
+    /**
+     * Genera y descarga un archivo JSON con toda la base de datos.
+     */
+    backupSystem() {
+        Swal.fire({
+            title: '¿Generar Respaldo?',
+            text: "Se descargará un archivo con toda la información del sistema.",
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Sí, descargar copia',
+            confirmButtonColor: 'var(--brand-dark)'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const fullData = {
+                    version: "V43_ENTERPRISE_BLUE",
+                    timestamp: new Date().toLocaleString(),
+                    operator: this.user,
+                    inventory: this.inv,
+                    orders: this.ord,
+                    agenda: this.agenda
+                };
+                const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(fullData, null, 2));
+                const downloadAnchorNode = document.createElement('a');
+                downloadAnchorNode.setAttribute("href", dataStr);
+                const date = new Date().toISOString().slice(0,10);
+                downloadAnchorNode.setAttribute("download", `RESPALDO_IDEAS_TEXTILES_V43_${date}.json`);
+                document.body.appendChild(downloadAnchorNode); // Requerido para Firefox
+                downloadAnchorNode.click();
+                downloadAnchorNode.remove();
+                this.alert("Copia de seguridad descargada correctamente.");
+            }
+        });
     }
 };
-window.onload = () => Core.init();
+
+// =================================================================
+// PUNTO DE ENTRADA PRINCIPAL
+// =================================================================
+// Iniciar el sistema cuando el DOM esté completamente cargado.
+window.addEventListener('DOMContentLoaded', () => {
+    console.log("[BOOT] Iniciando Sistema V43 Enterprise Blue Sky...");
+    // Pequeño delay para asegurar que los estilos CSS se apliquen antes de mostrar nada
+    setTimeout(() => {
+        Core.init();
+    }, 100);
+});
 </script>
 </body>
 </html>
