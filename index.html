@@ -3,176 +3,223 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>App Ideas Textiles SpA ®</title>
+    <title>Sistema Ideas Textiles SpA ®</title>
     
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
         :root {
-            --primary: #1e3a8a; --accent: #2563eb; 
-            --dark: #0f172a; --bg: #f8fafc;
-            --white: #ffffff; --border: #e2e8f0;
-            --success: #059669; --warning: #d97706; --danger: #dc2626;
+            --primary: #0f172a; /* Azul Oscuro Profundo */
+            --accent: #2563eb;  /* Azul Eléctrico */
+            --bg: #f1f5f9;      /* Gris Fondo */
+            --card: #ffffff;
+            --text: #334155;
+            --success: #16a34a; 
+            --warning: #d97706; 
+            --danger: #dc2626;
+            --border: #e2e8f0;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
-        body { background: var(--bg); color: var(--dark); padding-bottom: 90px; min-height: 100vh; display: flex; flex-direction: column; }
+        body { background: var(--bg); color: var(--text); padding-bottom: 90px; min-height: 100vh; display: flex; flex-direction: column; }
         .container { max-width: 600px; margin: 0 auto; padding: 15px; width: 100%; flex: 1; }
         .hidden { display: none !important; }
 
-        /* LOGIN */
+        /* --- 1. LOGIN --- */
         #loginScreen { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 90vh; text-align: center; padding: 30px; background: white; }
-        .login-logo-circle { width: 90px; height: 90px; background: linear-gradient(135deg, var(--primary), var(--accent)); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; box-shadow: 0 10px 25px rgba(30, 58, 138, 0.25); }
-        .login-logo-icon { font-size: 2.2em; color: white; }
-        .login-title { font-size: 1.5em; font-weight: 900; color: var(--dark); letter-spacing: -0.5px; }
-        .login-tm { font-size: 0.4em; vertical-align: super; opacity: 0.6; }
+        .login-logo { font-size: 3.5em; color: var(--accent); margin-bottom: 15px; }
+        .login-title { font-size: 1.8em; font-weight: 900; color: var(--primary); letter-spacing: -1px; margin-bottom: 5px; }
+        .login-sub { font-size: 0.8em; color: #64748b; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 40px; }
         
-        .user-grid { display: grid; gap: 15px; width: 100%; max-width: 320px; margin-top: 40px; }
-        .user-btn { background: white; border: 2px solid var(--border); padding: 18px; border-radius: 12px; font-size: 1.1em; font-weight: 700; color: var(--dark); cursor: pointer; display: flex; align-items: center; justify-content: flex-start; gap: 15px; transition: 0.2s; box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
-        .user-btn:active { border-color: var(--primary); background: #eff6ff; transform: scale(0.98); }
+        .user-grid { display: grid; gap: 12px; width: 100%; max-width: 300px; }
+        .user-btn { background: white; border: 1px solid var(--border); padding: 16px; border-radius: 12px; font-size: 1em; font-weight: 700; color: var(--primary); cursor: pointer; display: flex; align-items: center; gap: 12px; transition: 0.2s; box-shadow: 0 4px 6px rgba(0,0,0,0.03); }
+        .user-btn:active { border-color: var(--accent); background: #eff6ff; transform: scale(0.98); }
+        .user-icon { width: 32px; height: 32px; background: #eff6ff; color: var(--accent); border-radius: 50%; display: flex; align-items: center; justify-content: center; }
 
-        /* HEADER */
-        .pro-header { background: var(--dark); color: white; padding: 25px 20px; border-radius: 24px; text-align: center; margin-bottom: 20px; position: relative; overflow: hidden; box-shadow: 0 20px 40px -10px rgba(15, 23, 42, 0.3); }
-        .pro-header::before { content: '\f275'; font-family: "Font Awesome 6 Free"; font-weight: 900; position: absolute; top: -30%; right: -10%; font-size: 12em; opacity: 0.03; color: white; transform: rotate(-15deg); }
-        .header-top-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; position: relative; z-index: 2;}
-        .brand-small { font-size: 0.7em; font-weight: 800; letter-spacing: 1px; color: #94a3b8; text-transform: uppercase; }
-        .refresh-btn { color: #94a3b8; font-size: 1.2em; cursor: pointer; }
-        .main-logo-icon { font-size: 2.2em; color: #60a5fa; margin-bottom: 5px; display: inline-block; position: relative; z-index: 2; }
-        .welcome-text { font-size: 1.5em; font-weight: 800; margin: 0; position: relative; z-index: 2; }
-        .welcome-text span { color: #60a5fa; }
-        .logout-text { font-size: 0.4em; color: #f87171; text-decoration: underline; cursor: pointer; vertical-align: middle; margin-left: 5px; }
+        /* --- 2. HEADER --- */
+        .pro-header { background: var(--primary); color: white; padding: 20px; border-radius: 20px; margin-bottom: 20px; box-shadow: 0 10px 20px rgba(15, 23, 42, 0.15); position: relative; overflow: hidden; }
+        .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .brand-pill { background: rgba(255,255,255,0.1); padding: 4px 10px; border-radius: 20px; font-size: 0.65em; font-weight: 700; letter-spacing: 1px; }
+        .welcome-row { display: flex; align-items: center; gap: 15px; }
+        .avatar { width: 50px; height: 50px; background: var(--accent); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5em; color: white; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+        .user-info h2 { font-size: 1.2em; font-weight: 800; margin: 0; line-height: 1.2; }
+        .user-info span { font-size: 0.8em; opacity: 0.7; }
+        .logout { font-size: 0.7em; text-decoration: underline; cursor: pointer; color: #fca5a5; }
 
-        /* KPI & BUSCADOR */
-        .kpi-container { display: flex; gap: 10px; margin-bottom: 20px; }
-        .kpi-box { flex: 1; background: white; padding: 12px; border-radius: 14px; text-align: center; border: 1px solid var(--border); box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
-        .kpi-num { display: block; font-size: 1.5em; font-weight: 900; color: var(--dark); line-height: 1.1; }
-        .kpi-label { font-size: 0.65em; font-weight: 700; color: #64748b; text-transform: uppercase; margin-top: 4px; }
+        /* --- 3. GLOBAL STATS (KPIs) --- */
+        .stats-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 20px; }
+        .stat-card { background: white; padding: 12px; border-radius: 12px; border: 1px solid var(--border); text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+        .stat-val { display: block; font-size: 1.4em; font-weight: 900; color: var(--primary); }
+        .stat-lbl { font-size: 0.6em; font-weight: 700; color: #64748b; text-transform: uppercase; }
+        .c-green { color: var(--success); } .c-red { color: var(--danger); }
 
-        .search-box { position: relative; margin-bottom: 20px; }
-        .search-input { width: 100%; padding: 15px 15px 15px 45px; border-radius: 14px; border: 2px solid white; background: white; font-size: 0.95em; box-shadow: 0 4px 15px rgba(0,0,0,0.03); outline: none; transition: 0.2s; }
-        .search-input:focus { border-color: var(--primary); box-shadow: 0 4px 20px rgba(37, 99, 235, 0.1); }
-        .search-icon { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: #94a3b8; font-size: 1.1em; }
+        /* --- 4. BUSCADOR --- */
+        .search-wrap { position: relative; margin-bottom: 20px; }
+        .search-inp { width: 100%; padding: 14px 14px 14px 45px; border-radius: 12px; border: 2px solid white; background: white; font-size: 0.95em; box-shadow: 0 4px 10px rgba(0,0,0,0.03); outline: none; }
+        .search-inp:focus { border-color: var(--accent); }
+        .search-icon { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #94a3b8; }
 
-        /* TARJETAS LIMPIAS */
-        .card { background: white; border-radius: 18px; margin-bottom: 15px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.04); border: 1px solid var(--border); }
-        .card-top { padding: 18px; background: #ffffff; border-bottom: 1px solid #f1f5f9; display: flex; justify-content: space-between; align-items: start; }
-        .client { font-size: 0.75em; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; }
-        .order { font-size: 1.1em; font-weight: 900; color: var(--dark); margin-top: 3px; line-height: 1.2; }
-        .price { background: #eff6ff; color: var(--primary); padding: 5px 10px; border-radius: 8px; font-weight: 800; font-size: 0.85em; }
+        /* --- 5. TARJETA DETALLADA --- */
+        .order-card { background: white; border-radius: 16px; margin-bottom: 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border: 1px solid var(--border); overflow: hidden; }
+        
+        /* Cabecera Tarjeta */
+        .oc-header { padding: 15px; border-bottom: 1px solid #f1f5f9; display: flex; justify-content: space-between; align-items: flex-start; background: linear-gradient(to bottom, #ffffff, #f8fafc); }
+        .oc-client { font-size: 0.7em; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; display: block; }
+        .oc-title { font-size: 1.1em; font-weight: 900; color: var(--primary); line-height: 1.2; }
+        .oc-price { background: #eff6ff; color: var(--accent); padding: 5px 10px; border-radius: 8px; font-weight: 800; font-size: 0.85em; }
 
-        /* TABLA */
-        .table-wrap { padding: 5px 18px 18px 18px; }
+        /* Status Visual */
+        .status-bar { padding: 8px 15px; font-size: 0.75em; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; display: flex; align-items: center; gap: 8px; }
+        .sb-pending { background: #fff1f2; color: #be123c; border-bottom: 1px solid #ffe4e6; }
+        .sb-process { background: #fff7ed; color: #c2410c; border-bottom: 1px solid #ffedd5; }
+        .sb-done { background: #f0fdf4; color: #15803d; border-bottom: 1px solid #dcfce7; }
+        .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; background: currentColor; }
+
+        /* Grid de Datos (Tu dibujo) */
+        .data-grid { display: grid; grid-template-columns: 1fr 1fr 1.2fr; text-align: center; padding: 15px; background: white; }
+        .data-box { border-right: 1px solid #f1f5f9; }
+        .data-box:last-child { border-right: none; }
+        .data-lbl { font-size: 0.6em; font-weight: 700; color: #94a3b8; text-transform: uppercase; display: block; margin-bottom: 4px; }
+        .data-val { font-size: 1.3em; font-weight: 800; color: var(--primary); }
+        .val-missing { color: var(--danger); font-size: 1.5em; } /* Faltan destaca más */
+
+        /* Tabla Detalle */
+        .table-container { padding: 0 15px 15px 15px; background: white; }
         table { width: 100%; border-collapse: collapse; margin-top: 5px; }
-        td { padding: 12px 0; border-bottom: 1px solid #f1f5f9; font-size: 0.9em; vertical-align: middle; }
-        .prod { font-weight: 700; color: var(--dark); display: block; }
-        .size { background: #f1f5f9; padding: 2px 7px; border-radius: 5px; font-size: 0.8em; color: #64748b; font-weight: 600; }
+        th { text-align: left; font-size: 0.65em; color: #94a3b8; text-transform: uppercase; padding-bottom: 8px; border-bottom: 2px solid #f1f5f9; }
+        td { padding: 10px 0; border-bottom: 1px solid #f8fafc; font-size: 0.85em; vertical-align: middle; color: var(--text); }
+        .td-prod { font-weight: 700; }
+        .td-size { background: #f1f5f9; padding: 2px 6px; border-radius: 4px; font-size: 0.8em; color: #64748b; margin-left: 5px; }
+        .td-qty { text-align: center; font-weight: 700; }
+        .td-stat { text-align: right; }
         
-        .chip { padding: 4px 8px; border-radius: 6px; font-size: 0.65em; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; }
-        .bg-grey { background: #f1f5f9; color: #475569; }
-        .bg-yellow { background: #fef3c7; color: #d97706; }
-        .bg-green { background: #dcfce7; color: #16a34a; }
+        .badge { padding: 3px 8px; border-radius: 6px; font-size: 0.7em; font-weight: 800; text-transform: uppercase; }
+        .b-gray { background: #f1f5f9; color: #64748b; } /* Corte/Espera */
+        .b-yellow { background: #fef3c7; color: #b45309; } /* Proceso */
+        .b-green { background: #dcfce7; color: #15803d; } /* Listo */
 
-        .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 12px; background: #ffffff; border-top: 1px solid #f1f5f9; }
-        .btn { border: none; padding: 12px; border-radius: 10px; font-weight: 800; font-size: 0.9em; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none; transition: 0.1s; }
-        .btn:active { transform: scale(0.98); }
-        .btn-wa { background: #25D366; color: white; }
-        .btn-edit { background: var(--dark); color: white; }
+        /* Footer Botones */
+        .card-footer { display: flex; gap: 10px; padding: 12px 15px; background: #f8fafc; border-top: 1px solid #e2e8f0; }
+        .btn-act { flex: 1; border: none; padding: 10px; border-radius: 8px; font-weight: 700; font-size: 0.85em; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; transition: 0.1s; text-decoration: none; }
+        .btn-wa { background: #dcfce7; color: #15803d; border: 1px solid #bbf7d0; }
+        .btn-edit { background: var(--primary); color: white; }
+        .btn-act:active { transform: scale(0.97); }
 
-        /* FOOTER */
-        .footer-tm { text-align: center; font-size: 0.65em; color: #cbd5e1; margin-top: 30px; margin-bottom: 20px; font-weight: 500; }
+        /* --- OTRAS VISTAS --- */
+        #calendarView, #notesView { padding: 10px; }
+        .notes-area { width: 100%; height: 75vh; border: 1px solid #e2e8f0; background: #fffbeb; border-radius: 16px; padding: 20px; font-size: 1.1em; line-height: 1.5; resize: none; outline: none; box-shadow: inset 0 2px 5px rgba(0,0,0,0.05); }
+        .section-title { font-weight: 800; color: var(--primary); margin-bottom: 15px; display: flex; align-items: center; gap: 10px; }
 
-        /* CALENDARIO & NOTAS */
-        #calendarView { padding: 10px; }
-        .calendar-card { background: white; border-radius: 18px; padding: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.03); border: 1px solid var(--border); }
-        .cal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .cal-month { font-size: 1.4em; font-weight: 900; color: var(--primary); text-transform: uppercase; }
-        .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; text-align: center; }
-        .cal-day-name { font-size: 0.75em; font-weight: 700; color: #94a3b8; padding-bottom: 10px; }
-        .cal-day { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-size: 0.95em; font-weight: 600; border-radius: 10px; color: var(--dark); }
-        .cal-today { background: var(--primary); color: white; box-shadow: 0 4px 10px rgba(37, 99, 235, 0.3); }
-        .cal-empty { background: transparent; }
-
-        #notesView { padding: 0 15px; }
-        .notebook { width: 100%; height: 70vh; border: none; background: #fffbeb; border-radius: 18px; padding: 25px; font-size: 1.1em; line-height: 1.6; color: #4b5563; outline: none; resize: none; box-shadow: inset 0 0 0 2px #fcd34d; }
-        .notes-title { font-weight: 900; color: #b45309; margin-bottom: 15px; display: block; font-size: 1.1em; }
+        /* CALENDARIO ESTILO */
+        .cal-box { background: white; border-radius: 16px; padding: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.03); border: 1px solid var(--border); }
+        .cal-head { display: flex; justify-content: space-between; margin-bottom: 15px; font-weight: 800; color: var(--primary); text-transform: uppercase; }
+        .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; text-align: center; }
+        .day { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; border-radius: 8px; font-size: 0.9em; font-weight: 600; color: #334155; }
+        .day-head { font-size: 0.7em; color: #94a3b8; font-weight: 700; padding-bottom: 5px; }
+        .today { background: var(--accent); color: white; }
 
         /* NAV */
         .nav-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: white; border-top: 1px solid var(--border); display: flex; justify-content: space-around; padding: 12px 0; z-index: 100; box-shadow: 0 -5px 20px rgba(0,0,0,0.05); }
-        .nav-item { background: none; border: none; color: #94a3b8; font-size: 0.7em; font-weight: 800; display: flex; flex-direction: column; align-items: center; gap: 5px; cursor: pointer; width: 33%; transition: 0.2s; }
-        .nav-item i { font-size: 1.4em; margin-bottom: 2px; }
-        .nav-item.active { color: var(--primary); transform: translateY(-2px); }
+        .nav-item { background: none; border: none; color: #94a3b8; font-size: 0.7em; font-weight: 800; display: flex; flex-direction: column; align-items: center; gap: 5px; cursor: pointer; width: 33%; }
+        .nav-item i { font-size: 1.4em; }
+        .nav-item.active { color: var(--primary); }
 
-        #loading { text-align: center; margin-top: 60px; color: #64748b; font-weight: 600; }
+        #loading { text-align: center; margin-top: 60px; color: #64748b; font-weight: 600; font-size: 0.9em; }
     </style>
 </head>
 <body>
 
 <div id="loginScreen">
-    <div class="login-logo-circle"><i class="fa-solid fa-industry login-logo-icon"></i></div>
-    <h1 class="login-title">IDEAS TEXTILES<sup class="login-tm">®</sup></h1>
-    <span style="font-size:0.8em; font-weight:600; color:#64748b; letter-spacing:1px; margin-bottom:30px; display:block;">WORKWEAR AND CORPORATE</span>
+    <div class="login-logo"><i class="fa-solid fa-industry"></i></div>
+    <h1 class="login-title">IDEAS TEXTILES<br>SpA ®</h1>
+    <p class="login-sub">Workwear & Corporate</p>
+    
     <div class="user-grid">
-        <button class="user-btn" onclick="login('ALEJANDRO')"><i class="fa-solid fa-user-gear"></i> Alejandro</button>
-        <button class="user-btn" onclick="login('RICARDO')"><i class="fa-solid fa-user-tie"></i> Ricardo</button>
-        <button class="user-btn" onclick="login('RENATO')"><i class="fa-solid fa-user-pen"></i> Renato</button>
+        <button class="user-btn" onclick="login('ALEJANDRO')">
+            <div class="user-icon"><i class="fa-solid fa-user-gear"></i></div> Alejandro
+        </button>
+        <button class="user-btn" onclick="login('RICARDO')">
+            <div class="user-icon"><i class="fa-solid fa-user-tie"></i></div> Ricardo
+        </button>
+        <button class="user-btn" onclick="login('RENATO')">
+            <div class="user-icon"><i class="fa-solid fa-user-pen"></i></div> Renato
+        </button>
     </div>
-    <div class="footer-tm" style="margin-top:50px;">© 2026 Ideas Textiles SpA. Todos los derechos reservados.</div>
 </div>
 
 <div id="mainApp" class="hidden">
+    
     <div class="container">
         <div class="pro-header">
-            <div class="header-top-row">
-                <span class="brand-small">IDEAS TEXTILES SpA ®</span>
-                <i class="fa-solid fa-rotate-right refresh-btn" onclick="window.location.reload()"></i>
+            <div class="header-top">
+                <span class="brand-pill">PANEL DE CONTROL</span>
+                <i class="fa-solid fa-rotate refresh-btn" onclick="window.location.reload()" style="cursor:pointer"></i>
             </div>
-            <i class="fa-solid fa-industry main-logo-icon"></i>
-            <h2 class="welcome-text">Hola, <span id="userName">Equipo</span><span class="logout-text" onclick="logout()">(Salir)</span></h2>
+            <div class="welcome-row">
+                <div class="avatar"><i class="fa-solid fa-user"></i></div>
+                <div class="user-info">
+                    <h2>Hola, <span id="userName">...</span></h2>
+                    <span class="logout" onclick="logout()">Cerrar sesión</span>
+                </div>
+            </div>
         </div>
     </div>
 
     <div id="ordersView" class="container">
-        <div class="kpi-container">
-            <div class="kpi-box"><span class="kpi-num" id="statTotal">0</span><span class="kpi-label">Prendas</span></div>
-            <div class="kpi-box"><span class="kpi-num" style="color:var(--success)" id="statDone">0</span><span class="kpi-label">Entregadas</span></div>
-            <div class="kpi-box"><span class="kpi-num" style="color:var(--warning)" id="statPend">0</span><span class="kpi-label">Faltan</span></div>
+        <div class="stats-row">
+            <div class="stat-card">
+                <span class="stat-val" id="kpiTotal">0</span>
+                <span class="stat-lbl">Total Fabrica</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-val c-green" id="kpiDone">0</span>
+                <span class="stat-lbl">Entregadas</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-val c-red" id="kpiPend">0</span>
+                <span class="stat-lbl">Pendientes</span>
+            </div>
         </div>
 
-        <div class="search-box">
+        <div class="search-wrap">
             <i class="fa-solid fa-magnifying-glass search-icon"></i>
-            <input type="text" id="search" class="search-input" placeholder="Buscar orden, cliente..." onkeyup="filter()">
+            <input type="text" id="search" class="search-inp" placeholder="Buscar orden, cliente, producto..." onkeyup="filter()">
         </div>
 
-        <div id="loading"><i class="fa-solid fa-spinner fa-spin"></i> Cargando producción...</div>
+        <div id="loading"><i class="fa-solid fa-circle-notch fa-spin"></i> Conectando base de datos...</div>
         <div id="list"></div>
-        
-        <div class="footer-tm">Ideas Textiles SpA ® - Sistema de Gestión Interno</div>
     </div>
 
     <div id="calendarView" class="container hidden">
-        <div class="calendar-card">
-            <div class="cal-header">
-                <span id="calMonth" class="cal-month">MES</span>
-                <span id="calYear" style="font-weight:700; color:#64748b;">AÑO</span>
+        <h3 class="section-title"><i class="fa-regular fa-calendar-check"></i> AGENDA MENSUAL</h3>
+        <div class="cal-box">
+            <div class="cal-head">
+                <span id="calMonth">MES</span>
+                <span id="calYear">AÑO</span>
             </div>
             <div class="cal-grid" id="calGrid"></div>
         </div>
-        <div style="text-align:center; margin-top:20px; color:#64748b; font-size:0.9em;">
-            <i class="fa-regular fa-clock"></i> <span id="clock">00:00</span>
-        </div>
+        <p style="text-align:center; margin-top:20px; color:#94a3b8; font-size:0.8em;">Planificación de entregas</p>
     </div>
 
     <div id="notesView" class="container hidden">
-        <span class="notes-title"><i class="fa-solid fa-clipboard-list"></i> ASPECTOS CLAVES</span>
-        <textarea id="myNotes" class="notebook" placeholder="Bitácora de ideas, recordatorios y pendientes..."></textarea>
+        <h3 class="section-title"><i class="fa-solid fa-pen-nib"></i> BITÁCORA</h3>
+        <textarea id="myNotes" class="notes-area" placeholder="Escribe aquí apuntes rápidos, medidas pendientes o recordatorios..."></textarea>
     </div>
+
 </div>
 
 <div id="navBar" class="nav-bar hidden">
-    <button class="nav-item active" onclick="go('orders', this)"><i class="fa-solid fa-list-check"></i> PEDIDOS</button>
-    <button class="nav-item" onclick="go('calendar', this)"><i class="fa-regular fa-calendar-days"></i> AGENDA</button>
-    <button class="nav-item" onclick="go('notes', this)"><i class="fa-solid fa-pen-to-square"></i> BITÁCORA</button>
+    <button class="nav-item active" onclick="go('orders', this)">
+        <i class="fa-solid fa-layer-group"></i> PEDIDOS
+    </button>
+    <button class="nav-item" onclick="go('calendar', this)">
+        <i class="fa-regular fa-calendar"></i> AGENDA
+    </button>
+    <button class="nav-item" onclick="go('notes', this)">
+        <i class="fa-regular fa-note-sticky"></i> NOTAS
+    </button>
 </div>
 
 <script>
@@ -185,8 +232,11 @@
         const savedUser = localStorage.getItem('paeUser');
         if(savedUser) login(savedUser);
         renderCalendar();
-        updateClock();
-        setInterval(updateClock, 1000);
+        
+        // Auto-guardado de notas
+        const noteArea = document.getElementById('myNotes');
+        noteArea.value = localStorage.getItem('ideasNotes') || '';
+        noteArea.addEventListener('input', () => localStorage.setItem('ideasNotes', noteArea.value));
     };
 
     function login(u) {
@@ -209,7 +259,7 @@
             if(!res.ok) throw new Error("Error");
             parse(await res.text());
         } catch(e) {
-            document.getElementById('loading').innerHTML = "⚠️ Error de conexión.";
+            document.getElementById('loading').innerHTML = "⚠️ Error de conexión. Revisa el Excel.";
         }
     }
 
@@ -236,44 +286,87 @@
 
     function render(list) {
         const el = document.getElementById('list');
-        if(list.length===0) { el.innerHTML = "<p style='text-align:center;color:#999;margin-top:40px;'>No hay pedidos.</p>"; return; }
+        if(list.length===0) { el.innerHTML = "<p style='text-align:center;color:#94a3b8;margin-top:40px;'>Sin resultados.</p>"; return; }
 
         el.innerHTML = list.map(o => {
             let total = 0, ent = 0;
+            let statusText = "PENDIENTE";
+            let statusClass = "sb-pending";
+            let found = false;
+
             const linkEdit = `${EDIT}#gid=0&range=I${o.items[0].row}`;
 
-            o.items.forEach(i => { total += i.qty; ent += i.done; });
+            o.items.forEach(i => { 
+                total += i.qty; 
+                ent += i.done;
+                // Detectar estado activo
+                if(!found && (i.qty - i.done) > 0) {
+                    statusText = i.st || "PENDIENTE"; 
+                    if(statusText.includes("BORD") || statusText.includes("CONF") || statusText.includes("PROC")) statusClass = "sb-process";
+                    found = true;
+                }
+            });
+            
             const missing = total - ent;
+            if(missing <= 0 && total > 0) { statusText = "FINALIZADO"; statusClass = "sb-done"; }
 
             // WhatsApp
-            const msg = `Hola *${o.client}*, estado *${o.name}*: Solicitado ${total}, Entregado ${ent}. Faltan ${missing}. Ideas Textiles SpA ®`;
+            const msg = `Hola *${o.client}*, reporte *${o.name}*: Solicitado ${total}, Entregado ${ent}. Faltan ${missing}. Ideas Textiles SpA ®`;
             const wa = o.phone && o.phone.length > 5 ? `https://wa.me/${o.phone.replace(/[^0-9]/g,'')}?text=${encodeURIComponent(msg)}` : `https://wa.me/?text=${encodeURIComponent(msg)}`;
 
             return `
-            <div class="card">
-                <div class="card-top">
-                    <div><div class="client">${o.client}</div><div class="order">${o.name}</div></div>
-                    <div class="price">${o.price}</div>
+            <div class="order-card">
+                <div class="status-bar ${statusClass}">
+                    <span class="dot"></span> ${statusText}
                 </div>
 
-                <div class="table-wrap">
+                <div class="oc-header">
+                    <div>
+                        <span class="oc-client">${o.client}</span>
+                        <div class="oc-title">${o.name}</div>
+                    </div>
+                    <div class="oc-price">${o.price}</div>
+                </div>
+
+                <div class="data-grid">
+                    <div class="data-box">
+                        <span class="data-lbl">Solicitado</span>
+                        <span class="data-val">${total}</span>
+                    </div>
+                    <div class="data-box">
+                        <span class="data-lbl">Entregadas</span>
+                        <span class="data-val c-green">${ent}</span>
+                    </div>
+                    <div class="data-box">
+                        <span class="data-lbl">FALTAN</span>
+                        <span class="data-val val-missing">${missing}</span>
+                    </div>
+                </div>
+
+                <div class="table-container">
                     <table>
-                        ${o.items.map(i => {
-                            let color = 'bg-grey';
-                            if(i.st.includes('DESPACH')||i.st.includes('ENTREGA')) color = 'bg-green';
-                            else if(i.st.includes('BORDAD')||i.st.includes('CONFECC')) color = 'bg-yellow';
-                            
-                            return `<tr>
-                                <td><span class="prod">${i.prod}</span><span class="size">${i.size}</span></td>
-                                <td style="text-align:center; font-weight:bold">${i.qty}</td>
-                                <td style="text-align:right"><span class="chip ${color}">${i.st}</span></td>
-                            </tr>`;
-                        }).join('')}
+                        <thead>
+                            <tr><th>Producto</th><th style="text-align:center">Cant</th><th style="text-align:right">Estado</th></tr>
+                        </thead>
+                        <tbody>
+                            ${o.items.map(i => {
+                                let badge = 'b-gray';
+                                if(i.st.includes('DESP')||i.st.includes('ENTR')) badge = 'b-green';
+                                else if(i.st.includes('BORD')||i.st.includes('CONF')) badge = 'b-yellow';
+                                
+                                return `<tr>
+                                    <td><span class="td-prod">${i.prod}</span><span class="td-size">${i.size}</span></td>
+                                    <td class="td-qty">${i.qty}</td>
+                                    <td class="td-stat"><span class="badge ${badge}">${i.st}</span></td>
+                                </tr>`;
+                            }).join('')}
+                        </tbody>
                     </table>
                 </div>
-                <div class="actions">
-                    <a href="${wa}" target="_blank" class="btn btn-wa"><i class="fa-brands fa-whatsapp"></i> Reportar</a>
-                    <a href="${linkEdit}" class="btn btn-edit"><i class="fa-solid fa-pen"></i> Editar</a>
+
+                <div class="card-footer">
+                    <a href="${wa}" target="_blank" class="btn-act btn-wa"><i class="fa-brands fa-whatsapp"></i> Reportar</a>
+                    <a href="${linkEdit}" class="btn-act btn-edit"><i class="fa-solid fa-pen"></i> Editar</a>
                 </div>
             </div>`;
         }).join('');
@@ -282,9 +375,9 @@
     function calcStats(list) {
         let t=0, d=0;
         list.forEach(o => o.items.forEach(i => { t+=i.qty; d+=i.done; }));
-        document.getElementById('statTotal').innerText = t;
-        document.getElementById('statDone').innerText = d;
-        document.getElementById('statPend').innerText = t - d;
+        document.getElementById('kpiTotal').innerText = t;
+        document.getElementById('kpiDone').innerText = d;
+        document.getElementById('kpiPend').innerText = t - d;
     }
 
     function filter() {
@@ -306,7 +399,7 @@
         const now = new Date();
         const year = now.getFullYear();
         const month = now.getMonth();
-        const months = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
+        const months = ["ENERO","FEBRERO","MARZO","ABRIL","MAYO","JUNIO","JULIO","AGOSTO","SEPTIEMBRE","OCTUBRE","NOVIEMBRE","DICIEMBRE"];
         document.getElementById('calMonth').innerText = months[month];
         document.getElementById('calYear').innerText = year;
         const firstDay = new Date(year, month, 1).getDay(); 
@@ -314,24 +407,15 @@
         const today = now.getDate();
         let html = '';
         const days = ['D','L','M','M','J','V','S'];
-        days.forEach(d => html += `<div class="cal-day-name">${d}</div>`);
-        for(let i=0; i<firstDay; i++) html += `<div class="cal-day cal-empty"></div>`;
+        days.forEach(d => html += `<div class="day-head">${d}</div>`);
+        for(let i=0; i<firstDay; i++) html += `<div></div>`;
         for(let i=1; i<=daysInMonth; i++) {
-            let cls = 'cal-day';
-            if(i === today) cls += ' cal-today';
+            let cls = 'day';
+            if(i === today) cls += ' today';
             html += `<div class="${cls}">${i}</div>`;
         }
         document.getElementById('calGrid').innerHTML = html;
     }
-
-    function updateClock() {
-        const now = new Date();
-        document.getElementById('clock').innerText = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-    }
-
-    const noteArea = document.getElementById('myNotes');
-    noteArea.value = localStorage.getItem('ideasNotes') || '';
-    noteArea.addEventListener('input', () => localStorage.setItem('ideasNotes', noteArea.value));
 </script>
 </body>
 </html>
