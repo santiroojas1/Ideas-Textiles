@@ -5,15 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>App Ideas Textiles SpA</title>
     
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
         :root {
-            --primary: #1e40af; /* Azul Corporativo */
-            --dark: #0f172a; --bg: #f1f5f9;
-            --white: #ffffff; --border: #cbd5e1;
-            --success: #16a34a; --warning: #d97706; --danger: #dc2626;
+            --primary: #1e3a8a; /* Azul marino corporativo */
+            --accent: #3b82f6; /* Azul brillante para detalles */
+            --dark: #0f172a; --bg: #f8fafc;
+            --white: #ffffff; --border: #e2e8f0;
+            --success: #059669; --warning: #d97706; --danger: #dc2626;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
@@ -21,137 +22,144 @@
         .container { max-width: 600px; margin: 0 auto; padding: 15px; }
         .hidden { display: none !important; }
 
-        /* --- 1. LOGIN --- */
-        #loginScreen {
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            min-height: 90vh; text-align: center; padding: 20px; background: white;
-        }
-        .login-brand { font-size: 0.9em; font-weight: 900; letter-spacing: 2px; color: #94a3b8; margin-bottom: 10px; }
-        .login-logo { font-size: 4em; color: var(--primary); margin-bottom: 20px; }
-        .login-title { font-size: 1.8em; font-weight: 900; margin-bottom: 30px; color: var(--dark); }
+        /* --- 1. LOGIN (Estilo limpio) --- */
+        #loginScreen { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 90vh; text-align: center; padding: 30px; background: white; }
+        .login-brand-box { margin-bottom: 30px; }
+        .login-logo-circle { width: 80px; height: 80px; background: linear-gradient(135deg, var(--primary), var(--accent)); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px; box-shadow: 0 10px 20px rgba(30, 58, 138, 0.2); }
+        .login-logo-icon { font-size: 2.5em; color: white; }
+        .login-title { font-size: 1.6em; font-weight: 900; color: var(--dark); letter-spacing: -0.5px; line-height: 1.2; }
+        .login-tagline { font-size: 0.8em; font-weight: 700; color: #64748b; letter-spacing: 2px; margin-top: 5px; }
         
-        .user-grid { display: grid; gap: 15px; width: 100%; max-width: 350px; }
-        .user-btn {
-            background: var(--bg); border: 1px solid var(--border); padding: 18px;
-            border-radius: 12px; font-size: 1.1em; font-weight: 700; color: var(--dark);
-            cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: flex-start; gap: 15px;
-        }
-        .user-btn i { color: var(--primary); font-size: 1.2em; }
-        .user-btn:active { background: var(--primary); color: white; border-color: var(--primary); }
-        .user-btn:active i { color: white; }
+        .user-grid { display: grid; gap: 15px; width: 100%; max-width: 320px; margin-top: 20px; }
+        .user-btn { background: white; border: 2px solid var(--border); padding: 18px; border-radius: 12px; font-size: 1.1em; font-weight: 700; color: var(--dark); cursor: pointer; display: flex; align-items: center; justify-content: flex-start; gap: 15px; transition: all 0.2s; box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
+        .user-btn i { color: var(--primary); font-size: 1.2em; transition: 0.2s; }
+        .user-btn:active { border-color: var(--primary); background: #eff6ff; transform: scale(0.98); }
 
-        /* --- 2. CABECERA --- */
-        .header-card {
-            background: var(--dark); color: white; padding: 20px; 
-            border-radius: 20px; text-align: center; margin-bottom: 20px;
-            box-shadow: 0 10px 25px rgba(15, 23, 42, 0.2); position: relative; overflow: hidden;
+        /* --- 2. CABECERA PROFESIONAL --- */
+        .pro-header {
+            background: var(--dark); color: white; padding: 25px 20px;
+            border-radius: 24px; text-align: center; margin-bottom: 25px;
+            position: relative; overflow: hidden; box-shadow: 0 20px 40px -10px rgba(15, 23, 42, 0.3);
         }
-        .header-card::before {
-            content: '\f0c4'; font-family: "Font Awesome 6 Free"; font-weight: 900;
-            position: absolute; top: -20px; right: -20px; font-size: 8em; 
-            opacity: 0.05; color: white; transform: rotate(-20deg);
-        }
-        .company-name { font-size: 0.75em; font-weight: 800; letter-spacing: 2px; color: #94a3b8; margin-bottom: 10px; display: block; }
-        .main-logo { font-size: 2.5em; margin-bottom: 10px; color: #60a5fa; display: inline-block; }
-        .welcome-text { font-size: 1.4em; font-weight: 800; margin: 0; }
-        .welcome-text span { color: #60a5fa; }
+        /* Marca de agua de fondo sutil */
+        .pro-header::before { content: '\f553'; font-family: "Font Awesome 6 Free"; font-weight: 900; position: absolute; top: -30%; right: -10%; font-size: 12em; opacity: 0.03; color: white; transform: rotate(-15deg); }
+        
+        .header-branding { position: relative; z-index: 2; }
+        .brand-logo-container { width: 70px; height: 70px; background: linear-gradient(135deg, var(--primary), var(--accent)); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px; border: 3px solid rgba(255,255,255,0.1); }
+        .brand-logo-icon { font-size: 2em; color: white; }
+        .main-title { font-size: 1.4em; font-weight: 900; letter-spacing: 1px; line-height: 1; margin: 0; }
+        .tagline { font-size: 0.7em; font-weight: 700; color: #94a3b8; letter-spacing: 2px; margin-top: 8px; display: block; opacity: 0.8; }
+        
+        .welcome-badge { display: inline-block; background: rgba(255,255,255,0.1); padding: 6px 15px; border-radius: 20px; font-size: 0.85em; font-weight: 600; margin-top: 20px; backdrop-filter: blur(5px); }
+        .welcome-badge span { color: #93c5fd; font-weight: 800; }
 
-        /* KPI */
-        .kpi-container { display: flex; gap: 10px; margin-bottom: 20px; }
-        .kpi-box { flex: 1; background: white; padding: 12px; border-radius: 12px; text-align: center; border: 1px solid var(--border); box-shadow: 0 2px 5px rgba(0,0,0,0.03); }
-        .kpi-num { display: block; font-size: 1.5em; font-weight: 800; color: var(--dark); }
-        .kpi-label { font-size: 0.7em; font-weight: 700; color: #64748b; text-transform: uppercase; }
+        /* KPI DASHBOARD */
+        .kpi-container { display: flex; gap: 12px; margin-bottom: 25px; }
+        .kpi-box { flex: 1; background: white; padding: 15px; border-radius: 16px; text-align: center; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border: 1px solid rgba(255,255,255,0.5); }
+        .kpi-num { display: block; font-size: 1.6em; font-weight: 900; color: var(--dark); line-height: 1.2; }
+        .kpi-label { font-size: 0.7em; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 5px; }
 
         /* BUSCADOR */
         .search-box { position: relative; margin-bottom: 20px; }
-        .search-input { width: 100%; padding: 14px 14px 14px 45px; border-radius: 12px; border: 2px solid white; background: white; font-size: 1em; box-shadow: 0 4px 10px rgba(0,0,0,0.03); outline: none; }
-        .search-input:focus { border-color: var(--primary); }
-        .search-icon { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #94a3b8; }
+        .search-input { width: 100%; padding: 16px 16px 16px 50px; border-radius: 14px; border: none; background: white; font-size: 1em; box-shadow: 0 4px 15px rgba(0,0,0,0.05); outline: none; transition: 0.2s; }
+        .search-input:focus { box-shadow: 0 4px 20px rgba(37, 99, 235, 0.15); }
+        .search-icon { position: absolute; left: 18px; top: 50%; transform: translateY(-50%); color: #94a3b8; font-size: 1.2em; }
 
-        /* --- 3. TARJETA --- */
-        .card { background: white; border-radius: 16px; margin-bottom: 15px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.02); border: 1px solid var(--border); }
-        .card-top { padding: 15px; background: #f8fafc; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: start; }
-        .client { font-size: 0.75em; font-weight: 800; color: #64748b; text-transform: uppercase; }
-        .order { font-size: 1.1em; font-weight: 900; color: var(--dark); margin-top: 2px; line-height: 1.2; }
-        .price { background: #dbeafe; color: #1e40af; padding: 5px 10px; border-radius: 6px; font-weight: 700; font-size: 0.85em; }
+        /* TARJETA DE PEDIDO */
+        .card { background: white; border-radius: 18px; margin-bottom: 18px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border: 1px solid var(--border); }
+        .card-top { padding: 18px; background: #ffffff; border-bottom: 1px solid #f1f5f9; display: flex; justify-content: space-between; align-items: start; }
+        .client { font-size: 0.75em; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; }
+        .order { font-size: 1.2em; font-weight: 900; color: var(--dark); margin-top: 4px; line-height: 1.2; }
+        .price { background: #eff6ff; color: var(--primary); padding: 6px 12px; border-radius: 8px; font-weight: 800; font-size: 0.9em; }
 
-        .bar-section { padding: 15px 15px 5px 15px; }
-        .bar-header { display: flex; justify-content: space-between; font-size: 0.8em; font-weight: 700; color: #475569; margin-bottom: 5px; }
-        .bar-bg { background: #e2e8f0; height: 10px; border-radius: 10px; overflow: hidden; }
-        .bar-fill { height: 100%; background: var(--success); transition: width 0.5s; }
+        /* BARRA PROGRESO */
+        .bar-section { padding: 18px 18px 5px 18px; }
+        .bar-header { display: flex; justify-content: space-between; font-size: 0.8em; font-weight: 700; color: #475569; margin-bottom: 8px; }
+        .bar-bg { background: #e2e8f0; height: 12px; border-radius: 6px; overflow: hidden; }
+        .bar-fill { height: 100%; transition: width 0.6s ease; border-radius: 6px; }
 
-        .table-wrap { padding: 0 15px 15px 15px; }
+        /* Colores barra y chips */
+        .fill-red, .c-10 { background: var(--danger); color: white; }
+        .fill-orange, .c-50 { background: var(--warning); color: white; }
+        .fill-blue, .c-80 { background: var(--primary); color: white; }
+        .fill-green, .c-100 { background: var(--success); color: white; }
+
+        /* TABLA */
+        .table-wrap { padding: 5px 18px 18px 18px; }
         table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        td { padding: 8px 0; border-bottom: 1px solid #f1f5f9; font-size: 0.9em; vertical-align: middle; }
-        .prod { font-weight: 700; color: var(--dark); }
-        .size { background: #f1f5f9; padding: 2px 6px; border-radius: 4px; font-size: 0.8em; color: #64748b; margin-left: 5px; }
+        td { padding: 10px 0; border-bottom: 1px solid #f1f5f9; font-size: 0.9em; vertical-align: middle; }
+        .prod { font-weight: 700; color: var(--dark); display: block; }
+        .size { background: #f1f5f9; padding: 2px 8px; border-radius: 6px; font-size: 0.8em; color: #64748b; font-weight: 600; }
+        .chip { padding: 4px 10px; border-radius: 20px; font-size: 0.7em; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; }
         
-        .chip { padding: 3px 8px; border-radius: 6px; font-size: 0.7em; font-weight: 800; text-transform: uppercase; }
-        .c-pend { background: #fef2f2; color: #ef4444; }
-        .c-work { background: #fff7ed; color: #f59e0b; }
-        .c-done { background: #f0fdf4; color: #16a34a; }
+        /* BOTONES */
+        .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 15px; background: #f8fafc; border-top: 1px solid #f1f5f9; }
+        .btn { border: none; padding: 12px; border-radius: 12px; font-weight: 800; font-size: 0.9em; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none; transition: 0.2s; }
+        .btn:active { transform: scale(0.98); }
+        .btn-wa { background: #25D366; color: white; box-shadow: 0 4px 10px rgba(37, 211, 102, 0.2); }
+        .btn-edit { background: var(--dark); color: white; box-shadow: 0 4px 10px rgba(15, 23, 42, 0.2); }
 
-        .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 12px; background: #f8fafc; border-top: 1px solid var(--border); }
-        .btn { border: none; padding: 10px; border-radius: 8px; font-weight: 700; font-size: 0.9em; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none; transition: 0.1s; }
-        .btn:active { transform: scale(0.97); }
-        .btn-wa { background: #25D366; color: white; }
-        .btn-edit { background: var(--dark); color: white; }
-
-        /* --- 4. BITÁCORA --- */
+        /* NOTAS (Aspectos Claves) */
         #notesView { padding: 0 15px; }
-        .notebook { width: 100%; height: 70vh; border: 2px solid #fcd34d; background: #fffbeb; border-radius: 16px; padding: 20px; font-size: 1.1em; line-height: 1.6; color: #4b5563; outline: none; resize: none; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
-        .notes-title { font-weight: 800; color: #d97706; margin-bottom: 10px; display: block; }
+        .notebook { width: 100%; height: 75vh; border: none; background: #fffbeb; border-radius: 18px; padding: 25px; font-size: 1.1em; line-height: 1.6; color: #4b5563; outline: none; resize: none; box-shadow: inset 0 0 0 2px #fcd34d, 0 10px 20px rgba(251, 191, 36, 0.1); }
+        .notes-title { font-weight: 900; color: #b45309; margin-bottom: 15px; display: flex; align-items: center; gap: 10px; font-size: 1.1em; }
 
-        /* NAVEGACIÓN */
-        .nav-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: white; border-top: 1px solid var(--border); display: flex; justify-content: space-around; padding: 10px 0; z-index: 100; box-shadow: 0 -5px 20px rgba(0,0,0,0.03); }
-        .nav-item { background: none; border: none; color: #94a3b8; font-size: 0.7em; font-weight: 700; display: flex; flex-direction: column; align-items: center; gap: 5px; cursor: pointer; width: 33%; }
-        .nav-item i { font-size: 1.5em; margin-bottom: 2px; }
-        .nav-item.active { color: var(--primary); }
+        /* NAV */
+        .nav-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: white; border-top: 1px solid var(--border); display: flex; justify-content: space-around; padding: 12px 0; z-index: 100; box-shadow: 0 -5px 20px rgba(0,0,0,0.05); }
+        .nav-item { background: none; border: none; color: #94a3b8; font-size: 0.75em; font-weight: 800; display: flex; flex-direction: column; align-items: center; gap: 6px; cursor: pointer; width: 33%; transition: 0.2s; }
+        .nav-item i { font-size: 1.4em; margin-bottom: 2px; }
+        .nav-item.active { color: var(--primary); transform: translateY(-2px); }
 
-        #loading { text-align: center; margin-top: 50px; color: #64748b; }
+        #loading { text-align: center; margin-top: 80px; color: #64748b; font-weight: 600; }
     </style>
 </head>
 <body>
 
 <div id="loginScreen">
-    <div class="login-brand">IDEAS TEXTILES SPA</div>
-    <div class="login-logo"><i class="fa-solid fa-scissors"></i></div>
-    <h1 class="login-title">PANEL DE CONTROL</h1>
+    <div class="login-brand-box">
+        <div class="login-logo-circle"><i class="fa-solid fa-shirt login-logo-icon"></i></div>
+        <h1 class="login-title">IDEAS TEXTILES SPA</h1>
+        <span class="login-tagline">WORKWEAR AND CORPORATE</span>
+    </div>
+    
     <div class="user-grid">
-        <button class="user-btn" onclick="login('ALEJANDRO')"><i class="fa-solid fa-user-gear"></i> ALEJANDRO</button>
-        <button class="user-btn" onclick="login('RICARDO')"><i class="fa-solid fa-user-tie"></i> RICARDO</button>
-        <button class="user-btn" onclick="login('RENATO')"><i class="fa-solid fa-user-pen"></i> RENATO</button>
+        <button class="user-btn" onclick="login('ALEJANDRO')"><i class="fa-solid fa-user-gear"></i> Alejandro</button>
+        <button class="user-btn" onclick="login('RICARDO')"><i class="fa-solid fa-user-tie"></i> Ricardo</button>
+        <button class="user-btn" onclick="login('RENATO')"><i class="fa-solid fa-user-pen"></i> Renato</button>
     </div>
 </div>
 
 <div id="mainApp" class="hidden">
     <div class="container">
-        <div class="header-card">
-            <span class="company-name">IDEAS TEXTILES SPA</span>
-            <div class="main-logo"><i class="fa-solid fa-scissors"></i></div>
-            <h2 class="welcome-text">HOLA, <span id="userName">EQUIPO</span></h2>
+        <div class="pro-header">
+            <div class="header-branding">
+                <div class="brand-logo-container"><i class="fa-solid fa-shirt brand-logo-icon"></i></div>
+                <h1 class="main-title">IDEAS TEXTILES SPA</h1>
+                <span class="tagline">WORKWEAR AND CORPORATE</span>
+            </div>
+            <div class="welcome-badge">Hola, <span id="userName">Equipo</span></div>
         </div>
     </div>
 
     <div id="ordersView" class="container">
         <div class="kpi-container">
             <div class="kpi-box"><span class="kpi-num" id="statTotal">0</span><span class="kpi-label">Total Prendas</span></div>
-            <div class="kpi-box"><span class="kpi-num" style="color:var(--success)" id="statDone">0</span><span class="kpi-label">Entregadas</span></div>
+            <div class="kpi-box"><span class="kpi-num" style="color:var(--success)" id="statDone">0</span><span class="kpi-label">Listas</span></div>
             <div class="kpi-box"><span class="kpi-num" style="color:var(--warning)" id="statPend">0</span><span class="kpi-label">Pendientes</span></div>
         </div>
 
         <div class="search-box">
             <i class="fa-solid fa-magnifying-glass search-icon"></i>
-            <input type="text" id="search" class="search-input" placeholder="Buscar pedido, cliente..." onkeyup="filter()">
+            <input type="text" id="search" class="search-input" placeholder="Buscar por cliente o pedido..." onkeyup="filter()">
         </div>
 
-        <div id="loading"><i class="fa-solid fa-spinner fa-spin"></i> Cargando...</div>
+        <div id="loading"><i class="fa-solid fa-spinner fa-spin"></i> Cargando producción...</div>
         <div id="list"></div>
     </div>
 
     <div id="notesView" class="container hidden">
-        <span class="notes-title"><i class="fa-solid fa-lightbulb"></i> BITÁCORA DE IDEAS Y PENDIENTES</span>
-        <textarea id="myNotes" class="notebook" placeholder="Escribe aquí ideas... (Se guarda en tu celular)"></textarea>
+        <span class="notes-title"><i class="fa-solid fa-clipboard-list"></i> ASPECTOS CLAVES Y BITÁCORA</span>
+        <textarea id="myNotes" class="notebook" placeholder="Escribe aquí recordatorios, medidas pendientes o puntos importantes... (Se guarda automáticamente en este dispositivo)"></textarea>
     </div>
 </div>
 
@@ -162,11 +170,8 @@
 </div>
 
 <script>
-    // --- TUS LINKS DEFINITIVOS (YA INSERTADOS) ---
-    // Link de lectura (CSV que publicaste)
+    // --- TUS ENLACES (No tocar) ---
     const CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR709g0cB4EtdROEnIWBrK2O4FQrKHUd3jXNUTWwdWvT1F5UraKHGOr6dDQHsJtgrdv4-ARqow_jKi0/pub?output=csv";
-    
-    // Link de edición (Hoja privada)
     const EDIT = "https://docs.google.com/spreadsheets/d/1-Fxxi6Na5E-I15W5FuZd_TSDppYQKcAF_gsxwgxIULI/edit";
 
     let data = [];
@@ -185,7 +190,7 @@
             if(!res.ok) throw new Error("Error");
             parse(await res.text());
         } catch(e) {
-            document.getElementById('loading').innerHTML = "⚠️ Error de conexión. Revisa que el Excel esté publicado como CSV.";
+            document.getElementById('loading').innerHTML = "⚠️ Conexión inestable. Por favor refresca.";
         }
     }
 
@@ -198,23 +203,12 @@
             if(c.length < 12) return;
             const clean = s => s ? s.replace(/"/g, '').trim() : '';
 
-            // MAPEO SEGÚN TU EXCEL:
-            // 0:Fila, 1:ID, 2:Nombre, 3:Cliente, 4:Valor, 5:Prod, 6:Talla, 7:Cant, 8:Estado, 9:Dispo, 10:Obs, 11:Tel
-            
-            const id = clean(c[1]); // Columna B (ID)
-            
+            const id = clean(c[1]); 
             if(!map[id]) {
-                map[id] = {
-                    id, name: clean(c[2]), client: clean(c[3]), price: clean(c[4]), phone: clean(c[11]), items: []
-                };
+                map[id] = { id, name: clean(c[2]), client: clean(c[3]), price: clean(c[4]), phone: clean(c[11]), items: [] };
             }
             map[id].items.push({
-                row: clean(c[0]), // Fila para editar (Columna A)
-                prod: clean(c[5]), 
-                size: clean(c[6]), 
-                qty: parseInt(c[7])||0, // Solicitada
-                st: clean(c[8]).toUpperCase(), // Estado
-                done: parseInt(c[9])||0 // Disponible/Entregadas
+                row: clean(c[0]), prod: clean(c[5]), size: clean(c[6]), qty: parseInt(c[7])||0, st: clean(c[8]).toUpperCase(), done: parseInt(c[9])||0
             });
         });
 
@@ -224,51 +218,60 @@
         document.getElementById('loading').classList.add('hidden');
     }
 
+    // --- LÓGICA DEL SEMÁFORO (Tu Regla de Oro) ---
+    function getWeight(s) {
+        if(s.includes("DESPACHA") || s.includes("ENTREGA") || s.includes("LISTO")) return 100;
+        if(s.includes("TERMINA") || s.includes("ARMADO")) return 80;
+        if(s.includes("BORDADO") || s.includes("ESTAMPADO")) return 50; 
+        if(s.includes("CONFECCI")) return 30;
+        if(s.includes("CORTE") || s.includes("BODEGA") || s.includes("TELA")) return 10;
+        return 0;
+    }
+
     function render(list) {
         const el = document.getElementById('list');
-        if(list.length===0) { el.innerHTML = "<p style='text-align:center;color:#999'>Sin resultados</p>"; return; }
+        if(list.length===0) { el.innerHTML = "<p style='text-align:center;color:#999;margin-top:40px;'>No se encontraron pedidos.</p>"; return; }
 
         el.innerHTML = list.map(o => {
-            let total = 0, ent = 0;
-            // Enlace de edición: Apunta a Columna I (Estado) de la fila correcta
+            let total = 0;
+            let weightedScore = 0;
+            // Link edición móvil directo
             const linkEdit = `${EDIT}#gid=0&range=I${o.items[0].row}`;
 
-            o.items.forEach(i => { total += i.qty; ent += i.done; });
+            o.items.forEach(i => { 
+                total += i.qty; 
+                weightedScore += (i.qty * getWeight(i.st));
+            });
             
-            const pct = total===0 ? 0 : Math.round((ent/total)*100);
-            const pend = total - ent;
+            const pct = total===0 ? 0 : Math.round(weightedScore / total);
+            
+            let barColor = 'fill-red';
+            if(pct >= 30) barColor = 'fill-orange';
+            if(pct >= 80) barColor = 'fill-blue';
+            if(pct === 100) barColor = 'fill-green';
 
-            // WhatsApp
-            const msg = `Hola *${o.client}*, reporte *${o.name}*: Llevamos ${ent} de ${total} prendas listas (${pct}%).`;
+            const msg = `Hola *${o.client}*, reporte *${o.name}*: Avance de producción ${pct}%.`;
             const wa = o.phone && o.phone.length > 5 ? `https://wa.me/${o.phone.replace(/[^0-9]/g,'')}?text=${encodeURIComponent(msg)}` : `https://wa.me/?text=${encodeURIComponent(msg)}`;
 
             return `
             <div class="card">
                 <div class="card-top">
-                    <div>
-                        <div class="client">${o.client}</div>
-                        <div class="order">${o.name}</div>
-                    </div>
+                    <div><div class="client">${o.client}</div><div class="order">${o.name}</div></div>
                     <div class="price">${o.price}</div>
                 </div>
 
                 <div class="bar-section">
-                    <div class="bar-header">
-                        <span>ENTREGAS REALIZADAS: ${ent}/${total}</span>
-                        <span>${pct}%</span>
-                    </div>
-                    <div class="bar-bg"><div class="bar-fill" style="width:${pct}%"></div></div>
+                    <div class="bar-header"><span>AVANCE REAL DE PLANTA</span><span>${pct}%</span></div>
+                    <div class="bar-bg"><div class="bar-fill ${barColor}" style="width:${pct}%"></div></div>
                 </div>
 
                 <div class="table-wrap">
                     <table>
                         ${o.items.map(i => {
-                            let badge = 'c-pend';
-                            if(i.st.includes('DESPACHA') || i.st.includes('LISTO')) badge = 'c-done';
-                            else if(i.st.includes('BORDADO') || i.st.includes('ARMADO')) badge = 'c-work';
-                            
-                            return `
-                            <tr>
+                            let w = getWeight(i.st);
+                            let badge = 'c-10';
+                            if(w >= 100) badge = 'c-100'; else if(w >= 80) badge = 'c-80'; else if(w >= 50) badge = 'c-50';
+                            return `<tr>
                                 <td><span class="prod">${i.prod}</span><span class="size">${i.size}</span></td>
                                 <td style="text-align:center; font-weight:bold">${i.qty}</td>
                                 <td style="text-align:right"><span class="chip ${badge}">${i.st}</span></td>
@@ -302,16 +305,14 @@
         document.getElementById('ordersView').classList.add('hidden');
         document.getElementById('notesView').classList.add('hidden');
         document.getElementById(view+'View').classList.remove('hidden');
-        
         document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
+        window.scrollTo(0,0);
     }
 
-    // Guardar notas auto
     const noteArea = document.getElementById('myNotes');
     noteArea.value = localStorage.getItem('ideasNotes') || '';
     noteArea.addEventListener('input', () => localStorage.setItem('ideasNotes', noteArea.value));
-
 </script>
 </body>
 </html>
