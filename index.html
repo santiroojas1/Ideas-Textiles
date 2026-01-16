@@ -3,14 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>IDEAS TEXTILES | V104 FINAL</title>
+    <title>IDEAS TEXTILES | V105 FLEX</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
     <script src="https://unpkg.com/tesseract.js@4.0.2/dist/tesseract.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
 
     <style>
         :root {
@@ -24,66 +25,59 @@
         }
         
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); color: var(--dark); margin: 0; padding-bottom: 100px; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); color: var(--dark); margin: 0; padding-bottom: 110px; }
 
         /* HEADER */
         header { background: var(--dark); color: white; padding: 15px 20px; position: sticky; top: 0; z-index: 999; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
         .brand h1 { font-size: 1rem; font-weight: 800; margin: 0; }
         .brand small { color: var(--blue); font-weight: 700; font-size: 0.6rem; letter-spacing: 1px; }
-        .btn-ai { background: linear-gradient(135deg, var(--blue), #4f46e5); border: none; padding: 8px 14px; border-radius: 10px; color: white; font-weight: 700; font-size: 0.7rem; display: flex; align-items: center; gap: 6px; box-shadow: 0 0 10px rgba(37, 99, 235, 0.4); }
 
         /* NAV DOCK */
         .dock { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--dark); padding: 12px 30px; border-radius: 30px; display: flex; gap: 30px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); z-index: 1000; }
         .dock i { font-size: 1.4rem; color: #64748b; transition: 0.2s; cursor: pointer; }
         .dock i.active { color: white; transform: translateY(-3px); text-shadow: 0 0 10px var(--blue); }
 
-        /* SECCIONES */
+        /* VISTAS */
         .view { display: none; padding: 20px; max-width: 800px; margin: 0 auto; animation: fadeUp 0.3s ease; }
         .view.active { display: block; }
         @keyframes fadeUp { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
 
-        /* CARDS */
-        .card { background: white; border-radius: 16px; padding: 16px; margin-bottom: 15px; border: 1px solid #e2e8f0; box-shadow: 0 2px 5px rgba(0,0,0,0.02); position: relative; }
+        /* TARJETAS */
+        .card { background: white; border-radius: 16px; padding: 16px; margin-bottom: 15px; border: 1px solid #e2e8f0; box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
         
-        /* CHIPS ESTADO */
+        /* CHIPS */
         .chip { display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 8px; font-size: 0.65rem; font-weight: 800; text-transform: uppercase; margin-bottom: 10px; }
         .c-bodega { background: var(--amber-soft); color: var(--amber); }
-        .c-sinstock { background: var(--red-soft); color: var(--red); animation: pulse 1.5s infinite; }
         .c-pack { background: var(--purple-soft); color: var(--purple); }
         .c-done { background: var(--green-soft); color: var(--green); }
-        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.6; } 100% { opacity: 1; } }
 
-        /* INVENTARIO GRID */
-        .inv-row { display: flex; justify-content: space-between; align-items: center; }
-        .inv-sizes { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; margin-top: 10px; }
-        .size-box { background: #f1f5f9; text-align: center; padding: 5px; border-radius: 8px; border: 1px solid #e2e8f0; }
-        .size-box b { display: block; font-size: 0.9rem; color: var(--dark); }
-        .size-box span { font-size: 0.6rem; color: #94a3b8; font-weight: 700; }
+        /* LISTA DE ITEMS DENTRO DE LA TARJETA */
+        .order-items { background: #f8fafc; border-radius: 8px; padding: 10px; margin: 10px 0; border: 1px dashed #cbd5e1; }
+        .order-row { display: flex; justify-content: space-between; font-size: 0.85rem; border-bottom: 1px solid #e2e8f0; padding: 5px 0; }
+        .order-row:last-child { border-bottom: none; }
+        .order-row strong { color: var(--dark); }
 
-        /* FACTURA TAG */
-        .factura-tag { display: inline-block; background: var(--dark); color: white; font-size: 0.6rem; font-weight: 700; padding: 2px 6px; border-radius: 4px; margin-top: 5px; }
-
-        /* CALENDARIO */
-        .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; margin-top: 15px; }
-        .cal-day { aspect-ratio: 1; border: 1px solid #e2e8f0; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.8rem; background: white; cursor: pointer; position: relative; }
-        .cal-day.today { background: var(--blue); color: white; border-color: var(--blue); }
-        .cal-day.has-note::after { content:''; position:absolute; bottom:5px; width:5px; height:5px; background:var(--amber); border-radius:50%; }
-        
         /* BOTONES */
-        .btn-act { width: 100%; padding: 10px; border-radius: 10px; border: none; font-weight: 700; font-size: 0.75rem; margin-top: 10px; cursor: pointer; display: flex; justify-content: center; gap: 5px; align-items: center; transition: 0.2s; }
+        .btn-act { width: 100%; padding: 12px; border-radius: 10px; border: none; font-weight: 800; font-size: 0.75rem; margin-top: 5px; cursor: pointer; display: flex; justify-content: center; gap: 8px; align-items: center; transition: 0.2s; }
         .b-dark { background: var(--dark-light); color: white; }
+        .b-blue { background: var(--blue); color: white; }
         .b-wsp { background: #25D366; color: white; }
-        .b-done { background: transparent; color: var(--green); border: 1px solid var(--green); cursor: default; }
-        
-        /* SNAPSHOT STATUS */
-        #snap-date { margin: 10px 0; font-size: 0.8rem; font-weight: 700; color: var(--blue); background: var(--blue-soft); padding: 8px; border-radius: 8px; }
+        .b-pdf { background: #ef4444; color: white; }
 
         .search-box { width: 100%; padding: 12px; border-radius: 12px; border: 1px solid #cbd5e1; font-weight: 600; margin-bottom: 15px; }
 
-        /* TEMP LIST MODAL */
-        .temp-list-container { max-height: 150px; overflow-y: auto; margin-top: 15px; border: 1px solid #e2e8f0; border-radius: 8px; padding: 5px; background: #f8fafc; text-align: left; }
-        .temp-item { font-size: 0.8rem; padding: 8px; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; background: white; border-radius: 5px; margin-bottom: 3px; }
-        .temp-item b { color: var(--blue); }
+        /* ESTILOS MODAL MEJORADA */
+        .input-group { margin-bottom: 10px; text-align: left; }
+        .input-group label { font-size: 0.75rem; font-weight: 700; color: #64748b; display: block; margin-bottom: 4px; }
+        .custom-input { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 8px; font-family: inherit; }
+        
+        .temp-list { max-height: 150px; overflow-y: auto; background: #f1f5f9; border-radius: 8px; padding: 5px; margin-top: 10px; }
+        .temp-item { background: white; padding: 8px; margin-bottom: 5px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+
+        /* CALENDARIO SIMPLE */
+        .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; margin-top: 15px; }
+        .cal-day { aspect-ratio: 1; border: 1px solid #e2e8f0; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.8rem; background: white; cursor: pointer; position: relative; }
+        .cal-day.has-note { border: 2px solid var(--blue); color: var(--blue); background: var(--blue-soft); }
     </style>
 </head>
 <body>
@@ -91,30 +85,25 @@
 <header>
     <div class="brand">
         <h1>IDEAS TEXTILES</h1>
-        <small>FINAL V104</small>
+        <small>V105 ULTRA FLEX</small>
     </div>
-    <button class="btn-ai" onclick="App.AI.trigger()">
-        <i class="fa-solid fa-brain"></i> IA SCAN
+    <button class="btn-ai" style="background:none; border:none; color:white; font-size:1.2rem;" onclick="App.Backup.downloadPDF()">
+        <i class="fa-solid fa-file-pdf"></i>
     </button>
 </header>
 
 <section id="v-bodega" class="view active">
-    <input type="text" id="search" class="search-box" placeholder="🔍 Buscar TELA, SKU o PRODUCTO..." oninput="App.Render.bodega()">
-    <button class="btn-act b-dark" onclick="App.Actions.modalProd()">+ NUEVO PRODUCTO MANUAL</button>
+    <input type="text" id="search" class="search-box" placeholder="🔍 Buscar producto..." oninput="App.Render.bodega()">
+    <button class="btn-act b-dark" onclick="App.Actions.modalProd()">+ CREAR PRODUCTO</button>
     <br><br>
     <div id="list-bodega"></div>
 </section>
 
 <section id="v-ordenes" class="view">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-        <h2 style="font-size:1.2rem; font-weight:800;">PEDIDOS</h2>
-        <button class="btn-ai" style="background: #128c7e;" onclick="App.Backup.sendDashboard()">
-            <i class="fa-brands fa-whatsapp"></i> DASHBOARD
-        </button>
-    </div>
+    <h2 style="font-size:1.2rem; font-weight:800; margin-bottom:15px;">PEDIDOS ACTIVOS</h2>
     
-    <button class="btn-act" style="background:white; border:2px dashed #cbd5e1; color:#64748b; margin-bottom:20px;" onclick="App.Actions.modalOrderMixer()">
-        <i class="fa-solid fa-cart-plus"></i> NUEVO PEDIDO MIXTO (TALLAS + PRODUCTOS)
+    <button class="btn-act b-blue" style="margin-bottom:20px; box-shadow: 0 4px 15px rgba(37,99,235,0.3);" onclick="App.Actions.modalNewOrder()">
+        <i class="fa-solid fa-cart-shopping"></i> NUEVO PEDIDO (VARIOS ITEMS)
     </button>
     
     <div id="list-ordenes"></div>
@@ -122,29 +111,26 @@
 
 <section id="v-agenda" class="view">
     <div class="card">
-        <div class="inv-row">
-            <button onclick="App.Calendar.move(-1)" style="border:none; background:none; font-size:1.2rem;"><i class="fa-solid fa-chevron-left"></i></button>
-            <h3 id="cal-title" style="margin:0; font-weight:800;">CALENDARIO</h3>
-            <button onclick="App.Calendar.move(1)" style="border:none; background:none; font-size:1.2rem;"><i class="fa-solid fa-chevron-right"></i></button>
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+            <button onclick="App.Calendar.move(-1)" style="border:none;background:none;"><i class="fa-solid fa-chevron-left"></i></button>
+            <h3 id="cal-title" style="margin:0;">MES</h3>
+            <button onclick="App.Calendar.move(1)" style="border:none;background:none;"><i class="fa-solid fa-chevron-right"></i></button>
         </div>
         <div id="cal-grid" class="cal-grid"></div>
-        <p style="font-size:0.7rem; color:#64748b; text-align:center; margin-top:10px;">* Los despachos se agregan automáticamente aquí.</p>
+        <p style="text-align:center; font-size:0.7rem; color:#94a3b8; margin-top:10px;">Los despachos se guardan aquí automáticamente.</p>
     </div>
-
-    <div class="card" style="text-align:center; border: 2px solid var(--dark-light);">
-        <i class="fa-solid fa-floppy-disk" style="font-size:2rem; color:var(--dark); margin-bottom:10px;"></i>
-        <h3 style="margin:0; font-weight:800;">COPIA DE SEGURIDAD</h3>
-        <p style="font-size:0.75rem; color:#64748b;">Descarga el archivo y envíalo a tu WhatsApp para no perder nada.</p>
-        
-        <div id="snap-date">NO HAY COPIAS</div>
-
-        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:15px;">
-            <button class="btn-act b-dark" onclick="App.Backup.saveSnap()">
-                <i class="fa-solid fa-download"></i> DESCARGAR
-            </button>
-            <button class="btn-act" style="background:#e2e8f0; color:var(--dark);" onclick="App.Backup.loadSnap()">
-                <i class="fa-solid fa-upload"></i> RESTAURAR
-            </button>
+    
+    <div class="card" style="text-align:center;">
+        <i class="fa-solid fa-file-pdf" style="font-size:3rem; color:var(--red); margin-bottom:10px;"></i>
+        <h3>REPORTES & BACKUP</h3>
+        <p style="font-size:0.8rem; color:#64748b;">Descarga todo tu sistema en un PDF visual o JSON.</p>
+        <button class="btn-act b-pdf" onclick="App.Backup.downloadPDF()">DESCARGAR REPORTE PDF</button>
+        <button class="btn-act b-dark" onclick="App.Backup.downloadJSON()">BACKUP DATOS (JSON)</button>
+        <div style="margin-top:10px;">
+             <label style="font-size:0.7rem; color:var(--blue); font-weight:bold; cursor:pointer;">
+                <input type="file" hidden onchange="App.Backup.restoreJSON(this)">
+                <i class="fa-solid fa-upload"></i> RESTAURAR RESPALDO
+            </label>
         </div>
     </div>
 </section>
@@ -155,11 +141,8 @@
     <i class="fa-solid fa-calendar-days" onclick="App.UI.go('agenda', this)"></i>
 </nav>
 
-<input type="file" id="file-in" hidden multiple accept="image/*,.pdf,.xlsx,.xls">
-
 <script>
 const App = {
-    // BASE DE DATOS LOCAL
     db: {
         inv: JSON.parse(localStorage.getItem('db_inv')) || [],
         ord: JSON.parse(localStorage.getItem('db_ord')) || [],
@@ -171,16 +154,6 @@ const App = {
         this.Render.bodega();
         this.Render.ordenes();
         this.Calendar.render();
-        this.Backup.init();
-        
-        window.addEventListener('storage', () => {
-            App.db.inv = JSON.parse(localStorage.getItem('db_inv')) || [];
-            App.db.ord = JSON.parse(localStorage.getItem('db_ord')) || [];
-            App.db.log = JSON.parse(localStorage.getItem('db_log')) || {};
-            App.Render.bodega(); App.Render.ordenes(); App.Calendar.render();
-        });
-        
-        this.AI.worker = Tesseract.createWorker();
     },
 
     save() {
@@ -196,7 +169,6 @@ const App = {
             document.querySelectorAll('.dock i').forEach(i => i.classList.remove('active'));
             document.getElementById('v-'+id).classList.add('active');
             el.classList.add('active');
-            window.scrollTo({top:0, behavior:'smooth'});
         }
     },
 
@@ -206,234 +178,345 @@ const App = {
             const list = App.db.inv.filter(i => i.n.includes(q));
             document.getElementById('list-bodega').innerHTML = list.map((p, i) => `
                 <div class="card">
-                    <div class="inv-row">
-                        <h3 style="margin:0; font-size:1rem;">${p.n}</h3>
-                        <i class="fa-solid fa-pen" style="color:var(--blue); cursor:pointer;" onclick="App.Actions.modalProd(${i})"></i>
+                    <div style="display:flex; justify-content:space-between;">
+                        <h3 style="margin:0;">${p.n}</h3>
+                        <i class="fa-solid fa-pen" onclick="App.Actions.modalProd(${i})" style="color:var(--blue); cursor:pointer;"></i>
                     </div>
-                    <div class="inv-sizes">
-                        ${Object.entries(p.s).map(([k,v])=>`<div class="size-box"><b>${v}</b><span>${k}</span></div>`).join('')}
+                    <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:10px;">
+                        ${Object.entries(p.s).map(([k,v]) => 
+                            `<span style="background:#f1f5f9; padding:4px 8px; border-radius:6px; font-size:0.75rem;"><b>${k}:</b> ${v}</span>`
+                        ).join('')}
                     </div>
                 </div>
-            `).join('') || '<div style="text-align:center;color:#94a3b8">Sin resultados</div>';
+            `).join('') || '<div style="text-align:center;color:#94a3b8">Sin inventario</div>';
         },
 
         ordenes() {
             const list = document.getElementById('list-ordenes');
-            if(App.db.ord.length === 0) return list.innerHTML = '<div style="text-align:center;padding:20px;color:#94a3b8">No hay pedidos pendientes</div>';
+            // Filtrar o arreglar datos viejos si existen
+            const validOrders = App.db.ord.filter(o => o.items && Array.isArray(o.items));
             
-            list.innerHTML = App.db.ord.slice().reverse().map((o, idx) => {
-                const realIdx = App.db.ord.length - 1 - idx;
-                let statusInfo = '', actionBtn = '';
-
-                if(o.st === 'bodega') {
-                    statusInfo = `<span class="chip c-bodega"><i class="fa-solid fa-warehouse"></i> EN BODEGA</span>`;
-                    actionBtn = `<button class="btn-act b-dark" onclick="App.Actions.cycle(${realIdx})">EMPAQUETAR <i class="fa-solid fa-box"></i></button>`;
-                } else if(o.st === 'sinstock') {
-                    statusInfo = `<span class="chip c-sinstock"><i class="fa-solid fa-triangle-exclamation"></i> SIN STOCK</span>`;
-                    actionBtn = `<button class="btn-act b-wsp" onclick="App.Actions.askTaller('${o.p}','${o.sz}')">PEDIR A TALLER <i class="fa-brands fa-whatsapp"></i></button>`;
-                } else if(o.st === 'pack') {
-                    statusInfo = `<span class="chip c-pack"><i class="fa-solid fa-tape"></i> EMPAQUETADO</span>`;
-                    actionBtn = `<button class="btn-act" style="background:var(--green); color:white;" onclick="App.Actions.cycle(${realIdx})">DESPACHAR <i class="fa-solid fa-truck"></i></button>`;
-                } else if(o.st === 'done') {
-                    statusInfo = `<span class="chip c-done"><i class="fa-solid fa-check-double"></i> DESPACHADO</span>`;
-                    actionBtn = `<button class="btn-act b-done">Factura #${o.fac}</button>`;
-                }
+            if(validOrders.length === 0) return list.innerHTML = '<div style="text-align:center;padding:20px;color:#94a3b8">No hay pedidos activos</div>';
+            
+            list.innerHTML = validOrders.slice().reverse().map((o, idx) => {
+                const realIdx = App.db.ord.indexOf(o); // Encontrar índice real para acciones
+                
+                let stBadge = o.st==='done' ? '<span class="chip c-done">DESPACHADO</span>' : 
+                              (o.st==='pack' ? '<span class="chip c-pack">EMPAQUETADO</span>' : '<span class="chip c-bodega">EN PROCESO</span>');
+                
+                // Generar lista HTML de items
+                const itemsHtml = o.items.map(it => `
+                    <div class="order-row">
+                        <span>${it.p}</span>
+                        <span>Talla: <b>${it.sz}</b> x${it.q}</span>
+                    </div>
+                `).join('');
 
                 return `
-                <div class="card" style="border-left:5px solid ${o.st==='sinstock'?'var(--red)':(o.st==='done'?'var(--green)':'var(--blue)')}">
-                    <div style="display:flex; justify-content:space-between;">
-                        ${statusInfo}
+                <div class="card" style="border-left:5px solid ${o.st==='done'?'var(--green)':'var(--blue)'}">
+                    <div style="display:flex; justify-content:space-between; align-items:flex-start;">
                         <div>
-                            <i class="fa-solid fa-pen-to-square" style="color:var(--blue); cursor:pointer; margin-right:10px;" onclick="App.Actions.editOrd(${realIdx})"></i>
-                            <i class="fa-solid fa-trash" style="color:#cbd5e1; cursor:pointer;" onclick="App.Actions.delOrd(${realIdx})"></i>
+                            ${stBadge}
+                            <h3 style="margin:5px 0 0; font-size:1.1rem;">${o.c}</h3>
+                            ${o.fac ? `<small style="background:var(--dark); color:white; padding:2px 6px; border-radius:4px;">FAC: ${o.fac}</small>` : ''}
                         </div>
+                        <i class="fa-solid fa-trash" style="color:#cbd5e1; cursor:pointer;" onclick="App.Actions.delOrd(${realIdx})"></i>
                     </div>
-                    <div style="margin-top:5px;">
-                        <h3 style="margin:0; color:var(--dark);">${o.c}</h3>
-                        <p style="margin:2px 0; font-size:0.85rem; color:#64748b;">${o.p} | Talla: ${o.sz} | Cant: ${o.q}</p>
-                        ${o.fac ? `<span class="factura-tag">FAC: ${o.fac}</span>` : ''}
+
+                    <div class="order-items">
+                        ${itemsHtml}
                     </div>
-                    ${actionBtn}
-                    ${o.st!=='done' ? `<div style="text-align:right; margin-top:5px;"><small onclick="App.Actions.noStock(${realIdx})" style="color:var(--red); cursor:pointer; font-weight:700;">Marcar SIN STOCK</small></div>` : ''}
+
+                    ${o.st === 'bodega' ? `<button class="btn-act b-dark" onclick="App.Actions.cycle(${realIdx})">MARCAR EMPAQUETADO <i class="fa-solid fa-box"></i></button>` : ''}
+                    ${o.st === 'pack' ? `<button class="btn-act b-blue" onclick="App.Actions.cycle(${realIdx})">DESPACHAR <i class="fa-solid fa-truck"></i></button>` : ''}
                 </div>`;
             }).join('');
         }
     },
 
     Actions: {
-        async modalProd(i=null) {
-            const item = i!==null ? App.db.inv[i] : {n:'', s:{S:0,M:0,L:0,XL:0}};
-            const {value:f} = await Swal.fire({
-                title: i!==null?'Editar Producto':'Nuevo Producto',
-                html: `<input id="sw-n" class="swal2-input" placeholder="Nombre (Ej: POLERA ROJA)" value="${item.n}">
-                       <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;">
-                       ${Object.keys(item.s).map(k=>`<div><label>${k}</label><input type="number" id="sw-${k}" class="swal2-input" style="height:40px;margin:0" value="${item.s[k]}"></div>`).join('')}</div>`,
-                preConfirm:()=>{
-                    const n=document.getElementById('sw-n').value.toUpperCase();
-                    const s={}; Object.keys(item.s).forEach(k=>s[k]=Number(document.getElementById('sw-'+k).value));
-                    return {n,s};
-                }
-            });
-            if(f && f.n) { if(i!==null) App.db.inv[i]=f; else App.db.inv.push(f); App.save(); }
-        },
+        // --- MODAL FLEXIBLE PARA PEDIDOS ---
+        async modalNewOrder() {
+            // Lista de productos para autocompletar
+            const prods = App.db.inv.map(i => `<option value="${i.n}">`).join('');
+            let cart = [];
 
-        // --- MIXER DE PEDIDOS: MEZCLA TALLAS Y PRODUCTOS EN UNA ORDEN ---
-        async modalOrderMixer() {
-            const prods = [...new Set(App.db.inv.map(i=>i.n))].map(p=>`<option value="${p}">`).join('');
-            let tempCart = []; 
+            const updateCartHTML = () => {
+                const cDiv = document.getElementById('temp-cart-list');
+                if(!cart.length) return cDiv.innerHTML = '<small style="display:block;text-align:center;color:#94a3b8;padding:10px;">Nada agregado aún</small>';
+                cDiv.innerHTML = cart.map((it, ix) => `
+                    <div class="temp-item">
+                        <span><b>${it.p}</b> (T: ${it.sz})</span>
+                        <span>x${it.q} <i class="fa-solid fa-times" style="color:red; margin-left:5px; cursor:pointer;" onclick="window.delCartItem(${ix})"></i></span>
+                    </div>
+                `).join('');
+            };
+
+            window.delCartItem = (ix) => { cart.splice(ix,1); updateCartHTML(); };
 
             await Swal.fire({
-                title: '🛒 NUEVO PEDIDO',
+                title: 'NUEVO PEDIDO MULTI-ITEM',
                 width: 600,
                 html: `
-                    <input id="mix-c" class="swal2-input" placeholder="Nombre del Cliente (Ej: JUAN)">
-                    <div style="background:#f1f5f9; padding:10px; border-radius:10px; margin-top:10px;">
-                        <input id="mix-p" class="swal2-input" list="dl-p" placeholder="Escribe Producto..." style="margin-top:0"><datalist id="dl-p">${prods}</datalist>
-                        <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap:5px; margin-top:5px;">
-                            <div><small>S</small><input type="number" id="mix-S" class="swal2-input" style="margin:0; height:35px; padding:5px;" placeholder="0"></div>
-                            <div><small>M</small><input type="number" id="mix-M" class="swal2-input" style="margin:0; height:35px; padding:5px;" placeholder="0"></div>
-                            <div><small>L</small><input type="number" id="mix-L" class="swal2-input" style="margin:0; height:35px; padding:5px;" placeholder="0"></div>
-                            <div><small>XL</small><input type="number" id="mix-XL" class="swal2-input" style="margin:0; height:35px; padding:5px;" placeholder="0"></div>
+                    <div class="input-group">
+                        <label>NOMBRE CLIENTE</label>
+                        <input id="new-client" class="custom-input" placeholder="Ej: Maria Perez">
+                    </div>
+                    
+                    <div style="background:#f8fafc; padding:10px; border-radius:8px; border:1px solid #e2e8f0; margin-bottom:10px;">
+                        <div class="input-group">
+                            <label>PRODUCTO</label>
+                            <input id="add-prod" class="custom-input" list="dl-prods" placeholder="Busca o escribe...">
+                            <datalist id="dl-prods">${prods}</datalist>
                         </div>
-                        <button type="button" id="btn-add-mix" class="swal2-styled" style="background:var(--dark); width:100%; margin-top:10px; border:none; padding:10px; color:white; border-radius:5px;">
-                            <i class="fa-solid fa-plus"></i> AGREGAR A LISTA
+                        <div style="display:flex; gap:10px;">
+                            <div class="input-group" style="flex:2;">
+                                <label>TALLA (LIBRE)</label>
+                                <input id="add-size" class="custom-input" placeholder="Ej: 42, XXL, Única...">
+                            </div>
+                            <div class="input-group" style="flex:1;">
+                                <label>CANT.</label>
+                                <input id="add-qty" type="number" class="custom-input" value="1">
+                            </div>
+                        </div>
+                        <button type="button" id="btn-add-item" class="btn-act b-dark" style="margin-top:0;">
+                            <i class="fa-solid fa-plus"></i> AGREGAR
                         </button>
                     </div>
-                    <div id="mix-list" class="temp-list-container">
-                        <small style="color:#94a3b8; display:block; text-align:center; padding:10px;">Lista vacía...</small>
-                    </div>
+
+                    <div id="temp-cart-list" class="temp-list"></div>
                 `,
-                confirmButtonText: '✅ GUARDAR TODO',
                 showCancelButton: true,
+                confirmButtonText: 'GUARDAR PEDIDO COMPLETO',
                 didOpen: () => {
-                    const renderList = () => {
-                        const lc = document.getElementById('mix-list');
-                        if(!tempCart.length) return lc.innerHTML = '<small style="color:#94a3b8; display:block; text-align:center;">Lista vacía...</small>';
-                        lc.innerHTML = tempCart.map((t,x) => `
-                            <div class="temp-item">
-                                <span><b>${t.p}</b> (T:${t.sz})</span>
-                                <span>x${t.q} <i class="fa-solid fa-trash" style="color:var(--red); cursor:pointer; margin-left:5px;" onclick="window.delTemp(${x})"></i></span>
-                            </div>`).join('');
-                    };
-                    window.delTemp = (x) => { tempCart.splice(x,1); renderList(); };
-                    
-                    document.getElementById('btn-add-mix').onclick = () => {
-                        const p = document.getElementById('mix-p').value.toUpperCase();
-                        if(!p) return;
-                        ['S','M','L','XL'].forEach(sz => {
-                            const q = Number(document.getElementById('mix-'+sz).value);
-                            if(q > 0) tempCart.push({p, sz, q});
-                            document.getElementById('mix-'+sz).value = '';
-                        });
-                        renderList();
+                    updateCartHTML();
+                    document.getElementById('btn-add-item').onclick = () => {
+                        const p = document.getElementById('add-prod').value.toUpperCase();
+                        const sz = document.getElementById('add-size').value.toUpperCase();
+                        const q = Number(document.getElementById('add-qty').value);
+
+                        if(!p || !sz || q <= 0) return Swal.showValidationMessage('Faltan datos del producto');
+                        
+                        cart.push({p, sz, q});
+                        // Limpiar campos items
+                        document.getElementById('add-prod').value = '';
+                        document.getElementById('add-size').value = '';
+                        document.getElementById('add-qty').value = '1';
+                        updateCartHTML();
                     };
                 },
                 preConfirm: () => {
-                    const c = document.getElementById('mix-c').value.toUpperCase();
-                    if(!c) return Swal.showValidationMessage('Falta Nombre Cliente');
-                    if(!tempCart.length) return Swal.showValidationMessage('Lista vacía');
-                    return {c, items: tempCart};
+                    const c = document.getElementById('new-client').value.toUpperCase();
+                    if(!c) return Swal.showValidationMessage('¡Falta el nombre del cliente!');
+                    if(!cart.length) return Swal.showValidationMessage('¡No has agregado productos!');
+                    return { c, items: cart };
                 }
             }).then((res) => {
                 if(res.isConfirmed) {
-                    res.value.items.forEach(i => App.db.ord.push({c:res.value.c, p:i.p, sz:i.sz, q:i.q, st:'bodega', fac:null}));
+                    App.db.ord.push({
+                        c: res.value.c,
+                        items: res.value.items,
+                        st: 'bodega',
+                        fac: null,
+                        date: new Date().toLocaleDateString()
+                    });
                     App.save();
-                    Swal.fire('Éxito', 'Pedido ingresado correctamente', 'success');
+                    Swal.fire('¡Creado!', 'El pedido ha sido registrado.', 'success');
                 }
             });
         },
 
-        async editOrd(i) {
-            const o = App.db.ord[i];
-            const {value:n} = await Swal.fire({
-                title: 'Editar Pedido',
-                html: `<input id="eo-c" class="swal2-input" value="${o.c}"><input id="eo-q" type="number" class="swal2-input" value="${o.q}">`,
-                preConfirm: () => ({c:document.getElementById('eo-c').value.toUpperCase(), q:Number(document.getElementById('eo-q').value)})
+        async modalProd(i=null) {
+            const item = i!==null ? App.db.inv[i] : {n:'', s:{}};
+            // Convertir objeto tallas a texto para editar facil
+            const sizeStr = Object.entries(item.s).map(([k,v])=>`${k}:${v}`).join(', ');
+            
+            const {value:form} = await Swal.fire({
+                title: i!==null?'Editar':'Nuevo',
+                html: `
+                    <label>Nombre Producto</label>
+                    <input id="sw-n" class="swal2-input" value="${item.n}">
+                    <label>Inventario (Formato: Talla:Cant, Talla:Cant)</label>
+                    <input id="sw-s" class="swal2-input" value="${sizeStr}" placeholder="Ej: S:10, M:5, 42:2">
+                `,
+                preConfirm: () => {
+                    const n = document.getElementById('sw-n').value.toUpperCase();
+                    const sRaw = document.getElementById('sw-s').value;
+                    // Parsear texto a objeto
+                    const s = {};
+                    sRaw.split(',').forEach(x => {
+                        const [k,v] = x.split(':');
+                        if(k && v) s[k.trim().toUpperCase()] = Number(v);
+                    });
+                    return {n,s};
+                }
             });
-            if(n) { o.c=n.c; o.q=n.q; App.save(); }
+
+            if(form) {
+                if(i!==null) App.db.inv[i] = form;
+                else App.db.inv.push(form);
+                App.save();
+            }
         },
 
         async cycle(i) {
             const o = App.db.ord[i];
+            
             if(o.st === 'bodega') {
-                o.st = 'pack'; App.save();
-            } else if(o.st === 'pack') {
-                const {value:fac} = await Swal.fire({title:'FACTURA N°', input:'text', inputValidator:v=>!v&&'Requerido'});
+                o.st = 'pack';
+                App.save();
+            } 
+            else if(o.st === 'pack') {
+                const {value:fac} = await Swal.fire({
+                    title: 'DESPACHO',
+                    text: 'Ingresa Número de Factura:',
+                    input: 'text',
+                    inputPlaceholder: 'Ej: 1045'
+                });
+
                 if(fac) {
-                    const prod = App.db.inv.find(p => p.n === o.p);
-                    if(prod && prod.s[o.sz] >= o.q) {
-                        prod.s[o.sz] -= o.q;
-                        o.st = 'done'; o.fac = fac;
-                        
-                        // --- AUTO AGREGAR AL CALENDARIO ---
-                        const today = new Date();
-                        const key = `${today.getDate()}-${today.getMonth()}-${today.getFullYear()}`;
-                        const logTxt = `✅ FAC ${fac}: ${o.c} (${o.p} ${o.sz} x${o.q})`;
-                        App.db.log[key] = (App.db.log[key] ? App.db.log[key] + '\n' : '') + logTxt;
-                        
-                        App.save();
-                        Swal.fire('Despachado', 'Stock descontado y registrado en Calendario', 'success');
-                    } else {
-                        Swal.fire('Error', 'No hay stock suficiente', 'error');
-                    }
+                    // Descontar inventario (intento de match)
+                    let stockLog = [];
+                    o.items.forEach(it => {
+                        const prod = App.db.inv.find(x => x.n === it.p);
+                        if(prod && prod.s[it.sz] !== undefined) {
+                            prod.s[it.sz] -= it.q;
+                            stockLog.push(`✅ ${it.p} (${it.sz}): Stock descontado.`);
+                        } else {
+                            stockLog.push(`⚠️ ${it.p} (${it.sz}): No se encontró stock exacto, no se descontó.`);
+                        }
+                    });
+
+                    o.st = 'done';
+                    o.fac = fac;
+                    o.outDate = new Date();
+
+                    // Escribir en Calendario
+                    const k = `${o.outDate.getDate()}-${o.outDate.getMonth()}-${o.outDate.getFullYear()}`;
+                    const entry = `📦 FAC ${fac}: ${o.c} (Items: ${o.items.length})\n`;
+                    App.db.log[k] = (App.db.log[k] || '') + entry;
+
+                    App.save();
+                    Swal.fire('Despachado', stockLog.join('<br>'), 'success');
                 }
             }
         },
 
-        noStock(i) { App.db.ord[i].st = 'sinstock'; App.save(); },
-        delOrd(i) { Swal.fire({title:'¿Borrar?', showCancelButton:true}).then(r=>{if(r.isConfirmed){App.db.ord.splice(i,1);App.save();}}); },
-        askTaller(p,s) { window.open(`https://wa.me/?text=${encodeURIComponent(`URGENTE TALLER: ${p} Talla ${s}`)}`); }
+        delOrd(i) {
+            Swal.fire({title:'¿Borrar?', icon:'warning', showCancelButton:true}).then(r=>{
+                if(r.isConfirmed){ App.db.ord.splice(i,1); App.save(); }
+            });
+        }
     },
 
     Backup: {
-        init() {
-            const d = localStorage.getItem('snap_date');
-            if(d) document.getElementById('snap-date').innerText = 'ÚLTIMO: ' + d;
+        // GENERAR PDF VISUAL Y BONITO
+        downloadPDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            // TITULO
+            doc.setFillColor(15, 23, 42); // --dark
+            doc.rect(0, 0, 210, 20, 'F');
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(14);
+            doc.text("IDEAS TEXTILES - REPORTE GENERAL", 10, 13);
+            doc.setFontSize(8);
+            doc.text(`Generado: ${new Date().toLocaleString()}`, 150, 13);
+
+            let y = 30;
+
+            // 1. INVENTARIO
+            doc.setTextColor(0,0,0);
+            doc.setFontSize(12);
+            doc.text("INVENTARIO ACTUAL", 14, y);
+            y += 5;
+            
+            const invBody = App.db.inv.map(i => [
+                i.n, 
+                Object.entries(i.s).map(([k,v]) => `${k}:${v}`).join(', ')
+            ]);
+
+            doc.autoTable({
+                startY: y,
+                head: [['Producto', 'Stock Detallado']],
+                body: invBody,
+                theme: 'grid',
+                headStyles: { fillColor: [37, 99, 235] }
+            });
+
+            y = doc.lastAutoTable.finalY + 15;
+
+            // 2. PEDIDOS ACTIVOS
+            doc.text("PEDIDOS EN CURSO (Pendientes y Empaquetados)", 14, y);
+            y += 5;
+
+            const ordBody = App.db.ord
+                .filter(o => o.st !== 'done')
+                .map(o => [
+                    o.c,
+                    o.items.map(it => `${it.p} (${it.sz}) x${it.q}`).join('\n'),
+                    o.st.toUpperCase()
+                ]);
+
+            doc.autoTable({
+                startY: y,
+                head: [['Cliente', 'Items', 'Estado']],
+                body: ordBody,
+                theme: 'striped',
+                headStyles: { fillColor: [217, 119, 6] } // Amber
+            });
+
+            y = doc.lastAutoTable.finalY + 15;
+
+            // 3. ULTIMOS DESPACHOS
+            doc.text("ULTIMOS DESPACHOS (Con Factura)", 14, y);
+            y += 5;
+
+            const doneBody = App.db.ord
+                .filter(o => o.st === 'done')
+                .slice(-10) // Ultimos 10
+                .map(o => [
+                    o.fac || 'S/N',
+                    o.c,
+                    o.items.map(it => `${it.p} (${it.sz}) x${it.q}`).join(', ')
+                ]);
+
+            doc.autoTable({
+                startY: y,
+                head: [['Factura', 'Cliente', 'Detalle']],
+                body: doneBody,
+                theme: 'striped',
+                headStyles: { fillColor: [5, 150, 105] } // Green
+            });
+
+            doc.save(`REPORTE_IDEAS_${new Date().toLocaleDateString().replace(/\//g,'-')}.pdf`);
         },
-        saveSnap() {
+
+        downloadJSON() {
             const data = JSON.stringify(App.db);
             const blob = new Blob([data], {type: "application/json"});
+            const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
-            a.href = URL.createObjectURL(blob);
-            a.download = `IDEAS_DATA_${new Date().toLocaleDateString().replace(/\//g,'-')}.json`;
+            a.href = url;
+            a.download = "BACKUP_DATA.json";
+            document.body.appendChild(a);
             a.click();
-            localStorage.setItem('snap_date', new Date().toLocaleString());
-            this.init();
+            document.body.removeChild(a);
         },
-        async loadSnap() {
-            const {value:file} = await Swal.fire({title:'Subir archivo .json', input:'file'});
-            if(file) {
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    const data = JSON.parse(e.target.result);
-                    App.db = data; App.save();
-                    Swal.fire('Restaurado', 'Datos cargados con éxito', 'success');
-                };
-                reader.readAsText(file);
-            }
-        },
-        
-        // --- NUEVO DASHBOARD WHATSAPP (TEXTO) ---
-        sendDashboard() {
-            const now = new Date();
-            const pendientes = App.db.ord.filter(o => o.st !== 'done').length;
-            const despachados = App.db.ord.filter(o => o.st === 'done').length;
-            const stockTotal = App.db.inv.reduce((acc, p) => acc + p.s.S + p.s.M + p.s.L + p.s.XL, 0);
-            
-            // Filtramos despachos de HOY (usando la fecha del sistema simple)
-            // Nota: Para precisión absoluta en producción, esto es un aproximado útil
-            
-            const msg = 
-`📊 *DASHBOARD IDEAS TEXTILES*
-📅 ${now.toLocaleDateString()} ${now.toLocaleTimeString()}
 
-📦 *Inventario Total:* ${stockTotal} unid.
-⏳ *Pedidos Pendientes:* ${pendientes}
-✅ *Despachados Historico:* ${despachados}
-
-_Generado automáticamente por el sistema_`;
-
-            window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`);
+        restoreJSON(input) {
+            const file = input.files[0];
+            if(!file) return;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    App.db = JSON.parse(e.target.result);
+                    App.save();
+                    Swal.fire('Restaurado', 'Tus datos han sido cargados.', 'success');
+                } catch(e) { Swal.fire('Error', 'Archivo inválido', 'error'); }
+            };
+            reader.readAsText(file);
         }
     },
 
@@ -441,7 +524,7 @@ _Generado automáticamente por el sistema_`;
         move(dir) { App.db.date.setMonth(App.db.date.getMonth() + dir); this.render(); },
         render() {
             const d = App.db.date;
-            const mNames = ["ENE","FEB","MAR","ABR","MAY","JUN","JUL","AGO","SEP","OCT","NOV","DIC"];
+            const mNames = ["ENERO","FEBRERO","MARZO","ABRIL","MAYO","JUNIO","JULIO","AGOSTO","SEPTIEMBRE","OCTUBRE","NOVIEMBRE","DICIEMBRE"];
             document.getElementById('cal-title').innerText = `${mNames[d.getMonth()]} ${d.getFullYear()}`;
             
             const first = new Date(d.getFullYear(), d.getMonth(), 1).getDay();
@@ -452,22 +535,13 @@ _Generado automáticamente por el sistema_`;
             for(let i=1; i<=days; i++) {
                 const k = `${i}-${d.getMonth()}-${d.getFullYear()}`;
                 const hasNote = App.db.log[k];
-                html += `<div class="cal-day ${hasNote?'has-note':''}" onclick="App.Calendar.edit('${k}', ${i})">${i}</div>`;
+                html += `<div class="cal-day ${hasNote?'has-note':''}" onclick="App.Calendar.show('${k}')">${i}</div>`;
             }
             document.getElementById('cal-grid').innerHTML = html;
         },
-        async edit(k, n) {
-            const {value:t} = await Swal.fire({title:`Bitácora Día ${n}`, input:'textarea', inputValue:App.db.log[k]||''});
-            if(t!==undefined) { App.db.log[k]=t; App.save(); }
-        }
-    },
-
-    AI: {
-        trigger() { document.getElementById('file-in').click(); },
-        async process(files) {
-            Swal.fire({title:'Analizando...', didOpen:()=>Swal.showLoading()});
-            // (Logica de IA simplificada para este bloque final, mantiene la original)
-            setTimeout(() => { Swal.close(); Swal.fire('Procesado','(Simulación IA) Datos cargados','success'); }, 1000);
+        show(k) {
+            const txt = App.db.log[k] || 'Sin actividad.';
+            Swal.fire({ title: `Día ${k}`, text: txt });
         }
     }
 };
