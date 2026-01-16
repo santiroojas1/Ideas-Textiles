@@ -3,14 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>IDEAS TEXTILES </title>
+    <title>IDEAS TEXTILES | V129 PDF FIX</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+    
     <script src="https://unpkg.com/tesseract.js@4.0.2/dist/tesseract.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
@@ -68,7 +70,7 @@
 
 <div id="loader">
     <div class="spinner"></div>
-    <p style="margin-top:15px; font-weight:bold; color:#64748b;">CARGANDO SISTEMA...</p>
+    <p style="margin-top:15px; font-weight:bold; color:#64748b;">CARGANDO...</p>
 </div>
 
 <header>
@@ -112,7 +114,7 @@
         <h3>REPORTES</h3>
         <button class="btn btn-pdf" onclick="App.Backup.generatePDF()"><i class="fa-solid fa-file-pdf"></i> DESCARGAR INFORME PDF</button>
         <div style="margin-top:20px; padding-top:10px; border-top:1px solid #eee;">
-            <button class="btn btn-reset" onclick="App.Actions.factoryReset()">⚠️ BORRAR TODO (RESET)</button>
+            <button class="btn btn-reset" onclick="App.Actions.factoryReset()">⚠️ RESET FABRICA (BORRAR TODO)</button>
         </div>
     </div>
 </section>
@@ -195,7 +197,20 @@
                 if(list.length === 0) { el.innerHTML = '<div style="text-align:center;color:#94a3b8;margin-top:20px;">Inventario vacío.</div>'; return; }
                 el.innerHTML = list.map((p, i) => {
                     const sizes = Object.entries(p.s || {}).map(([k,v]) => `<span style="background:#f1f5f9; padding:2px 6px; border-radius:4px; font-size:0.75rem;"><b>${k}:</b>${v}</span>`).join(' ');
-                    return `<div class="card"><div style="display:flex; justify-content:space-between; align-items:flex-start;"><div><span class="sku-badge">SKU: ${p.sku}</span><h3 style="margin:4px 0;">${p.n}</h3><div style="margin-top:5px; display:flex; flex-wrap:wrap; gap:5px;">${sizes}</div></div><i class="fa-solid fa-pen" style="color:var(--primary); cursor:pointer; padding:10px;" onclick="App.Actions.modalProd(${App.db.inv.indexOf(p)})"></i></div></div>`;
+                    return `
+                    <div class="card">
+                        <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                            <div>
+                                <span class="sku-badge">SKU: ${p.sku}</span>
+                                <h3 style="margin:4px 0;">${p.n}</h3>
+                                <div style="margin-top:5px; display:flex; flex-wrap:wrap; gap:5px;">${sizes}</div>
+                            </div>
+                            <div style="display:flex; gap:10px;">
+                                <i class="fa-solid fa-pen" style="color:var(--primary); cursor:pointer;" onclick="App.Actions.modalProd(${App.db.inv.indexOf(p)})"></i>
+                                <i class="fa-solid fa-trash" style="color:var(--danger); cursor:pointer;" onclick="App.Actions.delProd(${App.db.inv.indexOf(p)})"></i>
+                            </div>
+                        </div>
+                    </div>`;
                 }).join('');
             },
             ordenes() {
@@ -212,6 +227,15 @@
         },
 
         Actions: {
+            async delProd(i) {
+                const p = App.db.inv[i];
+                if((await Swal.fire({title:'¿BORRAR PRODUCTO?', text:`Eliminar "${p.n}"`, icon:'warning', showCancelButton:true, confirmButtonColor:'#ef4444', confirmButtonText:'SÍ, BORRAR'})).isConfirmed) {
+                    App.db.inv.splice(i, 1);
+                    const k = new Date().toISOString().split('T')[0];
+                    App.db.log[k] = (App.db.log[k] || '') + `🗑️ Eliminado Producto: ${p.n}\n`;
+                    App.save(); App.Render.bodega(); Swal.fire('Eliminado', '', 'success');
+                }
+            },
             async changeStatus(i) {
                 const { value: newSt } = await Swal.fire({
                     title: 'ESTADO DEL PEDIDO', input: 'select',
@@ -260,7 +284,7 @@
                     }
                 });
             },
-            delOrd(i){ Swal.fire({title:'¿Borrar?', showCancelButton:true}).then(r=>{if(r.isConfirmed){App.db.ord.splice(i,1); App.save();}}); },
+            delOrd(i){ Swal.fire({title:'¿Borrar Pedido?', showCancelButton:true}).then(r=>{if(r.isConfirmed){App.db.ord.splice(i,1); App.save();}}); },
             async despachar(i){
                 const {value:f} = await Swal.fire({title:'N° FACTURA', input:'text'});
                 if(f) {
@@ -270,7 +294,7 @@
                 }
             },
             async factoryReset() {
-                if((await Swal.fire({title:'¿RESET TOTAL?', text:'Se borrará todo.', icon:'warning', showCancelButton:true})).isConfirmed) {
+                if((await Swal.fire({title:'¿RESET TOTAL?', text:'Se borrará TODO en la nube.', icon:'warning', showCancelButton:true})).isConfirmed) {
                     db.ref('/').set({inv:[], ord:[], log:{}}); Swal.fire('Listo','','success');
                 }
             }
@@ -334,46 +358,56 @@
 
         Backup: {
             generatePDF() {
-                const { jsPDF } = window.jspdf; const doc = new jsPDF();
-                const now = new Date().toLocaleDateString();
-                
-                // HEADER PROFESIONAL
-                doc.setFillColor(15, 23, 42); doc.rect(0, 0, 210, 40, 'F');
-                doc.setTextColor(255, 255, 255); doc.setFont("helvetica", "bold"); doc.setFontSize(22);
-                doc.text("IDEAS TEXTILES SPA", 105, 20, { align: "center" });
-                doc.setFontSize(10); doc.setFont("helvetica", "normal");
-                doc.text(`REPORTE DE GESTIÓN AL ${now}`, 105, 30, { align: "center" });
+                try {
+                    Swal.fire({title:'Generando PDF...', didOpen:()=>{Swal.showLoading()}});
+                    
+                    if (!window.jspdf) throw new Error("La librería PDF no cargó correctamente.");
+                    const { jsPDF } = window.jspdf;
+                    const doc = new jsPDF();
+                    
+                    if (typeof doc.autoTable !== 'function') {
+                        throw new Error("El complemento de Tablas no se ha cargado.");
+                    }
 
-                let y = 50;
-                
-                // 1. INVENTARIO
-                doc.setTextColor(15, 23, 42); doc.setFontSize(14); doc.setFont("helvetica", "bold");
-                doc.text("1. INVENTARIO ACTUAL", 14, y); y+=5; doc.setLineWidth(0.5); doc.line(14, y, 196, y); y+=5;
-                const bodyInv = (App.db.inv||[]).map(p => [p.sku, p.n, Object.entries(p.s).map(([k, v]) => `${k}:${v}`).join(', ')]);
-                doc.autoTable({ startY: y, head: [['SKU', 'PRODUCTO', 'STOCK']], body: bodyInv, theme: 'striped', headStyles:{fillColor:[59, 130, 246]} });
-                y = doc.lastAutoTable.finalY + 15;
+                    const now = new Date().toLocaleDateString();
+                    
+                    doc.setFillColor(15, 23, 42); doc.rect(0, 0, 210, 40, 'F');
+                    doc.setTextColor(255, 255, 255); doc.setFont("helvetica", "bold"); doc.setFontSize(22);
+                    doc.text("IDEAS TEXTILES SPA", 105, 20, { align: "center" });
+                    doc.setFontSize(10); doc.setFont("helvetica", "normal");
+                    doc.text(`REPORTE DE GESTIÓN AL ${now}`, 105, 30, { align: "center" });
 
-                // 2. PEDIDOS PENDIENTES
-                doc.text("2. PEDIDOS EN PROCESO", 14, y); y+=5; doc.line(14, y, 196, y); y+=5;
-                const bodyOrd = (App.db.ord||[]).filter(o => o.st !== 'done').map(o => [o.c, o.items.map(i => `${i.p} (${i.sz}) x${i.q}`).join('\n'), o.st]);
-                if(bodyOrd.length) { 
-                    doc.autoTable({ startY: y, head: [['CLIENTE', 'ITEMS', 'ESTADO']], body: bodyOrd, theme: 'grid', headStyles:{fillColor:[245, 158, 11]} }); 
+                    let y = 50;
+                    
+                    doc.setTextColor(15, 23, 42); doc.setFontSize(14); doc.setFont("helvetica", "bold");
+                    doc.text("1. INVENTARIO ACTUAL", 14, y); y+=5; doc.setLineWidth(0.5); doc.line(14, y, 196, y); y+=5;
+                    const bodyInv = (App.db.inv||[]).map(p => [p.sku, p.n, Object.entries(p.s).map(([k, v]) => `${k}:${v}`).join(', ')]);
+                    doc.autoTable({ startY: y, head: [['SKU', 'PRODUCTO', 'STOCK']], body: bodyInv, theme: 'striped', headStyles:{fillColor:[59, 130, 246]} });
                     y = doc.lastAutoTable.finalY + 15;
-                } else {
-                    doc.setFontSize(10); doc.setTextColor(100); doc.text("No hay pedidos pendientes.", 14, y+5); y+=15;
-                }
 
-                // 3. DESPACHADOS (LO NUEVO QUE PEDISTE)
-                doc.setFont("helvetica", "bold"); doc.setFontSize(14); doc.setTextColor(15, 23, 42);
-                doc.text("3. HISTORIAL DESPACHADOS", 14, y); y+=5; doc.line(14, y, 196, y); y+=5;
-                const bodyDone = (App.db.ord||[]).filter(o => o.st === 'done').map(o => [o.date||'-', o.fac||'S/N', o.c, o.items.map(i => `${i.p} (${i.sz}) x${i.q}`).join('\n')]);
-                if(bodyDone.length) {
-                    doc.autoTable({ startY: y, head: [['FECHA', 'FACTURA', 'CLIENTE', 'DETALLE']], body: bodyDone, theme: 'grid', headStyles:{fillColor:[16, 185, 129]} });
-                } else {
-                    doc.setFontSize(10); doc.setTextColor(100); doc.text("No hay despachos registrados.", 14, y+5);
-                }
+                    doc.text("2. PEDIDOS EN PROCESO", 14, y); y+=5; doc.line(14, y, 196, y); y+=5;
+                    const bodyOrd = (App.db.ord||[]).filter(o => o.st !== 'done').map(o => [o.c, o.items.map(i => `${i.p} (${i.sz}) x${i.q}`).join('\n'), o.st]);
+                    if(bodyOrd.length) { 
+                        doc.autoTable({ startY: y, head: [['CLIENTE', 'ITEMS', 'ESTADO']], body: bodyOrd, theme: 'grid', headStyles:{fillColor:[245, 158, 11]} }); 
+                        y = doc.lastAutoTable.finalY + 15;
+                    } else {
+                        doc.setFontSize(10); doc.setTextColor(100); doc.text("No hay pedidos pendientes.", 14, y+5); y+=15;
+                    }
 
-                doc.save(`REPORTE_IDEAS_TEXTILES_${now.replace(/\//g,'-')}.pdf`);
+                    doc.setFont("helvetica", "bold"); doc.setFontSize(14); doc.setTextColor(15, 23, 42);
+                    doc.text("3. HISTORIAL DESPACHADOS", 14, y); y+=5; doc.line(14, y, 196, y); y+=5;
+                    const bodyDone = (App.db.ord||[]).filter(o => o.st === 'done').map(o => [o.date||'-', o.fac||'S/N', o.c, o.items.map(i => `${i.p} (${i.sz}) x${i.q}`).join('\n')]);
+                    if(bodyDone.length) {
+                        doc.autoTable({ startY: y, head: [['FECHA', 'FACTURA', 'CLIENTE', 'DETALLE']], body: bodyDone, theme: 'grid', headStyles:{fillColor:[16, 185, 129]} });
+                    } else {
+                        doc.setFontSize(10); doc.setTextColor(100); doc.text("No hay despachos registrados.", 14, y+5);
+                    }
+
+                    doc.save(`REPORTE_IDEAS_TEXTILES_${now.replace(/\//g,'-')}.pdf`);
+                    Swal.close();
+                } catch (err) {
+                    Swal.fire('Error PDF', err.message, 'error');
+                }
             }
         },
 
@@ -400,7 +434,6 @@
         }
     };
 
-    // INICIAR TODO
     document.getElementById('ai-input').addEventListener('change', (e) => App.IA.process(e.target.files[0]));
     App.init();
 </script>
