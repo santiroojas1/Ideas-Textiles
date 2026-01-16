@@ -3,245 +3,115 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Ideas Textiles SpA - Sistema de Control Industrial V20</title>
+    <title>Ideas Textiles SpA - Industrial Control V22</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
         :root {
-            --primary: #0f172a; 
-            --accent: #2563eb; 
-            --bg: #f1f5f9; 
-            --white: #ffffff;
-            --success: #16a34a; 
-            --warning: #d97706; 
-            --danger: #dc2626;
-            --border: #cbd5e1;
+            --primary: #0f172a; --accent: #2563eb; --bg: #f1f5f9; --white: #ffffff;
+            --success: #16a34a; --warning: #d97706; --danger: #dc2626;
+            --info: #0284c7; --border: #cbd5e1;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
-        body { background: var(--bg); color: var(--primary); padding-bottom: 100px; line-height: 1.5; }
+        body { background: var(--bg); color: var(--primary); padding-bottom: 120px; line-height: 1.5; }
         .hidden { display: none !important; }
 
-        /* --- CABECERA PROFESIONAL --- */
+        /* --- HEADER INDUSTRIAL --- */
         .main-header { 
-            background: var(--primary); 
-            color: white; 
-            padding: 35px 20px 60px 20px; 
-            text-align: center; 
-            border-radius: 0 0 40px 40px; 
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            background: var(--primary); color: white; padding: 40px 20px 70px 20px; 
+            text-align: center; border-radius: 0 0 45px 45px; box-shadow: 0 15px 35px rgba(0,0,0,0.3);
         }
-        .main-header h1 { font-size: 1.6em; font-weight: 900; letter-spacing: -1px; text-transform: uppercase; }
+        .main-header h1 { font-size: 1.8em; font-weight: 900; letter-spacing: -1px; text-transform: uppercase; }
         .main-header h1 span { color: #60a5fa; }
         
         .user-pill {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            background: rgba(255,255,255,0.1);
-            padding: 6px 15px;
-            border-radius: 20px;
-            margin-top: 10px;
-            font-size: 0.75em;
-            font-weight: 700;
-            border: 1px solid rgba(255,255,255,0.2);
-            cursor: pointer;
+            display: inline-flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.12);
+            padding: 8px 18px; border-radius: 25px; margin-top: 15px; font-size: 0.8em;
+            font-weight: 800; border: 1px solid rgba(255,255,255,0.2); cursor: pointer;
         }
 
-        /* --- BUSCADOR FLOTANTE --- */
-        .search-area { 
-            padding: 0 20px; 
-            margin-top: -30px; 
-            margin-bottom: 30px; 
-            position: relative; 
-            z-index: 100;
-        }
+        /* --- BUSCADOR --- */
+        .search-area { padding: 0 20px; margin-top: -35px; margin-bottom: 30px; position: relative; z-index: 100; }
         .search-box { 
-            background: white; 
-            display: flex; 
-            align-items: center; 
-            padding: 5px 20px; 
-            border-radius: 20px; 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            border: 1px solid var(--white);
+            background: white; display: flex; align-items: center; padding: 8px 25px; border-radius: 25px; 
+            box-shadow: 0 15px 40px rgba(0,0,0,0.12); border: 1px solid var(--white);
         }
-        .search-box i { color: var(--accent); font-size: 1.2em; }
-        .search-box input { 
-            width: 100%; 
-            padding: 15px; 
-            border: none; 
-            outline: none; 
-            font-size: 1em; 
-            font-weight: 600;
-            color: var(--primary);
-        }
+        .search-box input { width: 100%; padding: 15px; border: none; outline: none; font-size: 1.1em; font-weight: 600; }
 
-        /* --- TARJETAS DE PRODUCCIÓN --- */
+        /* --- TARJETA DE PEDIDO ROBUSTA --- */
         .order-card { 
-            background: white; 
-            margin: 0 15px 25px 15px; 
-            border-radius: 28px; 
-            overflow: hidden; 
-            border: 1px solid var(--border); 
-            box-shadow: 0 8px 20px rgba(0,0,0,0.04);
+            background: white; margin: 0 18px 30px 18px; border-radius: 32px; 
+            overflow: hidden; border: 1px solid var(--border); box-shadow: 0 12px 25px rgba(0,0,0,0.06);
         }
 
         .status-banner { 
-            padding: 12px 20px; 
-            font-size: 0.75em; 
-            font-weight: 900; 
-            display: flex; 
-            align-items: center; 
-            gap: 10px; 
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+            padding: 14px 25px; font-size: 0.8em; font-weight: 900; 
+            display: flex; align-items: center; gap: 12px; text-transform: uppercase; letter-spacing: 0.8px;
         }
 
-        .card-content { padding: 25px; }
-        
-        .meta-info { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
-        .client-info { flex: 1; }
-        .client-label { font-size: 0.7em; font-weight: 800; color: #64748b; text-transform: uppercase; display: block; }
-        .client-name { font-size: 1.4em; font-weight: 900; color: var(--primary); line-height: 1.2; }
-        
-        .order-price { 
-            background: #f1f5f9; 
-            padding: 8px 12px; 
-            border-radius: 12px; 
-            font-weight: 800; 
-            font-size: 0.9em; 
-            color: var(--accent);
-            border: 1px solid #e2e8f0;
-        }
+        .card-content { padding: 28px; }
+        .meta-info { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px; }
+        .client-label { font-size: 0.75em; font-weight: 800; color: #64748b; text-transform: uppercase; display: block; margin-bottom: 4px; }
+        .client-name { font-size: 1.5em; font-weight: 900; color: var(--primary); line-height: 1.1; }
+        .order-price { background: #f8fafc; padding: 10px 15px; border-radius: 14px; font-weight: 900; color: var(--accent); border: 1px solid #e2e8f0; }
 
-        /* --- EL "CUADERNO" DE MATEMÁTICAS --- */
+        /* --- BLOQUE MATEMÁTICO LOGÍSTICO --- */
         .math-summary { 
-            background: #f8fafc; 
-            border: 2px solid #e2e8f0; 
-            border-radius: 24px; 
-            padding: 20px; 
-            margin: 20px 0; 
-            display: grid; 
-            grid-template-columns: 1fr 1fr; 
-            gap: 15px;
-            position: relative;
+            background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 26px; 
+            padding: 22px; margin: 25px 0; display: grid; grid-template-columns: 1fr 1fr; gap: 18px;
         }
         .math-box { text-align: center; }
-        .math-box.full { grid-column: span 2; border-top: 1px solid #e2e8f0; padding-top: 15px; }
-        .math-title { display: block; font-size: 0.65em; font-weight: 800; color: #94a3b8; text-transform: uppercase; margin-bottom: 5px; }
-        .math-num { font-size: 1.6em; font-weight: 900; color: var(--primary); }
-        .math-num.big { font-size: 2.8em; color: var(--danger); line-height: 1; }
+        .math-box.full { grid-column: span 2; border-top: 1px dashed #cbd5e1; padding-top: 18px; }
+        .math-title { display: block; font-size: 0.7em; font-weight: 800; color: #64748b; text-transform: uppercase; margin-bottom: 6px; }
+        .math-num { font-size: 1.8em; font-weight: 900; }
+        .math-num.big { font-size: 3.2em; color: var(--danger); line-height: 1; letter-spacing: -2px; }
 
-        /* --- TABLA DE PRODUCTOS --- */
-        .product-list { width: 100%; border-collapse: collapse; margin-top: 15px; }
-        .product-list th { text-align: left; font-size: 0.65em; color: #94a3b8; text-transform: uppercase; padding: 10px 0; border-bottom: 1px solid #f1f5f9; }
-        .product-list td { padding: 14px 0; border-bottom: 1px solid #f8fafc; vertical-align: middle; }
+        /* --- TABLA DE ITEMS --- */
+        .product-list { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        .product-list th { text-align: left; font-size: 0.7em; color: #94a3b8; text-transform: uppercase; padding: 12px 0; border-bottom: 2px solid #f1f5f9; }
+        .product-list td { padding: 16px 0; border-bottom: 1px solid #f8fafc; vertical-align: middle; }
         
-        .prod-title { font-weight: 700; color: var(--primary); font-size: 0.95em; }
-        .prod-sub { font-size: 0.75em; color: var(--accent); font-weight: 800; background: #eff6ff; padding: 2px 6px; border-radius: 4px; }
-        
-        .badge { 
-            padding: 6px 10px; 
-            border-radius: 10px; 
-            font-size: 0.7em; 
-            font-weight: 900; 
-            text-transform: uppercase; 
-            display: inline-block;
-        }
-        
+        .prod-title { font-weight: 800; color: var(--primary); font-size: 1em; }
+        .prod-sub { font-size: 0.8em; color: var(--accent); font-weight: 900; background: #eff6ff; padding: 3px 8px; border-radius: 6px; }
+        .delivery-pill { display: inline-flex; align-items: center; gap: 4px; font-size: 0.75em; font-weight: 800; color: var(--info); margin-top: 6px; }
+
+        /* --- BADGES Y BOTONES --- */
+        .badge { padding: 8px 12px; border-radius: 12px; font-size: 0.75em; font-weight: 900; text-transform: uppercase; }
         .st-yellow { background: #fef3c7; color: #92400e; }
         .st-red { background: #fee2e2; color: #991b1b; }
         .st-green { background: #dcfce7; color: #166534; }
         .st-blue { background: #e0f2fe; color: #0369a1; }
 
-        /* --- BOTONES DE ACCIÓN --- */
-        .card-footer { 
-            padding: 15px 25px 25px 25px; 
-            display: grid; 
-            grid-template-columns: 1fr 1fr; 
-            gap: 12px; 
-            background: #fafafa; 
-        }
-        .btn { 
-            padding: 15px; 
-            border-radius: 15px; 
-            border: none; 
-            font-weight: 800; 
-            font-size: 0.85em; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            gap: 8px; 
-            text-decoration: none; 
-            cursor: pointer;
-            transition: 0.2s;
-        }
-        .btn-wa { background: #25D366; color: white; }
-        .btn-view { background: var(--primary); color: white; }
-
-        /* --- VISTA AGENDA --- */
-        .calendar-wrap { padding: 20px; }
-        .cal-box { background: white; border-radius: 30px; padding: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); border: 1px solid var(--border); }
-        .cal-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
-        .cal-head h2 { font-weight: 900; text-transform: uppercase; color: var(--accent); letter-spacing: 1px; }
-        .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; }
-        .cal-weekday { font-size: 0.7em; font-weight: 900; color: #94a3b8; padding-bottom: 10px; text-align: center; }
-        .cal-day { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; border-radius: 15px; font-weight: 800; background: #f8fafc; border: 1px solid #f1f5f9; }
-        .cal-today { background: var(--accent); color: white; box-shadow: 0 8px 15px rgba(37,99,235,0.3); border: none; }
-
-        /* --- VISTA NOTAS --- */
-        .notes-container { padding: 20px; }
-        .notes-area { 
-            background: #fffdeb; 
-            border: 1px solid #fde68a; 
-            border-radius: 30px; 
-            padding: 30px; 
-            min-height: 500px; 
-            box-shadow: 0 10px 20px rgba(0,0,0,0.02);
-        }
-        #notesArea { 
-            width: 100%; 
-            height: 450px; 
-            background: transparent; 
-            border: none; 
-            outline: none; 
-            font-size: 1.15em; 
-            line-height: 1.7; 
-            color: #451a03; 
-            resize: none; 
-            font-weight: 500;
-        }
+        .card-footer { padding: 0 28px 28px 28px; display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .btn { padding: 18px; border-radius: 18px; border: none; font-weight: 900; font-size: 0.9em; display: flex; align-items: center; justify-content: center; gap: 10px; text-decoration: none; cursor: pointer; transition: 0.3s; }
+        .btn-wa { background: #22c55e; color: white; box-shadow: 0 8px 20px rgba(34,197,94,0.2); }
+        .btn-view { background: var(--primary); color: white; box-shadow: 0 8px 20px rgba(15,23,42,0.2); }
 
         /* --- NAVEGACIÓN --- */
-        .nav-bar { 
-            position: fixed; 
-            bottom: 0; 
-            left: 0; 
-            width: 100%; 
-            background: rgba(255,255,255,0.95); 
-            backdrop-filter: blur(10px);
-            display: flex; 
-            justify-content: space-around; 
-            padding: 15px 0 25px 0; 
-            border-top: 1px solid var(--border);
-            z-index: 1000;
-        }
-        .nav-item { border: none; background: none; color: #94a3b8; display: flex; flex-direction: column; align-items: center; gap: 6px; cursor: pointer; width: 33%; }
-        .nav-item i { font-size: 1.7em; }
-        .nav-item span { font-size: 0.65em; font-weight: 900; text-transform: uppercase; }
+        .nav-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: white; display: flex; justify-content: space-around; padding: 18px 0 35px 0; border-top: 1px solid var(--border); z-index: 1000; box-shadow: 0 -10px 30px rgba(0,0,0,0.05); }
+        .nav-item { border: none; background: none; color: #94a3b8; display: flex; flex-direction: column; align-items: center; gap: 8px; width: 33%; }
         .nav-item.active { color: var(--accent); }
+        .nav-item i { font-size: 1.8em; }
+        .nav-item span { font-size: 0.7em; font-weight: 900; text-transform: uppercase; }
 
-        #loader { text-align: center; padding: 100px 20px; font-weight: 800; color: #64748b; }
+        /* --- AGENDA Y NOTAS --- */
+        .view-frame { padding: 25px; }
+        .cal-box { background: white; border-radius: 35px; padding: 35px; border: 1px solid var(--border); box-shadow: 0 15px 40px rgba(0,0,0,0.05); }
+        .notes-area { background: #fffdeb; border: 1px solid #fde68a; border-radius: 35px; padding: 35px; min-height: 550px; }
+        #notesArea { width: 100%; height: 480px; background: transparent; border: none; outline: none; font-size: 1.2em; line-height: 1.6; color: #451a03; font-weight: 500; resize: none; }
+
+        #loader { text-align: center; padding: 120px 20px; font-weight: 900; color: #64748b; letter-spacing: 1px; }
     </style>
 </head>
 <body>
 
     <header class="main-header">
         <h1>IDEAS TEXTILES <span>SpA ®</span></h1>
-        <div class="user-pill" onclick="changeUserName()">
-            <i class="fa-solid fa-user-gear"></i>
+        <div class="user-pill" onclick="changeUser()">
+            <i class="fa-solid fa-user-shield"></i>
             <span id="userName">Operador</span>
         </div>
     </header>
@@ -250,118 +120,77 @@
         <div class="search-area">
             <div class="search-box">
                 <i class="fa-solid fa-magnifying-glass"></i>
-                <input type="text" id="searchInput" placeholder="Buscar pedido, cliente o ítem..." onkeyup="runSearch()">
+                <input type="text" id="searchInput" placeholder="Buscar cliente, pedido o producto..." onkeyup="runSearch()">
             </div>
         </div>
-
-        <div id="loader">
-            <i class="fa-solid fa-spinner fa-spin fa-2xl"></i>
-            <p style="margin-top:15px">SINCRONIZANDO EXCEL...</p>
-        </div>
-
+        <div id="loader"><i class="fa-solid fa-gear fa-spin fa-3xl"></i><p style="margin-top:20px">SINCRONIZANDO DATA INDUSTRIAL...</p></div>
         <div id="ordersList"></div>
     </div>
 
     <div id="view-calendar" class="view hidden">
-        <div class="calendar-wrap">
+        <div class="view-frame">
             <div class="cal-box">
-                <div class="cal-head">
-                    <h2 id="calMonth">MES</h2>
-                    <span id="calYear" style="font-weight: 900; opacity: 0.5;">2024</span>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px">
+                    <h2 id="calMonth" style="font-weight:900; text-transform:uppercase; color:var(--accent); font-size:1.8em">Enero</h2>
+                    <span style="font-weight:900; opacity:0.3; font-size:1.4em">2024</span>
                 </div>
-                <div class="cal-grid" id="calendarGrid"></div>
+                <div id="calendarGrid" style="display:grid; grid-template-columns:repeat(7, 1fr); gap:12px"></div>
             </div>
         </div>
     </div>
 
     <div id="view-notes" class="view hidden">
-        <div class="notes-container">
+        <div class="view-frame">
             <div class="notes-area">
-                <textarea id="notesArea" placeholder="Escribe medidas especiales, problemas de stock o recados para el turno siguiente..."></textarea>
+                <textarea id="notesArea" placeholder="Escribe aquí las novedades del día, medidas urgentes o pendientes de stock..."></textarea>
             </div>
         </div>
     </div>
 
     <nav class="nav-bar">
-        <button class="nav-item active" onclick="switchView('orders', this)">
-            <i class="fa-solid fa-list-check"></i>
-            <span>Pedidos</span>
-        </button>
-        <button class="nav-item" onclick="switchView('calendar', this)">
-            <i class="fa-solid fa-calendar-day"></i>
-            <span>Agenda</span>
-        </button>
-        <button class="nav-item" onclick="switchView('notes', this)">
-            <i class="fa-solid fa-note-sticky"></i>
-            <span>Notas</span>
-        </button>
+        <button class="nav-item active" onclick="switchView('orders', this)"><i class="fa-solid fa-layer-group"></i><span>Pedidos</span></button>
+        <button class="nav-item" onclick="switchView('calendar', this)"><i class="fa-solid fa-calendar-check"></i><span>Agenda</span></button>
+        <button class="nav-item" onclick="switchView('notes', this)"><i class="fa-solid fa-pen-to-square"></i><span>Notas</span></button>
     </nav>
 
 <script>
     const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR709g0cB4EtdROEnIWBrK2O4FQrKHUd3jXNUTWwdWvT1F5UraKHGOr6dDQHsJtgrdv4-ARqow_jKi0/pub?output=csv";
-    
     let allOrders = [];
 
-    // --- MEMORIA DE USUARIO ---
+    // --- SISTEMA DE USUARIO ---
     function initUser() {
-        let user = localStorage.getItem('it_user_name');
-        if(!user) {
-            user = prompt("Bienvenido al sistema. ¿Cuál es tu nombre?") || "Operador";
-            localStorage.setItem('it_user_name', user);
-        }
-        document.getElementById('userName').innerText = user;
+        let name = localStorage.getItem('it_user_v22') || "Operador Principal";
+        document.getElementById('userName').innerText = name;
     }
-
-    function changeUserName() {
-        let newUser = prompt("Cambiar nombre de usuario:");
-        if(newUser) {
-            localStorage.setItem('it_user_name', newUser);
-            document.getElementById('userName').innerText = newUser;
-        }
+    function changeUser() {
+        let n = prompt("Nombre del responsable:");
+        if(n) { localStorage.setItem('it_user_v22', n); document.getElementById('userName').innerText = n; }
     }
 
     // --- CARGA DE DATOS ---
-    async function fetchSheets() {
+    async function fetchData() {
         try {
             const r = await fetch("https://api.allorigins.win/raw?url=" + encodeURIComponent(CSV_URL) + "&t=" + Date.now());
-            const rawText = await r.text();
-            processCSV(rawText);
-        } catch (err) {
-            document.getElementById('loader').innerHTML = "<b style='color:red'>ERROR DE CONEXIÓN</b>";
-        }
+            const text = await r.text();
+            parseCSV(text);
+        } catch (e) { document.getElementById('loader').innerHTML = "<b style='color:red'>ERROR DE SINCRONIZACIÓN</b>"; }
     }
 
-    function processCSV(csv) {
+    function parseCSV(csv) {
         const rows = csv.split('\n').slice(1);
         const map = {};
-
         rows.forEach(row => {
             const cols = row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
             if (cols.length < 10) return;
-
             const clean = v => v ? v.replace(/"/g, '').trim() : '';
             const id = clean(cols[1]);
-
             if (!map[id]) {
-                map[id] = {
-                    id: id,
-                    orderName: clean(cols[2]),
-                    client: clean(cols[3]),
-                    price: clean(cols[4]),
-                    phone: clean(cols[11]),
-                    items: []
-                };
+                map[id] = { id, name: clean(cols[2]), client: clean(cols[3]), price: clean(cols[4]), phone: clean(cols[11]), items: [] };
             }
-
             map[id].items.push({
-                product: clean(cols[5]),
-                size: clean(cols[6]),
-                qty: parseInt(cols[7]) || 0,
-                status: clean(cols[8]).toUpperCase(),
-                done: parseInt(cols[9]) || 0
+                p: clean(cols[5]), s: clean(cols[6]), q: parseInt(cols[7]) || 0, st: clean(cols[8]).toUpperCase(), d: parseInt(cols[9]) || 0
             });
         });
-
         allOrders = Object.values(map);
         renderOrders(allOrders);
         document.getElementById('loader').classList.add('hidden');
@@ -369,106 +198,87 @@
 
     function renderOrders(list) {
         const container = document.getElementById('ordersList');
-        if(list.length === 0) {
-            container.innerHTML = "<p style='text-align:center; padding:50px'>No se encontraron resultados.</p>";
-            return;
-        }
+        if(list.length === 0) { container.innerHTML = "<p style='text-align:center; padding:100px; font-weight:800'>SIN RESULTADOS</p>"; return; }
 
-        container.innerHTML = list.map(order => {
-            let sumQty = 0, sumDone = 0;
+        container.innerHTML = list.map(o => {
+            let totalQ = 0, totalD = 0;
             let statusSet = new Set();
-            
-            order.items.forEach(i => {
-                sumQty += i.qty;
-                sumDone += i.done;
-                if(i.status) statusSet.add(i.status);
-            });
+            o.items.forEach(i => { totalQ += i.q; totalD += i.d; statusSet.add(i.st); });
+            const balance = totalQ - totalD;
 
-            const missing = sumQty - sumDone;
-            const fullStatusStr = Array.from(statusSet).join(' + ');
+            // CONFIGURACIÓN DE COLORES INDUSTRIALES
+            let bannerBg = "#f1f5f9", bannerCol = "#475569", label = Array.from(statusSet).join(' + ');
             
-            // Colores Dinámicos
-            let themeColor = "#cbd5e1"; // Gris
-            let themeBg = "#f1f5f9";
-            if(fullStatusStr.includes("STOCK")) { themeColor = "#dc2626"; themeBg = "#fee2e2"; }
-            else if(fullStatusStr.includes("BORDAD")) { themeColor = "#d97706"; themeBg = "#fef3c7"; }
-            if(missing === 0) { themeColor = "#16a34a"; themeBg = "#dcfce7"; }
+            if (totalD > 0 && totalD < totalQ) { 
+                bannerBg = "#e0f2fe"; bannerCol = "#0369a1"; label = "⚠️ ENTREGA PARCIAL EN CURSO";
+            } else if (totalD >= totalQ && totalQ > 0) {
+                bannerBg = "#dcfce7"; bannerCol = "#166534"; label = "✅ DESPACHADO TOTALMENTE";
+            } else if (label.includes("STOCK")) {
+                bannerBg = "#fee2e2"; bannerCol = "#dc2626";
+            } else if (label.includes("BORDADO")) {
+                bannerBg = "#fef3c7"; bannerCol = "#d97706";
+            }
 
             return `
             <div class="order-card">
-                <div class="status-banner" style="background:${themeBg}; color:${themeColor}">
-                    <i class="fa-solid fa-circle" style="font-size:8px"></i>
-                    ${missing === 0 ? 'PEDIDO COMPLETADO' : fullStatusStr}
+                <div class="status-banner" style="background:${bannerBg}; color:${bannerCol}">
+                    <i class="fa-solid fa-industry"></i> ${label}
                 </div>
-
                 <div class="card-content">
                     <div class="meta-info">
-                        <div class="client-info">
-                            <span class="client-label">${order.client}</span>
-                            <h2 class="client-name">${order.orderName}</h2>
+                        <div style="flex:1">
+                            <span class="client-label">${o.client}</span>
+                            <h2 class="client-name">${o.name}</h2>
                         </div>
-                        <div class="order-price">${order.price || '$ ---'}</div>
+                        <div class="order-price">${o.price || '$ --'}</div>
                     </div>
 
                     <div class="math-summary">
                         <div class="math-box">
-                            <span class="math-title">Total Pedido</span>
-                            <span class="math-num">${sumQty}</span>
+                            <span class="math-title">Solicitado</span>
+                            <span class="math-num">${totalQ}</span>
                         </div>
                         <div class="math-box">
-                            <span class="math-title">En Bodega</span>
-                            <span class="math-num" style="color:var(--success)">${sumDone}</span>
+                            <span class="math-title">Despachado</span>
+                            <span class="math-num" style="color:var(--info)">${totalD}</span>
                         </div>
                         <div class="math-box full">
-                            <span class="math-title">POR ENTREGAR (FALTANTES)</span>
-                            <span class="math-num big">${missing}</span>
+                            <span class="math-title">PENDIENTE POR ENTREGAR</span>
+                            <span class="math-num big">${balance}</span>
                         </div>
                     </div>
 
                     <table class="product-list">
-                        <thead>
-                            <tr>
-                                <th>Detalle Producto</th>
-                                <th style="text-align:center">Cant</th>
-                                <th style="text-align:right">Estado</th>
-                            </tr>
-                        </thead>
+                        <thead><tr><th>Descripción</th><th style="text-align:center">Pedido</th><th style="text-align:right">Status</th></tr></thead>
                         <tbody>
-                            ${order.items.map(i => {
-                                let bCls = "st-gray";
-                                if(i.status.includes("BORDAD")) bCls = "st-yellow";
-                                if(i.status.includes("STOCK")) bCls = "st-red";
-                                if(i.status.includes("LISTO") || i.status.includes("ENTREGA")) bCls = "st-green";
-                                
+                            ${o.items.map(i => {
+                                let badgeCls = "st-gray";
+                                if(i.st.includes("STOCK")) badgeCls = "st-red";
+                                if(i.st.includes("BORD")) badgeCls = "st-yellow";
+                                if(i.st.includes("LISTO")) badgeCls = "st-green";
                                 return `
                                 <tr>
                                     <td>
-                                        <div class="prod-title">${i.product}</div>
-                                        <span class="prod-sub">TALLA ${i.size}</span>
+                                        <div class="prod-title">${i.p}</div>
+                                        <span class="prod-sub">TALLA ${i.s}</span>
+                                        ${i.d > 0 ? `<br><span class="delivery-pill"><i class="fa-solid fa-truck"></i> ${i.d} entregados</span>` : ''}
                                     </td>
-                                    <td style="text-align:center; font-weight:900; font-size:1.1em">${i.qty}</td>
-                                    <td style="text-align:right">
-                                        <span class="badge ${bCls}">${i.status}</span>
-                                    </td>
+                                    <td style="text-align:center; font-weight:900; font-size:1.1em">${i.q}</td>
+                                    <td style="text-align:right"><span class="badge ${badgeCls}">${i.st}</span></td>
                                 </tr>`;
                             }).join('')}
                         </tbody>
                     </table>
                 </div>
-
                 <div class="card-footer">
-                    <a href="https://wa.me/${order.phone}?text=Hola%20${order.client},%20sobre%20su%20pedido%20${order.orderName}..." class="btn btn-wa">
-                        <i class="fa-brands fa-whatsapp"></i> CONTACTAR
-                    </a>
-                    <button class="btn btn-view" onclick="alert('Pedido ID: ${order.id}')">
-                        <i class="fa-solid fa-magnifying-glass-plus"></i> DETALLES
-                    </button>
+                    <a href="https://wa.me/${o.phone}" class="btn btn-wa"><i class="fa-brands fa-whatsapp"></i> CONTACTAR</a>
+                    <button class="btn btn-view" onclick="alert('Pedido Industrial ID: ${o.id}')"><i class="fa-solid fa-barcode"></i> DETALLES</button>
                 </div>
             </div>`;
         }).join('');
     }
 
-    // --- VISTAS ---
+    // --- NAVEGACIÓN Y VISTAS ---
     function switchView(view, btn) {
         document.querySelectorAll('.view').forEach(v => v.classList.add('hidden'));
         document.getElementById('view-' + view).classList.remove('hidden');
@@ -477,48 +287,33 @@
         if(view === 'calendar') buildCalendar();
     }
 
-    // --- AGENDA REAL ---
     function buildCalendar() {
         const d = new Date();
         const mNames = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
         document.getElementById('calMonth').innerText = mNames[d.getMonth()];
-        document.getElementById('calYear').innerText = d.getFullYear();
-        
         const firstDay = new Date(d.getFullYear(), d.getMonth(), 1).getDay();
         const daysInMonth = new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate();
         const grid = document.getElementById('calendarGrid');
         grid.innerHTML = "";
-        
-        ['D','L','M','M','J','V','S'].forEach(day => grid.innerHTML += `<div class="cal-weekday">${day}</div>`);
+        ['D','L','M','M','J','V','S'].forEach(day => grid.innerHTML += `<div style="text-align:center; font-size:0.8em; font-weight:900; color:#94a3b8; padding-bottom:10px">${day}</div>`);
         for(let i=0; i<firstDay; i++) grid.innerHTML += `<div></div>`;
         for(let i=1; i<=daysInMonth; i++) {
-            const isToday = i === d.getDate() ? 'cal-today' : '';
-            grid.innerHTML += `<div class="cal-day ${isToday}">${i}</div>`;
+            const isToday = i === d.getDate() ? 'background:var(--accent); color:white; border-radius:12px' : 'background:#f8fafc; border-radius:12px';
+            grid.innerHTML += `<div style="aspect-ratio:1; display:flex; align-items:center; justify-content:center; font-weight:800; ${isToday}">${i}</div>`;
         }
     }
 
-    // --- NOTAS PERSISTENTES ---
+    // --- NOTAS Y BÚSQUEDA ---
     const area = document.getElementById('notesArea');
-    area.value = localStorage.getItem('it_notes_data') || "";
-    area.addEventListener('input', () => {
-        localStorage.setItem('it_notes_data', area.value);
-    });
+    area.value = localStorage.getItem('it_notes_v22') || "";
+    area.oninput = () => localStorage.setItem('it_notes_v22', area.value);
 
-    // --- BÚSQUEDA ---
     function runSearch() {
         const q = document.getElementById('searchInput').value.toLowerCase();
-        const filtered = allOrders.filter(o => 
-            o.client.toLowerCase().includes(q) || 
-            o.orderName.toLowerCase().includes(q) ||
-            o.items.some(i => i.product.toLowerCase().includes(q))
-        );
-        renderOrders(filtered);
+        renderOrders(allOrders.filter(o => o.client.toLowerCase().includes(q) || o.name.toLowerCase().includes(q) || o.items.some(i => i.p.toLowerCase().includes(q))));
     }
 
-    window.onload = () => {
-        initUser();
-        fetchSheets();
-    };
+    window.onload = () => { initUser(); fetchData(); };
 </script>
 </body>
 </html>
