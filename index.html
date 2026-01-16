@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>IDEAS TEXTILES SPA </title>
+    <title>IDEAS TEXTILES | LIVE</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
@@ -18,7 +18,7 @@
         :root {
             --dark: #0f172a; --primary: #3b82f6; --accent: #6366f1;
             --success: #10b981; --danger: #ef4444; --warn: #f59e0b;
-            --bg: #f8fafc; --card-bg: #ffffff;
+            --prod: #8b5cf6; --bg: #f8fafc; --card-bg: #ffffff;
         }
         
         * { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
@@ -26,9 +26,11 @@
 
         /* HEADER */
         header { background: var(--dark); color: white; padding: 15px 20px; position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 15px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; }
-        .brand h1 { font-size: 1.1rem; font-weight: 800; margin: 0; }
-        .brand span { color: var(--primary); font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
-        .btn-scan { background: linear-gradient(135deg, var(--primary), var(--accent)); border: none; padding: 8px 12px; border-radius: 8px; color: white; font-size: 0.8rem; font-weight: 700; display: flex; align-items: center; gap: 6px; box-shadow: 0 0 10px rgba(59, 130, 246, 0.5); cursor: pointer; }
+        .brand h1 { font-size: 1.1rem; font-weight: 800; margin: 0; display: flex; align-items: center; gap: 8px; }
+        .live-dot { width: 10px; height: 10px; background: #22c55e; border-radius: 50%; box-shadow: 0 0 10px #22c55e; animation: pulse 2s infinite; }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+
+        .btn-scan { background: linear-gradient(135deg, var(--primary), var(--accent)); border: none; padding: 8px 12px; border-radius: 8px; color: white; font-size: 0.8rem; font-weight: 700; display: flex; align-items: center; gap: 6px; cursor: pointer; }
 
         /* VISTAS */
         .view { display: none; padding: 20px; max-width: 900px; margin: 0 auto; animation: fadeUp 0.3s ease; }
@@ -41,11 +43,13 @@
         /* SKU BADGE */
         .sku-badge { font-family: 'JetBrains Mono', monospace; background: var(--dark); color: #fbbf24; padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; font-weight: bold; display: inline-block; margin-bottom: 4px; }
 
-        /* STATUS */
+        /* STATUS CHIPS (TUS COLORES FAVORITOS) */
         .status { display: inline-block; padding: 4px 8px; border-radius: 6px; font-size: 0.65rem; font-weight: 800; text-transform: uppercase; margin-bottom: 8px; }
-        .st-1 { background: #fff7ed; color: var(--warn); border: 1px solid #fed7aa; }
-        .st-2 { background: #eff6ff; color: var(--primary); border: 1px solid #bfdbfe; }
-        .st-3 { background: #ecfdf5; color: var(--success); border: 1px solid #a7f3d0; }
+        .st-bodega { background: #eff6ff; color: var(--primary); border: 1px solid #bfdbfe; }
+        .st-pack { background: #e0f2fe; color: #0284c7; border: 1px solid #bae6fd; }
+        .st-done { background: #ecfdf5; color: var(--success); border: 1px solid #a7f3d0; }
+        .st-prod { background: #f5f3ff; color: var(--prod); border: 1px solid #ddd6fe; }
+        .st-nostock { background: #fef2f2; color: var(--danger); border: 1px solid #fecaca; }
 
         /* CALENDARIO */
         .cal-ctrl { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; background: var(--dark); color: white; padding: 10px; border-radius: 10px; }
@@ -63,23 +67,30 @@
         .btn-pri { background: var(--dark); color: white; }
         .btn-sec { background: white; border: 1px solid #cbd5e1; color: var(--dark); }
         .btn-pdf { background: var(--danger); color: white; }
-        .btn-reset { background: white; border: 2px solid var(--danger); color: var(--danger); font-weight: 800; margin-top: 20px; }
-
+        
         .dock { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--dark); padding: 12px 30px; border-radius: 40px; display: flex; gap: 35px; box-shadow: 0 10px 30px rgba(0,0,0,0.4); z-index: 999; }
         .dock i { font-size: 1.4rem; color: #94a3b8; transition: 0.2s; cursor: pointer; }
         .dock i.active { color: white; transform: translateY(-3px); text-shadow: 0 0 15px var(--primary); }
         .item-row { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px dashed #e2e8f0; font-size: 0.85rem; }
+
+        #loader { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(255,255,255,0.95); z-index:2000; display:flex; flex-direction:column; justify-content:center; align-items:center; transition: opacity 0.5s; }
+        .spinner { width: 40px; height: 40px; border: 4px solid #e2e8f0; border-top: 4px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
 
+<div id="loader">
+    <div class="spinner"></div>
+    <p style="margin-top:10px; font-weight:bold; color:#64748b;">CONECTANDO AL SISTEMA...</p>
+</div>
+
 <header>
     <div class="brand">
-        <h1>IDEAS TEXTILES</h1>
-        <span>WORKWEAR AND CORPORATE </span>
+        <h1>IDEAS TEXTILES <div class="live-dot" title="Conectado"></div></h1>
     </div>
     <button class="btn-scan" onclick="App.IA.trigger()">
-        <i class="fa-solid fa-wand-magic-sparkles"></i> IMPORTAR ARCHIVO
+        <i class="fa-solid fa-wand-magic-sparkles"></i> IA IMPORT
     </button>
 </header>
 
@@ -91,7 +102,7 @@
 </section>
 
 <section id="v-ordenes" class="view">
-    <h2 style="margin:0 0 15px; font-size:1.2rem;">PEDIDOS ACTIVOS</h2>
+    <h2 style="margin:0 0 15px; font-size:1.2rem;">PEDIDOS EN VIVO</h2>
     <button class="btn btn-pri" style="background:var(--primary); box-shadow:0 4px 10px rgba(59,130,246,0.3);" onclick="App.Actions.modalOrder()">
         <i class="fa-solid fa-cart-shopping"></i> NUEVO PEDIDO
     </button>
@@ -118,21 +129,10 @@
         </div>
         <div id="cal-days" class="cal-grid" style="margin-top:5px;"></div>
     </div>
-    
     <div class="card" style="margin-top:20px; text-align:center; border:2px dashed #cbd5e1;">
-        <h3>CONFIGURACIÓN</h3>
-        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-            <button class="btn btn-pdf" onclick="App.Backup.generatePDF()"><i class="fa-solid fa-file-pdf"></i> REPORTE PDF</button>
-            <button class="btn btn-pri" onclick="App.Backup.exportJSON()"><i class="fa-solid fa-download"></i> BACKUP JSON</button>
-        </div>
-        <div style="margin-top:15px;">
-            <label style="color:var(--primary); font-size:0.8rem; font-weight:bold; cursor:pointer;">
-                <input type="file" hidden onchange="App.Backup.importJSON(this)"><u>Restaurar Copia Seguridad</u>
-            </label>
-        </div>
-        <button class="btn btn-reset" onclick="App.Actions.factoryReset()">
-            <i class="fa-solid fa-skull"></i> BORRAR TODO (RESET DE FÁBRICA)
-        </button>
+        <h3>REPORTES</h3>
+        <button class="btn btn-pdf" onclick="App.Backup.generatePDF()"><i class="fa-solid fa-file-pdf"></i> DESCARGAR REPORTE PDF</button>
+        <p style="font-size:0.75rem; color:#94a3b8; margin-top:10px;">Sincronización Cloudflare/Firebase Activa 🟢</p>
     </div>
 </section>
 
@@ -144,410 +144,273 @@
 
 <input type="file" id="ai-input" hidden accept="image/*,.xlsx,.xls,.csv">
 
-<script>
-const App = {
-    db: {
-        inv: JSON.parse(localStorage.getItem('db_inv')) || [],
-        ord: JSON.parse(localStorage.getItem('db_ord')) || [],
-        log: JSON.parse(localStorage.getItem('db_log')) || {}, 
-        calDate: new Date()
-    },
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+    import { getDatabase, ref, set, onValue, update } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
 
-    init() {
-        this.db.inv.forEach((p, idx) => { if(!p.sku) p.sku = String(idx + 1).padStart(3, '0'); });
-        this.Render.bodega();
-        this.Render.ordenes();
-        this.Calendar.render();
-    },
+    // ✅ TUS CREDENCIALES CONFIGURADAS
+    const firebaseConfig = {
+        apiKey: "AIzaSyBg-Cx9SqZw35TyyMxtpVBEFlwZTjBXBew",
+        authDomain: "ideastextilesapp.firebaseapp.com",
+        databaseURL: "https://ideastextilesapp-default-rtdb.firebaseio.com",
+        projectId: "ideastextilesapp",
+        storageBucket: "ideastextilesapp.firebasestorage.app",
+        messagingSenderId: "268995530035",
+        appId: "1:268995530035:web:1890f45ac761cc81eb0246"
+    };
 
-    save() {
-        localStorage.setItem('db_inv', JSON.stringify(this.db.inv));
-        localStorage.setItem('db_ord', JSON.stringify(this.db.ord));
-        localStorage.setItem('db_log', JSON.stringify(this.db.log));
-        this.Render.bodega();
-        this.Render.ordenes();
-        this.Calendar.render();
-    },
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
 
-    UI: {
-        go(id, el) {
-            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-            document.querySelectorAll('.dock i').forEach(i => i.classList.remove('active'));
-            document.getElementById('v-'+id).classList.add('active');
-            el.classList.add('active');
-        }
-    },
+    const App = {
+        db: { inv: [], ord: [], log: {}, calDate: new Date() },
 
-    Helpers: {
-        getNextSKU() {
-            if(App.db.inv.length === 0) return '001';
-            const max = App.db.inv.reduce((acc, p) => Math.max(acc, parseInt(p.sku || 0)), 0);
-            return String(max + 1).padStart(3, '0');
-        }
-    },
-
-    Render: {
-        bodega() {
-            const q = document.getElementById('search-inv').value.toUpperCase();
-            const list = App.db.inv.filter(i => i.n.toUpperCase().includes(q) || (i.sku && i.sku.includes(q)));
-            
-            document.getElementById('list-bodega').innerHTML = list.map((p, i) => {
-                const sizes = Object.entries(p.s).map(([k,v]) => `<span style="background:#e2e8f0; padding:2px 6px; border-radius:4px; font-size:0.75rem;"><b>${k}:</b>${v}</span>`).join(' ');
-                return `
-                <div class="card">
-                    <div style="display:flex; justify-content:space-between; align-items:flex-start;">
-                        <div>
-                            <span class="sku-badge">SKU: ${p.sku}</span>
-                            <h3 style="margin:4px 0;">${p.n}</h3>
-                            <div style="margin-top:5px; display:flex; flex-wrap:wrap; gap:5px;">${sizes}</div>
-                        </div>
-                        <i class="fa-solid fa-pen" style="color:var(--primary); cursor:pointer; padding:10px;" onclick="App.Actions.modalProd(${App.db.inv.indexOf(p)})"></i>
-                    </div>
-                </div>`;
-            }).join('') || '<div style="text-align:center;color:#94a3b8">Sin inventario</div>';
-        },
-
-        ordenes() {
-            const list = App.db.ord;
-            document.getElementById('list-ordenes').innerHTML = list.slice().reverse().map((o, idx) => {
-                const realIdx = list.length - 1 - idx;
-                let stBadge = o.st==='done' ? '<span class="status st-3">DESPACHADO</span>' : (o.st==='pack' ? '<span class="status st-2">EMPAQUETADO</span>' : '<span class="status st-1">EN PROCESO</span>');
-                const itemsHtml = o.items.map(it => `<div class="item-row"><span>${it.p} (T:${it.sz})</span><b>x${it.q}</b></div>`).join('');
-                return `
-                <div class="card">
-                    <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
-                        ${stBadge}
-                        <div>
-                            <i class="fa-solid fa-pen" style="color:var(--dark); margin-right:10px; cursor:pointer;" onclick="App.Actions.modalOrder(${realIdx})"></i>
-                            <i class="fa-solid fa-trash" style="color:#cbd5e1; cursor:pointer;" onclick="App.Actions.delOrd(${realIdx})"></i>
-                        </div>
-                    </div>
-                    <h3 style="margin:0;">${o.c}</h3>
-                    ${o.fac ? `<small style="color:var(--success); font-weight:bold;">FAC: ${o.fac}</small>` : ''}
-                    <div style="background:#f8fafc; padding:8px; border-radius:8px; margin:10px 0; border:1px dashed #cbd5e1;">${itemsHtml}</div>
-                    ${o.st === 'bodega' ? `<button class="btn btn-pri" onclick="App.Actions.setStatus(${realIdx},'pack')">EMPAQUETAR <i class="fa-solid fa-box"></i></button>` : ''}
-                    ${o.st === 'pack' ? `<button class="btn btn-pri" style="background:var(--primary)" onclick="App.Actions.despachar(${realIdx})">DESPACHAR <i class="fa-solid fa-truck"></i></button>` : ''}
-                </div>`;
-            }).join('') || '<div style="text-align:center;color:#94a3b8">Sin pedidos</div>';
-        }
-    },
-
-    Actions: {
-        async modalProd(i = null) {
-            const isNew = i === null;
-            const item = isNew ? {n:'', s:{}, sku: App.Helpers.getNextSKU()} : App.db.inv[i];
-            const sTxt = Object.entries(item.s).map(([k,v])=>`${k}:${v}`).join(', ');
-            const {value} = await Swal.fire({
-                title: isNew ? 'NUEVO PRODUCTO' : 'EDITAR PRODUCTO',
-                html: `<div style="text-align:right; margin-bottom:10px;"><span class="sku-badge">SKU: ${item.sku}</span></div><input id="sw-n" class="swal2-input" placeholder="Nombre" value="${item.n}"><input id="sw-s" class="swal2-input" placeholder="Talla:Cant, Talla:Cant" value="${sTxt}">`,
-                preConfirm: () => {
-                    const n = document.getElementById('sw-n').value.toUpperCase();
-                    const s = {}; document.getElementById('sw-s').value.split(',').forEach(x => { const [k,v]=x.split(':'); if(k&&v) s[k.trim().toUpperCase()]=Number(v); });
-                    return {n, s, sku: item.sku};
+        init() {
+            // ESCUCHA EN TIEMPO REAL (SINCRONIZACIÓN MÁGICA)
+            onValue(ref(db, '/'), (snapshot) => {
+                const data = snapshot.val();
+                if (data) {
+                    App.db.inv = data.inv || [];
+                    App.db.ord = data.ord || [];
+                    App.db.log = data.log || {};
                 }
-            });
-            if(value) {
-                if(!isNew) App.db.inv[i]=value; else App.db.inv.push(value);
-                const {value:reason} = await Swal.fire({title: 'REGISTRO DE OPERACIÓN', text: '¿Motivo del cambio?', input: 'text', confirmButtonText: 'GUARDAR', allowOutsideClick: false});
-                if(reason) {
-                    const opID = Math.floor(Math.random() * 9000) + 1000;
-                    const d = new Date(); const k = `${d.getDate()}-${d.getMonth()}-${d.getFullYear()}`;
-                    App.db.log[k] = (App.db.log[k] || '') + `⚙️ OP-${opID}: ${value.n} - ${reason}\n`;
-                }
-                App.save(); Swal.fire('Guardado', 'Inventario y Calendario actualizados', 'success');
-            }
-        },
-
-        async modalOrder(i = null) {
-            let ord = i !== null ? JSON.parse(JSON.stringify(App.db.ord[i])) : {c:'', items:[], st:'bodega'};
-            let cart = ord.items;
-            const prodOpts = App.db.inv.map(p=>`<option value="${p.n}">`).join('');
-
-            const renderCart = () => {
-                const d = document.getElementById('cart-div');
-                if(d) d.innerHTML = !cart.length ? '<small>Carrito Vacío</small>' : cart.map((x,ix)=>`<div>${x.p} (${x.sz}) x${x.q} <span onclick="window.delCartItem(${ix})" style="color:red;cursor:pointer;margin-left:5px;">X</span></div>`).join('');
-            };
-            window.delCartItem = (idx) => { cart.splice(idx,1); renderCart(); };
-
-            await Swal.fire({
-                title: 'PEDIDO', width: 600,
-                html: `
-                    <input id="sw-c" class="swal2-input" placeholder="Cliente" value="${ord.c}" style="margin:5px 0 15px 0;">
-                    <div style="background:#f1f5f9; padding:15px; border-radius:8px; border:1px solid #e2e8f0;">
-                        <input id="sw-p" list="dl" class="swal2-input" style="margin:5px 0; width:100%; height:40px;" placeholder="Producto">
-                        <datalist id="dl">${prodOpts}</datalist>
-                        <div style="display:flex; gap:10px;">
-                            <input id="sw-sz" class="swal2-input" style="flex:1; margin:0; height:40px;" placeholder="Talla">
-                            <input id="sw-q" type="number" class="swal2-input" style="width:80px; margin:0; height:40px;" value="1">
-                        </div>
-                        <button type="button" id="btn-add-smart" class="btn btn-pri" style="margin-top:10px;">+ AGREGAR</button>
-                    </div>
-                    <div id="cart-div" style="max-height:150px; overflow-y:auto; margin-top:15px; text-align:left; border:1px dashed #cbd5e1; padding:10px;"></div>
-                `,
-                didOpen: () => {
-                    renderCart();
-                    const btn = document.getElementById('btn-add-smart');
-                    const inpP = document.getElementById('sw-p'); const inpS = document.getElementById('sw-sz');
-                    let forceAdd = false;
-                    [inpP, inpS].forEach(el => el.addEventListener('input', () => { btn.innerText = '+ AGREGAR'; btn.style.background = 'var(--dark)'; forceAdd = false; }));
-                    btn.addEventListener('click', () => {
-                        const pName = inpP.value.toUpperCase().trim(); const sz = inpS.value.toUpperCase().trim(); const q = Number(document.getElementById('sw-q').value);
-                        if(!pName || !sz || q <= 0) return Swal.showValidationMessage('⚠️ Faltan datos');
-                        const invItem = App.db.inv.find(x => x.n === pName);
-                        const stockActual = (invItem && invItem.s[sz] !== undefined) ? invItem.s[sz] : 0;
-                        if(q > stockActual && !forceAdd) { btn.innerText = `⚠️ STOCK: ${stockActual} - ¿AGREGAR IGUAL?`; btn.style.background = '#f59e0b'; forceAdd = true; return; }
-                        cart.push({p: pName, sz: sz, q: q}); renderCart();
-                        inpP.value = ''; inpS.value = ''; document.getElementById('sw-q').value = '1'; inpP.focus();
-                        btn.innerText = '+ AGREGAR'; btn.style.background = 'var(--dark)'; forceAdd = false;
-                    });
-                },
-                preConfirm: () => {
-                    const c = document.getElementById('sw-c').value.toUpperCase();
-                    if(!c) return Swal.showValidationMessage('Falta cliente');
-                    if(!cart.length) return Swal.showValidationMessage('Carrito vacío');
-                    return {c, items:cart};
-                }
-            }).then(r => {
-                if(r.isConfirmed) {
-                    ord.c = r.value.c; ord.items = r.value.items;
-                    if(i!==null) App.db.ord[i]=ord; else App.db.ord.push(ord);
-                    App.save(); Swal.fire('Guardado', '', 'success');
-                }
+                const l = document.getElementById('loader');
+                if(l) { l.style.opacity=0; setTimeout(()=>l.style.display='none',500); }
+                
+                App.Render.bodega();
+                App.Render.ordenes();
+                App.Calendar.render();
             });
         },
 
-        setStatus(i,st){ App.db.ord[i].st=st; App.save(); },
-        delOrd(i){ Swal.fire({title:'¿Borrar?', showCancelButton:true}).then(r=>{if(r.isConfirmed){App.db.ord.splice(i,1); App.save();}}); },
-        async despachar(i){
-            const {value:f} = await Swal.fire({title:'N° FACTURA', input:'text'});
-            if(f) {
-                const o = App.db.ord[i]; o.st='done'; o.fac=f;
-                o.items.forEach(it => { const p=App.db.inv.find(x=>x.n===it.p); if(p && p.s[it.sz]!==undefined) p.s[it.sz]-=it.q; });
-                const d = new Date(); const k = `${d.getDate()}-${d.getMonth()}-${d.getFullYear()}`;
-                App.db.log[k] = (App.db.log[k]||'') + `[AUTO] Despacho ${o.c} (FAC ${f})\n`;
-                App.save(); Swal.fire('Listo','','success');
+        save() {
+            // GUARDA EN LA NUBE AL INSTANTE
+            update(ref(db, '/'), { inv: App.db.inv, ord: App.db.ord, log: App.db.log });
+        },
+
+        UI: {
+            go(id, el) {
+                document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+                document.querySelectorAll('.dock i').forEach(i => i.classList.remove('active'));
+                document.getElementById('v-'+id).classList.add('active');
+                el.classList.add('active');
             }
         },
-        async factoryReset() {
-            const {isConfirmed} = await Swal.fire({title: '¿ESTÁS SEGURO?', text: 'Se borrarán TODOS los datos.', icon: 'warning', showCancelButton: true, confirmButtonColor: '#ef4444'});
-            if(isConfirmed) { localStorage.clear(); location.reload(); }
-        }
-    },
 
-    IA: {
-        trigger(){ document.getElementById('ai-input').click(); },
-        
-        // --- MOTOR DE DETECCION INTELIGENTE (COLUMNAS + AGRUPACION) ---
-        detectHeadersAndMap(jsonSheet) {
-            let mapping = { prod: 4, size: 5, qty: 6, client: -1 }; 
-            let headerRowIndex = 0;
+        Helpers: {
+            getNextSKU() {
+                if(App.db.inv.length === 0) return '001';
+                const max = App.db.inv.reduce((acc, p) => Math.max(acc, parseInt(p.sku || 0)), 0);
+                return String(max + 1).padStart(3, '0');
+            },
+            // LOS CHIPS DE COLORES QUE PEDISTE
+            getStatusLabel(st) {
+                switch(st) {
+                    case 'bodega': return '<span class="status st-bodega">📦 EN BODEGA</span>';
+                    case 'prod': return '<span class="status st-prod">🧵 EN CONFECCIÓN</span>';
+                    case 'nostock': return '<span class="status st-nostock">⚠️ SIN STOCK</span>';
+                    case 'pack': return '<span class="status st-pack">🎁 EMPAQUETADO</span>';
+                    case 'done': return '<span class="status st-done">🚚 DESPACHADO</span>';
+                    default: return '<span class="status st-bodega">PENDIENTE</span>';
+                }
+            }
+        },
 
-            for(let i=0; i<Math.min(jsonSheet.length, 10); i++) {
-                const row = jsonSheet[i];
-                let foundP = -1, foundS = -1, foundQ = -1, foundC = -1;
+        Render: {
+            bodega() {
+                const q = document.getElementById('search-inv').value.toUpperCase();
+                const list = App.db.inv.filter(i => i.n.toUpperCase().includes(q) || (i.sku && i.sku.includes(q)));
+                document.getElementById('list-bodega').innerHTML = list.map((p, i) => {
+                    const sizes = Object.entries(p.s).map(([k,v]) => `<span style="background:#e2e8f0; padding:2px 6px; border-radius:4px; font-size:0.75rem;"><b>${k}:</b>${v}</span>`).join(' ');
+                    return `<div class="card"><div style="display:flex; justify-content:space-between; align-items:flex-start;"><div><span class="sku-badge">SKU: ${p.sku}</span><h3 style="margin:4px 0;">${p.n}</h3><div style="margin-top:5px; display:flex; flex-wrap:wrap; gap:5px;">${sizes}</div></div><i class="fa-solid fa-pen" style="color:var(--primary); cursor:pointer; padding:10px;" onclick="window.App.Actions.modalProd(${App.db.inv.indexOf(p)})"></i></div></div>`;
+                }).join('') || '<div style="text-align:center;color:#94a3b8">Sin inventario</div>';
+            },
+            ordenes() {
+                const list = App.db.ord;
+                document.getElementById('list-ordenes').innerHTML = list.slice().reverse().map((o, idx) => {
+                    const realIdx = list.length - 1 - idx;
+                    const itemsHtml = o.items.map(it => `<div class="item-row"><span>${it.p} (T:${it.sz})</span><b>x${it.q}</b></div>`).join('');
+                    const actionBtn = o.st!=='done' ? `<button class="btn btn-sec" onclick="window.App.Actions.changeStatus(${realIdx})"><i class="fa-solid fa-arrows-rotate"></i> CAMBIAR ESTADO</button>` : '';
+                    return `<div class="card"><div style="display:flex; justify-content:space-between; margin-bottom:5px;">${App.Helpers.getStatusLabel(o.st || 'bodega')}<div><i class="fa-solid fa-pen" style="color:var(--dark); margin-right:10px; cursor:pointer;" onclick="window.App.Actions.modalOrder(${realIdx})"></i><i class="fa-solid fa-trash" style="color:#cbd5e1; cursor:pointer;" onclick="window.App.Actions.delOrd(${realIdx})"></i></div></div><h3 style="margin:0;">${o.c}</h3>${o.fac ? `<small style="color:var(--success); font-weight:bold;">FAC: ${o.fac}</small>` : ''}<div style="background:#f8fafc; padding:8px; border-radius:8px; margin:10px 0; border:1px dashed #cbd5e1;">${itemsHtml}</div>${actionBtn}</div>`;
+                }).join('') || '<div style="text-align:center;color:#94a3b8">Sin pedidos</div>';
+            }
+        },
 
-                row.forEach((cell, idx) => {
-                    if(!cell) return;
-                    const txt = String(cell).toUpperCase();
-                    if(txt.includes('PRODUCTO') || txt.includes('DESCRIPCION') || txt.includes('ITEM')) foundP = idx;
-                    if(txt.includes('TALLA') || txt.includes('SIZE') || txt.includes('MEDIDA')) foundS = idx;
-                    if(txt.includes('CANT') || txt.includes('SOLICITADA') || txt.includes('CTD')) foundQ = idx;
-                    // Detectar Cliente
-                    if(txt.includes('CLIENTE') || txt.includes('NOMBRE') || txt.includes('DESTINATARIO') || txt.includes('TIENDA')) foundC = idx;
+        Actions: {
+            async changeStatus(i) {
+                const { value: newSt } = await Swal.fire({
+                    title: 'CAMBIAR ESTADO', input: 'select',
+                    inputOptions: { 'bodega': '📦 En Bodega', 'prod': '🧵 En Confección', 'nostock': '⚠️ Sin Stock', 'pack': '🎁 Empaquetado', 'done': '🚚 Despachado' },
+                    showCancelButton: true
                 });
-
-                if(foundP !== -1 && (foundS !== -1 || foundQ !== -1)) {
-                    mapping = { 
-                        prod: foundP, 
-                        size: foundS !== -1 ? foundS : foundP+1, 
-                        qty: foundQ !== -1 ? foundQ : foundP+2,
-                        client: foundC // Puede ser -1 si no existe columna cliente
-                    };
-                    headerRowIndex = i + 1;
-                    break;
+                if (newSt) {
+                    if (newSt === 'done') this.despachar(i);
+                    else { App.db.ord[i].st = newSt; App.save(); }
+                }
+            },
+            async modalProd(i = null) {
+                const isNew = i === null;
+                const item = isNew ? {n:'', s:{}, sku: App.Helpers.getNextSKU()} : App.db.inv[i];
+                const sTxt = Object.entries(item.s).map(([k,v])=>`${k}:${v}`).join(', ');
+                const {value} = await Swal.fire({
+                    title: isNew ? 'PRODUCTO' : 'EDITAR',
+                    html: `<input id="sw-n" class="swal2-input" placeholder="Nombre" value="${item.n}"><input id="sw-s" class="swal2-input" placeholder="Talla:Cant, Talla:Cant" value="${sTxt}">`,
+                    preConfirm: () => {
+                        const n = document.getElementById('sw-n').value.toUpperCase();
+                        const s = {}; document.getElementById('sw-s').value.split(',').forEach(x => { const [k,v]=x.split(':'); if(k&&v) s[k.trim().toUpperCase()]=Number(v); });
+                        return {n, s, sku: item.sku};
+                    }
+                });
+                if(value) {
+                    if(!isNew) App.db.inv[i]=value; else App.db.inv.push(value);
+                    const {value:reason} = await Swal.fire({title: 'MOTIVO', input: 'text'});
+                    if(reason) {
+                        const d = new Date(); const k = `${d.getDate()}-${d.getMonth()}-${d.getFullYear()}`;
+                        App.db.log[k] = (App.db.log[k] || '') + `⚙️ ${value.n}: ${reason}\n`;
+                    }
+                    App.save();
+                }
+            },
+            async modalOrder(i = null) {
+                let ord = i !== null ? JSON.parse(JSON.stringify(App.db.ord[i])) : {c:'', items:[], st:'bodega'};
+                let cart = ord.items;
+                const prodOpts = App.db.inv.map(p=>`<option value="${p.n}">`).join('');
+                window.delCartItem = (idx) => { cart.splice(idx,1); Swal.getPopup().querySelector('#cart-div').innerHTML = cart.map((x,ix)=>`<div>${x.p} (${x.sz}) x${x.q} <span onclick="window.delCartItem(${ix})" style="color:red;cursor:pointer;">X</span></div>`).join(''); };
+                
+                await Swal.fire({
+                    title: 'PEDIDO', width: 600,
+                    html: `
+                        <input id="sw-c" class="swal2-input" placeholder="Cliente" value="${ord.c}">
+                        <div style="background:#f1f5f9; padding:10px; margin:10px 0;">
+                            <input id="sw-p" list="dl" class="swal2-input" placeholder="Producto"><datalist id="dl">${prodOpts}</datalist>
+                            <input id="sw-sz" class="swal2-input" placeholder="Talla" style="width:40%"> <input id="sw-q" type="number" class="swal2-input" value="1" style="width:20%">
+                            <button type="button" class="btn btn-pri" onclick="const p=document.getElementById('sw-p').value.toUpperCase(), s=document.getElementById('sw-sz').value.toUpperCase(), q=Number(document.getElementById('sw-q').value); if(p&&s&&q>0){ cart.push({p,sz:s,q}); window.delCartItem(-1); document.getElementById('sw-p').value=''; }">+ ADD</button>
+                        </div>
+                        <div id="cart-div">${cart.map((x,ix)=>`<div>${x.p} (${x.sz}) x${x.q}</div>`).join('')}</div>
+                    `,
+                    preConfirm: () => { return {c: document.getElementById('sw-c').value.toUpperCase(), items:cart}; }
+                }).then(r => {
+                    if(r.isConfirmed && r.value.c && r.value.items.length) {
+                        ord.c = r.value.c; ord.items = r.value.items;
+                        if(i!==null) App.db.ord[i]=ord; else App.db.ord.push(ord);
+                        App.save();
+                    }
+                });
+            },
+            delOrd(i){ Swal.fire({title:'¿Borrar?', showCancelButton:true}).then(r=>{if(r.isConfirmed){App.db.ord.splice(i,1); App.save();}}); },
+            async despachar(i){
+                const {value:f} = await Swal.fire({title:'N° FACTURA', input:'text'});
+                if(f) {
+                    const o = App.db.ord[i]; o.st='done'; o.fac=f;
+                    o.items.forEach(it => { const p=App.db.inv.find(x=>x.n===it.p); if(p && p.s[it.sz]!==undefined) p.s[it.sz]-=it.q; });
+                    App.save();
                 }
             }
-            return { mapping, headerRowIndex };
         },
 
-        resizeImage(file) {
-            return new Promise((resolve) => {
-                const img = new Image();
-                img.onload = () => {
-                    const canvas = document.createElement('canvas'); const ctx = canvas.getContext('2d');
-                    const maxW = 1000; const scale = maxW / img.width;
-                    canvas.width = maxW; canvas.height = img.height * scale;
-                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                    resolve(canvas.toDataURL('image/jpeg', 0.7));
-                };
-                img.src = URL.createObjectURL(file);
-            });
-        },
-
-        async process(f) {
-            if(!f) return;
-            if(f.name.match(/\.(xlsx|xls|csv)$/i)) {
+        IA: {
+            trigger(){ document.getElementById('ai-input').click(); },
+            detectHeadersAndMap(jsonSheet) {
+               let mapping = { prod: 4, size: 5, qty: 6, client: -1 }, headerRowIndex = 0;
+               for(let i=0; i<Math.min(jsonSheet.length, 10); i++) {
+                   const row = jsonSheet[i]; let foundP = -1, foundS = -1, foundQ = -1, foundC = -1;
+                   row.forEach((cell, idx) => { if(!cell)return; const txt=String(cell).toUpperCase(); if(txt.includes('PRODUCTO')||txt.includes('DESCRIPCION'))foundP=idx; if(txt.includes('TALLA')||txt.includes('SIZE'))foundS=idx; if(txt.includes('CANT')||txt.includes('CTD'))foundQ=idx; if(txt.includes('CLIENTE')||txt.includes('TIENDA'))foundC=idx; });
+                   if(foundP!==-1&&(foundS!==-1||foundQ!==-1)){ mapping={prod:foundP,size:foundS!==-1?foundS:foundP+1,qty:foundQ!==-1?foundQ:foundP+2,client:foundC}; headerRowIndex=i+1; break; }
+               }
+               return {mapping, headerRowIndex};
+            },
+            async process(f) {
+                if(!f) return;
                 const reader = new FileReader();
                 reader.onload = (e) => {
                     const wb = XLSX.read(e.target.result, {type:'array'});
                     const js = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], {header:1});
-                    
                     const { mapping, headerRowIndex } = this.detectHeadersAndMap(js);
-                    
-                    // --- LOGICA DE AGRUPACIÓN (SPLITTER) ---
-                    let ordersMap = {}; // Clave: Cliente, Valor: Array de Items
-                    let stockItems = []; // Items sin cliente (Stock)
-                    let cnt = 0;
-
+                    let ordersMap = {}, cnt = 0;
                     for(let i = headerRowIndex; i < js.length; i++) {
                         const row = js[i];
                         if(row[mapping.prod] && row[mapping.qty]) {
                             const n = String(row[mapping.prod]).toUpperCase().trim();
                             const sz = row[mapping.size] ? String(row[mapping.size]).toUpperCase().trim() : 'UNICA';
                             const q = parseInt(row[mapping.qty]);
-                            
-                            // Detectar nombre cliente si existe la columna
-                            let clientName = null;
-                            if(mapping.client !== -1 && row[mapping.client]) {
-                                clientName = String(row[mapping.client]).toUpperCase().trim();
-                            }
-
+                            let clientName = (mapping.client !== -1 && row[mapping.client]) ? String(row[mapping.client]).toUpperCase().trim() : null;
                             if(n && q > 0) {
-                                // Asegurar que el producto exista en DB (Aunque no sumemos stock aún)
                                 let p = App.db.inv.find(x => x.n === n);
                                 if(!p){ p={n, s:{}, sku: App.Helpers.getNextSKU()}; App.db.inv.push(p); }
-                                
-                                if(clientName) {
-                                    // Es un PEDIDO
-                                    if(!ordersMap[clientName]) ordersMap[clientName] = [];
-                                    ordersMap[clientName].push({p:n, sz:sz, q:q});
-                                } else {
-                                    // Es STOCK (Inventario directo)
-                                    p.s[sz] = (p.s[sz]||0) + q;
-                                }
+                                if(clientName) { if(!ordersMap[clientName]) ordersMap[clientName] = []; ordersMap[clientName].push({p:n, sz:sz, q:q}); }
+                                else { p.s[sz] = (p.s[sz]||0) + q; }
                                 cnt++;
                             }
                         }
                     }
-
-                    // GENERAR PEDIDOS
-                    Object.keys(ordersMap).forEach(client => {
-                        App.db.ord.push({
-                            c: client,
-                            items: ordersMap[client],
-                            st: 'bodega',
-                            fac: null
-                        });
-                    });
-
-                    App.save(); 
-                    
-                    let msg = `Procesados ${cnt} registros.\n`;
-                    const ordCount = Object.keys(ordersMap).length;
-                    if(ordCount > 0) msg += `✅ Se crearon ${ordCount} Pedidos nuevos.`;
-                    else msg += `✅ Se agregaron al Stock (Sin cliente detectado).`;
-
-                    Swal.fire('Importación Inteligente', msg, 'success');
+                    Object.keys(ordersMap).forEach(client => App.db.ord.push({c:client, items:ordersMap[client], st:'bodega', fac:null}));
+                    App.save(); Swal.fire('Importado', `${cnt} items`, 'success');
                 };
                 reader.readAsArrayBuffer(f);
-            } 
-            else {
-                Swal.fire({title:'Procesando...', text:'Optimizando imagen...', allowOutsideClick:false, didOpen:()=>{Swal.showLoading()}});
-                try {
-                    const resizedImgUrl = await this.resizeImage(f);
-                    const {data:{text}} = await Tesseract.recognize(resizedImgUrl, 'spa');
-                    const cleanText = text.split('\n').map(l=>l.trim()).filter(l=>l.length>3).join('\n');
-                    Swal.fire({ title: 'Lectura IA', input: 'textarea', inputValue: cleanText, footer: 'Para múltiples pedidos usa Excel.' });
-                } catch (err) { Swal.fire('Error', 'No se pudo leer', 'error'); }
+            }
+        },
+
+        Backup: {
+            generatePDF() {
+                const { jsPDF } = window.jspdf; const doc = new jsPDF();
+                const now = new Date(); const dateStr = now.toLocaleDateString('es-CL', {day: 'numeric', month: 'long', year: 'numeric'}).toUpperCase();
+                
+                doc.setFillColor(15, 23, 42); doc.rect(0, 0, 210, 30, 'F');
+                doc.setTextColor(255, 255, 255); doc.setFont("helvetica", "bold"); doc.setFontSize(18);
+                doc.text("REPORTE DE IDEAS TEXTILES SPA", 105, 12, { align: "center" });
+                doc.setFontSize(10); doc.setFont("helvetica", "normal");
+                doc.text(`GENERADO EL: ${dateStr}`, 105, 22, { align: "center" });
+
+                let y = 45;
+                const addTitle = (t) => {
+                    if(y>250){doc.addPage(); y=20;}
+                    doc.setFont("helvetica", "bold"); doc.setFontSize(14); doc.setTextColor(15, 23, 42);
+                    doc.text(t, 14, y); y += 6; doc.setLineWidth(0.5); doc.setDrawColor(15, 23, 42); doc.line(14, y, 196, y); y += 5;
+                };
+
+                addTitle("1. INVENTARIO ACTUAL");
+                const bodyInv = App.db.inv.map(p => [p.sku, p.n, Object.entries(p.s).map(([k, v]) => `${k}:${v}`).join(', ')]);
+                doc.autoTable({ startY: y, head: [['SKU', 'PRODUCTO', 'STOCK']], body: bodyInv, theme: 'striped', headStyles: { fillColor: [59, 130, 246], fontStyle: 'bold' } });
+                y = doc.lastAutoTable.finalY + 15;
+
+                addTitle("2. PEDIDOS EN PROCESO");
+                const bodyOrd = App.db.ord.filter(o => o.st !== 'done').map(o => [o.c, o.items.map(i => `${i.p} (${i.sz}) x${i.q}`).join('\n'), o.st === 'pack' ? 'EMPAQUETADO' : (o.st==='prod'?'EN CONFECCIÓN':'PENDIENTE')]);
+                if(bodyOrd.length) { doc.autoTable({ startY: y, head: [['CLIENTE', 'ITEMS', 'ESTADO']], body: bodyOrd, theme: 'grid', headStyles: { fillColor: [245, 158, 11], fontStyle: 'bold' } }); y = doc.lastAutoTable.finalY + 15; }
+
+                addTitle("3. HISTORIAL DESPACHADOS");
+                const bodyDone = App.db.ord.filter(o => o.st === 'done').map(o => [o.fac||'S/N', o.c, o.items.map(i => `${i.p} (${i.sz}) x${i.q}`).join('\n')]);
+                if(bodyDone.length) { doc.autoTable({ startY: y, head: [['N° FAC', 'CLIENTE', 'ITEMS']], body: bodyDone, theme: 'grid', headStyles: { fillColor: [16, 185, 129], fontStyle: 'bold' } }); }
+
+                doc.save(`REPORTE_${now.getDate()}.pdf`);
+            }
+        },
+
+        Calendar: {
+            moveMonth(dir) { App.db.calDate.setMonth(App.db.calDate.getMonth() + dir); this.render(); },
+            setYear(y) { App.db.calDate.setFullYear(parseInt(y)); this.render(); },
+            render() {
+                const d = App.db.calDate;
+                document.getElementById('cal-month-name').innerText = ["ENE","FEB","MAR","ABR","MAY","JUN","JUL","AGO","SEP","OCT","NOV","DIC"][d.getMonth()];
+                document.getElementById('cal-year-select').value = d.getFullYear();
+                const daysInMonth = new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate();
+                let html = '';
+                for(let i=0; i<new Date(d.getFullYear(), d.getMonth(), 1).getDay()-1; i++) html += '<div></div>';
+                for(let i=1; i<=daysInMonth; i++) {
+                    const k = `${i}-${d.getMonth()}-${d.getFullYear()}`;
+                    html += `<div class="day ${App.db.log[k]?'has-note':''}" onclick="window.App.Calendar.openDay('${k}')">${i}</div>`;
+                }
+                document.getElementById('cal-days').innerHTML = html;
+            },
+            async openDay(k) {
+                const { value } = await Swal.fire({ title: 'NOTA', input: 'textarea', inputValue: App.db.log[k] || '' });
+                if (value !== undefined) { App.db.log[k] = value; App.save(); }
             }
         }
-    },
+    };
 
-    Backup: {
-        generatePDF() {
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
-            const now = new Date();
-            const dateStr = now.toLocaleDateString('es-CL', {day: 'numeric', month: 'long', year: 'numeric'}).toUpperCase();
-
-            doc.setFillColor(15, 23, 42); doc.rect(0, 0, 210, 30, 'F');
-            doc.setTextColor(255, 255, 255); doc.setFont("helvetica", "bold"); doc.setFontSize(18);
-            doc.text("REPORTE DE IDEAS TEXTILES SPA", 105, 12, { align: "center" });
-            doc.setFontSize(10); doc.setFont("helvetica", "normal");
-            doc.text(`GENERADO EL: ${dateStr}`, 105, 22, { align: "center" });
-
-            let y = 45;
-            const addTitle = (t) => {
-                if(y>250){doc.addPage(); y=20;}
-                doc.setFont("helvetica", "bold"); doc.setFontSize(14); doc.setTextColor(15, 23, 42);
-                doc.text(t, 14, y); y += 6;
-                doc.setLineWidth(0.5); doc.setDrawColor(15, 23, 42); doc.line(14, y, 196, y); y += 5;
-            };
-
-            addTitle("1. INVENTARIO ACTUAL");
-            const bodyInv = App.db.inv.map(p => [p.sku, p.n, Object.entries(p.s).map(([k, v]) => `${k}:${v}`).join(', ')]);
-            doc.autoTable({ startY: y, head: [['SKU', 'PRODUCTO', 'STOCK']], body: bodyInv, theme: 'striped', headStyles: { fillColor: [59, 130, 246], fontStyle: 'bold' }, styles: { fontSize: 8, cellPadding: 3 } });
-            y = doc.lastAutoTable.finalY + 15;
-
-            addTitle("2. PEDIDOS EN PROCESO");
-            const bodyOrd = App.db.ord.filter(o => o.st !== 'done').map(o => [o.c, o.items.map(i => `${i.p} (${i.sz}) x${i.q}`).join('\n'), o.st === 'pack' ? 'EMPAQUETADO' : 'EN ESPERA']);
-            if(bodyOrd.length===0) { doc.setFontSize(10); doc.setTextColor(100); doc.text("(NO HAY PEDIDOS PENDIENTES)", 14, y+5); y+=15; }
-            else { doc.autoTable({ startY: y, head: [['CLIENTE', 'ITEMS', 'ESTADO']], body: bodyOrd, theme: 'grid', headStyles: { fillColor: [245, 158, 11], fontStyle: 'bold' }, styles: { fontSize: 8 } }); y = doc.lastAutoTable.finalY + 15; }
-
-            addTitle("3. HISTORIAL DESPACHADOS");
-            const bodyDone = App.db.ord.filter(o => o.st === 'done').map(o => [o.fac||'S/N', o.c, o.items.map(i => `${i.p} (${i.sz}) x${i.q}`).join('\n')]);
-            if(bodyDone.length===0) { doc.setFontSize(10); doc.setTextColor(100); doc.text("(AÚN NO HAY DESPACHOS)", 14, y+5); }
-            else { doc.autoTable({ startY: y, head: [['N° FAC', 'CLIENTE', 'ITEMS']], body: bodyDone, theme: 'grid', headStyles: { fillColor: [16, 185, 129], fontStyle: 'bold' }, styles: { fontSize: 8 } }); }
-
-            doc.save(`REPORTE_IDEAS_TEXTILES_${now.getDate()}_${now.getMonth()+1}.pdf`);
-        },
-        exportJSON(){ const blob = new Blob([JSON.stringify(App.db)], {type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='BACKUP.json'; a.click(); },
-        importJSON(el){ const r = new FileReader(); r.onload = e => { try{ App.db=JSON.parse(e.target.result); App.save(); Swal.fire('Ok','','success'); }catch{ Swal.fire('Error','','error'); } }; r.readAsText(el.files[0]); }
-    },
-
-    Calendar: {
-        moveMonth(dir) { App.db.calDate.setMonth(App.db.calDate.getMonth() + dir); this.render(); },
-        setYear(y) { App.db.calDate.setFullYear(parseInt(y)); this.render(); },
-        render() {
-            const d = App.db.calDate;
-            const mNames = ["ENERO","FEBRERO","MARZO","ABRIL","MAYO","JUNIO","JULIO","AGOSTO","SEPTIEMBRE","OCTUBRE","NOVIEMBRE","DICIEMBRE"];
-            document.getElementById('cal-month-name').innerText = mNames[d.getMonth()];
-            document.getElementById('cal-year-select').value = d.getFullYear();
-            const firstDay = new Date(d.getFullYear(), d.getMonth(), 1).getDay(); 
-            const daysInMonth = new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate();
-            let start = firstDay === 0 ? 6 : firstDay - 1;
-            let html = '';
-            for(let i=0; i<start; i++) html += '<div></div>';
-            const today = new Date();
-            for(let i=1; i<=daysInMonth; i++) {
-                const k = `${i}-${d.getMonth()}-${d.getFullYear()}`;
-                const hasNote = App.db.log[k] && App.db.log[k].trim() !== '';
-                const isToday = (i === today.getDate() && d.getMonth() === today.getMonth() && d.getFullYear() === today.getFullYear());
-                html += `<div class="day ${isToday ? 'today' : ''} ${hasNote ? 'has-note' : ''}" onclick="App.Calendar.openDay('${k}')">${i}</div>`;
-            }
-            document.getElementById('cal-days').innerHTML = html;
-        },
-        async openDay(k) {
-            const currentVal = App.db.log[k] || '';
-            const { isConfirmed, isDenied, value } = await Swal.fire({
-                title: `Notas ${k.replace(/-/g,'/')}`,
-                input: 'textarea',
-                inputValue: currentVal,
-                showCancelButton: true,
-                showDenyButton: true,
-                confirmButtonText: 'GUARDAR',
-                denyButtonText: '🗑️ BORRAR NOTA',
-                denyButtonColor: '#ef4444',
-                cancelButtonText: 'CERRAR'
-            });
-            if (isConfirmed) { App.db.log[k] = value; App.save(); } 
-            else if (isDenied) { delete App.db.log[k]; App.save(); Swal.fire('Nota eliminada', '', 'success'); }
-        }
-    }
-};
-
-document.getElementById('ai-input').addEventListener('change', (e) => App.IA.process(e.target.files[0]));
-window.onload = () => App.init();
+    window.App = App;
+    document.getElementById('ai-input').addEventListener('change', (e) => App.IA.process(e.target.files[0]));
+    App.init();
 </script>
 </body>
 </html>
