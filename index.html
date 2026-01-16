@@ -18,7 +18,6 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 
     <style>
-        /* ESTILOS PREMIUM V134 */
         :root { --dark: #0f172a; --primary: #3b82f6; --accent: #6366f1; --success: #10b981; --danger: #ef4444; --bg: #f8fafc; --card-bg: #ffffff; }
         * { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
         body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--dark); margin: 0; padding-bottom: 120px; }
@@ -141,17 +140,14 @@
     const db = firebase.database();
 
     const App = {
-        // Inicialización segura
         db: { inv: [], ord: [], log: {}, calDate: new Date() },
 
         init() {
-            // Loader de seguridad 5s
             setTimeout(() => { const l=document.getElementById('loader'); if(l) l.style.display='none'; }, 5000);
             
             db.ref('/').on('value', (snapshot) => {
                 const data = snapshot.val() || {};
                 
-                // Conversión forzosa a Array para evitar pantallazos blancos
                 let rawInv = data.inv;
                 if (rawInv && typeof rawInv === 'object' && !Array.isArray(rawInv)) rawInv = Object.values(rawInv);
                 
@@ -162,7 +158,6 @@
                 App.db.ord = (Array.isArray(rawOrd) ? rawOrd : []).filter(x => x);
                 App.db.log = data.log || {};
 
-                // Sanitización de propiedades
                 App.db.inv.forEach(p => {
                     if (!p.s) p.s = {};
                     if (!p.n) p.n = "PRODUCTO SIN NOMBRE";
@@ -292,7 +287,6 @@
                     if (!App.db.inv) App.db.inv = [];
                     
                     let item;
-                    // Guardar estado original para comparar
                     let oldStockStr = "";
 
                     if (isNew) {
@@ -300,7 +294,7 @@
                     } else {
                         item = App.db.inv[i];
                         if (!item) throw new Error("Producto no encontrado");
-                        oldStockStr = JSON.stringify(item.s || {}); // FOTO DEL STOCK ANTES DE EDITAR
+                        oldStockStr = JSON.stringify(item.s || {});
                     }
                     
                     const sTxt = Object.entries(item.s||{}).map(([k,v])=>`${k}:${v}`).join(', ');
@@ -322,7 +316,6 @@
                             if(sVal) {
                                 sVal.split(',').forEach(x => {
                                     x = x.trim();
-                                    // LOGICA INTELIGENTE (V134)
                                     if(x.includes(':')) {
                                         const parts = x.split(':');
                                         if(parts.length >= 2) {
@@ -341,10 +334,7 @@
                     });
 
                     if(value) {
-                        // --- AQUÍ ESTÁ LA MAGIA DE LA V135 INTEGRADA ---
-                        // Si no es nuevo Y el stock cambió, preguntamos POR QUÉ.
                         const newStockStr = JSON.stringify(value.s);
-                        
                         if (!isNew && oldStockStr !== newStockStr) {
                              const { value: reason } = await Swal.fire({
                                 title: '📋 MOTIVO DEL AJUSTE',
@@ -373,11 +363,55 @@
                 let ord = i !== null ? JSON.parse(JSON.stringify(App.db.ord[i])) : {c:'', items:[], st:'bodega'};
                 let cart = ord.items || [];
                 const prodOpts = (App.db.inv||[]).map(p=>`<option value="${p.n}">`).join('');
-                window.delCartItem = (idx) => { cart.splice(idx,1); document.getElementById('cart-div').innerHTML = cart.map((x,ix)=>`<div>${x.p} (${x.sz}) x${x.q} <span onclick="delCartItem(${ix})" style="color:red;cursor:pointer;">X</span></div>`).join(''); };
+                
+                // FUNCIONES GLOBALES PARA EL MODAL (SOLUCIÓN DEL BOTÓN)
+                window.renderCart = () => {
+                    document.getElementById('cart-div').innerHTML = cart.map((x,ix)=>`
+                        <div style="display:flex; justify-content:space-between; border-bottom:1px solid #eee; padding:5px;">
+                            <span>${x.p} (${x.sz}) x${x.q}</span>
+                            <i class="fa-solid fa-xmark" onclick="delCartItem(${ix})" style="color:red;cursor:pointer;"></i>
+                        </div>`).join('');
+                };
+
+                window.delCartItem = (idx) => { cart.splice(idx,1); window.renderCart(); };
+                
+                window.addToCart = () => {
+                    const p = document.getElementById('sw-p').value.toUpperCase().trim();
+                    let s = document.getElementById('sw-sz').value.toUpperCase().trim();
+                    const q = parseInt(document.getElementById('sw-q').value);
+                    if(!s) s='UNICA';
+                    if(p && q>0) { 
+                        cart.push({p,sz:s,q}); 
+                        window.renderCart();
+                        document.getElementById('sw-p').value='';
+                        document.getElementById('sw-q').value='1';
+                    }
+                };
+
                 await Swal.fire({
                     title: 'PEDIDO', width: 600,
-                    html: `<input id="sw-c" class="swal2-input" placeholder="Cliente" value="${ord.c}"><div style="background:#f1f5f9; padding:10px; margin:10px 0;"><input id="sw-p" list="dl" class="swal2-input" placeholder="Producto"><datalist id="dl">${prodOpts}</datalist><input id="sw-sz" class="swal2-input" placeholder="Talla (Dejar vacío para UNICA)" style="width:40%"> <input id="sw-q" type="number" class="swal2-input" value="1" style="width:20%"> <button class="btn btn-pri" style="margin-top:10px;" onclick="const p=document.getElementById('sw-p').value.toUpperCase(); let s=document.getElementById('sw-sz').value.toUpperCase(); const q=Number(document.getElementById('sw-q').value); if(!s) s='UNICA'; if(p&&q>0){ cart.push({p,sz:s,q}); delCartItem(-1); document.getElementById('sw-p').value=''; }">+ AGREGAR</button></div><div id="cart-div">${cart.map((x,ix)=>`<div>${x.p} (${x.sz}) x${x.q}</div>`).join('')}</div>`,
-                    preConfirm: () => { const c = document.getElementById('sw-c').value.toUpperCase(); return (c && cart.length) ? {c, items:cart} : false; }
+                    html: `
+                        <input id="sw-c" class="swal2-input" placeholder="Nombre Cliente" value="${ord.c}">
+                        <div style="background:#f8fafc; padding:15px; margin:15px 0; border-radius:8px; border:1px solid #e2e8f0;">
+                            <input id="sw-p" list="dl" class="swal2-input" placeholder="Buscar Producto..." style="margin-bottom:10px;">
+                            <datalist id="dl">${prodOpts}</datalist>
+                            <div style="display:flex; gap:10px;">
+                                <input id="sw-sz" class="swal2-input" placeholder="Talla" style="flex:1; margin:0;"> 
+                                <input id="sw-q" type="number" class="swal2-input" value="1" style="width:80px; margin:0;">
+                            </div>
+                            <button type="button" class="btn btn-pri" style="margin-top:10px;" onclick="addToCart()">
+                                + AGREGAR ITEM
+                            </button>
+                        </div>
+                        <div id="cart-div" style="max-height:150px; overflow-y:auto;"></div>
+                    `,
+                    didOpen: () => { window.renderCart(); },
+                    preConfirm: () => { 
+                        const c = document.getElementById('sw-c').value.toUpperCase(); 
+                        if(!c) return Swal.showValidationMessage('Falta el nombre del cliente');
+                        if(cart.length===0) return Swal.showValidationMessage('El pedido está vacío');
+                        return {c, items:cart};
+                    }
                 }).then(r => {
                     if(r.isConfirmed && r.value) {
                         ord.c = r.value.c; ord.items = r.value.items;
