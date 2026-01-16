@@ -10,7 +10,8 @@
 
     <style>
         :root {
-            --primary: #1e40af; --dark: #0f172a; --bg: #f1f5f9;
+            --primary: #1e40af; /* Azul Corporativo */
+            --dark: #0f172a; --bg: #f1f5f9;
             --white: #ffffff; --border: #cbd5e1;
             --success: #16a34a; --warning: #d97706; --danger: #dc2626;
         }
@@ -35,8 +36,8 @@
             border-radius: 12px; font-size: 1.1em; font-weight: 700; color: var(--dark);
             cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: flex-start; gap: 15px;
         }
-        .user-btn:active { background: var(--primary); color: white; border-color: var(--primary); }
         .user-btn i { color: var(--primary); font-size: 1.2em; }
+        .user-btn:active { background: var(--primary); color: white; border-color: var(--primary); }
         .user-btn:active i { color: white; }
 
         /* --- 2. CABECERA --- */
@@ -120,7 +121,6 @@
         <button class="user-btn" onclick="login('ALEJANDRO')"><i class="fa-solid fa-user-gear"></i> ALEJANDRO</button>
         <button class="user-btn" onclick="login('RICARDO')"><i class="fa-solid fa-user-tie"></i> RICARDO</button>
         <button class="user-btn" onclick="login('RENATO')"><i class="fa-solid fa-user-pen"></i> RENATO</button>
-         <button class="user-btn" onclick="login('SANTIAGO')"><i class="fa-solid fa-user-pen"></i> SANTIAGO </button>
     </div>
 </div>
 
@@ -162,7 +162,7 @@
 </div>
 
 <script>
-    // --- TUS LINKS DEFINITIVOS ---
+    // --- TUS LINKS DEFINITIVOS (YA INSERTADOS) ---
     // Link de lectura (CSV que publicaste)
     const CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR709g0cB4EtdROEnIWBrK2O4FQrKHUd3jXNUTWwdWvT1F5UraKHGOr6dDQHsJtgrdv4-ARqow_jKi0/pub?output=csv";
     
