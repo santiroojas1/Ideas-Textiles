@@ -6,174 +6,193 @@
     
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#0f172a">
     
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Playfair+Display:ital,wght@1,400&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700;900&family=Playfair+Display:ital,wght@1,500&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
-    <script src='https://unpkg.com/tesseract.js@v2.1.0/dist/tesseract.min.js'></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 
     <style>
         :root { 
-            --corp-dark: #0f172a; --corp-gray: #334155; --gold: #d97706; --bg: #f8fafc; --card-bg: #ffffff;
-            --danger: #ef4444; --success: #10b981; --prod: #7c3aed;
+            --corp-dark: #0f172a; --corp-black: #020617; --gold: #d97706; --gold-light: #fbbf24;
+            --bg: #f1f5f9; --card-bg: #ffffff;
+            --danger: #ef4444; --success: #10b981; --prod: #6366f1;
+            --font-main: 'Outfit', sans-serif;
         }
         * { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; user-select: none; }
-        input, textarea, select { user-select: text; font-family: 'Inter', sans-serif; }
-        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--corp-dark); margin: 0; padding: 0; padding-bottom: 120px; padding-top: env(safe-area-inset-top); height: 100vh; overflow-y: scroll; overscroll-behavior-y: none; }
+        input, textarea, select { user-select: text; font-family: var(--font-main); }
+        body { font-family: var(--font-main); background: var(--bg); color: var(--corp-dark); margin: 0; padding: 0; padding-bottom: 120px; padding-top: env(safe-area-inset-top); height: 100vh; overflow-y: scroll; overscroll-behavior-y: none; }
 
-        /* HEADER */
-        header { background: var(--corp-dark); color: white; padding: 20px 20px 30px 20px; position: sticky; top: 0; z-index: 100; border-bottom-left-radius: 25px; border-bottom-right-radius: 25px; box-shadow: 0 10px 25px rgba(15, 23, 42, 0.15); }
-        .corp-title { font-size: 1.4rem; font-weight: 800; margin: 0; display: flex; justify-content: center; align-items: center; gap: 10px; }
-        .corp-subtitle { font-family: 'Playfair Display', serif; font-style: italic; font-size: 0.85rem; color: #94a3b8; margin-top: 4px; text-align: center; }
-        .import-btn { position: absolute; right: 20px; top: 20px; background: rgba(255,255,255,0.1); width: 35px; height: 35px; border-radius: 50%; color: white; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        /* HEADER REFORZADO */
+        header { 
+            background: linear-gradient(135deg, var(--corp-black) 0%, var(--corp-dark) 100%); 
+            color: white; padding: 25px 20px 35px 20px; position: sticky; top: 0; z-index: 100; 
+            border-bottom-left-radius: 30px; border-bottom-right-radius: 30px; 
+            box-shadow: 0 15px 30px rgba(15, 23, 42, 0.25); border-bottom: 2px solid var(--gold);
+        }
+        .corp-brand { text-align: center; position: relative; }
+        .corp-title { 
+            font-size: 1.8rem; font-weight: 900; letter-spacing: -1px; margin: 0; 
+            text-transform: uppercase; color: white; display: flex; align-items: center; justify-content: center; gap: 12px;
+        }
+        .corp-title i { color: var(--gold); font-size: 1.6rem; filter: drop-shadow(0 0 10px rgba(217, 119, 6, 0.6)); }
+        .corp-subtitle { 
+            font-family: 'Playfair Display', serif; font-style: italic; font-size: 0.9rem; 
+            color: #cbd5e1; margin-top: 5px; letter-spacing: 1px; 
+        }
+        .import-btn { position: absolute; right: 0; top: 5px; background: rgba(255,255,255,0.15); width: 40px; height: 40px; border-radius: 50%; color: var(--gold); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.3s; }
+        .import-btn:active { transform: scale(0.9); background: white; }
 
-        /* UI ELEMENTS */
-        .view { display: none; padding: 20px; max-width: 600px; margin: 0 auto; animation: fadeUp 0.3s ease-out; }
+        /* UI GENERICA */
+        .view { display: none; padding: 20px; max-width: 650px; margin: 0 auto; animation: fadeUp 0.35s cubic-bezier(0.16, 1, 0.3, 1); }
         .view.active { display: block; }
-        @keyframes fadeUp { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+        @keyframes fadeUp { from { opacity:0; transform:translateY(15px); } to { opacity:1; transform:translateY(0); } }
 
-        .card { background: var(--card-bg); border-radius: 16px; padding: 18px; margin-bottom: 15px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); border: 1px solid #e2e8f0; position: relative; }
-        .sku-badge { font-family: 'JetBrains Mono', monospace; background: var(--corp-dark); color: var(--gold); padding: 3px 8px; border-radius: 4px; font-size: 0.65rem; font-weight: 700; }
+        .card { 
+            background: var(--card-bg); border-radius: 20px; padding: 20px; margin-bottom: 18px; 
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05); border: 1px solid white; position: relative; 
+        }
+        .sku-badge { font-family: 'JetBrains Mono', monospace; background: var(--corp-black); color: var(--gold); padding: 4px 10px; border-radius: 6px; font-size: 0.7rem; font-weight: 700; letter-spacing: -0.5px; }
 
-        .qs-tag { background: #f1f5f9; padding: 4px 10px; border-radius: 8px; font-size: 0.8rem; color: var(--corp-gray); display: inline-flex; align-items: center; gap: 8px; border: 1px solid #cbd5e1; margin: 2px; }
-        .qs-btn { width: 22px; height: 22px; border-radius: 50%; border: none; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-        .qs-minus { background: #e2e8f0; } .qs-plus { background: var(--corp-dark); color: white; }
-
-        .btn { width: 100%; padding: 14px; border: none; border-radius: 12px; font-weight: 700; font-size: 0.9rem; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px; margin-top: 10px; }
-        .btn-pri { background: var(--corp-dark); color: white; }
-        .btn-sec { background: white; border: 1px solid #cbd5e1; color: var(--corp-dark); }
+        .btn { width: 100%; padding: 16px; border: none; border-radius: 14px; font-weight: 800; font-size: 0.95rem; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 10px; transition: transform 0.1s; text-transform: uppercase; letter-spacing: 0.5px; }
+        .btn:active { transform: scale(0.98); }
+        .btn-pri { background: var(--corp-dark); color: white; box-shadow: 0 4px 12px rgba(15, 23, 42, 0.3); }
+        .btn-sec { background: white; border: 2px solid #e2e8f0; color: var(--corp-dark); }
         .btn-danger { background: var(--danger); color: white; }
-        .btn-prod { background: var(--prod); color: white; }
-        .btn-disabled { background: #cbd5e1; color: #94a3b8; cursor: not-allowed; }
-        .btn-group { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px;}
+        .btn-prod { background: var(--prod); color: white; box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4); }
+        .btn-group { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 15px;}
 
-        .search-bar { width:100%; padding:16px; border-radius:12px; border:1px solid #cbd5e1; margin-bottom:20px; background: white; font-size: 1rem; }
+        .search-bar { 
+            width:100%; padding:18px; border-radius:16px; border:none; margin-bottom:25px; 
+            background: white; font-size: 1rem; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); color: var(--corp-dark); font-weight: 600;
+        }
+
+        /* CHIPS INTELIGENTES (UI MEJORADA) */
+        .chip-container { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0; }
+        .chip { 
+            background: #f1f5f9; padding: 8px 14px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; 
+            cursor: pointer; border: 1px solid #e2e8f0; transition: 0.2s; color: #64748b;
+        }
+        .chip.selected { background: var(--corp-dark); color: white; border-color: var(--corp-dark); box-shadow: 0 2px 8px rgba(15,23,42,0.3); }
         
-        /* CHECKBOX Y TOOLBAR MASIVO */
-        .chk-bulk { transform: scale(1.4); margin-right: 12px; accent-color: var(--corp-dark); cursor: pointer; }
-        .bulk-toolbar { background: var(--gold); color: white; padding: 12px 20px; border-radius: 12px; margin-bottom: 20px; display: none; justify-content: space-between; align-items: center; box-shadow: 0 5px 15px rgba(217, 119, 6, 0.3); animation: fadeUp 0.2s; }
-        .bulk-toolbar.visible { display: flex; }
+        .stock-adder { background: #f8fafc; padding: 15px; border-radius: 12px; border: 1px dashed #cbd5e1; margin-top: 10px; }
+        .stock-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #eee; font-size: 0.9rem; font-weight: 500; }
 
-        /* ITEM STATUS PILLS (NUEVO) */
-        .ist-pill { font-size: 0.65rem; padding: 2px 5px; border-radius: 4px; font-weight: 800; margin-left: 6px; text-transform: uppercase; }
+        /* FABRICA */
+        .toggle-fabrica { display: flex; background: #e2e8f0; border-radius: 16px; padding: 5px; margin-bottom: 25px; }
+        .toggle-fabrica button { flex: 1; border: none; background: transparent; padding: 12px; border-radius: 12px; font-weight: 700; color: #64748b; font-size: 0.9rem; transition: 0.3s; cursor: pointer; }
+        .toggle-fabrica button.active { background: white; color: var(--corp-dark); box-shadow: 0 2px 10px rgba(0,0,0,0.08); }
+        .toggle-fabrica button.active-prod { background: var(--prod); color: white; }
+
+        /* UI EXTRAS */
+        .dock { position: fixed; bottom: 35px; left: 50%; transform: translateX(-50%); background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(20px); padding: 18px 45px; border-radius: 60px; display: flex; gap: 45px; box-shadow: 0 20px 50px rgba(0,0,0,0.4); z-index: 999; border: 1px solid rgba(255,255,255,0.15); }
+        .dock i { font-size: 1.5rem; color: #64748b; transition: 0.3s; cursor: pointer; }
+        .dock i.active { color: var(--gold); transform: translateY(-8px); filter: drop-shadow(0 0 10px rgba(217, 119, 6, 0.5)); }
+
+        .ist-pill { font-size: 0.65rem; padding: 4px 8px; border-radius: 6px; font-weight: 800; margin-left: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
         .ist-ok { background: #dcfce7; color: #15803d; }
         .ist-no { background: #fee2e2; color: #b91c1c; }
         .ist-pend { background: #fef9c3; color: #a16207; }
-
-        /* FABRICA */
-        .toggle-fabrica { display: flex; background: #e2e8f0; border-radius: 12px; padding: 4px; margin-bottom: 20px; }
-        .toggle-fabrica button { flex: 1; border: none; background: transparent; padding: 10px; border-radius: 10px; font-weight: 600; color: var(--corp-gray); }
-        .toggle-fabrica button.active { background: white; color: var(--corp-dark); box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        .toggle-fabrica button.active-prod { background: var(--prod); color: white; }
-        .prod-bar { height: 6px; background: #e2e8f0; border-radius: 3px; margin: 12px 0; overflow: hidden; }
-        .prod-fill { height: 100%; background: var(--prod); transition: width 0.4s ease; }
-
-        /* DOCK */
-        .dock { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(15px); padding: 18px 40px; border-radius: 50px; display: flex; gap: 45px; box-shadow: 0 15px 40px rgba(0,0,0,0.25); z-index: 999; border: 1px solid rgba(255,255,255,0.1); }
-        .dock i { font-size: 1.4rem; color: #94a3b8; transition: 0.3s; cursor: pointer; }
-        .dock i.active { color: white; transform: translateY(-6px); text-shadow: 0 0 15px rgba(255,255,255,0.5); }
-
-        /* CALENDARIO */
-        .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; margin-top: 10px; }
-        .day { aspect-ratio: 1; border: 1px solid #f1f5f9; display: flex; flex-direction: column; align-items: center; justify-content: center; background: white; border-radius: 10px; font-size: 0.9rem; position: relative; font-weight: 600; color: var(--corp-gray); }
-        .day.current { border: 2px solid var(--corp-dark); background: #f8fafc; }
-        .dot { width: 5px; height: 5px; border-radius: 50%; margin-top: 4px; background: var(--gold); }
         
+        /* Checkbox Masivo */
+        .chk-bulk { width: 22px; height: 22px; accent-color: var(--gold); border-radius: 6px; cursor: pointer; }
+        .bulk-toolbar { background: var(--corp-dark); color: white; padding: 15px 20px; border-radius: 16px; margin-bottom: 20px; display: none; justify-content: space-between; align-items: center; animation: fadeUp 0.2s; box-shadow: 0 10px 25px rgba(15,23,42,0.3); }
+        .bulk-toolbar.visible { display: flex; }
+
         #loader { position:fixed; top:0; left:0; width:100%; height:100%; background:var(--bg); z-index:2000; display:flex; flex-direction:column; justify-content:center; align-items:center; }
-        .spinner { width: 40px; height: 40px; border: 4px solid #cbd5e1; border-top: 4px solid var(--corp-dark); border-radius: 50%; animation: spin 0.8s linear infinite; }
+        .spinner { width: 45px; height: 45px; border: 5px solid #cbd5e1; border-top: 5px solid var(--gold); border-radius: 50%; animation: spin 0.8s cubic-bezier(0.5, 0, 0.5, 1) infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
 
-<div id="loader"><div class="spinner"></div><p style="margin-top:20px; font-weight:700; color:var(--corp-gray); font-size: 0.8rem;">CARGANDO SISTEMA...</p></div>
+<div id="loader"><div class="spinner"></div><p style="margin-top:25px; font-weight:700; color:var(--corp-gray); letter-spacing:1px; font-size:0.8rem;">INICIANDO SISTEMA...</p></div>
 
 <header>
     <div class="corp-brand">
-        <h1 class="corp-title"><i class="fa-solid fa-scissors" style="color:var(--gold); transform:rotate(-45deg);"></i> IDEAS TEXTILES SPA</h1>
-        <div class="corp-subtitle">Workwear & Corporate</div>
+        <h1 class="corp-title"><i class="fa-solid fa-layer-group"></i> IDEAS TEXTILES</h1>
+        <div class="corp-subtitle">Expert Workwear Solutions</div>
+        <div class="import-btn" onclick="App.IA.trigger()"><i class="fa-solid fa-upload"></i></div>
     </div>
-    <div class="import-btn" onclick="App.IA.trigger()"><i class="fa-solid fa-cloud-arrow-up"></i></div>
 </header>
 
 <section id="v-bodega" class="view active">
     <div class="toggle-fabrica">
-        <button id="tab-stock" class="active" onclick="App.UI.toggleFabrica('stock')">📦 BODEGA</button>
-        <button id="tab-fabrica" onclick="App.UI.toggleFabrica('fabrica')">🏭 FÁBRICA <span id="fab-badge" style="background:rgba(0,0,0,0.1);padding:2px 6px;border-radius:10px;font-size:0.7em;">0</span></button>
+        <button id="tab-stock" class="active" onclick="App.UI.toggleFabrica('stock')">📦 BODEGA CENTRAL</button>
+        <button id="tab-fabrica" onclick="App.UI.toggleFabrica('fabrica')">🏭 FÁBRICA <span id="fab-badge" style="background:rgba(0,0,0,0.1);padding:2px 8px;border-radius:10px;font-size:0.8em;font-weight:900;">0</span></button>
     </div>
 
     <div id="sub-stock">
-        <input type="text" id="search-inv" class="search-bar" placeholder="🔍 Buscar SKU o Nombre..." oninput="App.Render.bodega()">
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-            <button class="btn btn-pri" style="margin:0;" onclick="App.Actions.modalProd()">+ ITEM</button>
-            <button class="btn btn-sec" style="margin:0; color:var(--gold); border-color:var(--gold);" onclick="App.Actions.tachaManual()">📄 SALIDA LIBRE</button>
+        <input type="text" id="search-inv" class="search-bar" placeholder="🔍 Buscar SKU, Producto..." oninput="App.Render.bodega()">
+        <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 12px;">
+            <button class="btn btn-pri" style="margin:0;" onclick="App.Actions.modalProd()"><i class="fa-solid fa-plus"></i> NUEVO ITEM</button>
+            <button class="btn btn-sec" style="margin:0; border-color:var(--gold); color:var(--gold);" onclick="App.Actions.tachaManual()"><i class="fa-solid fa-dolly"></i> SALIDA</button>
         </div>
-        <div id="list-bodega" style="margin-top:20px;"></div>
+        <div id="list-bodega" style="margin-top:25px;"></div>
     </div>
 
     <div id="sub-fabrica" style="display:none;">
-        <div style="text-align:center; padding:15px; border:1px dashed #cbd5e1; background:#fff; margin-bottom:15px; border-radius:12px; font-size:0.8rem;">Control de Producción en curso.</div>
+        <div style="text-align:center; padding:20px; border:2px dashed #cbd5e1; background:rgba(255,255,255,0.5); margin-bottom:20px; border-radius:16px; font-size:0.9rem; color:#64748b; font-weight:500;">
+            <i class="fa-solid fa-industry" style="margin-bottom:10px; font-size:1.5rem;"></i><br>
+            Panel de Control de Producción
+        </div>
         <div id="list-fabrica"></div>
     </div>
 </section>
 
 <section id="v-ordenes" class="view">
-    <h2 style="margin:0 0 20px; font-size:1.3rem; font-weight:800; color:var(--corp-dark);">PEDIDOS ACTIVOS</h2>
-    <button class="btn btn-pri" onclick="App.Actions.modalOrder()"><i class="fa-solid fa-cart-plus"></i> NUEVA OC DE VENTA</button>
-    
-    <div style="margin-top:20px;">
-        <div id="bulk-tools" class="bulk-toolbar">
-            <span style="font-weight:700; font-size:0.9rem;"><i class="fa-solid fa-check-double"></i> <span id="sel-count">0</span> Seleccionados</span>
-            <button onclick="App.Actions.printBulk()" style="background:white; color:var(--gold); border:none; padding:6px 14px; border-radius:8px; font-weight:800; font-size:0.8rem; cursor:pointer;">🖨️ IMPRIMIR PACK 4</button>
-        </div>
-        <div id="list-ordenes"></div>
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+        <h2 style="margin:0; font-size:1.5rem; font-weight:900; color:var(--corp-dark);">PEDIDOS</h2>
+        <button class="btn btn-pri" style="width:auto; padding:10px 20px; margin:0;" onclick="App.Actions.modalOrder()"><i class="fa-solid fa-plus"></i> CREAR OC</button>
     </div>
+    
+    <div id="bulk-tools" class="bulk-toolbar">
+        <span style="font-weight:700; font-size:0.95rem;"><i class="fa-solid fa-check-double"></i> <span id="sel-count">0</span> SELECCIONADOS</span>
+        <button onclick="App.Actions.printBulk()" style="background:white; color:var(--corp-dark); border:none; padding:8px 16px; border-radius:10px; font-weight:800; font-size:0.8rem; cursor:pointer;">IMPRIMIR PACK 4</button>
+    </div>
+    <div id="list-ordenes"></div>
 </section>
 
 <section id="v-agenda" class="view">
     <div class="card">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-            <button onclick="App.Calendar.move(-1)" style="border:none; background:none; font-size:1.2rem;">◀</button>
-            <span id="cal-title" style="font-weight:800; color:var(--corp-dark);">MES AÑO</span>
-            <button onclick="App.Calendar.move(1)" style="border:none; background:none; font-size:1.2rem;">▶</button>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+            <button onclick="App.Calendar.move(-1)" style="border:none; background:none; font-size:1.4rem; color:var(--corp-dark);"><i class="fa-solid fa-chevron-left"></i></button>
+            <span id="cal-title" style="font-weight:900; color:var(--corp-dark); font-size:1.2rem;">MES AÑO</span>
+            <button onclick="App.Calendar.move(1)" style="border:none; background:none; font-size:1.4rem; color:var(--corp-dark);"><i class="fa-solid fa-chevron-right"></i></button>
         </div>
-        <div style="display:grid; grid-template-columns:repeat(7,1fr); text-align:center; font-size:0.7rem; color:#94a3b8; font-weight:700;"><div>L</div><div>M</div><div>M</div><div>J</div><div>V</div><div>S</div><div>D</div></div>
-        <div id="cal-grid" class="cal-grid"></div>
-        <div style="margin-top:15px; display:flex; gap:15px; justify-content:center; font-size:0.75rem; color:#64748b;">
-            <div style="display:flex;align-items:center;gap:5px;"><div style="width:10px;height:10px;border:2px solid var(--corp-dark);border-radius:3px;"></div> HOY</div>
-            <div style="display:flex;align-items:center;gap:5px;"><div class="dot"></div> REGISTROS</div>
-        </div>
+        <div style="display:grid; grid-template-columns:repeat(7,1fr); text-align:center; font-size:0.75rem; color:#94a3b8; font-weight:800; margin-bottom:10px;"><div>L</div><div>M</div><div>M</div><div>J</div><div>V</div><div>S</div><div>D</div></div>
+        <div id="cal-grid" style="display:grid; grid-template-columns:repeat(7,1fr); gap:8px;"></div>
     </div>
 
     <div class="card" style="text-align:center; border: 1px solid #e2e8f0; background: #f8fafc;">
-        <h3 style="margin-top:0; color:var(--corp-dark);">ADMINISTRACIÓN</h3>
-        <p style="font-size:0.8rem; color:#64748b; margin-bottom:15px;">Zona segura. Respalda antes de resetear.</p>
-        <button class="btn btn-pri" onclick="App.Backup.generatePDF()"><i class="fa-solid fa-file-pdf"></i> DESCARGAR RESPALDO</button>
-        <div style="margin-top:20px; padding-top:15px; border-top:1px solid #e2e8f0;">
-            <button id="btn-reset" class="btn btn-disabled" onclick="App.Actions.factoryReset()">⚠️ RESET FABRICA (BLOQUEADO)</button>
+        <h3 style="margin-top:0; color:var(--corp-dark); font-weight:800;">ZONA SEGURA</h3>
+        <p style="font-size:0.85rem; color:#64748b; margin-bottom:20px;">Respalda tus datos antes de limpiar.</p>
+        <button class="btn btn-pri" onclick="App.Backup.generatePDF()"><i class="fa-solid fa-file-shield"></i> DESCARGAR RESPALDO</button>
+        <div style="margin-top:25px; padding-top:20px; border-top:1px solid #e2e8f0;">
+            <button id="btn-reset" class="btn" style="background:#cbd5e1; color:#94a3b8; cursor:not-allowed;" onclick="App.Actions.factoryReset()">⚠️ RESET FABRICA</button>
         </div>
     </div>
-    <div style="text-align:center; color:#94a3b8; font-size:0.7rem; margin-top:30px;">&copy; 2026 Ideas Textiles Spa. Todos los derechos reservados.</div>
 </section>
 
 <nav class="dock">
-    <i class="fa-solid fa-box-open active" onclick="App.UI.go('bodega', this)"></i>
-    <i class="fa-solid fa-clipboard-check" onclick="App.UI.go('ordenes', this)"></i>
-    <i class="fa-solid fa-calendar-days" onclick="App.UI.go('agenda', this)"></i>
+    <i class="fa-solid fa-box active" onclick="App.UI.go('bodega', this)"></i>
+    <i class="fa-solid fa-clipboard-list" onclick="App.UI.go('ordenes', this)"></i>
+    <i class="fa-regular fa-calendar" onclick="App.UI.go('agenda', this)"></i>
 </nav>
 <input type="file" id="ai-input" hidden accept="image/*,.xlsx,.xls,.csv">
 
 <script>
+    // CONFIGURACIÓN FIREBASE (NO TOCAR)
     const firebaseConfig = { apiKey: "AIzaSyBg-Cx9SqZw35TyyMxtpVBEFlwZTjBXBew", authDomain: "ideastextilesapp.firebaseapp.com", databaseURL: "https://ideastextilesapp-default-rtdb.firebaseio.com", projectId: "ideastextilesapp", storageBucket: "ideastextilesapp.firebasestorage.app", messagingSenderId: "268995530035", appId: "1:268995530035:web:1890f45ac761cc81eb0246" };
-    firebase.initializeApp(firebaseConfig);
+    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
     const App = {
@@ -181,16 +200,27 @@
         state: { backupDone: false, calDate: new Date() },
 
         init() {
-            setTimeout(() => { const l=document.getElementById('loader'); if(l)l.style.display='none'; }, 3000);
+            // Carga robusta con prevención de vacíos
             db.ref('/').on('value', (s) => {
                 const v = s.val() || {};
+                // Forzar Arrays vacíos si vienen nulos para evitar crasheos
                 App.data.inv = Object.values(v.inv || []).filter(x => x);
                 App.data.ord = Object.values(v.ord || []).filter(x => x);
                 App.data.fab = Object.values(v.fab || []).filter(x => x);
                 App.data.log = v.log || {};
-                App.data.inv.forEach(p => { if(!p.s)p.s={}; if(!p.n)p.n="ITEM?"; if(!p.sku)p.sku="000"; });
+                
+                // Saneamiento de datos antiguos
+                App.data.inv.forEach(p => { 
+                    if(!p.s || typeof p.s !== 'object') p.s={}; 
+                    if(!p.n) p.n="ITEM SIN NOMBRE"; 
+                    if(!p.sku) p.sku="000"; 
+                });
+
                 document.getElementById('fab-badge').innerText = App.data.fab.length;
                 App.Render.bodega(); App.Render.ordenes(); App.Render.fabrica(); App.Calendar.render();
+                
+                const l = document.getElementById('loader');
+                if(l) { l.style.opacity = '0'; setTimeout(()=>l.style.display='none', 500); }
             });
         },
 
@@ -223,11 +253,11 @@
                 App.data.log[k] = (App.data.log[k]||'') + `[${d.getHours()}:${d.getMinutes()}] ${msg}\n`;
             },
             
-            // --- PDF 4-EN-1 INTELIGENTE ---
+            // MOTOR PDF 4-EN-1 (ROBUSTO)
             createPDF(type, dataList) {
                 const docs = Array.isArray(dataList) ? dataList : [dataList];
                 const { jsPDF } = window.jspdf;
-                const pdf = new jsPDF({ format: 'legal', unit: 'mm' }); // Hoja Oficio
+                const pdf = new jsPDF({ format: 'legal', unit: 'mm' });
                 const quadrants = [ [10, 10], [110, 10], [10, 150], [110, 150] ];
 
                 docs.forEach((data, index) => {
@@ -239,22 +269,21 @@
                     pdf.text("IDEAS TEXTILES SPA", offX, offY + 5);
                     
                     pdf.setFont("helvetica", "bold"); pdf.setFontSize(8); pdf.setTextColor(0);
-                    const title = type === 'taller' ? 'SALIDA TALLER / LIBRE' : 'TACHA DE PEDIDO';
+                    const title = type === 'taller' ? 'SALIDA DE PLANTA' : 'ORDEN DE PREPARACIÓN';
                     pdf.text(title, offX, offY + 12);
                     
                     pdf.setFontSize(7); pdf.setFont("helvetica", "normal");
                     pdf.text(`FECHA: ${new Date().toLocaleDateString()}`, offX, offY + 18);
-                    pdf.text(`DEST/CLIENTE: ${(data.dest||data.c||'').substring(0,25)}`, offX, offY + 23);
+                    pdf.text(`DESTINO: ${(data.dest||data.c||'').substring(0,25)}`, offX, offY + 23);
                     if(data.trans) pdf.text(`RESP: ${data.trans.substring(0,25)}`, offX, offY + 28);
                     
                     let currY = offY + 35;
                     pdf.setFillColor(240); pdf.rect(offX, currY - 4, 85, 5, 'F');
-                    pdf.setFont("helvetica", "bold"); pdf.text("CANT  DESCRIPCIÓN", offX + 2, currY);
+                    pdf.setFont("helvetica", "bold"); pdf.text("CANT  ITEM / DETALLE", offX + 2, currY);
                     pdf.setFont("helvetica", "normal");
                     
                     data.items.forEach(it => {
                         currY += 5; if(currY > offY + 100) return;
-                        // Mostrar estado en PDF si existe
                         const stTxt = it.st && it.st !== 'OK' ? ` [${it.st}]` : '';
                         pdf.text(`${it.q}`, offX + 5, currY);
                         pdf.text(`${it.p} (${it.sz})${stTxt}`.substring(0, 30), offX + 15, currY);
@@ -269,7 +298,7 @@
                     pdf.line(offX+5, firmY, offX+35, firmY); pdf.text("ENTREGA", offX+10, firmY+3);
                     pdf.line(offX+50, firmY, offX+80, firmY); pdf.text("RECIBE", offX+55, firmY+3);
                 });
-                pdf.save(`TACHAS_PACK_${new Date().getTime()}.pdf`);
+                pdf.save(`DOC_${new Date().getTime()}.pdf`);
             }
         },
 
@@ -278,62 +307,101 @@
                 const el = document.getElementById('list-bodega');
                 const q = (document.getElementById('search-inv').value||'').toUpperCase();
                 const list = App.data.inv.filter(i => (i.n||'').toUpperCase().includes(q) || (i.sku||'').includes(q));
-                if(!list.length) { el.innerHTML='<div style="text-align:center;color:#94a3b8;margin-top:30px;">Sin resultados.</div>'; return; }
+                if(!list.length) { el.innerHTML='<div style="text-align:center;color:#94a3b8;margin-top:40px;font-weight:600;">No se encontraron items.</div>'; return; }
 
                 el.innerHTML = list.map((p, idx) => {
                     const realIdx = App.data.inv.indexOf(p);
-                    const keys = Object.keys(p.s);
-                    let sizesHtml = keys.length ? keys.map(k => `<div class="qs-tag"><b>${k}</b>:${p.s[k]}<div style="display:flex;gap:3px;margin-left:5px;"><button class="qs-btn qs-minus" onclick="App.Actions.quickStock(${realIdx},'${k}',-1)">-</button><button class="qs-btn qs-plus" onclick="App.Actions.quickStock(${realIdx},'${k}',1)">+</button></div></div>`).join('') : '<span style="font-size:0.8rem;color:#cbd5e1;">Sin stock.</span>';
-                    const isZero = keys.length === 0 || Object.values(p.s).every(v=>v<=0);
+                    const keys = Object.keys(p.s || {});
+                    const totalStock = Object.values(p.s || {}).reduce((a,b)=>a+b,0);
                     
+                    let sizesHtml = keys.length ? keys.map(k => `
+                        <div style="display:inline-flex;align-items:center;background:#f8fafc;padding:4px 8px;border-radius:8px;border:1px solid #e2e8f0;font-size:0.8rem;margin:2px;">
+                            <span style="font-weight:700;margin-right:5px;">${k}:</span> ${p.s[k]}
+                            <div style="display:flex;gap:2px;margin-left:6px;">
+                                <button onclick="App.Actions.quickStock(${realIdx},'${k}',-1)" style="width:20px;height:20px;border-radius:4px;border:none;background:#e2e8f0;font-weight:bold;">-</button>
+                                <button onclick="App.Actions.quickStock(${realIdx},'${k}',1)" style="width:20px;height:20px;border-radius:4px;border:none;background:var(--corp-dark);color:white;font-weight:bold;">+</button>
+                            </div>
+                        </div>`).join('') : '<span style="font-size:0.8rem;color:#cbd5e1;font-style:italic;">Stock en 0</span>';
+
                     return `<div class="card">
-                        <div style="display:flex;justify-content:space-between;margin-bottom:5px;">
+                        <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
                             <span class="sku-badge">SKU: ${p.sku}</span>
-                            <div><i class="fa-solid fa-pen" style="color:var(--corp-gray);margin-right:10px;cursor:pointer;" onclick="App.Actions.modalProd(${realIdx})"></i><i class="fa-solid fa-trash" style="color:#cbd5e1;cursor:pointer;" onclick="App.Actions.delProd(${realIdx})"></i></div>
+                            <div>
+                                <i class="fa-solid fa-pen-to-square" style="color:#64748b;margin-right:12px;cursor:pointer;" onclick="App.Actions.modalProd(${realIdx})"></i>
+                                <i class="fa-solid fa-trash-can" style="color:#cbd5e1;cursor:pointer;" onclick="App.Actions.delProd(${realIdx})"></i>
+                            </div>
                         </div>
-                        <h3 style="margin:5px 0 10px;font-size:1rem;">${p.n}</h3>
-                        <button onclick="App.Actions.startProduction(${realIdx})" style="float:right;background:transparent;border:1px solid #ddd;border-radius:8px;color:var(--prod);font-size:0.7rem;font-weight:700;padding:5px 10px;">${isZero ? '🛠️ REPONER' : '⚙️ PRODUCIR'}</button>
-                        <div style="display:flex;flex-wrap:wrap;gap:5px;margin-top:8px;">${sizesHtml}</div>
+                        <h3 style="margin:0 0 10px; font-size:1.1rem; font-weight:800;">${p.n}</h3>
+                        <div style="display:flex; justify-content:space-between; align-items:flex-end;">
+                            <div style="flex:1;">${sizesHtml}</div>
+                            <button onclick="App.Actions.startProduction(${realIdx})" class="btn-prod" style="border:none; padding:8px 14px; border-radius:10px; font-weight:700; font-size:0.75rem; cursor:pointer; margin-left:10px;">
+                                <i class="fa-solid fa-gears"></i> PRODUCIR
+                            </button>
+                        </div>
                     </div>`;
                 }).join('');
             },
+
             fabrica() {
                 const el = document.getElementById('list-fabrica');
-                if(!App.data.fab.length) { el.innerHTML='<div style="text-align:center;color:#cbd5e1;">Fábrica detenida.</div>'; return; }
+                if(!App.data.fab.length) { el.innerHTML='<div style="text-align:center;color:#cbd5e1;margin-top:20px;">No hay producción activa.</div>'; return; }
                 el.innerHTML = App.data.fab.map((f, i) => {
-                    const pct = Math.round(((f.stepIndex+1)/f.steps.length)*100);
-                    return `<div class="card" style="border-left:5px solid var(--prod);"><h3 style="margin:0;font-size:1rem;">${f.n} <small>(${f.sz})</small></h3><div style="font-size:0.8rem;color:#64748b;">Lote: ${f.q} un.</div><div class="prod-bar"><div class="prod-fill" style="width:${pct}%"></div></div><div style="display:flex;justify-content:space-between;font-size:0.75rem;font-weight:700;color:var(--prod);margin-bottom:10px;"><span>FASE: ${f.steps[f.stepIndex]}</span><span>${pct}%</span></div><div class="btn-group"><button class="btn btn-sec" style="padding:8px;font-size:0.75rem;" onclick="App.Helpers.createPDF('prod',{obs:f.steps.join('>'),items:[{p:f.n,q:f.q,sz:f.sz}]})">📄 RUTA</button><button class="btn btn-prod" style="padding:8px;font-size:0.75rem;" onclick="App.Actions.advanceFab(${i})">AVANZAR ➡</button></div></div>`;
+                    // Validar integridad de pasos
+                    const steps = f.steps || ['Pendiente'];
+                    const currentStep = steps[f.stepIndex] || 'Finalizando';
+                    const pct = Math.round(((f.stepIndex+1)/steps.length)*100);
+                    
+                    return `<div class="card" style="border-left:6px solid var(--prod);">
+                        <div style="display:flex;justify-content:space-between;">
+                            <h3 style="margin:0;font-size:1rem;">${f.n} <span style="font-weight:400;color:#64748b;">(${f.sz})</span></h3>
+                            <span style="font-weight:800;color:var(--prod);">x${f.q}</span>
+                        </div>
+                        <div style="margin:10px 0;height:8px;background:#e2e8f0;border-radius:4px;overflow:hidden;">
+                            <div style="height:100%;width:${pct}%;background:var(--prod);transition:width 0.5s;"></div>
+                        </div>
+                        <div style="display:flex;justify-content:space-between;font-size:0.75rem;font-weight:800;color:var(--prod);margin-bottom:12px;text-transform:uppercase;">
+                            <span>ACTUAL: ${currentStep}</span>
+                            <span>${pct}%</span>
+                        </div>
+                        <div class="btn-group">
+                            <button class="btn btn-sec" style="padding:10px;font-size:0.75rem;" onclick="App.Helpers.createPDF('prod',{obs:steps.join(' > '),items:[{p:f.n,q:f.q,sz:f.sz}]})">HOJA RUTA</button>
+                            <button class="btn btn-prod" style="padding:10px;font-size:0.75rem;" onclick="App.Actions.advanceFab(${i})">AVANZAR <i class="fa-solid fa-arrow-right"></i></button>
+                        </div>
+                    </div>`;
                 }).join('');
             },
+
             ordenes() {
                 const el = document.getElementById('list-ordenes');
                 const list = App.data.ord || [];
-                if(!list.length) { el.innerHTML='<div style="text-align:center;color:#cbd5e1;">No hay pedidos.</div>'; return; }
+                if(!list.length) { el.innerHTML='<div style="text-align:center;color:#cbd5e1;margin-top:30px;">No hay pedidos activos.</div>'; return; }
                 
                 el.innerHTML = list.slice().reverse().map((o, idx) => {
                     const realIdx = list.length - 1 - idx;
-                    // ITEM STATUS: Muestra pastillas de color según estado
-                    const items = o.items.map(x => {
-                        let stClass = 'ist-ok';
-                        if(x.st === 'NO') stClass = 'ist-no';
-                        if(x.st === 'PEND') stClass = 'ist-pend';
-                        const stLabel = x.st && x.st!=='OK' ? `<span class="ist-pill ${stClass}">${x.st}</span>` : '';
-                        return `<div>${x.p} (${x.sz}) <b>x${x.q}</b>${stLabel}</div>`;
+                    const itemsHtml = o.items.map(x => {
+                        let stClass = x.st === 'NO' ? 'ist-no' : (x.st === 'PEND' ? 'ist-pend' : 'ist-ok');
+                        const pill = x.st && x.st!=='OK' ? `<span class="ist-pill ${stClass}">${x.st}</span>` : '';
+                        return `<div style="display:flex;justify-content:space-between;font-size:0.85rem;margin-bottom:4px;"><span>${x.p} (${x.sz})</span><span><b>x${x.q}</b>${pill}</span></div>`;
                     }).join('');
                     
-                    return `<div class="card" style="display:flex; gap:10px;">
-                        <div style="display:flex;align-items:center;"><input type="checkbox" class="chk-bulk" value="${realIdx}" onchange="App.UI.updateBulk()"></div>
+                    return `<div class="card" style="display:flex; gap:15px;">
+                        <div style="display:flex;align-items:flex-start;padding-top:5px;">
+                            <input type="checkbox" class="chk-bulk" value="${realIdx}" onchange="App.UI.updateBulk()">
+                        </div>
                         <div style="flex:1;">
-                            <div style="display:flex;justify-content:space-between;align-items:center;">
-                                <h3 style="margin:0;">${o.c}</h3>
-                                <span style="font-size:0.7rem;background:#f1f5f9;padding:2px 6px;border-radius:4px;text-transform:uppercase;">${o.st}</span>
+                            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
+                                <h3 style="margin:0;font-size:1.1rem;">${o.c}</h3>
+                                <div style="display:flex;gap:8px;">
+                                    ${o.st!=='done' ? `<i class="fa-solid fa-pencil" style="color:var(--gold);background:#fffbeb;padding:6px;border-radius:50%;cursor:pointer;" onclick="App.Actions.modalOrder(${realIdx})"></i>` : ''}
+                                    <span style="font-size:0.7rem;background:#f1f5f9;padding:4px 8px;border-radius:6px;text-transform:uppercase;font-weight:700;">${o.st}</span>
+                                </div>
                             </div>
-                            <small style="color:#64748b;">${o.fac || 'Sin Documento'}</small>
-                            <div style="font-size:0.8rem;color:#64748b;margin:8px 0;background:#f8fafc;padding:8px;border-radius:8px;">${items}</div>
+                            <div style="font-size:0.75rem;color:#94a3b8;margin-bottom:10px;"><i class="fa-regular fa-file"></i> ${o.fac || 'Pendiente'}</div>
+                            <div style="background:#f8fafc;padding:10px;border-radius:10px;border:1px solid #f1f5f9;margin-bottom:10px;">${itemsHtml}</div>
                             <div class="btn-group">
-                                <button class="btn btn-sec" style="padding:6px;font-size:0.7rem;" onclick="App.Actions.tachaFromOrder(${realIdx})">TACHA INDIVIDUAL</button>
-                                ${o.st!=='done' ? `<button class="btn btn-pri" style="padding:6px;font-size:0.7rem;" onclick="App.Actions.changeStatus(${realIdx})">ESTADO</button>` : ''}
-                                <button class="btn btn-sec" style="padding:6px;font-size:0.7rem;color:red;border-color:#fee2e2;" onclick="App.Actions.delOrd(${realIdx})"><i class="fa-solid fa-trash"></i></button>
+                                <button class="btn btn-sec" style="padding:8px;font-size:0.75rem;" onclick="App.Actions.tachaFromOrder(${realIdx})">IMPRIMIR</button>
+                                ${o.st!=='done' ? `<button class="btn btn-pri" style="padding:8px;font-size:0.75rem;" onclick="App.Actions.changeStatus(${realIdx})">GESTIONAR</button>` : ''}
+                                <button class="btn btn-sec" style="padding:8px;font-size:0.75rem;color:var(--danger);border-color:#fee2e2;" onclick="App.Actions.delOrd(${realIdx})"><i class="fa-solid fa-trash"></i></button>
                             </div>
                         </div>
                     </div>`;
@@ -342,63 +410,208 @@
         },
 
         Actions: {
-            // STOCK RÁPIDO
             quickStock(i,sz,d) {
                 const p = App.data.inv[i]; const f = (p.s[sz]||0)+d;
-                if(f<0) return Swal.fire('Error','Stock negativo','error');
-                p.s[sz] = f; 
-                if(Math.abs(d)>=5) App.Helpers.addToLog(`Ajuste ${p.n} (${sz}): ${d>0?'+':''}${d}`);
-                App.save(); App.Render.bodega();
+                p.s[sz] = f; App.save(); App.Render.bodega();
             },
 
-            // ORDENES Y ESTADOS DE ITEMS (OC MEJORADA)
-            async modalOrder() {
-                let cart = [];
+            // --- CREADOR DE PRODUCTOS VISUAL (SIN ERRORES) ---
+            async modalProd(i=null) {
+                const p = i===null ? {n:'', s:{}, sku:App.Helpers.getNextSKU()} : JSON.parse(JSON.stringify(App.data.inv[i]));
+                // Convertir objeto stock a array temporal para el visualizador
+                let tempStock = Object.entries(p.s).map(([k,v]) => ({sz:k, q:v}));
+
+                window.tempAddS = () => {
+                    const szInput = document.getElementById('tmp-sz');
+                    const qInput = document.getElementById('tmp-q');
+                    // Si no pone talla, asume UNICA
+                    const sz = (szInput.value.trim() || 'UNICA').toUpperCase();
+                    const q = parseInt(qInput.value);
+
+                    if(!isNaN(q)) {
+                        // Buscar si ya existe para sumar o agregar nuevo
+                        const existing = tempStock.find(x => x.sz === sz);
+                        if(existing) existing.q = q; // Reemplaza valor
+                        else tempStock.push({sz, q});
+                        
+                        szInput.value = ''; qInput.value = ''; szInput.focus();
+                        tempRender();
+                    }
+                };
+                
+                window.tempRender = () => {
+                    document.getElementById('stock-list-visual').innerHTML = tempStock.map((x, idx) => 
+                        `<div class="stock-row">
+                            <span><b>${x.sz}</b> : ${x.q} u.</span>
+                            <i class="fa-solid fa-xmark" style="color:var(--danger);cursor:pointer;padding:5px;" onclick="tempStock.splice(${idx},1);tempRender()"></i>
+                        </div>`
+                    ).join('');
+                };
+
+                const {value} = await Swal.fire({
+                    title: i===null ? 'NUEVO PRODUCTO' : 'EDITAR PRODUCTO',
+                    html: `
+                        <div style="text-align:left;">
+                            <label style="font-size:0.8rem;font-weight:700;">NOMBRE DEL PRODUCTO</label>
+                            <input id="sw-n" class="swal2-input" value="${p.n}" placeholder="Ej: Polar Corporativo" style="margin:5px 0 15px 0; width:100%;">
+                            
+                            <label style="font-size:0.8rem;font-weight:700;">CONTROL DE VARIANTES</label>
+                            <div class="stock-adder">
+                                <div style="display:flex; gap:10px;">
+                                    <input id="tmp-sz" class="swal2-input" placeholder="Talla (Opcional)" style="margin:0; flex:1;">
+                                    <input id="tmp-q" type="number" class="swal2-input" placeholder="Cant." style="margin:0; width:80px;">
+                                    <button onclick="tempAddS()" class="btn btn-pri" style="margin:0; width:auto; padding:0 15px;">OK</button>
+                                </div>
+                                <div id="stock-list-visual" style="margin-top:10px; max-height:150px; overflow-y:auto;"></div>
+                            </div>
+                        </div>
+                    `,
+                    didOpen: () => tempRender(),
+                    preConfirm: () => {
+                        const n = document.getElementById('sw-n').value.toUpperCase();
+                        if(!n) return Swal.showValidationMessage('El nombre es obligatorio');
+                        // Reconstruir objeto stock
+                        const finalStock = {};
+                        tempStock.forEach(item => finalStock[item.sz] = item.q);
+                        return { n, s: finalStock, sku: p.sku };
+                    }
+                });
+
+                if(value) {
+                    if(i===null) App.data.inv.push(value);
+                    else App.data.inv[i] = value;
+                    App.save(); App.Render.bodega();
+                }
+            },
+
+            // --- PRODUCIR CON CHIPS INTELIGENTES ---
+            async startProduction(i) {
+                const p = App.data.inv[i];
+                let selectedChips = ['CORTE', 'CONFECCION', 'TERMINACION']; // Default
+
+                window.toggleChip = (el) => {
+                    el.classList.toggle('selected');
+                    const val = el.innerText;
+                    if(selectedChips.includes(val)) selectedChips = selectedChips.filter(x=>x!==val);
+                    else selectedChips.push(val);
+                };
+
+                const {value:v} = await Swal.fire({
+                    title: 'INICIAR PRODUCCIÓN',
+                    html: `
+                        <div style="text-align:left;">
+                            <h3 style="margin:0;color:var(--corp-dark);">${p.n}</h3>
+                            <p style="font-size:0.8rem;color:#64748b;margin-bottom:15px;">Define cantidad y ruta de trabajo.</p>
+                            
+                            <div style="display:flex; gap:10px; margin-bottom:15px;">
+                                <input id="sw-q" type="number" class="swal2-input" placeholder="Cantidad" style="margin:0;">
+                                <input id="sw-sz" class="swal2-input" placeholder="Talla" style="margin:0;">
+                            </div>
+                            
+                            <label style="font-size:0.75rem;font-weight:800;color:#94a3b8;">RUTA DE PROCESO (Toca para activar)</label>
+                            <div class="chip-container">
+                                <div class="chip selected" onclick="toggleChip(this)">CORTE</div>
+                                <div class="chip" onclick="toggleChip(this)">BORDADO</div>
+                                <div class="chip" onclick="toggleChip(this)">ESTAMPADO</div>
+                                <div class="chip selected" onclick="toggleChip(this)">CONFECCION</div>
+                                <div class="chip selected" onclick="toggleChip(this)">TERMINACION</div>
+                                <div class="chip" onclick="toggleChip(this)">EMPAQUE</div>
+                            </div>
+                        </div>
+                    `,
+                    preConfirm: () => {
+                        const q = parseInt(document.getElementById('sw-q').value);
+                        const sz = (document.getElementById('sw-sz').value || 'UNICA').toUpperCase();
+                        if(!q || q<=0) return Swal.showValidationMessage('Ingresa una cantidad válida');
+                        if(selectedChips.length === 0) return Swal.showValidationMessage('Selecciona al menos un proceso');
+                        return { q, sz, steps: selectedChips };
+                    }
+                });
+
+                if(v) {
+                    // Push seguro a Firebase
+                    const newFabItem = { ...v, n: p.n, sku: p.sku, stepIndex: 0 };
+                    App.data.fab.push(newFabItem);
+                    App.save();
+                    App.UI.toggleFabrica('fabrica');
+                    App.Render.fabrica();
+                    // Feedback visual
+                    Swal.fire({icon:'success', title:'Enviado a Fábrica', timer:1500, showConfirmButton:false});
+                }
+            },
+
+            async advanceFab(i) {
+                const f = App.data.fab[i];
+                if(f.stepIndex < f.steps.length-1) { f.stepIndex++; App.save(); App.Render.fabrica(); }
+                else if(await Swal.fire({title:'¿Terminar Producción?', text:'El stock se sumará a bodega', icon:'question', showCancelButton:true, confirmButtonColor:'var(--success)'}).then(r=>r.isConfirmed)) {
+                    let p = App.data.inv.find(x=>x.sku===f.sku || x.n===f.n); 
+                    if(p) p.s[f.sz] = (p.s[f.sz]||0) + f.q;
+                    App.data.fab.splice(i,1); App.save(); App.Render.bodega(); App.UI.toggleFabrica('stock');
+                }
+            },
+
+            // --- ORDEN DE COMPRA (MODAL UNIFICADO Y ROBUSTO) ---
+            async modalOrder(idx = null) {
+                const isEdit = idx !== null;
+                let cart = isEdit ? JSON.parse(JSON.stringify(App.data.ord[idx].items)) : [];
+                const currentClient = isEdit ? App.data.ord[idx].c : '';
+                
                 window.addC = () => {
                     const p = document.getElementById('o-p').value.toUpperCase();
                     const q = parseInt(document.getElementById('o-q').value);
                     const sz = (document.getElementById('o-sz').value||'UNICA').toUpperCase();
-                    const st = document.getElementById('o-st').value; // STATUS ITEM
+                    const st = document.getElementById('o-st').value;
                     if(p && q>0) { cart.push({p,q,sz,st}); renderC(); document.getElementById('o-p').value=''; }
                 };
                 window.renderC = () => {
                     document.getElementById('o-list').innerHTML = cart.map((x,i)=>
-                        `<div style="display:flex;justify-content:space-between;border-bottom:1px solid #eee;padding:5px;font-size:0.8rem;">
-                            <span>${x.p} (${x.sz}) x${x.q} [${x.st}]</span>
-                            <span onclick="cart.splice(${i},1);renderC()" style="color:red;cursor:pointer;">X</span>
+                        `<div style="display:flex;justify-content:space-between;border-bottom:1px solid #eee;padding:8px 0;font-size:0.85rem;">
+                            <span><b>${x.p}</b> (${x.sz}) x${x.q}</span>
+                            <span onclick="cart.splice(${i},1);renderC()" style="color:var(--danger);cursor:pointer;font-weight:bold;">QUITAR</span>
                         </div>`
                     ).join('');
                 };
+                
                 const opts = App.data.inv.map(x=>`<option value="${x.n}">`).join('');
+                setTimeout(() => { if(isEdit) renderC(); }, 100);
+
                 const {value} = await Swal.fire({
-                    title: 'NUEVA OC DE VENTA',
+                    title: isEdit ? 'EDITAR PEDIDO' : 'NUEVO PEDIDO',
+                    width: 600,
                     html: `
-                        <input id="o-c" class="swal2-input" placeholder="Nombre Cliente / Empresa">
-                        <div style="background:#f8fafc;padding:10px;margin:10px 0;border:1px solid #eee;border-radius:8px;">
-                            <input id="o-p" list="dl-o" class="swal2-input" placeholder="Buscar Producto" style="margin-top:0;">
+                        <input id="o-c" class="swal2-input" placeholder="Nombre Cliente / Empresa" value="${currentClient}">
+                        <div style="background:#f8fafc;padding:15px;margin:15px 0;border:1px solid #e2e8f0;border-radius:12px;">
+                            <label style="font-size:0.7rem;font-weight:800;color:#94a3b8;">AGREGAR ITEMS</label>
+                            <input id="o-p" list="dl-o" class="swal2-input" placeholder="Buscar Producto" style="margin-top:5px;">
                             <datalist id="dl-o">${opts}</datalist>
-                            <div style="display:grid;grid-template-columns:1fr 1fr 1fr; gap:5px;">
-                                <input id="o-sz" class="swal2-input" placeholder="Talla" style="width:100%;margin:0;">
-                                <input id="o-q" type="number" class="swal2-input" value="1" style="width:100%;margin:0;">
-                                <select id="o-st" class="swal2-input" style="width:100%;margin:0;padding:0 5px;font-size:0.8rem;">
-                                    <option value="OK">✅ OK</option>
-                                    <option value="PEND">⏳ PEND</option>
-                                    <option value="NO">❌ NO STOCK</option>
+                            <div style="display:grid;grid-template-columns:1fr 1fr 1fr; gap:8px;">
+                                <input id="o-sz" class="swal2-input" placeholder="Talla" style="margin:0;">
+                                <input id="o-q" type="number" class="swal2-input" value="1" style="margin:0;">
+                                <select id="o-st" class="swal2-input" style="margin:0;padding:0 5px;font-size:0.8rem;">
+                                    <option value="OK">STOCK OK</option>
+                                    <option value="PEND">PENDIENTE</option>
+                                    <option value="NO">SIN STOCK</option>
                                 </select>
                             </div>
-                            <button onclick="addC()" class="btn btn-pri" style="margin-top:10px;width:100%;">+ AGREGAR ITEM</button>
+                            <button onclick="addC()" class="btn btn-pri" style="margin-top:10px;padding:10px;">+ AGREGAR A LISTA</button>
                         </div>
-                        <div id="o-list" style="max-height:100px;overflow-y:auto;text-align:left;"></div>
+                        <div id="o-list" style="max-height:150px;overflow-y:auto;text-align:left;"></div>
                     `,
                     preConfirm: () => {
                         const c = document.getElementById('o-c').value.toUpperCase();
-                        return (c && cart.length) ? {c, items:cart, st:'bodega', date:new Date().toLocaleDateString()} : false;
+                        if(!c) return Swal.showValidationMessage('Falta el cliente');
+                        if(!cart.length) return Swal.showValidationMessage('Agrega al menos un producto');
+                        return {c, items:cart};
                     }
                 });
-                if(value) { App.data.ord.push(value); App.save(); App.Render.ordenes(); }
+
+                if(value) {
+                    if(isEdit) { App.data.ord[idx].c = value.c; App.data.ord[idx].items = value.items; }
+                    else App.data.ord.push({c: value.c, items: value.items, st:'bodega', date: new Date().toLocaleDateString()});
+                    App.save(); App.Render.ordenes();
+                }
             },
 
-            // SALIDA LIBRE (MIX)
             async tachaManual() {
                 let cart = [];
                 window.mixAdd = () => {
@@ -407,16 +620,16 @@
                     const q = parseInt(document.getElementById('m-q').value);
                     if(p && q>0) { cart.push({p,sz,q}); mixRender(); document.getElementById('m-p').value=''; }
                 };
-                window.mixRender = () => document.getElementById('m-list').innerHTML = cart.map((x,i)=>`<div style="display:flex;justify-content:space-between;border-bottom:1px solid #eee;font-size:0.8rem;padding:4px;"><span>${x.q} ${x.p} (${x.sz})</span><span onclick="cart.splice(${i},1);mixRender()" style="color:red;cursor:pointer;">X</span></div>`).join('');
+                window.mixRender = () => document.getElementById('m-list').innerHTML = cart.map((x,i)=>`<div style="display:flex;justify-content:space-between;padding:5px;border-bottom:1px solid #eee;"><span>${x.q} ${x.p} (${x.sz})</span><span onclick="cart.splice(${i},1);mixRender()" style="color:red;cursor:pointer;">X</span></div>`).join('');
                 
                 const opts = App.data.inv.map(x=>`<option value="${x.n}">`).join('');
                 const {value} = await Swal.fire({
-                    title: 'SALIDA LIBRE / MIX',
+                    title: 'SALIDA DE PRODUCTOS',
                     html: `
-                        <input id="m-dst" class="swal2-input" placeholder="Destino / Taller">
-                        <input id="m-tr" class="swal2-input" placeholder="Responsable">
-                        <div style="background:#f8fafc;padding:10px;margin:10px 0;border-radius:8px;">
-                            <input id="m-p" list="dl-m" class="swal2-input" placeholder="Producto" style="margin-top:0;">
+                        <input id="m-dst" class="swal2-input" placeholder="Destino (Ej: Taller Bordado)">
+                        <input id="m-tr" class="swal2-input" placeholder="Nombre Responsable">
+                        <div style="background:#f8fafc;padding:10px;margin:10px 0;border-radius:10px;border:1px dashed #cbd5e1;">
+                            <input id="m-p" list="dl-m" class="swal2-input" placeholder="Buscar Item..." style="margin-top:0;">
                             <datalist id="dl-m">${opts}</datalist>
                             <div style="display:flex;gap:5px;">
                                 <input id="m-sz" class="swal2-input" placeholder="Talla">
@@ -424,80 +637,62 @@
                                 <button onclick="mixAdd()" class="btn btn-pri" style="width:auto;margin:0;">+</button>
                             </div>
                         </div>
-                        <div id="m-list" style="max-height:100px;overflow-y:auto;text-align:left;"></div>
-                        <div style="margin-top:10px;display:flex;justify-content:center;gap:5px;"><input type="checkbox" id="m-dec" checked><label for="m-dec">Descontar de Bodega</label></div>
+                        <div id="m-list" style="max-height:120px;overflow-y:auto;text-align:left;"></div>
+                        <div style="margin-top:10px;"><input type="checkbox" id="m-dec" checked> <label for="m-dec">Descontar Stock</label></div>
                     `,
                     preConfirm: () => {
                         const dest = document.getElementById('m-dst').value;
-                        if(!dest || !cart.length) return Swal.showValidationMessage('Falta Destino o Items');
+                        if(!dest || !cart.length) return Swal.showValidationMessage('Completa los datos');
                         return { dest, trans:document.getElementById('m-tr').value, ded:document.getElementById('m-dec').checked, items:cart };
                     }
                 });
+
                 if(value) {
                     if(value.ded) {
                         value.items.forEach(it => { const p=App.data.inv.find(x=>x.n===it.p); if(p) p.s[it.sz]=(p.s[it.sz]||0)-it.q; });
                         App.save(); App.Render.bodega();
                     }
-                    App.Helpers.createPDF('taller', [{dest:value.dest, trans:value.trans, obs:value.ded?'Con descuento stock':'Sin descuento', items:value.items}]);
-                    App.Helpers.addToLog(`Salida Libre: ${value.dest}`);
+                    App.Helpers.createPDF('taller', [{dest:value.dest, trans:value.trans, obs:value.ded?'Stock Descontado':'Traslado Sin Descuento', items:value.items}]);
                 }
             },
 
-            // IMPRESIÓN MASIVA
             printBulk() {
                 const checks = document.querySelectorAll('.chk-bulk:checked');
                 if(!checks.length) return;
                 const docs = [];
                 checks.forEach(c => {
                     const o = App.data.ord[parseInt(c.value)];
-                    docs.push({ dest: o.c, obs: `Pedido ${o.fac||'Pend'}`, trans: o.trans, items: o.items });
+                    docs.push({ dest: o.c, obs: `Pedido ${o.fac||'Pendiente'}`, trans: o.trans, items: o.items });
                 });
                 App.Helpers.createPDF('order', docs);
                 checks.forEach(c => c.checked=false); App.UI.updateBulk();
             },
 
-            // RESTO DE ACCIONES
-            async startProduction(i) {
-                const p = App.data.inv[i];
-                const {value:v} = await Swal.fire({title:'PRODUCIR', html:`<input id="sw-q" type="number" class="swal2-input" placeholder="Cant"><input id="sw-sz" class="swal2-input" placeholder="Talla"><textarea id="sw-st" class="swal2-textarea">Corte, Confección, Terminación</textarea>`, preConfirm:()=>({q:parseInt(document.getElementById('sw-q').value), sz:document.getElementById('sw-sz').value.toUpperCase(), steps:document.getElementById('sw-st').value.split(',')})});
-                if(v && v.q>0) { App.data.fab.push({...v, n:p.n, sku:p.sku, stepIndex:0}); App.save(); App.UI.toggleFabrica('fabrica'); }
-            },
-            async advanceFab(i) {
-                const f = App.data.fab[i];
-                if(f.stepIndex < f.steps.length-1) { f.stepIndex++; App.save(); App.Render.fabrica(); }
-                else if(await Swal.fire({title:'¿Finalizar?',icon:'question',showCancelButton:true}).then(r=>r.isConfirmed)) {
-                    let p = App.data.inv.find(x=>x.sku===f.sku||x.n===f.n); if(p) p.s[f.sz]=(p.s[f.sz]||0)+f.q;
-                    App.data.fab.splice(i,1); App.save(); App.Render.bodega(); App.UI.toggleFabrica('stock');
-                }
-            },
             async changeStatus(i) {
-                const {value:st} = await Swal.fire({input:'select', inputOptions:{'bodega':'Bodega','prod':'Proceso','pack':'Empaque','done':'Finalizar'}});
+                const {value:st} = await Swal.fire({input:'select', inputOptions:{'bodega':'Bodega','prod':'En Proceso','pack':'Empacado','done':'Entregado/Final'}, title:'CAMBIAR ESTADO'});
                 if(st){ 
                     if(st==='done'){ 
-                        const {value:f}=await Swal.fire({input:'text',title:'N° Doc'}); 
-                        if(f){ App.data.ord[i].st='done'; App.data.ord[i].fac=f; App.data.ord[i].items.forEach(it=>{const p=App.data.inv.find(x=>x.n===it.p); if(p)p.s[it.sz]-=it.q;}); } 
+                        const {value:f}=await Swal.fire({input:'text', title:'N° DOCUMENTO / FACTURA'});
+                        if(f !== undefined){
+                            App.data.ord[i].st='done'; App.data.ord[i].fac = f || 'Sin Doc';
+                            App.data.ord[i].items.forEach(it=>{
+                                const p=App.data.inv.find(x=>x.n===it.p);
+                                if(p) p.s[it.sz] = (p.s[it.sz] || 0) - it.q;
+                            });
+                            App.Helpers.addToLog(`Pedido Finalizado: ${App.data.ord[i].c}`);
+                        } 
                     } else App.data.ord[i].st=st; 
                     App.save(); App.Render.ordenes(); App.Render.bodega(); 
                 }
             },
-            async modalProd(i=null) {
-                const p = i===null ? {n:'',s:{},sku:App.Helpers.getNextSKU()} : App.data.inv[i];
-                const sStr = Object.entries(p.s).map(([k,v])=>`${k}:${v}`).join(',');
-                const {value} = await Swal.fire({title:i===null?'NUEVO':'EDITAR', html:`<input id="sw-n" class="swal2-input" value="${p.n}"><input id="sw-s" class="swal2-input" value="${sStr}" placeholder="S:10, M:20">`, preConfirm:()=>{
-                    const n=document.getElementById('sw-n').value.toUpperCase();
-                    const s={}; document.getElementById('sw-s').value.split(',').forEach(x=>{const[k,v]=x.split(':');if(k&&v)s[k.trim().toUpperCase()]=parseInt(v)});
-                    return n?{n,s,sku:p.sku}:false;
-                }});
-                if(value){ if(i===null)App.data.inv.push(value); else App.data.inv[i]=value; App.save(); App.Render.bodega(); }
-            },
-            delProd(i){ Swal.fire({title:'¿Borrar?',showCancelButton:true}).then(r=>{if(r.isConfirmed){App.data.inv.splice(i,1);App.save();App.Render.bodega();}}) },
-            delOrd(i){ Swal.fire({title:'¿Borrar?',showCancelButton:true}).then(r=>{if(r.isConfirmed){App.data.ord.splice(i,1);App.save();App.Render.ordenes();}}) },
-            tachaFromOrder(i){ const o=App.data.ord[i]; Swal.fire({title:'Datos',html:`<input id="tt" class="swal2-input" placeholder="Transp"><input id="to" class="swal2-input" placeholder="Obs">`, preConfirm:()=>({trans:document.getElementById('tt').value, obs:document.getElementById('to').value})}).then(r=>{if(r.value){o.trans=r.value.trans; o.obs=r.value.obs; App.save(); App.Helpers.createPDF('order',o)}}) },
+
+            delProd(i){ Swal.fire({title:'¿Eliminar Producto?', text:'No podrás deshacer esto', icon:'warning', showCancelButton:true}).then(r=>{if(r.isConfirmed){App.data.inv.splice(i,1);App.save();App.Render.bodega();}}) },
+            delOrd(i){ Swal.fire({title:'¿Eliminar Pedido?', icon:'warning', showCancelButton:true}).then(r=>{if(r.isConfirmed){App.data.ord.splice(i,1);App.save();App.Render.ordenes();}}) },
+            tachaFromOrder(i){ const o=App.data.ord[i]; Swal.fire({title:'Datos Despacho', html:`<input id="tt" class="swal2-input" placeholder="Responsable / Transporte"><input id="to" class="swal2-input" placeholder="Observaciones Extra">`, preConfirm:()=>({trans:document.getElementById('tt').value, obs:document.getElementById('to').value})}).then(r=>{if(r.value){o.trans=r.value.trans; o.obs=r.value.obs; App.save(); App.Helpers.createPDF('order',o)}}) },
             
-            // SEGURIDAD
             async factoryReset() {
-                if(!App.state.backupDone) return Swal.fire('Bloqueado','Descarga respaldo primero','lock');
-                const {value:p}=await Swal.fire({title:'CONFIRMAR',text:'Escribe ELIMINAR',input:'text'});
+                if(!App.state.backupDone) return Swal.fire('Acceso Denegado','Debes descargar el respaldo PDF primero.','error');
+                const {value:p}=await Swal.fire({title:'BORRADO TOTAL', text:'Escribe ELIMINAR para confirmar', input:'text', inputPlaceholder:'ELIMINAR'});
                 if(p==='ELIMINAR') { db.ref('/').set({}); location.reload(); }
             }
         },
@@ -506,40 +701,42 @@
             move(d){ App.state.calDate.setMonth(App.state.calDate.getMonth()+d); this.render(); },
             render(){
                 const d=App.state.calDate; const today=new Date();
-                document.getElementById('cal-title').innerText=`${d.getMonth()+1}/${d.getFullYear()}`;
+                document.getElementById('cal-title').innerText=`${d.toLocaleString('es-ES', { month: 'long' }).toUpperCase()} ${d.getFullYear()}`;
                 const dim=new Date(d.getFullYear(),d.getMonth()+1,0).getDate();
                 const fd=new Date(d.getFullYear(),d.getMonth(),1).getDay()||7;
                 let h=''; for(let i=1;i<fd;i++)h+='<div></div>';
                 for(let i=1;i<=dim;i++){
                     const k=`${i}-${d.getMonth()}-${d.getFullYear()}`;
-                    h+=`<div class="day ${i===today.getDate()&&d.getMonth()===today.getMonth()?'current':''}" onclick="App.Calendar.show('${k}')">${i}${App.data.log[k]?'<div class="dot"></div>':''}</div>`;
+                    const hasLog = App.data.log[k] ? 'border:2px solid var(--gold);color:var(--gold);' : '';
+                    const isToday = i===today.getDate()&&d.getMonth()===today.getMonth() ? 'background:var(--corp-dark);color:white;' : 'background:white;';
+                    h+=`<div onclick="App.Calendar.show('${k}')" style="aspect-ratio:1;display:flex;align-items:center;justify-content:center;border-radius:10px;cursor:pointer;${isToday}${hasLog}">${i}</div>`;
                 }
                 document.getElementById('cal-grid').innerHTML=h;
             },
-            show(k){ if(App.data.log[k]) Swal.fire({title:k, text:App.data.log[k]}); }
+            show(k){ if(App.data.log[k]) Swal.fire({title:`REGISTROS DÍA ${k}`, text:App.data.log[k], confirmButtonColor:'var(--corp-dark)'}); }
         },
         
         Backup: {
             generatePDF() {
                 const {jsPDF}=window.jspdf; const doc=new jsPDF();
-                doc.text("RESPALDO IDEAS TEXTILES",10,10);
-                const body=App.data.inv.map(p=>[p.sku,p.n,JSON.stringify(p.s)]);
-                doc.autoTable({head:[['SKU','ITEM','STOCK']],body});
-                doc.save('RESPALDO.pdf');
+                doc.setFont("helvetica", "bold"); doc.text("RESPALDO INVENTARIO IDEAS TEXTILES",10,20);
+                const body=App.data.inv.map(p=>[p.sku, p.n, JSON.stringify(p.s).replace(/"/g,'').replace(/{/g,'').replace(/}/g,'')]);
+                doc.autoTable({startY:30, head:[['SKU','ITEM','STOCK DETALLE']], body});
+                doc.save(`RESPALDO_${new Date().toLocaleDateString()}.pdf`);
                 App.state.backupDone=true;
-                document.getElementById('btn-reset').classList.remove('btn-disabled');
-                document.getElementById('btn-reset').classList.add('btn-danger');
-                document.getElementById('btn-reset').innerText="⚠️ BORRAR DATOS";
+                document.getElementById('btn-reset').style.background='var(--danger)';
+                document.getElementById('btn-reset').style.color='white';
+                document.getElementById('btn-reset').style.cursor='pointer';
             }
         },
         IA: { trigger:()=>document.getElementById('ai-input').click() }
     };
 
+    // HANDLER IMPORTACIÓN (SIMPLIFICADO PARA ESTABILIDAD)
     document.getElementById('ai-input').addEventListener('change', (e) => {
-        // Lógica Excel simple mantenida por estabilidad
         const f = e.target.files[0]; if(!f)return;
-        Swal.fire({title:'Procesando...',didOpen:()=>Swal.showLoading()});
-        setTimeout(()=>Swal.fire('Info','Para importación masiva usar Excel estándar (Col A: Nombre, B: Cantidad, C: Talla)','info'),1000);
+        Swal.fire({title:'Leyendo archivo...', didOpen:()=>Swal.showLoading()});
+        setTimeout(()=>Swal.fire('Información','Para carga masiva se requiere plantilla Excel estándar. Contactar soporte para habilitar módulo IA completo.','info'), 1500);
     });
 
     App.init();
