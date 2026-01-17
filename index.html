@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>IDEAS TEXTILES </title>
+    <title>IDEAS TEXTILES - V14 FINAL</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700;900&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
@@ -17,62 +17,70 @@
 
     <style>
         :root { 
-            --dark: #0f172a; --gold: #d97706; --bg: #f8fafc; 
-            --step-done: #10b981; --step-curr: #3b82f6; --step-wait: #e2e8f0;
+            --dark: #0f172a; --gold: #d97706; --bg: #f1f5f9; 
+            --prod: #4f46e5; --danger: #ef4444; --success: #10b981; --gray: #64748b;
         }
         * { box-sizing: border-box; font-family: 'Outfit', sans-serif; -webkit-tap-highlight-color: transparent; outline: none; }
         body { background: var(--bg); margin: 0; padding-bottom: 120px; color: var(--dark); user-select: none; }
         
-        /* HEADER */
+        /* HEADER LIMPIO (Solo Título) */
         header { 
             background: linear-gradient(135deg, #020617 0%, #1e293b 100%); 
-            color: white; padding: 25px 20px; border-bottom: 4px solid var(--gold); 
-            border-radius: 0 0 30px 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); position: sticky; top: 0; z-index: 100;
+            color: white; padding: 20px; border-bottom: 4px solid var(--gold); 
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2); position: sticky; top: 0; z-index: 100;
+            display: flex; justify-content: space-between; align-items: center;
         }
-        .corp-title { font-weight: 900; font-size: 1.5rem; display: flex; align-items: center; gap: 12px; }
-        .corp-subtitle { font-size: 0.7rem; letter-spacing: 2px; text-transform: uppercase; color: #94a3b8; margin-left: 36px; }
-        
-        /* TABS */
-        .tabs { display: flex; gap: 8px; margin-top: 20px; background: rgba(255,255,255,0.08); padding: 5px; border-radius: 14px; }
-        .tab-btn { flex: 1; background: transparent; border: none; color: #94a3b8; padding: 10px; border-radius: 10px; font-weight: 700; font-size: 0.8rem; cursor: pointer; transition: 0.3s; }
-        .tab-btn.active { background: var(--gold); color: white; box-shadow: 0 4px 12px rgba(217, 119, 6, 0.4); }
+        .corp-title { font-weight: 900; font-size: 1.3rem; display: flex; align-items: center; gap: 10px; }
+        .version-badge { background: rgba(255,255,255,0.1); padding: 4px 8px; border-radius: 6px; font-size: 0.7rem; color: var(--gold); }
+
+        /* NAVEGACIÓN INTERNA (Solo aparece en VISTA 1) */
+        .sub-nav { 
+            display: flex; gap: 10px; background: white; padding: 10px; 
+            margin-bottom: 20px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+        }
+        .sub-tab { 
+            flex: 1; border: none; background: transparent; padding: 10px; 
+            font-weight: 700; color: var(--gray); cursor: pointer; border-radius: 8px; transition: 0.2s;
+        }
+        .sub-tab.active { background: var(--dark); color: white; shadow: 0 4px 10px rgba(0,0,0,0.2); }
 
         /* VISTAS */
-        .view { display: none; padding: 20px 15px; max-width: 800px; margin: auto; animation: fadeIn 0.4s ease; }
+        .view { display: none; padding: 20px 15px; max-width: 900px; margin: auto; animation: fadeUp 0.3s ease; }
         .view.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        .card { background: white; border-radius: 18px; padding: 20px; margin-bottom: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); border: 1px solid #e2e8f0; position: relative; }
+        /* TARJETAS */
+        .card { background: white; border-radius: 16px; padding: 18px; margin-bottom: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.02); border: 1px solid #e2e8f0; position: relative; }
         
-        /* BOTONES */
-        .btn { width: 100%; padding: 14px; border: none; border-radius: 12px; font-weight: 800; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px; font-size: 0.85rem; text-transform: uppercase; margin-bottom: 10px; }
-        .btn:active { transform: scale(0.97); }
+        /* BOTONES INDUSTRIALES */
+        .btn { width: 100%; padding: 14px; border: none; border-radius: 10px; font-weight: 800; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px; font-size: 0.85rem; text-transform: uppercase; margin-bottom: 8px; transition: transform 0.1s; }
+        .btn:active { transform: scale(0.98); }
         .btn-pri { background: var(--dark); color: white; }
-        .btn-gold { background: var(--gold); color: white; box-shadow: 0 4px 15px rgba(217, 119, 6, 0.3); }
-        .btn-ia { background: linear-gradient(45deg, #6366f1, #a855f7); color: white; box-shadow: 0 4px 15px rgba(168, 85, 247, 0.4); }
-        .btn-sec { background: #e2e8f0; color: var(--dark); }
-
-        /* VISUALIZACION DE PASOS (NUEVO V13) */
-        .step-track { display: flex; gap: 4px; margin: 10px 0; overflow-x: auto; padding-bottom: 5px; }
-        .step-pill { 
-            padding: 4px 10px; border-radius: 20px; font-size: 0.7rem; font-weight: bold; white-space: nowrap; 
-            background: var(--step-wait); color: #64748b; display: flex; align-items: center; gap: 5px;
-        }
-        .step-pill.done { background: var(--step-done); color: white; }
-        .step-pill.active { background: var(--step-curr); color: white; box-shadow: 0 2px 8px rgba(59, 130, 246, 0.4); }
+        .btn-gold { background: var(--gold); color: white; }
+        .btn-magic { background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3); }
+        .btn-sec { background: #f1f5f9; color: var(--dark); border: 1px solid #cbd5e1; }
 
         /* INPUTS */
-        .search-input { width: 100%; padding: 15px; border-radius: 12px; border: 2px solid #e2e8f0; font-size: 1rem; margin-bottom: 15px; transition: 0.3s; }
+        .search-input { width: 100%; padding: 14px; border-radius: 10px; border: 2px solid #e2e8f0; font-size: 1rem; margin-bottom: 15px; }
         .search-input:focus { border-color: var(--gold); }
 
-        /* CALENDARIO & DOCK */
-        .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; margin-bottom: 15px; }
-        .cal-day { aspect-ratio: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 8px; border: 1px solid #f1f5f9; font-size: 0.9rem; position: relative; cursor: pointer; }
+        /* FABRICA VISUAL */
+        .step-track { display: flex; gap: 5px; overflow-x: auto; padding: 10px 0; margin-bottom: 10px; scrollbar-width: none; }
+        .step-pill { 
+            white-space: nowrap; padding: 5px 12px; border-radius: 20px; font-size: 0.7rem; font-weight: bold; 
+            background: #f1f5f9; color: #94a3b8; display: flex; align-items: center; gap: 5px; 
+        }
+        .step-pill.done { background: var(--success); color: white; }
+        .step-pill.active { background: var(--gold); color: white; transform: scale(1.05); box-shadow: 0 2px 8px rgba(217,119,6,0.3); }
+
+        /* CALENDARIO */
+        .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+        .cal-day { aspect-ratio: 1; background: white; border-radius: 8px; border: 1px solid #e2e8f0; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; font-size: 0.85rem; cursor: pointer; }
         .cal-day.today { border-color: var(--gold); font-weight: bold; background: #fffbeb; }
-        .cal-dot { width: 6px; height: 6px; border-radius: 50%; margin-top: 2px; }
-        .dot-red { background: #ef4444; } .dot-gold { background: var(--gold); }
-        
-        .dock { position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%); background: #0f172a; padding: 18px 40px; border-radius: 50px; display: flex; gap: 40px; box-shadow: 0 15px 40px rgba(0,0,0,0.4); z-index: 2000; }
+        .dot-marker { width: 6px; height: 6px; border-radius: 50%; margin-top: 3px; }
+
+        /* DOCK DE NAVEGACIÓN */
+        .dock { position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%); background: #0f172a; padding: 16px 35px; border-radius: 40px; display: flex; gap: 40px; box-shadow: 0 15px 40px rgba(0,0,0,0.5); z-index: 2000; }
         .dock i { font-size: 1.5rem; color: #64748b; cursor: pointer; transition: 0.2s; }
         .dock i.active { color: var(--gold); transform: translateY(-5px); }
     </style>
@@ -80,28 +88,42 @@
 <body>
 
 <header>
-    <div class="corp-title"><i class="fa-solid fa-scissors" style="color:var(--gold)"></i> IDEAS TEXTILES</div>
-    <div class="corp-subtitle">WORKWEAR AND CORPORATE</div>
-    <div class="tabs">
-        <button class="tab-btn active" onclick="App.UI.tab('bodega', this)">BODEGA</button>
-        <button class="tab-btn" onclick="App.UI.tab('fabrica', this)">FÁBRICA <span id="fab-badge" style="background:#ef4444;color:white;padding:1px 6px;border-radius:10px;font-size:0.8em;">0</span></button>
+    <div class="corp-title">
+        <i class="fa-solid fa-layer-group"></i> IDEAS TEXTILES
     </div>
+    <span class="version-badge">V14 PRO</span>
 </header>
 
-<section id="v-bodega" class="view active">
-    <div id="sub-bodega">
-        <button class="btn btn-ia" onclick="App.Actions.smartImport('INV')"><i class="fa-solid fa-wand-magic-sparkles"></i> CARGA RÁPIDA (DESDE CUADERNO)</button>
-        <button class="btn btn-pri" onclick="App.Actions.addInvProduct()">➕ NUEVO PRODUCTO</button>
-        <input type="text" id="search-inv" class="search-input" placeholder="🔍 Buscar..." oninput="App.Render.bodega()">
+<section id="v-ops" class="view active">
+    <div class="sub-nav">
+        <button class="sub-tab active" onclick="App.UI.subTab('bodega', this)">BODEGA</button>
+        <button class="sub-tab" onclick="App.UI.subTab('fabrica', this)">FÁBRICA (<span id="fab-count">0</span>)</button>
+    </div>
+
+    <div id="mod-bodega">
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:15px;">
+            <button class="btn btn-magic" onclick="App.IA.importInventory()"><i class="fa-solid fa-wand-magic-sparkles"></i> CARGA MASIVA IA</button>
+            <button class="btn btn-pri" onclick="App.Actions.prodModal()"><i class="fa-solid fa-plus"></i> NUEVO MANUAL</button>
+        </div>
+        <input type="text" id="search-inv" class="search-input" placeholder="🔍 Buscar SKU o Nombre..." oninput="App.Render.bodega()">
         <div id="list-bodega"></div>
     </div>
-    <div id="sub-fabrica" style="display:none;">
+
+    <div id="mod-fabrica" style="display:none;">
         <div id="list-fabrica"></div>
     </div>
 </section>
 
 <section id="v-ordenes" class="view">
-    <button class="btn btn-gold" onclick="App.Actions.newOC()">📄 NUEVA ORDEN DE COMPRA</button>
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+        <h2 style="margin:0">PEDIDOS (OC)</h2>
+        <span style="font-size:0.8rem; color:gray;">Gestión Comercial</span>
+    </div>
+    
+    <button class="btn btn-magic" onclick="App.IA.importOrders()"><i class="fa-solid fa-bolt"></i> IA: SEPARAR PEDIDOS MASIVOS</button>
+    <button class="btn btn-gold" onclick="App.Actions.newOC()">📄 NUEVA OC INDIVIDUAL</button>
+    
+    <hr style="border:0; border-top:1px solid #e2e8f0; margin: 20px 0;">
     <div id="list-ordenes"></div>
 </section>
 
@@ -109,24 +131,30 @@
     <div class="card">
         <h3 style="text-align:center; margin-top:0;">CALENDARIO</h3>
         <div id="cal-grid" class="cal-grid"></div>
-        <div style="text-align:center; font-size:0.8rem; color:#64748b;"><span style="color:#ef4444">●</span> Entrega OC &nbsp; <span style="color:#d97706">●</span> Nota</div>
+        <div style="text-align:center; font-size:0.75rem; color:#64748b; margin-top:10px;">
+            <span style="color:#ef4444">●</span> Entrega &nbsp; <span style="color:#d97706">●</span> Nota
+        </div>
     </div>
-    <div style="background:#fff1f2; border-left:4px solid #ef4444; padding:15px; border-radius:8px; margin-top:20px;">
-        <h4 style="margin:0 0 10px 0; color:#991b1b;"><i class="fa-solid fa-bell"></i> PRÓXIMOS 7 DÍAS</h4>
+
+    <div style="background:#fff1f2; border-left:4px solid #ef4444; padding:15px; border-radius:10px; margin-top:15px;">
+        <h4 style="margin:0 0 10px 0; color:#991b1b;"><i class="fa-solid fa-triangle-exclamation"></i> PRÓXIMAS ENTREGAS</h4>
         <div id="upcoming-list"></div>
     </div>
+
     <div class="card" style="margin-top:20px;">
-        <button class="btn btn-pri" onclick="App.Backup.pdf()">DESCARGAR REPORTE (PDF)</button>
+        <h3 style="margin-top:0;">SISTEMA</h3>
+        <button class="btn btn-pri" onclick="App.Backup.download()">DESCARGAR BACKUP (PDF)</button>
     </div>
 </section>
 
 <nav class="dock">
-    <i class="fa-solid fa-warehouse active" onclick="App.UI.go('bodega', this)"></i>
-    <i class="fa-solid fa-list-check" onclick="App.UI.go('ordenes', this)"></i>
+    <i class="fa-solid fa-industry active" onclick="App.UI.go('ops', this)"></i>
+    <i class="fa-solid fa-file-invoice" onclick="App.UI.go('ordenes', this)"></i>
     <i class="fa-solid fa-calendar-days" onclick="App.UI.go('agenda', this)"></i>
 </nav>
 
 <script>
+// --- CONFIGURACIÓN FIREBASE ---
 const firebaseConfig = { apiKey: "AIzaSyBg-Cx9SqZw35TyyMxtpVBEFlwZTjBXBew", authDomain: "ideastextilesapp.firebaseapp.com", databaseURL: "https://ideastextilesapp-default-rtdb.firebaseio.com", projectId: "ideastextilesapp", storageBucket: "ideastextilesapp.firebasestorage.app", messagingSenderId: "268995530035", appId: "1:268995530035:web:1890f45ac761cc81eb0246" };
 if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
@@ -135,265 +163,336 @@ const App = {
     data: { inv: [], ord: [], fab: [], logs: {} },
 
     init() {
-        db.ref('/').on('value', s => {
-            const v = s.val() || {};
+        db.ref('/').on('value', snap => {
+            const v = snap.val() || {};
             App.data.inv = v.inv || [];
             App.data.ord = v.ord || [];
             App.data.fab = v.fab || [];
             App.data.logs = v.logs || {};
             
-            // Reparación datos viejos
+            // Auto-corrección de datos antiguos
             App.data.ord.forEach(o => { if(!o.deadline) o.deadline = o.date; });
-            App.data.fab.forEach(f => { if(!f.route) f.route = [{n:'PRODUCCION', r:'TALLER'}]; });
-
-            document.getElementById('fab-badge').innerText = App.data.fab.length;
+            
+            document.getElementById('fab-count').innerText = App.data.fab.length;
             App.Render.all();
         });
     },
-
     save() { db.ref('/').update(App.data); },
 
-    Actions: {
-        // --- MOTOR DE TEXTO (V12) ---
+    // --- MOTOR DE IA (ANÁLISIS DE TEXTO) ---
+    IA: {
         parseLine(line) {
-            const parts = line.split(/\s+/).filter(x => x.trim() !== '');
-            let qty = 0, size = 'UNICA', nameParts = [];
-            const sizes = ['XS','S','M','L','XL','XXL','3XL'];
+            // Lógica robusta para entender: "50 Poleras Azules XL" o "Gorros rojos 20"
+            const clean = line.trim();
+            if(!clean) return null;
+            
+            const parts = clean.split(/\s+/);
+            let qty = 1; 
+            let size = 'UNICA';
+            let nameParts = [];
+            let foundQty = false;
+
+            const sizes = ['XS','S','M','L','XL','XXL','3XL','4XL'];
+
             parts.forEach(p => {
-                if (!isNaN(p)) qty = parseInt(p);
-                else if (sizes.includes(p.toUpperCase())) size = p.toUpperCase();
-                else nameParts.push(p);
+                const up = p.toUpperCase();
+                // Detectar número (Cantidad)
+                if(!foundQty && !isNaN(p) && p.length < 5) {
+                    qty = parseInt(p);
+                    foundQty = true;
+                }
+                // Detectar Talla
+                else if(sizes.includes(up)) {
+                    size = up;
+                }
+                // Resto es nombre
+                else {
+                    nameParts.push(p);
+                }
             });
-            return { name: nameParts.join(' ').toUpperCase().replace(/[^a-zA-Z0-9\s]/g, ''), qty, size };
+
+            const name = nameParts.join(' ').replace(/[^a-zA-Z0-9\sñÑ]/g, '').trim().toUpperCase();
+            if(!name) return null;
+
+            return { n: name, q: qty, sz: size };
         },
 
-        async smartImport(type, ordIdx = null) {
+        async importInventory() {
             const { value: text } = await Swal.fire({
-                title: 'DICTADO RÁPIDO',
+                title: 'CARGA MASIVA BODEGA',
                 input: 'textarea',
-                inputPlaceholder: '50 poleras L\n100 gorros',
-                inputAttributes: { style: 'height:150px;' }
+                inputPlaceholder: 'Pega tu lista aquí (ej: 50 poleras L)...',
+                inputAttributes: { style: 'height:200px' },
+                footer: 'El sistema detecta automáticamente cantidades y tallas.'
             });
-            if (text) {
-                const lines = text.split(/\n/);
+
+            if(text) {
+                const lines = text.split('\n');
+                let count = 0;
                 lines.forEach(l => {
-                    const d = App.Actions.parseLine(l);
-                    if(d.name && d.qty > 0) {
-                        if(type==='INV') {
-                            let p = App.data.inv.find(x => x.n === d.name);
-                            if(!p) { p = {n:d.name, sku:'SKU-'+Math.floor(Math.random()*9999), s:{}}; App.data.inv.push(p); }
-                            p.s[d.size] = (p.s[d.size]||0) + d.qty;
-                        } else if(type==='OC') {
-                            App.data.ord[ordIdx].items.push({p:d.name, sz:d.size, q:d.qty, st:'PENDIENTE'});
+                    const item = App.IA.parseLine(l);
+                    if(item) {
+                        let p = App.data.inv.find(x => x.n === item.n);
+                        if(!p) {
+                            p = { n: item.n, sku: 'SKU-'+Math.floor(Math.random()*99999), s: {} };
+                            App.data.inv.push(p);
                         }
+                        p.s[item.sz] = (p.s[item.sz] || 0) + item.q;
+                        count++;
                     }
                 });
                 App.save();
+                Swal.fire('Procesado', `Se actualizaron ${count} productos.`, 'success');
             }
         },
 
-        async addInvProduct() {
-            const {value:n} = await Swal.fire({title:'Nuevo Producto', input:'text'});
-            if(n) { App.data.inv.push({n:n.toUpperCase(), sku:'SKU-'+Math.floor(Math.random()*9999), s:{}}); App.save(); }
+        async importOrders() {
+            // MAGIA: Detecta si hay nombres de clientes (terminados en :) para crear multiples ordenes
+            const { value: text } = await Swal.fire({
+                title: 'CARGA MASIVA DE PEDIDOS',
+                html: '<p style="font-size:0.8rem; color:gray;">Usa "CLIENTE:" para separar ordenes.<br>Ej:<br>JUAN:<br>10 poleras<br>PEDRO:<br>5 gorros</p>',
+                input: 'textarea',
+                inputAttributes: { style: 'height:250px' }
+            });
+
+            if(text) {
+                const lines = text.split('\n');
+                let currentClient = 'CLIENTE GENÉRICO';
+                let currentItems = [];
+                let ordersCreated = 0;
+
+                const saveBatch = () => {
+                    if(currentItems.length > 0) {
+                        App.data.ord.push({
+                            c: currentClient,
+                            date: new Date().toLocaleDateString(),
+                            deadline: new Date().toLocaleDateString(), // Por defecto hoy, usuario edita
+                            st: 'PROCESO',
+                            items: currentItems
+                        });
+                        ordersCreated++;
+                        currentItems = [];
+                    }
+                };
+
+                lines.forEach(l => {
+                    const clean = l.trim();
+                    if(!clean) return;
+
+                    // Detectar si es un cliente (Termina en : o es solo texto corto sin numeros)
+                    const isClientHeader = clean.includes(':') || (isNaN(clean.charAt(0)) && !clean.match(/\d/) && clean.length < 20);
+
+                    if(isClientHeader) {
+                        saveBatch(); // Guardar lo anterior
+                        currentClient = clean.replace(':','').toUpperCase();
+                    } else {
+                        // Es un producto
+                        const item = App.IA.parseLine(clean);
+                        if(item) {
+                            currentItems.push({ p: item.n, q: item.q, sz: item.sz, st: 'PENDIENTE' });
+                        }
+                    }
+                });
+                saveBatch(); // Guardar el ultimo
+                App.save();
+                Swal.fire('Éxito', `Se crearon ${ordersCreated} órdenes de compra distintas.`, 'success');
+            }
+        }
+    },
+
+    // --- ACCIONES MANUALES ---
+    Actions: {
+        async prodModal() {
+            const { value: n } = await Swal.fire({ title:'Nuevo Producto', input:'text', inputPlaceholder:'Nombre' });
+            if(n) { App.data.inv.push({ n: n.toUpperCase(), sku: 'SKU-'+Math.floor(Math.random()*90000), s:{} }); App.save(); }
+        },
+        
+        delInv(i) {
+            Swal.fire({title:'¿Borrar?', showCancelButton:true}).then(r => { 
+                if(r.isConfirmed) { App.data.inv.splice(i,1); App.save(); App.Render.bodega(); } 
+            });
         },
 
-        // --- FABRICA MODULAR (V13) ---
-        async sendToFab(i) {
+        // LOGICA DE FÁBRICA FLEXIBLE (V13)
+        async sendFab(i) {
             const p = App.data.inv[i];
-            
-            // 1. Preguntar Cantidad
-            const { value: qty } = await Swal.fire({ 
-                title: `Producir: ${p.n}`, 
-                input: 'number', inputPlaceholder: 'Cantidad a enviar' 
-            });
-            if (!qty) return;
-
-            // 2. Definir Ruta (Aquí está la magia de V13)
-            const { value: routeStr } = await Swal.fire({
-                title: 'RUTA DE TRABAJO',
-                input: 'textarea',
-                inputValue: 'CORTE (JUAN) > CONFECCION (MARIA) > TERMINACION (BODEGA)',
-                inputLabel: 'Define los pasos y responsables separados por ">"',
-                footer: 'Puedes editar los nombres y orden como quieras.'
+            const {value:form} = await Swal.fire({
+                title: `PRODUCIR: ${p.n}`,
+                html: `
+                    <input id="f-q" type="number" class="swal2-input" placeholder="Cantidad">
+                    <label style="display:block; text-align:left; font-weight:bold; margin-top:10px;">Ruta de Proceso:</label>
+                    <textarea id="f-r" class="swal2-textarea" style="margin:0;">CORTE (JUAN) > CONFECCION (MARIA) > EMPAQUE</textarea>
+                    <small style="color:gray;">Usa > para separar pasos.</small>
+                `,
+                preConfirm: () => ({ q: document.getElementById('f-q').value, r: document.getElementById('f-r').value })
             });
 
-            if (routeStr) {
-                // Convertir texto "Corte (Juan) > Conf (Maria)" en objeto real
-                const steps = routeStr.split('>').map(s => {
+            if(form && form.q && form.r) {
+                // Parsear ruta
+                const steps = form.r.split('>').map(s => {
                     const clean = s.trim();
-                    const match = clean.match(/([^(]+)(?:\(([^)]+)\))?/); // Separa "Corte" de "(Juan)"
-                    return {
-                        n: match[1].trim().toUpperCase(),
-                        r: match[2] ? match[2].trim().toUpperCase() : 'POR ASIGNAR'
+                    const match = clean.match(/([^(]+)(?:\(([^)]+)\))?/);
+                    return { 
+                        n: match[1].trim().toUpperCase(), 
+                        r: match[2] ? match[2].trim().toUpperCase() : 'TALLER' 
                     };
                 });
 
                 App.data.fab.push({
                     n: p.n,
-                    qty: parseInt(qty),
+                    qty: parseInt(form.q),
                     route: steps,
                     stepIdx: 0,
                     start: Date.now()
                 });
                 App.save();
-                App.UI.tab('fabrica', document.querySelectorAll('.tab-btn')[1]);
+                App.UI.subTab('fabrica', document.querySelectorAll('.sub-tab')[1]);
+                Swal.fire('Enviado', 'Lote ingresado a línea de producción', 'success');
             }
         },
 
         advanceFab(i) {
             const f = App.data.fab[i];
-            const currentStep = f.route[f.stepIdx];
-            
-            if (f.stepIdx < f.route.length - 1) {
-                // Avanzar siguiente paso
-                const nextStep = f.route[f.stepIdx + 1];
-                Swal.fire({
-                    title: `Terminó: ${currentStep.n}`,
-                    text: `El lote pasa a: ${nextStep.n} (${nextStep.r})`,
-                    icon: 'info',
-                    showCancelButton: true,
-                    confirmButtonText: 'Sí, Avanzar'
-                }).then(r => {
-                    if(r.isConfirmed) {
-                        f.stepIdx++;
-                        App.save();
-                    }
-                });
+            if(f.stepIdx < f.route.length - 1) {
+                f.stepIdx++; App.save(); App.Render.fabrica();
             } else {
-                // Finalizar
-                Swal.fire({
-                    title: '¿Finalizar Producción?',
-                    text: `${f.qty} unidades volverán al inventario (Stock).`,
-                    icon: 'success',
-                    showCancelButton: true
-                }).then(r => {
+                Swal.fire({title:'¿Finalizar Lote?', text:'Se sumará al stock', showCancelButton:true}).then(r=>{
                     if(r.isConfirmed) {
-                        // Reingreso simple a stock como UNICA o a definir (simplificado para robustez)
                         let p = App.data.inv.find(x => x.n === f.n);
-                        if(p) {
-                            p.s['PROD'] = (p.s['PROD']||0) + parseInt(f.qty); // Entra como 'PROD' para que lo clasifiquen luego
-                        }
-                        App.data.fab.splice(i, 1); // Sacar de fabrica
+                        if(p) p.s['PROD'] = (p.s['PROD']||0) + parseInt(f.qty);
+                        App.data.fab.splice(i,1);
                         App.save();
                     }
                 });
             }
         },
 
-        editFabStep(i) {
-            // Permite cambiar el responsable en caliente
-            const f = App.data.fab[i];
-            const step = f.route[f.stepIdx];
-            Swal.fire({
-                title: `Editando: ${step.n}`,
-                input: 'text',
-                inputValue: step.r,
-                inputLabel: 'Responsable actual:'
-            }).then(r => {
-                if(r.value) {
-                    step.r = r.value.toUpperCase();
-                    App.save();
-                }
-            });
-        },
-
-        // --- OC & CALENDARIO ---
         async newOC() {
             const {value:form} = await Swal.fire({
-                title:'NUEVA OC', html:`<input id="c" class="swal2-input" placeholder="Cliente"><input id="d" type="date" class="swal2-input">`,
-                preConfirm:()=>{return{c:document.getElementById('c').value, d:document.getElementById('d').value}}
+                title:'NUEVA ORDEN',
+                html:`<input id="c" class="swal2-input" placeholder="Cliente"><input id="d" type="date" class="swal2-input">`,
+                preConfirm:() => ({ c:document.getElementById('c').value, d:document.getElementById('d').value })
             });
-            if(form && form.c && form.d) {
-                App.data.ord.push({c:form.c.toUpperCase(), deadline:form.d, items:[], st:'PROCESO'});
+            if(form) {
+                App.data.ord.push({ c:form.c.toUpperCase(), deadline:form.d, st:'PROCESO', items:[] });
                 App.save();
-                Swal.fire('Creada','¿Agregar items?','question').then(r=>{if(r.isConfirmed)App.Actions.smartImport('OC', App.data.ord.length-1)});
+                Swal.fire('Creada', 'Usa "IA: Cargar Pedidos" o edita manualmente para agregar items.', 'success');
             }
         },
-
+        
         logDay(k) {
-            Swal.fire({title:'Notas', input:'textarea', inputValue:App.data.logs[k]||''}).then(r=>{if(r.value!==undefined){App.data.logs[k]=r.value; App.save();}});
+            Swal.fire({title:'Notas del Día', input:'textarea', inputValue:App.data.logs[k]||''}).then(r=>{
+                if(r.value!==undefined) { App.data.logs[k]=r.value; App.save(); App.Render.calendar(); }
+            });
         }
     },
 
     UI: {
-        go(id, el) { document.querySelectorAll('.view').forEach(v=>v.classList.remove('active')); document.getElementById('v-'+id).classList.add('active'); document.querySelectorAll('.dock i').forEach(i=>i.classList.remove('active')); el.classList.add('active'); },
-        tab(t, el) { document.getElementById('sub-bodega').style.display = t==='bodega'?'block':'none'; document.getElementById('sub-fabrica').style.display = t==='fabrica'?'block':'none'; document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active')); el.classList.add('active'); }
+        go(id, el) {
+            document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+            document.querySelectorAll('.dock i').forEach(i=>i.classList.remove('active'));
+            document.getElementById('v-'+id).classList.add('active');
+            el.classList.add('active');
+        },
+        subTab(t, el) {
+            document.getElementById('mod-bodega').style.display = t==='bodega'?'block':'none';
+            document.getElementById('mod-fabrica').style.display = t==='fabrica'?'block':'none';
+            document.querySelectorAll('.sub-tab').forEach(b=>b.classList.remove('active'));
+            el.classList.add('active');
+        }
     },
 
     Render: {
         all() { this.bodega(); this.fabrica(); this.ordenes(); this.calendar(); },
-        
+
         bodega() {
             const q = document.getElementById('search-inv').value.toUpperCase();
-            document.getElementById('list-bodega').innerHTML = App.data.inv.filter(x=>x.n.includes(q)).map((p,i)=>`
+            document.getElementById('list-bodega').innerHTML = App.data.inv.filter(x => x.n.includes(q)).map((p,i) => `
                 <div class="card">
-                    <div style="display:flex;justify-content:space-between;"><b>${p.n}</b> <small>${p.sku}</small></div>
-                    <div style="color:#64748b;font-size:0.8rem;margin:5px 0;">${Object.entries(p.s).map(([k,v])=>`${k}:${v}`).join('  ')}</div>
-                    <button class="btn btn-sec" style="padding:8px" onclick="App.Actions.sendToFab(${i})">PRODUCIR</button>
-                </div>`).join('');
+                    <div style="display:flex; justify-content:space-between;">
+                        <b>${p.n}</b> <small>${p.sku}</small>
+                    </div>
+                    <div style="margin:5px 0; color:#64748b; font-size:0.8rem;">
+                        ${Object.entries(p.s).map(([k,v]) => `<span style="background:#f1f5f9;padding:2px 5px;border-radius:4px;">${k}:${v}</span>`).join(' ')}
+                    </div>
+                    <div style="display:flex; gap:10px; margin-top:10px;">
+                        <button class="btn btn-sec" style="margin:0;" onclick="App.Actions.sendFab(${i})">PRODUCIR</button>
+                        <button class="btn btn-sec" style="margin:0; width:auto; color:red;" onclick="App.Actions.delInv(${i})"><i class="fa-solid fa-trash"></i></button>
+                    </div>
+                </div>
+            `).join('');
         },
 
         fabrica() {
             document.getElementById('list-fabrica').innerHTML = App.data.fab.map((f,i) => {
-                // Generar pills de pasos
-                const stepsHtml = f.route.map((step, idx) => {
-                    let statusClass = '';
-                    if (idx < f.stepIdx) statusClass = 'done'; // Pasado
-                    else if (idx === f.stepIdx) statusClass = 'active'; // Actual
-                    return `<div class="step-pill ${statusClass}">${idx+1}. ${step.n.substring(0,3)}</div>`;
+                const steps = f.route.map((s, idx) => {
+                    let st = idx < f.stepIdx ? 'done' : (idx === f.stepIdx ? 'active' : '');
+                    return `<div class="step-pill ${st}">${idx+1}. ${s.n}</div>`;
                 }).join('');
-
-                const cur = f.route[f.stepIdx];
                 
-                return `<div class="card" style="border-left:4px solid var(--gold);">
-                    <div style="display:flex;justify-content:space-between;align-items:center;">
-                        <b>${f.n}</b> <span style="background:#e2e8f0;padding:2px 8px;border-radius:10px;font-size:0.8rem;">${f.qty} un.</span>
+                const cur = f.route[f.stepIdx];
+                return `
+                <div class="card" style="border-left:4px solid var(--gold);">
+                    <div style="display:flex; justify-content:space-between;"><b>${f.n}</b> <b>${f.qty} un.</b></div>
+                    <div class="step-track">${steps}</div>
+                    <div style="text-align:center; margin:10px 0; font-weight:bold;">
+                        <i class="fa-solid fa-arrow-right"></i> ${cur.n} (${cur.r})
                     </div>
-                    
-                    <div class="step-track">${stepsHtml}</div>
-
-                    <div style="background:#f8fafc; padding:10px; border-radius:8px; margin-top:5px; border:1px solid #e2e8f0;">
-                        <div style="font-size:0.75rem; color:#64748b; font-weight:bold;">EN PROCESO:</div>
-                        <div style="font-size:1.1rem; font-weight:900; color:var(--dark);">${cur.n}</div>
-                        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:5px;">
-                            <span style="font-size:0.9rem;"><i class="fa-solid fa-user-tag"></i> ${cur.r}</span>
-                            <i class="fa-solid fa-pen" style="color:#94a3b8; cursor:pointer;" onclick="App.Actions.editFabStep(${i})"></i>
-                        </div>
-                    </div>
-
-                    <button class="btn btn-pri" style="margin-top:10px;" onclick="App.Actions.advanceFab(${i})">
-                        ${f.stepIdx === f.route.length - 1 ? 'FINALIZAR' : 'AVANZAR ETAPA'}
+                    <button class="btn btn-pri" onclick="App.Actions.advanceFab(${i})">
+                        ${f.stepIdx===f.route.length-1 ? 'FINALIZAR' : 'AVANZAR'}
                     </button>
                 </div>`;
             }).join('');
         },
 
-        ordenes() { /* Similar a V12 */ 
-            document.getElementById('list-ordenes').innerHTML = App.data.ord.sort((a,b)=>new Date(a.deadline)-new Date(b.deadline)).map((o,i) => `
+        ordenes() {
+            document.getElementById('list-ordenes').innerHTML = App.data.ord.map((o,i) => `
                 <div class="card">
-                    <div style="display:flex;justify-content:space-between;"><b>${o.c}</b> <button class="btn btn-sec" style="width:auto;padding:5px;" onclick="App.Actions.smartImport('OC',${App.data.ord.indexOf(o)})">+ITEMS</button></div>
-                    <small style="color:${new Date(o.deadline)<new Date()?'red':'green'}">Entrega: ${o.deadline}</small>
-                    <ul style="padding-left:20px;font-size:0.85rem;">${o.items.map(it=>`<li>${it.q} ${it.p} (${it.sz})</li>`).join('')}</ul>
-                </div>`).join('');
+                    <div style="display:flex; justify-content:space-between;">
+                        <b>${o.c}</b> <small>${o.deadline}</small>
+                    </div>
+                    <ul style="padding-left:20px; font-size:0.85rem;">
+                        ${o.items.map(it => `<li>${it.q} ${it.p} (${it.sz})</li>`).join('')}
+                    </ul>
+                </div>
+            `).join('');
         },
 
-        calendar() { /* Igual a V12 pero optimizado */ 
-            const d=new Date(); const days=new Date(d.getFullYear(),d.getMonth()+1,0).getDate();
-            let h=''; 
-            for(let i=1;i<=days;i++){
-                const k=`${i}-${d.getMonth()}-${d.getFullYear()}`, dk=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(i).padStart(2,'0')}`;
-                const oc=App.data.ord.find(o=>o.deadline===dk && o.st!=='done'), lg=App.data.logs[k];
-                h+=`<div class="cal-day ${i===d.getDate()?'today':''}" onclick="App.Actions.logDay('${k}')">${i}<div style="display:flex;gap:2px;">${oc?'<div class="cal-dot dot-red"></div>':''}${lg?'<div class="cal-dot dot-gold"></div>':''}</div></div>`;
+        calendar() {
+            const d = new Date();
+            const days = new Date(d.getFullYear(), d.getMonth()+1, 0).getDate();
+            let h = '';
+            for(let i=1; i<=days; i++) {
+                const dk = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(i).padStart(2,'0')}`;
+                const lk = `${i}-${d.getMonth()}-${d.getFullYear()}`;
+                const hasOc = App.data.ord.some(o => o.deadline === dk);
+                const hasNt = App.data.logs[lk];
+                h += `<div class="cal-day ${i===d.getDate()?'today':''}" onclick="App.Actions.logDay('${lk}')">
+                    ${i} <div style="display:flex; gap:2px;">
+                    ${hasOc?'<div class="dot-marker" style="background:#ef4444"></div>':''}
+                    ${hasNt?'<div class="dot-marker" style="background:#d97706"></div>':''}
+                    </div>
+                </div>`;
             }
-            document.getElementById('cal-grid').innerHTML=h;
+            document.getElementById('cal-grid').innerHTML = h;
             
-            const up = App.data.ord.filter(o=>{const diff=(new Date(o.deadline)-d)/(1000*60*60*24); return diff>=-1 && diff<=7 && o.st!=='done'});
-            document.getElementById('upcoming-list').innerHTML = up.length ? up.map(o=>`<div class="alert-item"><b>${o.c}</b> <span style="color:#ef4444">${o.deadline}</span></div>`).join('') : '<small>Nada urgente.</small>';
+            // Proximas entregas
+            const up = App.data.ord.filter(o => {
+                const diff = (new Date(o.deadline) - d) / (1000*60*60*24);
+                return diff >= 0 && diff <= 7;
+            });
+            document.getElementById('upcoming-list').innerHTML = up.length ? up.map(o=>`<div><b>${o.c}</b>: ${o.deadline}</div>`).join('') : '<small>Sin urgencias.</small>';
         }
     },
 
     Backup: {
-        pdf() { const doc=new window.jspdf.jsPDF(); doc.text("REPORTE V13",10,20); doc.autoTable({startY:30, head:[['Producto','Stock']], body:App.data.inv.map(x=>[x.n, JSON.stringify(x.s)])}); doc.save('Reporte.pdf'); }
+        download() {
+            const doc = new window.jspdf.jsPDF();
+            doc.text("REPORTE IDEAS TEXTILES", 10, 20);
+            const data = App.data.inv.map(x => [x.n, JSON.stringify(x.s)]);
+            doc.autoTable({startY:30, head:[['Producto','Stock']], body:data});
+            doc.save('Backup.pdf');
+        }
     }
 };
 
