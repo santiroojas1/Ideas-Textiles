@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>IDEAS TEXTILES SPA</title>
+    <title>IDEAS TEXTILES </title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700;900&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
@@ -73,12 +73,13 @@
         .step-pill.done { background: var(--success); color: white; }
         .step-pill.active { background: var(--gold); color: white; transform: scale(1.05); box-shadow: 0 2px 8px rgba(217,119,6,0.3); }
 
-        /* CALENDARIO */
-        .cal-header { text-align: center; font-weight: 900; font-size: 1.2rem; margin-bottom: 15px; text-transform: uppercase; color: var(--dark); letter-spacing: 1px; }
+        /* CALENDARIO REFORZADO */
+        .cal-header { text-align: center; font-weight: 900; font-size: 1.5rem; margin-bottom: 15px; text-transform: uppercase; color: var(--dark); letter-spacing: 1px; }
+        .cal-weekdays { display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; font-weight: bold; font-size: 0.8rem; margin-bottom: 5px; color: var(--gray); }
         .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
-        .cal-day { aspect-ratio: 1; background: white; border-radius: 8px; border: 1px solid #e2e8f0; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; font-size: 0.85rem; cursor: pointer; }
-        .cal-day.today { border: 2px solid var(--gold); background: var(--gold); color: white; font-weight: bold; box-shadow: 0 4px 10px rgba(217, 119, 6, 0.4); }
-        .dot-marker { width: 6px; height: 6px; border-radius: 50%; margin-top: 3px; }
+        .cal-day { aspect-ratio: 1; background: white; border-radius: 8px; border: 1px solid #e2e8f0; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; font-size: 0.9rem; cursor: pointer; }
+        .cal-day.today { border: 2px solid var(--gold); background: #fffbeb; color: var(--gold); font-weight: 900; }
+        .dot-marker { width: 8px; height: 8px; border-radius: 50%; margin-top: 3px; }
 
         /* DOCK DE NAVEGACIÓN */
         .dock { position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%); background: #0f172a; padding: 16px 35px; border-radius: 40px; display: flex; gap: 40px; box-shadow: 0 15px 40px rgba(0,0,0,0.5); z-index: 2000; }
@@ -89,9 +90,8 @@
 <body>
 
 <header>
-    <div class="corp-title"><i class="fa-solid fa-layer-group"></i> IDEAS TEXTILES</div>
+    <div class="corp-title"><i class="fa-solid fa-scissors"></i> IDEAS TEXTILES</div>
     <span class="version-badge">WORKWEAR AND CORPORATE</span>
-    
 </header>
 
 <section id="v-ops" class="view active">
@@ -102,7 +102,7 @@
 
     <div id="mod-bodega">
         <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:15px;">
-            <button class="btn btn-magic" onclick="App.IA.importInventory()"><i class="fa-solid fa-wand-magic-sparkles"></i> CARGA RÁPIDA (IA)</button>
+            <button class="btn btn-magic" onclick="App.IA.importInventory()"><i class="fa-solid fa-wand-magic-sparkles"></i> IA: SUMAR STOCK</button>
             <button class="btn btn-pri" onclick="App.Actions.prodModal()"><i class="fa-solid fa-plus"></i> NUEVO MANUAL</button>
         </div>
         <input type="text" id="search-inv" class="search-input" placeholder="🔍 Buscar SKU o Nombre..." oninput="App.Render.bodega()">
@@ -120,7 +120,7 @@
         <span style="font-size:0.8rem; color:gray;">Gestión Comercial</span>
     </div>
     
-    <button class="btn btn-magic" onclick="App.IA.importOrders()"><i class="fa-solid fa-bolt"></i> IA: SEPARAR PEDIDOS</button>
+    <button class="btn btn-magic" onclick="App.IA.importOrders()"><i class="fa-solid fa-users-viewfinder"></i> IA: SEPARAR POR CLIENTE</button>
     <button class="btn btn-gold" onclick="App.Actions.newOC()">📄 NUEVA OC INDIVIDUAL</button>
     
     <div id="list-ordenes" style="margin-top:20px;"></div>
@@ -129,9 +129,12 @@
 <section id="v-agenda" class="view">
     <div class="card">
         <div id="cal-header" class="cal-header"></div> 
+        <div class="cal-weekdays">
+            <div>L</div><div>M</div><div>M</div><div>J</div><div>V</div><div>S</div><div>D</div>
+        </div>
         <div id="cal-grid" class="cal-grid"></div>
         <div style="text-align:center; font-size:0.75rem; color:#64748b; margin-top:10px;">
-            <span style="color:#ef4444">●</span> Entrega &nbsp; <span style="color:#d97706">●</span> Nota
+            <span style="color:#ef4444">●</span> Entrega Pedido &nbsp; <span style="color:#d97706">●</span> Nota/Idea
         </div>
     </div>
     <div style="background:#fff1f2; border-left:4px solid #ef4444; padding:15px; border-radius:10px; margin-top:15px;">
@@ -160,12 +163,12 @@ const App = {
     init() {
         db.ref('/').on('value', snap => {
             const v = snap.val() || {};
+            // Aseguramos Arrays
             App.data.inv = v.inv || [];
             App.data.ord = v.ord || [];
             App.data.fab = v.fab || [];
             App.data.logs = v.logs || {};
             
-            // Auto-reparación y renderizado inicial
             App.data.ord.forEach(o => { if(!o.deadline) o.deadline = o.date; });
             document.getElementById('fab-count').innerText = App.data.fab.length;
             App.Render.all();
@@ -180,6 +183,7 @@ const App = {
             if(!clean) return null;
             const parts = clean.split(/\s+/);
             let qty = 1, size = 'UNICA', nameParts = [], foundQty = false;
+            // Tallas comunes para AYUDAR a detectar, pero NO limitar
             const sizes = ['XS','S','M','L','XL','XXL','3XL'];
 
             parts.forEach(p => {
@@ -196,9 +200,9 @@ const App = {
 
         async importInventory() {
             const { value: text } = await Swal.fire({
-                title: 'DICTADO DE INVENTARIO',
+                title: 'IA: CARGA DE STOCK',
                 input: 'textarea',
-                inputPlaceholder: '50 poleras M\n20 gorros rojos',
+                inputPlaceholder: 'Copia de tu cuaderno:\n50 poleras M\n20 gorros',
                 inputAttributes: { style: 'height:200px' }
             });
             if(text) {
@@ -215,16 +219,17 @@ const App = {
                     }
                 });
                 App.save();
-                App.Render.bodega(); // REFUERZO VISUAL
-                Swal.fire('Listo', `Se procesaron ${c} lineas.`, 'success');
+                App.Render.bodega(); // REFRESH VISUAL
+                Swal.fire('Listo', `Stock actualizado: ${c} líneas.`, 'success');
             }
         },
 
         async importOrders() {
             const { value: text } = await Swal.fire({
-                title: 'IA: SEPARADOR DE PEDIDOS',
-                html: '<small>Usa ":" para clientes. Ej: "JUAN: 10 poleras"</small>',
+                title: 'IA: SEPARAR PEDIDOS',
+                html: '<small>Detecta "CLIENTE:" y crea tarjetas separadas.</small>',
                 input: 'textarea',
+                inputPlaceholder: 'JUAN PEREZ:\n10 poleras\n\nCOLEGIO:\n50 buzos',
                 inputAttributes: { style: 'height:250px' }
             });
             if(text) {
@@ -250,58 +255,52 @@ const App = {
                 });
                 save();
                 App.save();
-                App.Render.ordenes(); // REFUERZO VISUAL
-                Swal.fire('Procesado', `Se crearon ${count} órdenes distintas.`, 'success');
+                App.Render.ordenes(); // REFRESH VISUAL
+                Swal.fire('Procesado', `Se generaron ${count} pedidos.`, 'success');
             }
         }
     },
 
     // --- ACCIONES MANUALES ---
     Actions: {
+        // *** MANUAL CON LIBERTAD DE TALLA ***
         async prodModal() {
             const { value: form } = await Swal.fire({
-                title: 'ALTA MANUAL',
+                title: 'NUEVO PRODUCTO',
                 html: `
-                    <input id="new-n" class="swal2-input" placeholder="Nombre Producto (Ej: POLERA PIQUE)">
+                    <input id="new-n" class="swal2-input" placeholder="Nombre (Ej: JEANS)">
                     <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:15px;">
-                        <input id="new-s" type="number" class="swal2-input" placeholder="Cant. S" style="margin:0">
-                        <input id="new-m" type="number" class="swal2-input" placeholder="Cant. M" style="margin:0">
-                        <input id="new-l" type="number" class="swal2-input" placeholder="Cant. L" style="margin:0">
-                        <input id="new-xl" type="number" class="swal2-input" placeholder="Cant. XL" style="margin:0">
+                        <input id="new-sz" class="swal2-input" placeholder="Talla (Cualquiera)" style="margin:0">
+                        <input id="new-q" type="number" class="swal2-input" placeholder="Cantidad" style="margin:0">
                     </div>
                 `,
                 focusConfirm: false,
                 preConfirm: () => {
                     return {
                         n: document.getElementById('new-n').value,
-                        s: document.getElementById('new-s').value,
-                        m: document.getElementById('new-m').value,
-                        l: document.getElementById('new-l').value,
-                        xl: document.getElementById('new-xl').value
+                        sz: document.getElementById('new-sz').value,
+                        q: document.getElementById('new-q').value
                     }
                 }
             });
 
-            if(form && form.n) {
-                const stock = {};
-                if(form.s) stock['S'] = parseInt(form.s);
-                if(form.m) stock['M'] = parseInt(form.m);
-                if(form.l) stock['L'] = parseInt(form.l);
-                if(form.xl) stock['XL'] = parseInt(form.xl);
+            if(form && form.n && form.q) {
+                const sizeName = form.sz ? form.sz.toUpperCase() : 'UNICA';
+                const qty = parseInt(form.q);
                 
-                // ASEGURAR ARRAY
                 if (!App.data.inv) App.data.inv = [];
-
-                App.data.inv.push({
-                    n: form.n.toUpperCase(),
-                    sku: 'REF-'+Math.floor(Math.random()*99999),
-                    s: stock
-                });
-                App.save();
+                let exists = App.data.inv.find(p => p.n === form.n.toUpperCase());
                 
-                // *** LA CORRECCIÓN CLAVE: ACTUALIZAR PANTALLA ***
-                App.Render.bodega(); 
-                Swal.fire('Guardado', `${form.n} ingresado correctamente.`, 'success');
+                if (exists) {
+                    exists.s[sizeName] = (exists.s[sizeName] || 0) + qty;
+                } else {
+                    const stock = {}; stock[sizeName] = qty;
+                    App.data.inv.push({ n: form.n.toUpperCase(), sku: 'REF-'+Math.floor(Math.random()*99999), s: stock });
+                }
+
+                App.save();
+                App.Render.bodega(); // ACTUALIZACIÓN INSTANTANEA
+                Swal.fire('Guardado', `${form.n} actualizado.`, 'success');
             }
         },
 
@@ -338,7 +337,7 @@ const App = {
         advanceFab(i) {
             const f = App.data.fab[i];
             if(f.stepIdx < f.route.length-1) {
-                f.stepIdx++; App.save(); App.Render.fabrica(); // Render forzado
+                f.stepIdx++; App.save(); App.Render.fabrica();
             } else {
                 Swal.fire({title:'¿Terminado?', text:'Vuelve a stock', showCancelButton:true}).then(r=>{
                     if(r.isConfirmed) {
@@ -427,11 +426,21 @@ const App = {
         calendar() {
             const d = new Date();
             const months = ["ENERO","FEBRERO","MARZO","ABRIL","MAYO","JUNIO","JULIO","AGOSTO","SEPTIEMBRE","OCTUBRE","NOVIEMBRE","DICIEMBRE"];
+            // HEADER CALENDARIO
             document.getElementById('cal-header').innerText = `${months[d.getMonth()]} ${d.getFullYear()}`;
 
-            const days = new Date(d.getFullYear(), d.getMonth()+1, 0).getDate();
+            // LOGICA DIAS
+            const firstDay = new Date(d.getFullYear(), d.getMonth(), 1).getDay(); // Dia semana que empieza el mes
+            // Ajuste para Lunes = 1 (JS devuelve Domingo = 0)
+            const startOffset = firstDay === 0 ? 6 : firstDay - 1; 
+
+            const daysInMonth = new Date(d.getFullYear(), d.getMonth()+1, 0).getDate();
             let h = '';
-            for(let i=1; i<=days; i++) {
+            
+            // Relleno dias vacios antes del 1
+            for(let j=0; j<startOffset; j++) h+=`<div></div>`;
+
+            for(let i=1; i<=daysInMonth; i++) {
                 const dk = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(i).padStart(2,'0')}`;
                 const lk = `${i}-${d.getMonth()}-${d.getFullYear()}`;
                 const isToday = i === d.getDate();
@@ -457,7 +466,7 @@ const App = {
         Backup: {
             download() {
                 const doc = new window.jspdf.jsPDF();
-                doc.text("REPORTE V16",10,20);
+                doc.text("REPORTE V18",10,20);
                 doc.autoTable({startY:30, head:[['Producto','Stock']], body:App.data.inv.map(x=>[x.n, JSON.stringify(x.s)])});
                 doc.save('IdeasTextiles.pdf');
             }
