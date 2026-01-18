@@ -3,536 +3,1004 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IDEAS TEXTILES</title>
+    <title>IDEASTEXTILES</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
     <style>
-        /* Estilos personalizados para el calendario */
+        /* Estilos específicos para impresión y calendario */
+        @media print {
+            .no-print { display: none !important; }
+            .print-only { display: block !important; }
+            body { background: white; -webkit-print-color-adjust: exact; }
+            .page-break { page-break-after: always; }
+        }
+        .print-only { display: none; }
+        
+        /* Grid del Calendario */
         .calendar-grid {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
-            gap: 2px;
+            gap: 1px;
+            background-color: #e5e7eb;
+            border: 1px solid #e5e7eb;
         }
         .calendar-day {
-            aspect-ratio: 1/1;
-            border: 1px solid #e5e7eb;
-            padding: 5px;
-            font-size: 0.9rem;
-            position: relative;
-        }
-        .calendar-header {
-            font-weight: bold;
-            text-align: center;
-            padding: 10px 0;
-            background-color: #f3f4f6;
-        }
-        .today {
-            background-color: #3b82f6;
-            color: white;
-            border-radius: 50%;
-            width: 24px;
-            height: 24px;
+            background-color: white;
+            min-height: 100px;
+            padding: 4px;
+            font-size: 0.85rem;
             display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto;
+            flex-direction: column;
+            justify-content: space-between;
         }
+        .calendar-day:hover { background-color: #f9fafb; }
+        
+        /* Estilos personalizados de Scroll */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #888; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #555; }
     </style>
 </head>
-<body class="bg-gray-100 font-sans text-gray-800">
+<body class="bg-gray-100 font-sans text-gray-800 h-screen overflow-hidden flex">
 
-    <div class="flex h-screen overflow-hidden">
+    <aside class="w-64 bg-gray-900 text-white flex-col flex-shrink-0 hidden md:flex z-20 shadow-2xl no-print">
+        <div class="p-6 flex items-center justify-center border-b border-gray-800">
+            <i class="fas fa-scissors text-3xl text-yellow-500 mr-3"></i>
+            <h1 class="text-lg font-bold tracking-wider">GESTIÓN WW</h1>
+        </div>
         
-        <aside class="w-64 bg-gray-900 text-white flex-shrink-0 hidden md:flex flex-col shadow-xl">
-            <div class="p-6 flex items-center justify-center border-b border-gray-700">
-                <i class="fas fa-scissors text-3xl text-yellow-500 mr-3"></i>
-                <h2 class="text-xl font-bold tracking-wider">GESTIÓN</h2>
-            </div>
-            <nav class="mt-6 flex-1 px-4 space-y-2">
-                <a href="#" onclick="showSection('dashboard')" class="nav-item block py-3 px-4 rounded hover:bg-gray-700 transition flex items-center bg-gray-800">
-                    <i class="fas fa-home w-6"></i> Dashboard
-                </a>
-                <a href="#" onclick="showSection('orders')" class="nav-item block py-3 px-4 rounded hover:bg-gray-700 transition flex items-center">
-                    <i class="fas fa-file-invoice w-6"></i> Órdenes (OC)
-                </a>
-                <a href="#" onclick="showSection('inventory')" class="nav-item block py-3 px-4 rounded hover:bg-gray-700 transition flex items-center">
-                    <i class="fas fa-boxes w-6"></i> Inventario
-                </a>
-                <a href="#" onclick="showSection('calendar')" class="nav-item block py-3 px-4 rounded hover:bg-gray-700 transition flex items-center">
-                    <i class="fas fa-calendar-alt w-6"></i> Calendario
-                </a>
-            </nav>
-            <div class="p-4 border-t border-gray-700">
-                <p class="text-xs text-gray-400 text-center">v2.4 - Sistema Corregido</p>
-            </div>
-        </aside>
+        <nav class="mt-6 flex-1 px-4 space-y-2">
+            <button onclick="showSection('inventory')" class="nav-item w-full text-left py-3 px-4 rounded hover:bg-gray-800 transition flex items-center bg-gray-800 text-yellow-500">
+                <i class="fas fa-boxes w-6"></i> Inventario
+            </button>
+            <button onclick="showSection('orders')" class="nav-item w-full text-left py-3 px-4 rounded hover:bg-gray-800 transition flex items-center">
+                <i class="fas fa-file-invoice w-6"></i> Órdenes (OC)
+            </button>
+            <button onclick="showSection('calendar')" class="nav-item w-full text-left py-3 px-4 rounded hover:bg-gray-800 transition flex items-center">
+                <i class="fas fa-calendar-alt w-6"></i> Calendario
+            </button>
+            <button onclick="showSection('analysis')" class="nav-item w-full text-left py-3 px-4 rounded hover:bg-gray-800 transition flex items-center">
+                <i class="fas fa-robot w-6"></i> IA / Análisis
+            </button>
+        </nav>
 
-        <div class="flex-1 flex flex-col overflow-hidden">
+        <div class="p-4 border-t border-gray-800">
+            <button onclick="confirmFullReset()" class="w-full bg-red-900 hover:bg-red-700 text-xs py-2 rounded text-red-200 transition">
+                <i class="fas fa-bomb mr-1"></i> DERECHOS RESERVADOS
+            </button>
+        </div>
+    </aside>
+
+    <div class="flex-1 flex flex-col h-full relative">
+        
+        <header class="bg-white shadow-md z-10 p-4 flex justify-between items-center border-b-4 border-yellow-500 no-print">
+            <div class="flex items-center">
+                <button class="md:hidden mr-4 text-gray-600"><i class="fas fa-bars"></i></button>
+                <h2 class="text-2xl font-black text-gray-800 tracking-wider uppercase flex items-center">
+                    WORKWEAR AND CORPORATE 
+                    <i class="fas fa-scissors ml-3 text-yellow-600"></i>
+                </h2>
+            </div>
+            <div class="flex items-center space-x-4">
+                <button onclick="generateCompanyReport()" class="bg-gray-800 hover:bg-gray-700 text-white px-3 py-1 rounded text-sm flex items-center">
+                    <i class="fas fa-file-pdf mr-2"></i> Reporte General
+                </button>
+                <div class="h-8 w-8 rounded-full bg-yellow-500 flex items-center justify-center text-white font-bold">A</div>
+            </div>
+        </header>
+
+        <main id="main-content" class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50 p-6 no-print">
             
-            <header class="bg-white shadow-sm z-10 p-4 flex justify-between items-center border-b-4 border-yellow-500">
-                <div class="flex items-center">
-                    <button class="md:hidden mr-4 text-gray-600 focus:outline-none">
-                        <i class="fas fa-bars text-2xl"></i>
-                    </button>
-                    <h1 class="text-2xl font-black text-gray-800 tracking-wider uppercase flex items-center">
-                        WORKWEAR AND CORPORATE 
-                        <i class="fas fa-scissors ml-3 text-yellow-600"></i>
-                    </h1>
-                </div>
-                <div class="flex items-center space-x-4">
-                    <span class="text-sm font-semibold text-gray-600" id="currentDateDisplay"></span>
-                    <div class="h-8 w-8 rounded-full bg-yellow-500 flex items-center justify-center text-white font-bold">
-                        A
+            <div id="inventory" class="section-content">
+                <div class="flex justify-between items-center mb-6">
+                    <div>
+                        <h2 class="text-3xl font-bold text-gray-800">Inventario</h2>
+                        <p class="text-sm text-gray-500">Gestión de productos, tallas y stock.</p>
                     </div>
-                </div>
-            </header>
-
-            <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50 p-6" id="main-container">
-                
-                <div id="dashboard" class="section-content">
-                    <h2 class="text-2xl font-bold mb-6 text-gray-700">Resumen General</h2>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                        <div class="bg-white p-6 rounded-lg shadow border-l-4 border-blue-500">
-                            <div class="flex items-center">
-                                <div class="p-3 rounded-full bg-blue-100 text-blue-500 mr-4">
-                                    <i class="fas fa-clipboard-list text-xl"></i>
-                                </div>
-                                <div>
-                                    <p class="text-gray-500 text-sm">Total Órdenes</p>
-                                    <p class="text-2xl font-bold" id="total-orders-count">0</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="bg-white p-6 rounded-lg shadow border-l-4 border-green-500">
-                            <div class="flex items-center">
-                                <div class="p-3 rounded-full bg-green-100 text-green-500 mr-4">
-                                    <i class="fas fa-box-open text-xl"></i>
-                                </div>
-                                <div>
-                                    <p class="text-gray-500 text-sm">Items Inventario</p>
-                                    <p class="text-2xl font-bold" id="total-inventory-count">0</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="bg-white p-6 rounded-lg shadow border-l-4 border-yellow-500">
-                            <div class="flex items-center">
-                                <div class="p-3 rounded-full bg-yellow-100 text-yellow-600 mr-4">
-                                    <i class="fas fa-clock text-xl"></i>
-                                </div>
-                                <div>
-                                    <p class="text-gray-500 text-sm">Pendientes</p>
-                                    <p class="text-2xl font-bold">3</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="orders" class="section-content hidden">
-                    <div class="flex justify-between items-center mb-6">
-                        <h2 class="text-2xl font-bold text-gray-700">Órdenes de Compra</h2>
-                        <button onclick="openModal('orderModal')" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded shadow flex items-center">
-                            <i class="fas fa-plus mr-2"></i> Nueva OC
+                    <div class="space-x-2">
+                        <button onclick="confirmReset('inventory')" class="bg-red-100 text-red-600 px-3 py-2 rounded hover:bg-red-200 text-sm">
+                            <i class="fas fa-trash-alt mr-1"></i> Reset Inv.
                         </button>
-                    </div>
-
-                    <div class="bg-white rounded-lg shadow overflow-hidden">
-                        <table class="min-w-full leading-normal">
-                            <thead>
-                                <tr>
-                                    <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">ID OC</th>
-                                    <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Cliente</th>
-                                    <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Fecha</th>
-                                    <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Estado</th>
-                                    <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Acciones</th>
-                                </tr>
-                            </thead>
-                            <tbody id="orders-table-body">
-                                </tbody>
-                        </table>
-                        <div id="no-orders-msg" class="p-5 text-center text-gray-500 hidden">No hay órdenes registradas.</div>
-                    </div>
-                </div>
-
-                <div id="inventory" class="section-content hidden">
-                    <div class="flex justify-between items-center mb-6">
-                        <h2 class="text-2xl font-bold text-gray-700">Inventario de Productos</h2>
-                        <button onclick="openModal('inventoryModal')" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded shadow flex items-center">
+                        <button onclick="openProductModal()" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded shadow-lg flex items-center transition transform hover:scale-105">
                             <i class="fas fa-plus mr-2"></i> Nuevo Producto
                         </button>
                     </div>
+                </div>
 
-                    <div class="bg-white rounded-lg shadow overflow-hidden">
-                        <table class="min-w-full leading-normal">
-                            <thead>
-                                <tr>
-                                    <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">SKU</th>
-                                    <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Producto</th>
-                                    <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Categoría</th>
-                                    <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Stock</th>
-                                    <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Acciones</th>
-                                </tr>
-                            </thead>
-                            <tbody id="inventory-table-body">
-                                </tbody>
-                        </table>
-                        <div id="no-inventory-msg" class="p-5 text-center text-gray-500 hidden">Inventario vacío.</div>
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200">
+                    <table class="min-w-full leading-normal">
+                        <thead class="bg-gray-100 border-b border-gray-200">
+                            <tr>
+                                <th class="px-5 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">SKU</th>
+                                <th class="px-5 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Producto</th>
+                                <th class="px-5 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Categoría</th>
+                                <th class="px-5 py-3 text-center text-xs font-bold text-gray-600 uppercase tracking-wider">Distribución Tallas</th>
+                                <th class="px-5 py-3 text-right text-xs font-bold text-gray-600 uppercase tracking-wider">Total</th>
+                                <th class="px-5 py-3 text-center text-xs font-bold text-gray-600 uppercase tracking-wider">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="inventory-table-body">
+                            </tbody>
+                    </table>
+                    <div id="empty-inventory" class="p-10 text-center text-gray-400 hidden">
+                        <i class="fas fa-box-open text-4xl mb-3"></i>
+                        <p>No hay productos en inventario.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="orders" class="section-content hidden">
+                <div class="flex justify-between items-center mb-6">
+                    <div>
+                        <h2 class="text-3xl font-bold text-gray-800">Órdenes de Compra</h2>
+                        <p class="text-sm text-gray-500">Seguimiento de producción y despachos.</p>
+                    </div>
+                    <div class="space-x-2">
+                        <button onclick="confirmReset('orders')" class="bg-red-100 text-red-600 px-3 py-2 rounded hover:bg-red-200 text-sm">
+                            <i class="fas fa-trash-alt mr-1"></i> Reset OCs
+                        </button>
+                        <button onclick="openOrderModal()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded shadow-lg flex items-center transition transform hover:scale-105">
+                            <i class="fas fa-plus mr-2"></i> Nueva OC
+                        </button>
                     </div>
                 </div>
 
-                <div id="calendar" class="section-content hidden">
-                    <h2 class="text-2xl font-bold mb-6 text-gray-700">Agenda Mensual</h2>
-                    <div class="bg-white rounded-lg shadow p-4 max-w-4xl mx-auto">
-                        
-                        <div class="flex justify-between items-center mb-4">
-                            <button onclick="changeMonth(-1)" class="p-2 hover:bg-gray-200 rounded"><i class="fas fa-chevron-left"></i></button>
-                            <h3 id="calendar-month-year" class="text-xl font-bold uppercase">Enero 2026</h3>
-                            <button onclick="changeMonth(1)" class="p-2 hover:bg-gray-200 rounded"><i class="fas fa-chevron-right"></i></button>
-                        </div>
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200">
+                    <table class="min-w-full leading-normal">
+                        <thead class="bg-gray-100 border-b border-gray-200">
+                            <tr>
+                                <th class="px-5 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">ID OC</th>
+                                <th class="px-5 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Cliente</th>
+                                <th class="px-5 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Fecha / Entrega</th>
+                                <th class="px-5 py-3 text-center text-xs font-bold text-gray-600 uppercase tracking-wider">Estado</th>
+                                <th class="px-5 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Detalles Despacho</th>
+                                <th class="px-5 py-3 text-center text-xs font-bold text-gray-600 uppercase tracking-wider">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="orders-table-body">
+                            </tbody>
+                    </table>
+                    <div id="empty-orders" class="p-10 text-center text-gray-400 hidden">
+                        <i class="fas fa-clipboard-list text-4xl mb-3"></i>
+                        <p>No hay órdenes registradas.</p>
+                    </div>
+                </div>
+            </div>
 
-                        <div class="grid grid-cols-7 mb-2 text-center text-sm font-semibold text-gray-500">
-                            <div>DOM</div>
-                            <div>LUN</div>
-                            <div>MAR</div>
-                            <div>MIE</div>
-                            <div>JUE</div>
-                            <div>VIE</div>
-                            <div>SAB</div>
-                        </div>
+            <div id="calendar" class="section-content hidden">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-3xl font-bold text-gray-800">Calendario de Despachos</h2>
+                    <div class="flex items-center space-x-4">
+                        <button onclick="changeMonth(-1)" class="p-2 hover:bg-gray-200 rounded-full"><i class="fas fa-chevron-left"></i></button>
+                        <h3 id="calendar-header" class="text-xl font-bold uppercase w-48 text-center">Enero 2026</h3>
+                        <button onclick="changeMonth(1)" class="p-2 hover:bg-gray-200 rounded-full"><i class="fas fa-chevron-right"></i></button>
+                    </div>
+                </div>
 
-                        <div id="calendar-days-grid" class="calendar-grid">
+                <div class="grid grid-cols-7 text-center font-bold text-gray-500 bg-gray-200 py-2 rounded-t-lg">
+                    <div>DOM</div><div>LUN</div><div>MAR</div><div>MIE</div><div>JUE</div><div>VIE</div><div>SAB</div>
+                </div>
+                <div id="calendar-grid" class="calendar-grid bg-white shadow-lg rounded-b-lg border-l border-r border-b">
+                    </div>
+            </div>
+
+            <div id="analysis" class="section-content hidden">
+                <h2 class="text-3xl font-bold text-gray-800 mb-6 flex items-center">
+                    <i class="fas fa-robot text-blue-500 mr-3"></i> Detección y Análisis IA
+                </h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-white p-6 rounded-xl shadow-lg border-t-4 border-blue-500">
+                        <h3 class="font-bold text-lg mb-4 text-gray-700">Estado del Sistema</h3>
+                        <div id="ia-status-list" class="space-y-3">
+                            </div>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-xl shadow-lg border-t-4 border-red-500">
+                        <h3 class="font-bold text-lg mb-4 text-gray-700">Stock Crítico & Sugerencias</h3>
+                        <div id="ia-stock-list" class="space-y-3">
                             </div>
                     </div>
                 </div>
+            </div>
 
-            </main>
-        </div>
+        </main>
     </div>
 
-    <div id="orderModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
-        <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="text-lg font-bold text-gray-900">Nueva Orden de Compra</h3>
-                <button onclick="closeModal('orderModal')" class="text-gray-500 hover:text-red-500"><i class="fas fa-times"></i></button>
+    <div id="productModal" class="fixed inset-0 bg-gray-900 bg-opacity-60 hidden z-50 flex items-center justify-center backdrop-blur-sm">
+        <div class="bg-white rounded-lg shadow-2xl w-full max-w-lg p-6 transform transition-all scale-100">
+            <div class="flex justify-between items-center mb-4 border-b pb-2">
+                <h3 class="text-xl font-bold text-gray-800">Gestión de Producto</h3>
+                <button onclick="closeModal('productModal')" class="text-gray-400 hover:text-red-500"><i class="fas fa-times text-xl"></i></button>
             </div>
-            <form id="orderForm">
-                <div class="mb-4">
-                    <label class="block text-gray-700 text-sm font-bold mb-2">Cliente</label>
-                    <input type="text" id="orderClient" required class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="Ej: Minera Escondida">
+            <form id="productForm">
+                <div class="grid grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-1">SKU (Auto)</label>
+                        <input type="text" id="prodSku" readonly class="w-full bg-gray-100 border border-gray-300 rounded px-3 py-2 text-gray-600 font-mono">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-1">Categoría</label>
+                        <select id="prodCat" class="w-full border border-gray-300 rounded px-3 py-2">
+                            <option>Ropa Ignífuga</option><option>Corporativo</option><option>EPP</option><option>Calzado</option><option>Accesorios</option>
+                        </select>
+                    </div>
                 </div>
                 <div class="mb-4">
-                    <label class="block text-gray-700 text-sm font-bold mb-2">ID Orden</label>
-                    <input type="text" id="orderId" required class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="Ej: OC-2024-001">
+                    <label class="block text-sm font-bold text-gray-700 mb-1">Nombre Producto</label>
+                    <input type="text" id="prodName" required class="w-full border border-gray-300 rounded px-3 py-2 focus:ring-2 focus:ring-yellow-400 outline-none">
                 </div>
-                <div class="mb-4">
-                    <label class="block text-gray-700 text-sm font-bold mb-2">Fecha Entrega</label>
-                    <input type="date" id="orderDate" required class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                
+                <div class="mb-4 flex items-center">
+                    <input type="checkbox" id="hasSizes" class="mr-2 h-4 w-4" checked onchange="toggleSizeInputs()">
+                    <label for="hasSizes" class="text-sm font-semibold text-gray-700">Producto con Tallas (S, M, L...)</label>
                 </div>
-                <div class="flex justify-end">
-                    <button type="button" onclick="closeModal('orderModal')" class="bg-gray-400 text-white px-4 py-2 rounded mr-2 hover:bg-gray-500">Cancelar</button>
-                    <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Guardar OC</button>
+
+                <div id="sizeInputs" class="grid grid-cols-4 gap-2 mb-4 bg-gray-50 p-3 rounded border border-gray-200">
+                    <div><label class="text-xs font-bold text-center block">S</label><input type="number" id="stockS" value="0" class="w-full border rounded px-1 py-1 text-center"></div>
+                    <div><label class="text-xs font-bold text-center block">M</label><input type="number" id="stockM" value="0" class="w-full border rounded px-1 py-1 text-center"></div>
+                    <div><label class="text-xs font-bold text-center block">L</label><input type="number" id="stockL" value="0" class="w-full border rounded px-1 py-1 text-center"></div>
+                    <div><label class="text-xs font-bold text-center block">XL</label><input type="number" id="stockXL" value="0" class="w-full border rounded px-1 py-1 text-center"></div>
+                    <div><label class="text-xs font-bold text-center block">XXL</label><input type="number" id="stockXXL" value="0" class="w-full border rounded px-1 py-1 text-center"></div>
+                </div>
+                <div id="singleStockInput" class="mb-4 hidden">
+                    <label class="block text-sm font-bold text-gray-700 mb-1">Stock Total</label>
+                    <input type="number" id="stockUnique" value="0" class="w-full border border-gray-300 rounded px-3 py-2">
+                </div>
+
+                <div class="flex justify-end pt-4 border-t">
+                    <button type="button" onclick="closeModal('productModal')" class="mr-3 px-4 py-2 text-gray-600 hover:bg-gray-100 rounded">Cancelar</button>
+                    <button type="submit" class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded font-bold shadow">Guardar</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <div id="inventoryModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
-        <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="text-lg font-bold text-gray-900">Nuevo Producto</h3>
-                <button onclick="closeModal('inventoryModal')" class="text-gray-500 hover:text-red-500"><i class="fas fa-times"></i></button>
+    <div id="orderModal" class="fixed inset-0 bg-gray-900 bg-opacity-60 hidden z-50 flex items-center justify-center backdrop-blur-sm">
+        <div class="bg-white rounded-lg shadow-2xl w-full max-w-4xl p-6 h-5/6 flex flex-col">
+            <div class="flex justify-between items-center mb-4 border-b pb-2">
+                <h3 class="text-xl font-bold text-gray-800">Nueva Orden de Compra</h3>
+                <button onclick="closeModal('orderModal')" class="text-gray-400 hover:text-red-500"><i class="fas fa-times text-xl"></i></button>
             </div>
-            <form id="inventoryForm">
-                <div class="mb-4">
-                    <label class="block text-gray-700 text-sm font-bold mb-2">SKU / Código</label>
-                    <input type="text" id="prodSku" required class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+            
+            <div class="flex-1 overflow-y-auto">
+                <form id="orderForm">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 bg-gray-50 p-4 rounded border">
+                        <div>
+                            <label class="block text-xs font-bold text-gray-600 uppercase">ID Orden</label>
+                            <input type="text" id="orderId" required class="w-full bg-white border rounded px-3 py-2 font-mono">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-600 uppercase">Cliente</label>
+                            <input type="text" id="orderClient" required class="w-full bg-white border rounded px-3 py-2">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-600 uppercase">Fecha Entrega</label>
+                            <input type="date" id="orderDate" required class="w-full bg-white border rounded px-3 py-2">
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <h4 class="font-bold text-gray-700 mb-2 border-b">Agregar Productos a la Orden</h4>
+                        <div class="flex gap-2 mb-2">
+                            <select id="orderProductSelect" class="flex-1 border rounded px-2 py-2" onchange="updateOrderSizeInputs()">
+                                <option value="">Seleccione un producto del Inventario...</option>
+                                </select>
+                            <button type="button" onclick="addProductToOrder()" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"><i class="fas fa-plus"></i></button>
+                        </div>
+                        <div id="orderSizeInputs" class="flex gap-2 items-end hidden bg-blue-50 p-2 rounded mb-2">
+                            </div>
+                    </div>
+
+                    <div class="bg-white border rounded shadow-inner min-h-[150px] overflow-hidden">
+                        <table class="min-w-full text-sm">
+                            <thead class="bg-gray-100">
+                                <tr>
+                                    <th class="px-4 py-2 text-left">Producto</th>
+                                    <th class="px-4 py-2 text-center">Detalle Cantidades</th>
+                                    <th class="px-4 py-2 text-right">Total</th>
+                                    <th class="px-4 py-2"></th>
+                                </tr>
+                            </thead>
+                            <tbody id="orderItemsList">
+                                </tbody>
+                        </table>
+                        <div id="no-order-items" class="text-center p-4 text-gray-400 text-sm">Sin productos agregados.</div>
+                    </div>
+                </form>
+            </div>
+
+            <div class="pt-4 border-t flex justify-between items-center">
+                <span class="text-xs text-gray-500">* Recuerda verificar el stock antes de guardar.</span>
+                <div class="flex">
+                    <button type="button" onclick="closeModal('orderModal')" class="mr-3 px-4 py-2 text-gray-600 hover:bg-gray-100 rounded">Cancelar</button>
+                    <button type="button" onclick="saveOrder()" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded font-bold shadow">Guardar Orden</button>
                 </div>
-                <div class="mb-4">
-                    <label class="block text-gray-700 text-sm font-bold mb-2">Nombre Producto</label>
-                    <input type="text" id="prodName" required class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-                </div>
-                <div class="mb-4">
-                    <label class="block text-gray-700 text-sm font-bold mb-2">Categoría</label>
-                    <select id="prodCat" class="shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-                        <option>Ropa Ignífuga</option>
-                        <option>Corporativo</option>
-                        <option>EPP</option>
-                        <option>Calzado</option>
-                    </select>
-                </div>
-                <div class="mb-4">
-                    <label class="block text-gray-700 text-sm font-bold mb-2">Stock Inicial</label>
-                    <input type="number" id="prodStock" required class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-                </div>
-                <div class="flex justify-end">
-                    <button type="button" onclick="closeModal('inventoryModal')" class="bg-gray-400 text-white px-4 py-2 rounded mr-2 hover:bg-gray-500">Cancelar</button>
-                    <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">Guardar Item</button>
-                </div>
-            </form>
+            </div>
         </div>
     </div>
+
+    <div id="dispatchModal" class="fixed inset-0 bg-black bg-opacity-70 hidden z-[60] flex items-center justify-center">
+        <div class="bg-white rounded-lg shadow-2xl w-96 p-6 border-l-4 border-green-600">
+            <h3 class="text-xl font-bold text-gray-800 mb-2">Confirmar Despacho</h3>
+            <p class="text-sm text-gray-600 mb-4">Para marcar como "Despachado", es obligatorio ingresar los datos de facturación.</p>
+            
+            <div class="mb-3">
+                <label class="block text-sm font-bold text-gray-700">Nro. Factura</label>
+                <input type="text" id="dispatchInvoice" class="w-full border-2 border-green-100 rounded px-3 py-2 focus:border-green-500 outline-none">
+            </div>
+            <div class="mb-4">
+                <label class="block text-sm font-bold text-gray-700">Cantidad de Cajas</label>
+                <input type="number" id="dispatchBoxes" class="w-full border-2 border-green-100 rounded px-3 py-2 focus:border-green-500 outline-none">
+            </div>
+            
+            <div class="flex justify-end">
+                <button onclick="closeModal('dispatchModal')" class="mr-2 text-gray-500 hover:text-gray-700 px-3 py-1">Cancelar</button>
+                <button onclick="confirmDispatch()" class="bg-green-600 text-white font-bold px-4 py-2 rounded hover:bg-green-700 shadow">Confirmar y Despachar</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="noteModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center">
+        <div class="bg-white p-4 rounded shadow-lg w-80">
+            <h3 class="font-bold mb-2">Nota para el día</h3>
+            <textarea id="calendarNoteText" class="w-full border rounded p-2 mb-2" rows="3"></textarea>
+            <div class="flex justify-end">
+                <button onclick="saveCalendarNote()" class="bg-blue-600 text-white px-3 py-1 rounded">Guardar</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="print-area" class="print-only p-8">
+        </div>
 
     <script>
-        // --- BASE DE DATOS LOCAL (Arrays) ---
-        let orders = JSON.parse(localStorage.getItem('ordersData')) || [];
-        let inventory = JSON.parse(localStorage.getItem('inventoryData')) || [];
-
-        // --- INICIALIZACIÓN ---
-        document.addEventListener('DOMContentLoaded', () => {
-            renderOrders();
-            renderInventory();
-            updateDashboard();
-            renderCalendar(); // Inicializar calendario
-            
-            // Fecha actual en header
-            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-            document.getElementById('currentDateDisplay').textContent = new Date().toLocaleDateString('es-ES', options);
-        });
-
-        // --- NAVEGACIÓN ---
-        function showSection(sectionId) {
-            // Ocultar todas las secciones
-            document.querySelectorAll('.section-content').forEach(el => el.classList.add('hidden'));
-            // Mostrar la seleccionada
-            document.getElementById(sectionId).classList.remove('hidden');
-            
-            // Actualizar estilo activo del sidebar
-            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('bg-gray-800'));
-            // (Lógica simple de highlight, se puede mejorar buscando el elemento clickeado)
-        }
-
-        // --- MODALES ---
-        function openModal(modalId) {
-            document.getElementById(modalId).classList.remove('hidden');
-        }
-        function closeModal(modalId) {
-            document.getElementById(modalId).classList.add('hidden');
-        }
-
-        // --- LÓGICA DE ÓRDENES (OC) ---
-        const orderForm = document.getElementById('orderForm');
+        // --- 1. GESTIÓN DE DATOS (LOCALSTORAGE) ---
+        let inventory = JSON.parse(localStorage.getItem('ww_inventory')) || [];
+        let orders = JSON.parse(localStorage.getItem('ww_orders')) || [];
+        let calendarNotes = JSON.parse(localStorage.getItem('ww_notes')) || {};
         
-        orderForm.addEventListener('submit', function(e) {
-            // PIENSA: Evitar recarga
-            e.preventDefault(); 
+        // Variables Temporales
+        let tempOrderItems = []; 
+        let currentDispatchOrderId = null;
+        let currentDate = new Date();
+        let currentNoteDate = null;
 
-            // Obtener valores
-            const client = document.getElementById('orderClient').value;
-            const id = document.getElementById('orderId').value;
-            const date = document.getElementById('orderDate').value;
-
-            // Crear objeto
-            const newOrder = {
-                id: id,
-                client: client,
-                date: date,
-                status: 'Pendiente'
-            };
-
-            // Guardar en Array
-            orders.push(newOrder);
-            
-            // Guardar en LocalStorage
-            localStorage.setItem('ordersData', JSON.stringify(orders));
-
-            // PIENSA: Actualizar la vista INMEDIATAMENTE
-            renderOrders();
-            updateDashboard();
-
-            // Limpiar y cerrar
-            orderForm.reset();
-            closeModal('orderModal');
-            
-            // Feedback
-            alert('OC Guardada Correctamente');
+        // --- 2. INICIALIZACIÓN ---
+        document.addEventListener('DOMContentLoaded', () => {
+            showSection('inventory'); // Inventario por defecto
+            renderInventory();
+            updateOrderProductSelect();
+            updateAnalysis();
         });
 
-        function renderOrders() {
-            const tbody = document.getElementById('orders-table-body');
-            const noDataMsg = document.getElementById('no-orders-msg');
+        function showSection(id) {
+            document.querySelectorAll('.section-content').forEach(el => el.classList.add('hidden'));
+            document.getElementById(id).classList.remove('hidden');
             
-            tbody.innerHTML = ''; // Limpiar tabla antes de pintar
-
-            if (orders.length === 0) {
-                noDataMsg.classList.remove('hidden');
-                return;
-            } else {
-                noDataMsg.classList.add('hidden');
-            }
-
-            orders.forEach((order, index) => {
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm font-bold text-gray-900">${order.id}</td>
-                    <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm text-gray-900">${order.client}</td>
-                    <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm text-gray-900">${order.date}</td>
-                    <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                        <span class="relative inline-block px-3 py-1 font-semibold text-orange-900 leading-tight">
-                            <span aria-hidden class="absolute inset-0 bg-orange-200 opacity-50 rounded-full"></span>
-                            <span class="relative">${order.status}</span>
-                        </span>
-                    </td>
-                    <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                        <button onclick="deleteOrder(${index})" class="text-red-600 hover:text-red-900"><i class="fas fa-trash"></i></button>
-                    </td>
-                `;
-                tbody.appendChild(tr);
+            // Renderizados específicos al entrar
+            if(id === 'orders') renderOrders();
+            if(id === 'calendar') renderCalendar();
+            if(id === 'analysis') updateAnalysis();
+            
+            // Actualizar Nav Activo
+            document.querySelectorAll('.nav-item').forEach(btn => {
+                btn.classList.remove('bg-gray-800', 'text-yellow-500');
+                if(btn.getAttribute('onclick').includes(id)) {
+                    btn.classList.add('bg-gray-800', 'text-yellow-500');
+                }
             });
         }
 
-        function deleteOrder(index) {
-            if(confirm('¿Eliminar esta orden?')) {
-                orders.splice(index, 1);
-                localStorage.setItem('ordersData', JSON.stringify(orders));
-                renderOrders();
-                updateDashboard();
+        // --- 3. LÓGICA DE INVENTARIO ---
+        function openProductModal() {
+            document.getElementById('productForm').reset();
+            // Generar SKU Automático: WW + (Total + 1) formateado a 4 dígitos
+            let nextId = inventory.length + 1;
+            document.getElementById('prodSku').value = `WW-${String(nextId).padStart(4, '0')}`;
+            toggleSizeInputs();
+            document.getElementById('productModal').classList.remove('hidden');
+        }
+
+        function toggleSizeInputs() {
+            const hasSizes = document.getElementById('hasSizes').checked;
+            if(hasSizes) {
+                document.getElementById('sizeInputs').classList.remove('hidden');
+                document.getElementById('sizeInputs').classList.add('grid');
+                document.getElementById('singleStockInput').classList.add('hidden');
+            } else {
+                document.getElementById('sizeInputs').classList.add('hidden');
+                document.getElementById('sizeInputs').classList.remove('grid');
+                document.getElementById('singleStockInput').classList.remove('hidden');
             }
         }
 
-        // --- LÓGICA DE INVENTARIO ---
-        const inventoryForm = document.getElementById('inventoryForm');
-
-        inventoryForm.addEventListener('submit', function(e) {
-            e.preventDefault(); // PIENSA: Importante
-
+        document.getElementById('productForm').addEventListener('submit', (e) => {
+            e.preventDefault();
             const sku = document.getElementById('prodSku').value;
             const name = document.getElementById('prodName').value;
             const cat = document.getElementById('prodCat').value;
-            const stock = document.getElementById('prodStock').value;
+            const hasSizes = document.getElementById('hasSizes').checked;
+            
+            let stockData = {};
+            let total = 0;
 
-            const newItem = { sku, name, cat, stock };
+            if(hasSizes) {
+                stockData = {
+                    S: parseInt(document.getElementById('stockS').value) || 0,
+                    M: parseInt(document.getElementById('stockM').value) || 0,
+                    L: parseInt(document.getElementById('stockL').value) || 0,
+                    XL: parseInt(document.getElementById('stockXL').value) || 0,
+                    XXL: parseInt(document.getElementById('stockXXL').value) || 0
+                };
+                total = Object.values(stockData).reduce((a, b) => a + b, 0);
+            } else {
+                total = parseInt(document.getElementById('stockUnique').value) || 0;
+                stockData = { unique: total };
+            }
 
-            inventory.push(newItem);
-            localStorage.setItem('inventoryData', JSON.stringify(inventory));
-
-            renderInventory(); // PIENSA: Repintar
-            updateDashboard();
-
-            inventoryForm.reset();
-            closeModal('inventoryModal');
-            alert('Producto Agregado');
+            inventory.push({ sku, name, cat, hasSizes, stockData, total });
+            localStorage.setItem('ww_inventory', JSON.stringify(inventory));
+            
+            renderInventory();
+            closeModal('productModal');
+            alert('Producto guardado correctamente');
         });
 
         function renderInventory() {
             const tbody = document.getElementById('inventory-table-body');
-            const noDataMsg = document.getElementById('no-inventory-msg');
-            
             tbody.innerHTML = '';
-
-            if (inventory.length === 0) {
-                noDataMsg.classList.remove('hidden');
-                return;
+            
+            if(inventory.length === 0) {
+                document.getElementById('empty-inventory').classList.remove('hidden');
             } else {
-                noDataMsg.classList.add('hidden');
-            }
+                document.getElementById('empty-inventory').classList.add('hidden');
+                inventory.forEach((item, index) => {
+                    let sizeStr = '';
+                    if(item.hasSizes) {
+                        // Mostrar resumen de tallas
+                        sizeStr = `<div class="flex justify-center gap-1 text-xs">
+                            <span class="bg-gray-100 px-1 rounded">S:${item.stockData.S}</span>
+                            <span class="bg-gray-100 px-1 rounded">M:${item.stockData.M}</span>
+                            <span class="bg-gray-100 px-1 rounded">L:${item.stockData.L}</span>
+                            <span class="bg-gray-100 px-1 rounded">XL:${item.stockData.XL}</span>
+                        </div>`;
+                    } else {
+                        sizeStr = '<span class="text-gray-400 text-xs">Sin Talla</span>';
+                    }
 
-            inventory.forEach((item, index) => {
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm font-mono text-gray-600">${item.sku}</td>
-                    <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm font-bold text-gray-800">${item.name}</td>
-                    <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm text-gray-600">${item.cat}</td>
-                    <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm font-bold text-green-600">${item.stock} u.</td>
-                    <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                        <button onclick="deleteInventory(${index})" class="text-red-600 hover:text-red-900"><i class="fas fa-trash"></i></button>
-                    </td>
-                `;
-                tbody.appendChild(tr);
+                    const tr = document.createElement('tr');
+                    tr.className = "hover:bg-gray-50 border-b border-gray-100";
+                    tr.innerHTML = `
+                        <td class="px-5 py-3 text-sm font-mono text-gray-600">${item.sku}</td>
+                        <td class="px-5 py-3 text-sm font-bold text-gray-800">${item.name}</td>
+                        <td class="px-5 py-3 text-sm text-gray-600">${item.cat}</td>
+                        <td class="px-5 py-3">${sizeStr}</td>
+                        <td class="px-5 py-3 text-sm font-bold text-right ${item.total < 10 ? 'text-red-600' : 'text-green-600'}">${item.total}</td>
+                        <td class="px-5 py-3 text-center">
+                            <button onclick="deleteItem(${index})" class="text-red-500 hover:text-red-700 transition"><i class="fas fa-trash"></i></button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            }
+            updateOrderProductSelect();
+        }
+
+        function deleteItem(index) {
+            if(confirm('¿Eliminar producto? Esta acción no se puede deshacer.')) {
+                inventory.splice(index, 1);
+                localStorage.setItem('ww_inventory', JSON.stringify(inventory));
+                renderInventory();
+            }
+        }
+
+        // --- 4. LÓGICA DE ÓRDENES (COMPLEJA) ---
+        
+        function openOrderModal() {
+            document.getElementById('orderForm').reset();
+            tempOrderItems = [];
+            renderTempOrderItems();
+            document.getElementById('orderModal').classList.remove('hidden');
+        }
+
+        function updateOrderProductSelect() {
+            const select = document.getElementById('orderProductSelect');
+            select.innerHTML = '<option value="">Seleccione Producto...</option>';
+            inventory.forEach((p, idx) => {
+                const opt = document.createElement('option');
+                opt.value = idx;
+                opt.text = `${p.sku} - ${p.name} (Stock: ${p.total})`;
+                select.appendChild(opt);
             });
         }
 
-        function deleteInventory(index) {
-            inventory.splice(index, 1);
-            localStorage.setItem('inventoryData', JSON.stringify(inventory));
-            renderInventory();
-            updateDashboard();
+        function updateOrderSizeInputs() {
+            const idx = document.getElementById('orderProductSelect').value;
+            const container = document.getElementById('orderSizeInputs');
+            container.innerHTML = '';
+            
+            if(idx === "") {
+                container.classList.add('hidden');
+                return;
+            }
+            
+            const product = inventory[idx];
+            container.classList.remove('hidden');
+            
+            if(product.hasSizes) {
+                ['S','M','L','XL','XXL'].forEach(size => {
+                    container.innerHTML += `
+                        <div class="flex flex-col">
+                            <span class="text-[10px] text-center font-bold">${size}</span>
+                            <input type="number" id="addOrder_${size}" placeholder="0" class="w-12 text-center border rounded text-sm">
+                        </div>`;
+                });
+            } else {
+                 container.innerHTML += `
+                    <div class="flex flex-col flex-1">
+                        <span class="text-[10px] font-bold">Cantidad</span>
+                        <input type="number" id="addOrder_Unique" placeholder="0" class="w-full text-center border rounded text-sm">
+                    </div>`;
+            }
         }
 
-        // --- DASHBOARD ---
-        function updateDashboard() {
-            document.getElementById('total-orders-count').innerText = orders.length;
-            document.getElementById('total-inventory-count').innerText = inventory.length;
+        function addProductToOrder() {
+            const idx = document.getElementById('orderProductSelect').value;
+            if(idx === "") return;
+            
+            const product = inventory[idx];
+            let itemEntry = {
+                sku: product.sku,
+                name: product.name,
+                hasSizes: product.hasSizes,
+                quantities: {},
+                totalItem: 0
+            };
+
+            if(product.hasSizes) {
+                let s = parseInt(document.getElementById('addOrder_S').value) || 0;
+                let m = parseInt(document.getElementById('addOrder_M').value) || 0;
+                let l = parseInt(document.getElementById('addOrder_L').value) || 0;
+                let xl = parseInt(document.getElementById('addOrder_XL').value) || 0;
+                let xxl = parseInt(document.getElementById('addOrder_XXL').value) || 0;
+                itemEntry.quantities = { S:s, M:m, L:l, XL:xl, XXL:xxl };
+                itemEntry.totalItem = s+m+l+xl+xxl;
+            } else {
+                let q = parseInt(document.getElementById('addOrder_Unique').value) || 0;
+                itemEntry.quantities = { unique: q };
+                itemEntry.totalItem = q;
+            }
+
+            if(itemEntry.totalItem > 0) {
+                tempOrderItems.push(itemEntry);
+                renderTempOrderItems();
+                // Limpiar inputs
+                document.querySelectorAll('#orderSizeInputs input').forEach(i => i.value = '');
+            }
         }
 
-        // --- CALENDARIO TIPO CELULAR (GRID COMPLETO) ---
-        let currDate = new Date();
-        
+        function renderTempOrderItems() {
+            const tbody = document.getElementById('orderItemsList');
+            tbody.innerHTML = '';
+            
+            if(tempOrderItems.length === 0) {
+                document.getElementById('no-order-items').classList.remove('hidden');
+            } else {
+                document.getElementById('no-order-items').classList.add('hidden');
+                tempOrderItems.forEach((item, idx) => {
+                    let detail = '';
+                    if(item.hasSizes) {
+                        for(let [size, cant] of Object.entries(item.quantities)) {
+                            if(cant > 0) detail += `<span class="mr-2 text-xs bg-gray-200 px-1 rounded">${size}:${cant}</span>`;
+                        }
+                    } else {
+                        detail = `${item.quantities.unique} Unidades`;
+                    }
+
+                    tbody.innerHTML += `
+                        <tr class="border-b">
+                            <td class="px-4 py-2 font-bold text-gray-700">${item.name}</td>
+                            <td class="px-4 py-2 text-center text-gray-600">${detail}</td>
+                            <td class="px-4 py-2 text-right font-bold">${item.totalItem}</td>
+                            <td class="px-4 py-2 text-right">
+                                <button onclick="tempOrderItems.splice(${idx},1); renderTempOrderItems()" class="text-red-500"><i class="fas fa-times"></i></button>
+                            </td>
+                        </tr>
+                    `;
+                });
+            }
+        }
+
+        function saveOrder() {
+            const id = document.getElementById('orderId').value;
+            const client = document.getElementById('orderClient').value;
+            const date = document.getElementById('orderDate').value;
+            
+            if(!id || !client || !date || tempOrderItems.length === 0) {
+                alert('Por favor complete todos los datos y agregue productos.');
+                return;
+            }
+
+            orders.push({
+                id, client, date,
+                items: tempOrderItems,
+                status: 'Pendiente',
+                invoice: '',
+                boxes: ''
+            });
+
+            localStorage.setItem('ww_orders', JSON.stringify(orders));
+            closeModal('orderModal');
+            renderOrders();
+        }
+
+        function renderOrders() {
+            const tbody = document.getElementById('orders-table-body');
+            tbody.innerHTML = '';
+            
+            if(orders.length === 0) {
+                document.getElementById('empty-orders').classList.remove('hidden');
+            } else {
+                document.getElementById('empty-orders').classList.add('hidden');
+                orders.forEach((o, idx) => {
+                    // Colores de estado
+                    let statusColor = "bg-gray-200 text-gray-800";
+                    if(o.status === 'En Producción') statusColor = "bg-blue-100 text-blue-800";
+                    if(o.status === 'Listo') statusColor = "bg-green-100 text-green-800";
+                    if(o.status === 'Despachado') statusColor = "bg-green-600 text-white";
+
+                    // Resumen items
+                    let itemsSummary = o.items.map(i => `${i.name} (${i.totalItem})`).join(', ');
+                    if(itemsSummary.length > 30) itemsSummary = itemsSummary.substring(0,30) + '...';
+
+                    // Info despacho
+                    let dispatchInfo = o.status === 'Despachado' 
+                        ? `<div class="text-xs">
+                             <p class="font-bold">FAC: ${o.invoice}</p>
+                             <p>Cajas: ${o.boxes}</p>
+                           </div>` 
+                        : '<span class="text-gray-400 text-xs">-</span>';
+
+                    const tr = document.createElement('tr');
+                    tr.className = "hover:bg-gray-50 border-b";
+                    tr.innerHTML = `
+                        <td class="px-5 py-3 font-bold">${o.id}</td>
+                        <td class="px-5 py-3">${o.client}</td>
+                        <td class="px-5 py-3 text-sm">${o.date}</td>
+                        <td class="px-5 py-3 text-center">
+                            <button onclick="cycleStatus(${idx})" class="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide cursor-pointer ${statusColor} shadow-sm transition hover:opacity-80">
+                                ${o.status}
+                            </button>
+                        </td>
+                        <td class="px-5 py-3">${dispatchInfo}</td>
+                        <td class="px-5 py-3 text-center flex justify-center space-x-2">
+                             <button onclick="printTachas(${idx})" class="text-gray-600 hover:text-black" title="Imprimir Tachas"><i class="fas fa-print"></i></button>
+                             <button onclick="deleteOrder(${idx})" class="text-red-500 hover:text-red-700" title="Eliminar"><i class="fas fa-trash"></i></button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            }
+        }
+
+        function cycleStatus(index) {
+            const states = ['Pendiente', 'En Producción', 'Listo', 'Despachado'];
+            const current = orders[index].status;
+            let nextIndex = states.indexOf(current) + 1;
+            
+            // Si va a pasar a Despachado, interceptar
+            if (states[nextIndex] === 'Despachado') {
+                currentDispatchOrderId = index;
+                document.getElementById('dispatchModal').classList.remove('hidden');
+                return; 
+            }
+            
+            if (nextIndex >= states.length) nextIndex = 0; // Loop (opcional)
+            
+            orders[index].status = states[nextIndex];
+            localStorage.setItem('ww_orders', JSON.stringify(orders));
+            renderOrders();
+            updateAnalysis();
+        }
+
+        function confirmDispatch() {
+            const inv = document.getElementById('dispatchInvoice').value;
+            const boxes = document.getElementById('dispatchBoxes').value;
+            
+            if(!inv || !boxes) {
+                alert("La factura y las cajas son obligatorias para despachar.");
+                return;
+            }
+            
+            orders[currentDispatchOrderId].status = 'Despachado';
+            orders[currentDispatchOrderId].invoice = inv;
+            orders[currentDispatchOrderId].boxes = boxes;
+            
+            localStorage.setItem('ww_orders', JSON.stringify(orders));
+            document.getElementById('dispatchModal').classList.add('hidden');
+            document.getElementById('dispatchInvoice').value = '';
+            document.getElementById('dispatchBoxes').value = '';
+            
+            renderOrders();
+            updateAnalysis();
+        }
+
+        // --- 5. CALENDARIO ---
         function renderCalendar() {
-            const monthYear = document.getElementById('calendar-month-year');
-            const daysGrid = document.getElementById('calendar-days-grid');
+            const grid = document.getElementById('calendar-grid');
+            const header = document.getElementById('calendar-header');
+            grid.innerHTML = '';
             
-            // Limpiar grid anterior
-            daysGrid.innerHTML = '';
-            
-            const year = currDate.getFullYear();
-            const month = currDate.getMonth();
-            
-            // Nombres de meses
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth();
             const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
             
-            monthYear.innerText = `${monthNames[month]} ${year}`;
+            header.innerText = `${monthNames[month]} ${year}`;
             
-            // Primer día del mes (para saber dónde empezar a pintar)
-            const firstDayIndex = new Date(year, month, 1).getDay(); // 0 = Domingo
-            
-            // Total días en el mes actual
+            const firstDay = new Date(year, month, 1).getDay();
             const daysInMonth = new Date(year, month + 1, 0).getDate();
             
-            // Total días mes anterior (para rellenar huecos)
-            const prevLastDay = new Date(year, month, 0).getDate();
-            
-            // FECHA DE HOY REAL (para marcar el círculo azul)
-            const todayReal = new Date();
-
-            // 1. Rellenar días vacíos del mes anterior (Grises)
-            for (let x = firstDayIndex; x > 0; x--) {
-                const dayDiv = document.createElement('div');
-                dayDiv.className = 'calendar-day text-gray-300 bg-gray-50';
-                dayDiv.innerText = prevLastDay - x + 1;
-                daysGrid.appendChild(dayDiv);
+            // Días vacíos previos
+            for(let i=0; i<firstDay; i++) {
+                grid.innerHTML += `<div class="bg-gray-100"></div>`;
             }
             
-            // 2. Rellenar días del mes actual
-            for (let i = 1; i <= daysInMonth; i++) {
-                const dayDiv = document.createElement('div');
-                dayDiv.className = 'calendar-day bg-white hover:bg-blue-50 cursor-pointer';
+            // Días reales
+            for(let day=1; day<=daysInMonth; day++) {
+                const dateKey = `${year}-${String(month+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
                 
-                // Verificar si es HOY
-                if (i === todayReal.getDate() && month === todayReal.getMonth() && year === todayReal.getFullYear()) {
-                    dayDiv.innerHTML = `<div class="today">${i}</div>`;
-                } else {
-                    dayDiv.innerText = i;
-                }
-                
-                // Verificar si hay una OC ese día (Pequeño punto indicador)
-                // Formato fecha input: YYYY-MM-DD
-                const checkDateStr = `${year}-${String(month+1).padStart(2,'0')}-${String(i).padStart(2,'0')}`;
-                const hasOrder = orders.some(o => o.date === checkDateStr);
-                
-                if (hasOrder) {
-                    const dot = document.createElement('div');
-                    dot.className = 'absolute bottom-1 right-1 w-2 h-2 bg-yellow-500 rounded-full';
-                    dayDiv.appendChild(dot);
+                // Buscar eventos (Despachos)
+                let eventsHtml = '';
+                orders.filter(o => o.status === 'Despachado').forEach(o => {
+                    // Aquí asumo que la fecha de la OC es la de entrega/despacho.
+                    if(o.date === dateKey) {
+                        eventsHtml += `<div class="bg-green-100 text-green-800 text-[10px] p-1 mb-1 rounded border border-green-200 truncate" title="Fac: ${o.invoice}">
+                            <i class="fas fa-truck"></i> ${o.client} (${o.invoice})
+                        </div>`;
+                    }
+                });
+
+                // Notas manuales
+                if(calendarNotes[dateKey]) {
+                    eventsHtml += `<div class="bg-yellow-100 text-yellow-800 text-[10px] p-1 rounded border border-yellow-200 truncate">
+                        <i class="fas fa-sticky-note"></i> ${calendarNotes[dateKey]}
+                    </div>`;
                 }
 
-                daysGrid.appendChild(dayDiv);
-            }
-            
-            // 3. Rellenar huecos finales (opcional, para cuadrar la grilla visualmente)
-            const totalSlots = daysGrid.children.length;
-            const nextDays = 42 - totalSlots; // 6 filas de 7 = 42
-            
-            for (let j = 1; j <= nextDays; j++) {
-                const dayDiv = document.createElement('div');
-                dayDiv.className = 'calendar-day text-gray-300 bg-gray-50';
-                dayDiv.innerText = j;
-                daysGrid.appendChild(dayDiv);
+                const dayEl = document.createElement('div');
+                dayEl.className = 'calendar-day relative group';
+                dayEl.innerHTML = `
+                    <div class="flex justify-between items-start">
+                        <span class="font-bold text-gray-700 ml-1 mt-1 ${day === new Date().getDate() && month === new Date().getMonth() ? 'bg-blue-500 text-white rounded-full w-6 h-6 flex items-center justify-center' : ''}">${day}</span>
+                        <button onclick="openNoteModal('${dateKey}')" class="opacity-0 group-hover:opacity-100 text-gray-400 hover:text-blue-500 mr-1 mt-1"><i class="fas fa-edit"></i></button>
+                    </div>
+                    <div class="flex-1 overflow-y-auto mt-1 px-1">
+                        ${eventsHtml}
+                    </div>
+                `;
+                grid.appendChild(dayEl);
             }
         }
 
-        function changeMonth(dir) {
-            currDate.setMonth(currDate.getMonth() + dir);
+        function changeMonth(delta) {
+            currentDate.setMonth(currentDate.getMonth() + delta);
             renderCalendar();
+        }
+        
+        function openNoteModal(dateKey) {
+            currentNoteDate = dateKey;
+            document.getElementById('calendarNoteText').value = calendarNotes[dateKey] || '';
+            document.getElementById('noteModal').classList.remove('hidden');
+        }
+
+        function saveCalendarNote() {
+            const txt = document.getElementById('calendarNoteText').value;
+            if(txt.trim()) {
+                calendarNotes[currentNoteDate] = txt;
+            } else {
+                delete calendarNotes[currentNoteDate];
+            }
+            localStorage.setItem('ww_notes', JSON.stringify(calendarNotes));
+            document.getElementById('noteModal').classList.add('hidden');
+            renderCalendar();
+        }
+
+        // --- 6. IMPRESIÓN (PDF / TACHAS MULTIPLES) ---
+        function printTachas(orderIdx) {
+            const order = orders[orderIdx];
+            const area = document.getElementById('print-area');
+            
+            // Generar Grid de 2x2 para tachas (o lista vertical si son muchas)
+            let html = `<div class="grid grid-cols-2 gap-8 w-full h-full">`;
+            
+            // Generamos una "Tacha" por cada producto de la orden
+            order.items.forEach(item => {
+                // Tabla de tallas para la tacha
+                let tallasHtml = '';
+                if(item.hasSizes) {
+                    tallasHtml = `
+                    <table class="w-full text-xs border mt-2 text-center">
+                        <tr class="bg-gray-100 font-bold"><td>S</td><td>M</td><td>L</td><td>XL</td><td>XXL</td></tr>
+                        <tr>
+                            <td class="border p-1">${item.quantities.S}</td>
+                            <td class="border p-1">${item.quantities.M}</td>
+                            <td class="border p-1">${item.quantities.L}</td>
+                            <td class="border p-1">${item.quantities.XL}</td>
+                            <td class="border p-1">${item.quantities.XXL}</td>
+                        </tr>
+                    </table>`;
+                } else {
+                    tallasHtml = `<div class="mt-2 font-bold text-center border p-2">CANTIDAD ÚNICA: ${item.quantities.unique}</div>`;
+                }
+
+                html += `
+                <div class="border-4 border-gray-800 p-4 relative bg-white flex flex-col justify-between" style="min-height: 400px;">
+                    <div class="flex justify-between items-center border-b-2 border-gray-800 pb-2 mb-2">
+                        <div>
+                            <h1 class="font-black text-xl uppercase">Workwear & Corp <i class="fas fa-scissors"></i></h1>
+                            <p class="text-xs">Hoja de Control de Producción</p>
+                        </div>
+                        <div class="text-right">
+                            <p class="font-bold text-lg">OC: ${order.id}</p>
+                            <p class="text-sm">${order.client}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <p class="font-bold text-lg">${item.name}</p>
+                        <p class="text-xs font-mono">SKU: ${item.sku}</p>
+                        ${tallasHtml}
+                    </div>
+
+                    <div class="grid grid-cols-3 gap-2 text-center text-xs font-bold mb-4">
+                        <div class="border p-2 pt-6 relative">CORTE <div class="absolute top-1 right-1 w-4 h-4 border border-black rounded-full"></div></div>
+                        <div class="border p-2 pt-6 relative">CONFECCIÓN <div class="absolute top-1 right-1 w-4 h-4 border border-black rounded-full"></div></div>
+                        <div class="border p-2 pt-6 relative">TERMINACIÓN <div class="absolute top-1 right-1 w-4 h-4 border border-black rounded-full"></div></div>
+                    </div>
+
+                    <div class="border-t-2 border-gray-800 pt-2 mt-auto">
+                        <div class="flex justify-between text-xs mb-4">
+                            <span>Factura: _________________</span>
+                            <span>Cajas: ____ / ____</span>
+                        </div>
+                        <div class="text-center mt-6">
+                            <div class="border-t border-black w-3/4 mx-auto"></div>
+                            <p class="text-[10px]">Firma Responsable / Control de Calidad</p>
+                        </div>
+                    </div>
+                </div>`;
+            });
+            html += `</div>`;
+            
+            area.innerHTML = html;
+            window.print();
+            // Limpiar área después de imprimir para no afectar layout normal (opcional)
+        }
+
+        // --- 7. IA / ANÁLISIS ---
+        function updateAnalysis() {
+            const statusList = document.getElementById('ia-status-list');
+            const stockList = document.getElementById('ia-stock-list');
+            
+            // 1. Análisis de Estado
+            let pending = orders.filter(o => o.status === 'Pendiente').length;
+            let production = orders.filter(o => o.status === 'En Producción').length;
+            
+            let statusHtml = `
+                <div class="flex justify-between border-b pb-2"><span class="text-gray-600">Pendientes</span> <span class="font-bold">${pending}</span></div>
+                <div class="flex justify-between border-b pb-2"><span class="text-blue-600">En Taller</span> <span class="font-bold text-blue-600">${production}</span></div>
+            `;
+            
+            if(production > 5) {
+                statusHtml += `<div class="text-red-500 text-sm mt-2 flex items-center"><i class="fas fa-exclamation-triangle mr-1"></i> ¡Alerta! Cuello de botella en taller.</div>`;
+            }
+            statusList.innerHTML = statusHtml;
+
+            // 2. Análisis de Stock (Sugerencias simples)
+            // Revisamos productos con stock < 5
+            stockList.innerHTML = '';
+            let warnings = 0;
+            inventory.forEach(p => {
+                if(p.total < 10) {
+                    warnings++;
+                    stockList.innerHTML += `
+                        <div class="text-sm bg-red-50 p-2 rounded border border-red-100 flex items-center justify-between">
+                            <span><strong>${p.sku}</strong> ${p.name}</span>
+                            <span class="text-red-600 font-bold">${p.total} u.</span>
+                        </div>
+                    `;
+                }
+            });
+            if(warnings === 0) stockList.innerHTML = '<div class="text-green-500 text-sm">Inventario Saludable.</div>';
+        }
+
+        // --- 8. UTILS Y MODALES GENERICOS ---
+        function closeModal(id) {
+            document.getElementById(id).classList.add('hidden');
+        }
+        
+        function confirmReset(type) {
+            if(confirm('¿Estás SEGURO? Se borrará toda la información de ' + type)) {
+                if(type === 'inventory') {
+                    localStorage.removeItem('ww_inventory');
+                    inventory = [];
+                    renderInventory();
+                }
+                if(type === 'orders') {
+                    localStorage.removeItem('ww_orders');
+                    orders = [];
+                    renderOrders();
+                }
+                updateAnalysis();
+                alert('Reset completado.');
+            }
+        }
+        
+        function confirmFullReset() {
+            if(confirm('PELIGRO: ¿Borrar ABSOLUTAMENTE TODO el sistema? Esto no se puede deshacer.')) {
+                if(confirm('Confirma por segunda vez: ¿Borrar Todo?')) {
+                    localStorage.clear();
+                    location.reload();
+                }
+            }
+        }
+
+        function deleteOrder(idx) {
+             if(confirm('¿Eliminar orden?')) {
+                 orders.splice(idx, 1);
+                 localStorage.setItem('ww_orders', JSON.stringify(orders));
+                 renderOrders();
+                 updateAnalysis();
+             }
+        }
+
+        function generateCompanyReport() {
+            // Ejemplo básico usando html2pdf o window.print de un div oculto.
+            // Por simplicidad y robustez, usaremos window.print sobre un area formateada.
+            const area = document.getElementById('print-area');
+            const date = new Date().toLocaleDateString();
+            
+            area.innerHTML = `
+                <div class="max-w-4xl mx-auto p-8 border-4 border-gray-800">
+                    <div class="text-center border-b-4 border-gray-800 pb-4 mb-6">
+                        <h1 class="text-4xl font-black uppercase">Workwear & Corporate <i class="fas fa-scissors"></i></h1>
+                        <h2 class="text-xl mt-2 text-gray-600">Informe General de Gestión</h2>
+                        <p class="text-sm mt-1">Fecha de emisión: ${date}</p>
+                    </div>
+                    
+                    <div class="mb-8">
+                        <h3 class="text-2xl font-bold mb-4 border-b-2 border-gray-400">1. Resumen Financiero & Operativo</h3>
+                        <div class="grid grid-cols-3 gap-4 text-center">
+                            <div class="bg-gray-100 p-4 rounded">
+                                <p class="text-sm text-gray-500">Total Productos Inv.</p>
+                                <p class="text-3xl font-bold">${inventory.length}</p>
+                            </div>
+                            <div class="bg-gray-100 p-4 rounded">
+                                <p class="text-sm text-gray-500">Órdenes Activas</p>
+                                <p class="text-3xl font-bold text-blue-600">${orders.filter(o => o.status !== 'Despachado').length}</p>
+                            </div>
+                            <div class="bg-gray-100 p-4 rounded">
+                                <p class="text-sm text-gray-500">Despachadas Mes</p>
+                                <p class="text-3xl font-bold text-green-600">${orders.filter(o => o.status === 'Despachado').length}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-8">
+                        <h3 class="text-2xl font-bold mb-4 border-b-2 border-gray-400">2. Alertas de Stock (IA)</h3>
+                         <ul class="list-disc pl-5">
+                            ${inventory.filter(i => i.total < 10).map(i => `<li class="text-red-600"><strong>${i.sku}</strong> ${i.name}: Quedan solo ${i.total} unidades.</li>`).join('') || '<li>Sin alertas de stock.</li>'}
+                         </ul>
+                    </div>
+                    
+                    <div class="text-center text-xs text-gray-400 mt-10">Generado por Sistema de Gestión WW v3.0</div>
+                </div>
+            `;
+            window.print();
         }
 
     </script>
