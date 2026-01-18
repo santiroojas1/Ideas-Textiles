@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>IDEAS TEXTILES</title>
+    <title>IDEAS TEXTILES SPA</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700;900&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
@@ -17,13 +17,13 @@
 
     <style>
         :root { 
-            --dark: #0f172a; --gold: #d97706; --bg: #f1f5f9; 
+            --dark: #0f172a; --gold: #d97706; --bg: #f8fafc; 
             --prod: #4f46e5; --danger: #ef4444; --success: #10b981; --gray: #64748b;
         }
         * { box-sizing: border-box; font-family: 'Outfit', sans-serif; -webkit-tap-highlight-color: transparent; outline: none; }
         body { background: var(--bg); margin: 0; padding-bottom: 120px; color: var(--dark); user-select: none; }
         
-        /* HEADER LIMPIO (Solo Título) */
+        /* HEADER */
         header { 
             background: linear-gradient(135deg, #020617 0%, #1e293b 100%); 
             color: white; padding: 20px; border-bottom: 4px solid var(--gold); 
@@ -33,7 +33,7 @@
         .corp-title { font-weight: 900; font-size: 1.3rem; display: flex; align-items: center; gap: 10px; }
         .version-badge { background: rgba(255,255,255,0.1); padding: 4px 8px; border-radius: 6px; font-size: 0.7rem; color: var(--gold); }
 
-        /* NAVEGACIÓN INTERNA (Solo aparece en VISTA 1) */
+        /* NAVEGACIÓN INTERNA */
         .sub-nav { 
             display: flex; gap: 10px; background: white; padding: 10px; 
             margin-bottom: 20px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.03);
@@ -42,7 +42,7 @@
             flex: 1; border: none; background: transparent; padding: 10px; 
             font-weight: 700; color: var(--gray); cursor: pointer; border-radius: 8px; transition: 0.2s;
         }
-        .sub-tab.active { background: var(--dark); color: white; shadow: 0 4px 10px rgba(0,0,0,0.2); }
+        .sub-tab.active { background: var(--dark); color: white; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
 
         /* VISTAS */
         .view { display: none; padding: 20px 15px; max-width: 900px; margin: auto; animation: fadeUp 0.3s ease; }
@@ -52,7 +52,7 @@
         /* TARJETAS */
         .card { background: white; border-radius: 16px; padding: 18px; margin-bottom: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.02); border: 1px solid #e2e8f0; position: relative; }
         
-        /* BOTONES INDUSTRIALES */
+        /* BOTONES */
         .btn { width: 100%; padding: 14px; border: none; border-radius: 10px; font-weight: 800; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px; font-size: 0.85rem; text-transform: uppercase; margin-bottom: 8px; transition: transform 0.1s; }
         .btn:active { transform: scale(0.98); }
         .btn-pri { background: var(--dark); color: white; }
@@ -74,9 +74,10 @@
         .step-pill.active { background: var(--gold); color: white; transform: scale(1.05); box-shadow: 0 2px 8px rgba(217,119,6,0.3); }
 
         /* CALENDARIO */
-        .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+        .cal-header { text-align: center; font-weight: 900; font-size: 1.2rem; margin-bottom: 15px; text-transform: uppercase; color: var(--dark); letter-spacing: 1px; }
+        .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
         .cal-day { aspect-ratio: 1; background: white; border-radius: 8px; border: 1px solid #e2e8f0; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; font-size: 0.85rem; cursor: pointer; }
-        .cal-day.today { border-color: var(--gold); font-weight: bold; background: #fffbeb; }
+        .cal-day.today { border: 2px solid var(--gold); background: var(--gold); color: white; font-weight: bold; box-shadow: 0 4px 10px rgba(217, 119, 6, 0.4); }
         .dot-marker { width: 6px; height: 6px; border-radius: 50%; margin-top: 3px; }
 
         /* DOCK DE NAVEGACIÓN */
@@ -88,10 +89,9 @@
 <body>
 
 <header>
-    <div class="corp-title">
-        <i class="fa-solid fa-layer-group"></i> IDEAS TEXTILES
-    </div>
+    <div class="corp-title"><i class="fa-solid fa-layer-group"></i> IDEAS TEXTILES</div>
     <span class="version-badge">WORKWEAR AND CORPORATE</span>
+    
 </header>
 
 <section id="v-ops" class="view active">
@@ -102,7 +102,7 @@
 
     <div id="mod-bodega">
         <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:15px;">
-            <button class="btn btn-magic" onclick="App.IA.importInventory()"><i class="fa-solid fa-wand-magic-sparkles"></i> CARGA MASIVA IA</button>
+            <button class="btn btn-magic" onclick="App.IA.importInventory()"><i class="fa-solid fa-wand-magic-sparkles"></i> CARGA RÁPIDA (IA)</button>
             <button class="btn btn-pri" onclick="App.Actions.prodModal()"><i class="fa-solid fa-plus"></i> NUEVO MANUAL</button>
         </div>
         <input type="text" id="search-inv" class="search-input" placeholder="🔍 Buscar SKU o Nombre..." oninput="App.Render.bodega()">
@@ -116,34 +116,30 @@
 
 <section id="v-ordenes" class="view">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-        <h2 style="margin:0">PEDIDOS (OC)</h2>
+        <h2 style="margin:0">PEDIDOS</h2>
         <span style="font-size:0.8rem; color:gray;">Gestión Comercial</span>
     </div>
     
-    <button class="btn btn-magic" onclick="App.IA.importOrders()"><i class="fa-solid fa-bolt"></i> IA: SEPARAR PEDIDOS MASIVOS</button>
+    <button class="btn btn-magic" onclick="App.IA.importOrders()"><i class="fa-solid fa-bolt"></i> IA: SEPARAR PEDIDOS</button>
     <button class="btn btn-gold" onclick="App.Actions.newOC()">📄 NUEVA OC INDIVIDUAL</button>
     
-    <hr style="border:0; border-top:1px solid #e2e8f0; margin: 20px 0;">
-    <div id="list-ordenes"></div>
+    <div id="list-ordenes" style="margin-top:20px;"></div>
 </section>
 
 <section id="v-agenda" class="view">
     <div class="card">
-        <h3 style="text-align:center; margin-top:0;">CALENDARIO</h3>
+        <div id="cal-header" class="cal-header"></div> 
         <div id="cal-grid" class="cal-grid"></div>
         <div style="text-align:center; font-size:0.75rem; color:#64748b; margin-top:10px;">
             <span style="color:#ef4444">●</span> Entrega &nbsp; <span style="color:#d97706">●</span> Nota
         </div>
     </div>
-
     <div style="background:#fff1f2; border-left:4px solid #ef4444; padding:15px; border-radius:10px; margin-top:15px;">
-        <h4 style="margin:0 0 10px 0; color:#991b1b;"><i class="fa-solid fa-triangle-exclamation"></i> PRÓXIMAS ENTREGAS</h4>
+        <h4 style="margin:0 0 10px 0; color:#991b1b;"><i class="fa-solid fa-triangle-exclamation"></i> URGENTE (7 DÍAS)</h4>
         <div id="upcoming-list"></div>
     </div>
-
     <div class="card" style="margin-top:20px;">
-        <h3 style="margin-top:0;">SISTEMA</h3>
-        <button class="btn btn-pri" onclick="App.Backup.download()">DESCARGAR BACKUP (PDF)</button>
+        <button class="btn btn-pri" onclick="App.Backup.download()">DESCARGAR REPORTE (PDF)</button>
     </div>
 </section>
 
@@ -154,7 +150,6 @@
 </nav>
 
 <script>
-// --- CONFIGURACIÓN FIREBASE ---
 const firebaseConfig = { apiKey: "AIzaSyBg-Cx9SqZw35TyyMxtpVBEFlwZTjBXBew", authDomain: "ideastextilesapp.firebaseapp.com", databaseURL: "https://ideastextilesapp-default-rtdb.firebaseio.com", projectId: "ideastextilesapp", storageBucket: "ideastextilesapp.firebasestorage.app", messagingSenderId: "268995530035", appId: "1:268995530035:web:1890f45ac761cc81eb0246" };
 if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
@@ -170,132 +165,93 @@ const App = {
             App.data.fab = v.fab || [];
             App.data.logs = v.logs || {};
             
-            // Auto-corrección de datos antiguos
+            // Auto-reparación y renderizado inicial
             App.data.ord.forEach(o => { if(!o.deadline) o.deadline = o.date; });
-            
             document.getElementById('fab-count').innerText = App.data.fab.length;
             App.Render.all();
         });
     },
     save() { db.ref('/').update(App.data); },
 
-    // --- MOTOR DE IA (ANÁLISIS DE TEXTO) ---
+    // --- CEREBRO IA (TEXTO A DATOS) ---
     IA: {
         parseLine(line) {
-            // Lógica robusta para entender: "50 Poleras Azules XL" o "Gorros rojos 20"
             const clean = line.trim();
             if(!clean) return null;
-            
             const parts = clean.split(/\s+/);
-            let qty = 1; 
-            let size = 'UNICA';
-            let nameParts = [];
-            let foundQty = false;
-
-            const sizes = ['XS','S','M','L','XL','XXL','3XL','4XL'];
+            let qty = 1, size = 'UNICA', nameParts = [], foundQty = false;
+            const sizes = ['XS','S','M','L','XL','XXL','3XL'];
 
             parts.forEach(p => {
                 const up = p.toUpperCase();
-                // Detectar número (Cantidad)
-                if(!foundQty && !isNaN(p) && p.length < 5) {
-                    qty = parseInt(p);
-                    foundQty = true;
-                }
-                // Detectar Talla
-                else if(sizes.includes(up)) {
-                    size = up;
-                }
-                // Resto es nombre
-                else {
-                    nameParts.push(p);
-                }
+                if(!foundQty && !isNaN(p) && p.length < 5) { qty = parseInt(p); foundQty = true; }
+                else if(sizes.includes(up)) { size = up; }
+                else { nameParts.push(p); }
             });
 
             const name = nameParts.join(' ').replace(/[^a-zA-Z0-9\sñÑ]/g, '').trim().toUpperCase();
             if(!name) return null;
-
             return { n: name, q: qty, sz: size };
         },
 
         async importInventory() {
             const { value: text } = await Swal.fire({
-                title: 'CARGA MASIVA BODEGA',
+                title: 'DICTADO DE INVENTARIO',
                 input: 'textarea',
-                inputPlaceholder: 'Pega tu lista aquí (ej: 50 poleras L)...',
-                inputAttributes: { style: 'height:200px' },
-                footer: 'El sistema detecta automáticamente cantidades y tallas.'
+                inputPlaceholder: '50 poleras M\n20 gorros rojos',
+                inputAttributes: { style: 'height:200px' }
             });
-
             if(text) {
                 const lines = text.split('\n');
-                let count = 0;
+                let c = 0;
                 lines.forEach(l => {
                     const item = App.IA.parseLine(l);
                     if(item) {
+                        if (!App.data.inv) App.data.inv = [];
                         let p = App.data.inv.find(x => x.n === item.n);
-                        if(!p) {
-                            p = { n: item.n, sku: 'SKU-'+Math.floor(Math.random()*99999), s: {} };
-                            App.data.inv.push(p);
-                        }
-                        p.s[item.sz] = (p.s[item.sz] || 0) + item.q;
-                        count++;
+                        if(!p) { p = {n:item.n, sku:'REF-'+Math.floor(Math.random()*9999), s:{}}; App.data.inv.push(p); }
+                        p.s[item.sz] = (p.s[item.sz]||0) + item.q;
+                        c++;
                     }
                 });
                 App.save();
-                Swal.fire('Procesado', `Se actualizaron ${count} productos.`, 'success');
+                App.Render.bodega(); // REFUERZO VISUAL
+                Swal.fire('Listo', `Se procesaron ${c} lineas.`, 'success');
             }
         },
 
         async importOrders() {
-            // MAGIA: Detecta si hay nombres de clientes (terminados en :) para crear multiples ordenes
             const { value: text } = await Swal.fire({
-                title: 'CARGA MASIVA DE PEDIDOS',
-                html: '<p style="font-size:0.8rem; color:gray;">Usa "CLIENTE:" para separar ordenes.<br>Ej:<br>JUAN:<br>10 poleras<br>PEDRO:<br>5 gorros</p>',
+                title: 'IA: SEPARADOR DE PEDIDOS',
+                html: '<small>Usa ":" para clientes. Ej: "JUAN: 10 poleras"</small>',
                 input: 'textarea',
                 inputAttributes: { style: 'height:250px' }
             });
-
             if(text) {
                 const lines = text.split('\n');
-                let currentClient = 'CLIENTE GENÉRICO';
-                let currentItems = [];
-                let ordersCreated = 0;
-
-                const saveBatch = () => {
-                    if(currentItems.length > 0) {
-                        App.data.ord.push({
-                            c: currentClient,
-                            date: new Date().toLocaleDateString(),
-                            deadline: new Date().toLocaleDateString(), // Por defecto hoy, usuario edita
-                            st: 'PROCESO',
-                            items: currentItems
-                        });
-                        ordersCreated++;
-                        currentItems = [];
+                let client = 'VARIOS', items = [], count = 0;
+                
+                const save = () => {
+                    if(items.length > 0) {
+                        App.data.ord.push({c:client, date:new Date().toLocaleDateString(), deadline:new Date().toLocaleDateString(), st:'PROCESO', items:items});
+                        count++; items = [];
                     }
                 };
 
                 lines.forEach(l => {
                     const clean = l.trim();
                     if(!clean) return;
-
-                    // Detectar si es un cliente (Termina en : o es solo texto corto sin numeros)
-                    const isClientHeader = clean.includes(':') || (isNaN(clean.charAt(0)) && !clean.match(/\d/) && clean.length < 20);
-
-                    if(isClientHeader) {
-                        saveBatch(); // Guardar lo anterior
-                        currentClient = clean.replace(':','').toUpperCase();
+                    if(clean.includes(':') || (isNaN(clean.charAt(0)) && clean.length<20 && !clean.match(/\d/))) {
+                        save(); client = clean.replace(':','').toUpperCase();
                     } else {
-                        // Es un producto
-                        const item = App.IA.parseLine(clean);
-                        if(item) {
-                            currentItems.push({ p: item.n, q: item.q, sz: item.sz, st: 'PENDIENTE' });
-                        }
+                        const it = App.IA.parseLine(clean);
+                        if(it) items.push({p:it.n, q:it.q, sz:it.sz, st:'PENDIENTE'});
                     }
                 });
-                saveBatch(); // Guardar el ultimo
+                save();
                 App.save();
-                Swal.fire('Éxito', `Se crearon ${ordersCreated} órdenes de compra distintas.`, 'success');
+                App.Render.ordenes(); // REFUERZO VISUAL
+                Swal.fire('Procesado', `Se crearon ${count} órdenes distintas.`, 'success');
             }
         }
     },
@@ -303,65 +259,92 @@ const App = {
     // --- ACCIONES MANUALES ---
     Actions: {
         async prodModal() {
-            const { value: n } = await Swal.fire({ title:'Nuevo Producto', input:'text', inputPlaceholder:'Nombre' });
-            if(n) { App.data.inv.push({ n: n.toUpperCase(), sku: 'SKU-'+Math.floor(Math.random()*90000), s:{} }); App.save(); }
+            const { value: form } = await Swal.fire({
+                title: 'ALTA MANUAL',
+                html: `
+                    <input id="new-n" class="swal2-input" placeholder="Nombre Producto (Ej: POLERA PIQUE)">
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:15px;">
+                        <input id="new-s" type="number" class="swal2-input" placeholder="Cant. S" style="margin:0">
+                        <input id="new-m" type="number" class="swal2-input" placeholder="Cant. M" style="margin:0">
+                        <input id="new-l" type="number" class="swal2-input" placeholder="Cant. L" style="margin:0">
+                        <input id="new-xl" type="number" class="swal2-input" placeholder="Cant. XL" style="margin:0">
+                    </div>
+                `,
+                focusConfirm: false,
+                preConfirm: () => {
+                    return {
+                        n: document.getElementById('new-n').value,
+                        s: document.getElementById('new-s').value,
+                        m: document.getElementById('new-m').value,
+                        l: document.getElementById('new-l').value,
+                        xl: document.getElementById('new-xl').value
+                    }
+                }
+            });
+
+            if(form && form.n) {
+                const stock = {};
+                if(form.s) stock['S'] = parseInt(form.s);
+                if(form.m) stock['M'] = parseInt(form.m);
+                if(form.l) stock['L'] = parseInt(form.l);
+                if(form.xl) stock['XL'] = parseInt(form.xl);
+                
+                // ASEGURAR ARRAY
+                if (!App.data.inv) App.data.inv = [];
+
+                App.data.inv.push({
+                    n: form.n.toUpperCase(),
+                    sku: 'REF-'+Math.floor(Math.random()*99999),
+                    s: stock
+                });
+                App.save();
+                
+                // *** LA CORRECCIÓN CLAVE: ACTUALIZAR PANTALLA ***
+                App.Render.bodega(); 
+                Swal.fire('Guardado', `${form.n} ingresado correctamente.`, 'success');
+            }
         },
-        
+
         delInv(i) {
-            Swal.fire({title:'¿Borrar?', showCancelButton:true}).then(r => { 
-                if(r.isConfirmed) { App.data.inv.splice(i,1); App.save(); App.Render.bodega(); } 
+            Swal.fire({title:'¿Eliminar?', icon:'warning', showCancelButton:true}).then(r=>{
+                if(r.isConfirmed){ App.data.inv.splice(i,1); App.save(); App.Render.bodega(); }
             });
         },
 
-        // LOGICA DE FÁBRICA FLEXIBLE (V13)
         async sendFab(i) {
             const p = App.data.inv[i];
             const {value:form} = await Swal.fire({
                 title: `PRODUCIR: ${p.n}`,
                 html: `
-                    <input id="f-q" type="number" class="swal2-input" placeholder="Cantidad">
-                    <label style="display:block; text-align:left; font-weight:bold; margin-top:10px;">Ruta de Proceso:</label>
-                    <textarea id="f-r" class="swal2-textarea" style="margin:0;">CORTE (JUAN) > CONFECCION (MARIA) > EMPAQUE</textarea>
-                    <small style="color:gray;">Usa > para separar pasos.</small>
+                    <input id="f-q" type="number" class="swal2-input" placeholder="Cantidad Total">
+                    <label style="display:block;margin-top:10px;font-weight:bold;">Ruta (Separa con >):</label>
+                    <textarea id="f-r" class="swal2-textarea" style="margin:5px 0;">CORTE (JUAN) > TALLER > PLANCHA</textarea>
                 `,
-                preConfirm: () => ({ q: document.getElementById('f-q').value, r: document.getElementById('f-r').value })
+                preConfirm:() => ({q:document.getElementById('f-q').value, r:document.getElementById('f-r').value})
             });
 
             if(form && form.q && form.r) {
-                // Parsear ruta
                 const steps = form.r.split('>').map(s => {
-                    const clean = s.trim();
-                    const match = clean.match(/([^(]+)(?:\(([^)]+)\))?/);
-                    return { 
-                        n: match[1].trim().toUpperCase(), 
-                        r: match[2] ? match[2].trim().toUpperCase() : 'TALLER' 
-                    };
+                    const m = s.trim().match(/([^(]+)(?:\(([^)]+)\))?/);
+                    return { n: m[1].trim().toUpperCase(), r: m[2]?m[2].trim().toUpperCase():'TALLER' };
                 });
-
-                App.data.fab.push({
-                    n: p.n,
-                    qty: parseInt(form.q),
-                    route: steps,
-                    stepIdx: 0,
-                    start: Date.now()
-                });
+                if(!App.data.fab) App.data.fab = [];
+                App.data.fab.push({ n:p.n, qty:parseInt(form.q), route:steps, stepIdx:0, start:Date.now() });
                 App.save();
                 App.UI.subTab('fabrica', document.querySelectorAll('.sub-tab')[1]);
-                Swal.fire('Enviado', 'Lote ingresado a línea de producción', 'success');
             }
         },
 
         advanceFab(i) {
             const f = App.data.fab[i];
-            if(f.stepIdx < f.route.length - 1) {
-                f.stepIdx++; App.save(); App.Render.fabrica();
+            if(f.stepIdx < f.route.length-1) {
+                f.stepIdx++; App.save(); App.Render.fabrica(); // Render forzado
             } else {
-                Swal.fire({title:'¿Finalizar Lote?', text:'Se sumará al stock', showCancelButton:true}).then(r=>{
+                Swal.fire({title:'¿Terminado?', text:'Vuelve a stock', showCancelButton:true}).then(r=>{
                     if(r.isConfirmed) {
-                        let p = App.data.inv.find(x => x.n === f.n);
+                        let p = App.data.inv.find(x=>x.n===f.n);
                         if(p) p.s['PROD'] = (p.s['PROD']||0) + parseInt(f.qty);
-                        App.data.fab.splice(i,1);
-                        App.save();
+                        App.data.fab.splice(i,1); App.save(); App.Render.fabrica();
                     }
                 });
             }
@@ -369,19 +352,20 @@ const App = {
 
         async newOC() {
             const {value:form} = await Swal.fire({
-                title:'NUEVA ORDEN',
+                title:'NUEVO PEDIDO',
                 html:`<input id="c" class="swal2-input" placeholder="Cliente"><input id="d" type="date" class="swal2-input">`,
-                preConfirm:() => ({ c:document.getElementById('c').value, d:document.getElementById('d').value })
+                preConfirm:()=>({c:document.getElementById('c').value, d:document.getElementById('d').value})
             });
             if(form) {
-                App.data.ord.push({ c:form.c.toUpperCase(), deadline:form.d, st:'PROCESO', items:[] });
+                if(!App.data.ord) App.data.ord = [];
+                App.data.ord.push({c:form.c.toUpperCase(), deadline:form.d, st:'PROCESO', items:[]});
                 App.save();
-                Swal.fire('Creada', 'Usa "IA: Cargar Pedidos" o edita manualmente para agregar items.', 'success');
+                App.Render.ordenes();
             }
         },
-        
+
         logDay(k) {
-            Swal.fire({title:'Notas del Día', input:'textarea', inputValue:App.data.logs[k]||''}).then(r=>{
+            Swal.fire({title:'Nota del Día', input:'textarea', inputValue:App.data.logs[k]||''}).then(r=>{
                 if(r.value!==undefined) { App.data.logs[k]=r.value; App.save(); App.Render.calendar(); }
             });
         }
@@ -407,91 +391,76 @@ const App = {
 
         bodega() {
             const q = document.getElementById('search-inv').value.toUpperCase();
-            document.getElementById('list-bodega').innerHTML = App.data.inv.filter(x => x.n.includes(q)).map((p,i) => `
+            const list = App.data.inv || [];
+            document.getElementById('list-bodega').innerHTML = list.filter(x=>x.n.includes(q)).map((p,i)=>`
                 <div class="card">
-                    <div style="display:flex; justify-content:space-between;">
-                        <b>${p.n}</b> <small>${p.sku}</small>
-                    </div>
+                    <div style="display:flex;justify-content:space-between;"><b>${p.n}</b> <small>${p.sku}</small></div>
                     <div style="margin:5px 0; color:#64748b; font-size:0.8rem;">
-                        ${Object.entries(p.s).map(([k,v]) => `<span style="background:#f1f5f9;padding:2px 5px;border-radius:4px;">${k}:${v}</span>`).join(' ')}
+                        ${Object.entries(p.s).map(([k,v])=>`<span style="background:#f1f5f9;margin-right:5px;padding:2px 6px;border-radius:4px;">${k}:${v}</span>`).join('')}
                     </div>
                     <div style="display:flex; gap:10px; margin-top:10px;">
-                        <button class="btn btn-sec" style="margin:0;" onclick="App.Actions.sendFab(${i})">PRODUCIR</button>
-                        <button class="btn btn-sec" style="margin:0; width:auto; color:red;" onclick="App.Actions.delInv(${i})"><i class="fa-solid fa-trash"></i></button>
+                        <button class="btn btn-sec" onclick="App.Actions.sendFab(${i})">PRODUCIR</button>
+                        <button class="btn btn-sec" style="width:auto; color:red;" onclick="App.Actions.delInv(${i})"><i class="fa-solid fa-trash"></i></button>
                     </div>
-                </div>
-            `).join('');
+                </div>`).join('');
         },
 
         fabrica() {
-            document.getElementById('list-fabrica').innerHTML = App.data.fab.map((f,i) => {
-                const steps = f.route.map((s, idx) => {
-                    let st = idx < f.stepIdx ? 'done' : (idx === f.stepIdx ? 'active' : '');
-                    return `<div class="step-pill ${st}">${idx+1}. ${s.n}</div>`;
-                }).join('');
-                
-                const cur = f.route[f.stepIdx];
-                return `
+            const list = App.data.fab || [];
+            document.getElementById('list-fabrica').innerHTML = list.map((f,i)=>`
                 <div class="card" style="border-left:4px solid var(--gold);">
-                    <div style="display:flex; justify-content:space-between;"><b>${f.n}</b> <b>${f.qty} un.</b></div>
-                    <div class="step-track">${steps}</div>
-                    <div style="text-align:center; margin:10px 0; font-weight:bold;">
-                        <i class="fa-solid fa-arrow-right"></i> ${cur.n} (${cur.r})
-                    </div>
-                    <button class="btn btn-pri" onclick="App.Actions.advanceFab(${i})">
-                        ${f.stepIdx===f.route.length-1 ? 'FINALIZAR' : 'AVANZAR'}
-                    </button>
-                </div>`;
-            }).join('');
+                    <div style="display:flex;justify-content:space-between;"><b>${f.n}</b> <b>${f.qty} un.</b></div>
+                    <div class="step-track">${f.route.map((s,x)=>`<div class="step-pill ${x<f.stepIdx?'done':(x===f.stepIdx?'active':'')}">${x+1}.${s.n}</div>`).join('')}</div>
+                    <button class="btn btn-pri" onclick="App.Actions.advanceFab(${i})">${f.stepIdx===f.route.length-1?'FINALIZAR':'AVANZAR ETAPA'}</button>
+                </div>`).join('');
         },
 
         ordenes() {
-            document.getElementById('list-ordenes').innerHTML = App.data.ord.map((o,i) => `
+            const list = App.data.ord || [];
+            document.getElementById('list-ordenes').innerHTML = list.map(o=>`
                 <div class="card">
-                    <div style="display:flex; justify-content:space-between;">
-                        <b>${o.c}</b> <small>${o.deadline}</small>
-                    </div>
-                    <ul style="padding-left:20px; font-size:0.85rem;">
-                        ${o.items.map(it => `<li>${it.q} ${it.p} (${it.sz})</li>`).join('')}
-                    </ul>
-                </div>
-            `).join('');
+                    <div style="display:flex;justify-content:space-between;"><b>${o.c}</b> <small>${o.deadline}</small></div>
+                    <ul style="padding-left:20px;font-size:0.85rem;">${o.items.map(it=>`<li>${it.q} ${it.p} (${it.sz})</li>`).join('')}</ul>
+                </div>`).join('');
         },
 
         calendar() {
             const d = new Date();
+            const months = ["ENERO","FEBRERO","MARZO","ABRIL","MAYO","JUNIO","JULIO","AGOSTO","SEPTIEMBRE","OCTUBRE","NOVIEMBRE","DICIEMBRE"];
+            document.getElementById('cal-header').innerText = `${months[d.getMonth()]} ${d.getFullYear()}`;
+
             const days = new Date(d.getFullYear(), d.getMonth()+1, 0).getDate();
             let h = '';
             for(let i=1; i<=days; i++) {
                 const dk = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(i).padStart(2,'0')}`;
                 const lk = `${i}-${d.getMonth()}-${d.getFullYear()}`;
-                const hasOc = App.data.ord.some(o => o.deadline === dk);
-                const hasNt = App.data.logs[lk];
-                h += `<div class="cal-day ${i===d.getDate()?'today':''}" onclick="App.Actions.logDay('${lk}')">
-                    ${i} <div style="display:flex; gap:2px;">
-                    ${hasOc?'<div class="dot-marker" style="background:#ef4444"></div>':''}
-                    ${hasNt?'<div class="dot-marker" style="background:#d97706"></div>':''}
+                const isToday = i === d.getDate();
+                const hasOc = (App.data.ord||[]).some(o=>o.deadline===dk);
+                const hasLog = (App.data.logs||{})[lk];
+
+                h+=`<div class="cal-day ${isToday?'today':''}" onclick="App.Actions.logDay('${lk}')">
+                    ${i} <div style="display:flex;gap:2px;">
+                        ${hasOc?'<div class="dot-marker" style="background:#ef4444"></div>':''}
+                        ${hasLog?'<div class="dot-marker" style="background:#d97706"></div>':''}
                     </div>
                 </div>`;
             }
             document.getElementById('cal-grid').innerHTML = h;
             
-            // Proximas entregas
-            const up = App.data.ord.filter(o => {
-                const diff = (new Date(o.deadline) - d) / (1000*60*60*24);
-                return diff >= 0 && diff <= 7;
+            const up = (App.data.ord||[]).filter(o=>{
+                const diff = (new Date(o.deadline)-d)/(1000*60*60*24);
+                return diff>=-1 && diff<=7;
             });
-            document.getElementById('upcoming-list').innerHTML = up.length ? up.map(o=>`<div><b>${o.c}</b>: ${o.deadline}</div>`).join('') : '<small>Sin urgencias.</small>';
-        }
-    },
+            document.getElementById('upcoming-list').innerHTML = up.length ? up.map(o=>`<div><b>${o.c}</b>: ${o.deadline}</div>`).join('') : '<small>Todo en orden.</small>';
+        },
 
-    Backup: {
-        download() {
-            const doc = new window.jspdf.jsPDF();
-            doc.text("REPORTE IDEAS TEXTILES", 10, 20);
-            const data = App.data.inv.map(x => [x.n, JSON.stringify(x.s)]);
-            doc.autoTable({startY:30, head:[['Producto','Stock']], body:data});
-            doc.save('Backup.pdf');
+        Backup: {
+            download() {
+                const doc = new window.jspdf.jsPDF();
+                doc.text("REPORTE V16",10,20);
+                doc.autoTable({startY:30, head:[['Producto','Stock']], body:App.data.inv.map(x=>[x.n, JSON.stringify(x.s)])});
+                doc.save('IdeasTextiles.pdf');
+            }
         }
     }
 };
