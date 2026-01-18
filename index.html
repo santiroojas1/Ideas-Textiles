@@ -2,479 +2,539 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>IDEAS TEXTILES </title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700;900&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
-    
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IDEAS TEXTILES</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        :root { 
-            --dark: #0f172a; --gold: #d97706; --bg: #f8fafc; 
-            --prod: #4f46e5; --danger: #ef4444; --success: #10b981; --gray: #64748b;
+        /* Estilos personalizados para el calendario */
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 2px;
         }
-        * { box-sizing: border-box; font-family: 'Outfit', sans-serif; -webkit-tap-highlight-color: transparent; outline: none; }
-        body { background: var(--bg); margin: 0; padding-bottom: 120px; color: var(--dark); user-select: none; }
-        
-        /* HEADER */
-        header { 
-            background: linear-gradient(135deg, #020617 0%, #1e293b 100%); 
-            color: white; padding: 20px; border-bottom: 4px solid var(--gold); 
-            box-shadow: 0 5px 20px rgba(0,0,0,0.2); position: sticky; top: 0; z-index: 100;
-            display: flex; justify-content: space-between; align-items: center;
+        .calendar-day {
+            aspect-ratio: 1/1;
+            border: 1px solid #e5e7eb;
+            padding: 5px;
+            font-size: 0.9rem;
+            position: relative;
         }
-        .corp-title { font-weight: 900; font-size: 1.3rem; display: flex; align-items: center; gap: 10px; }
-        .version-badge { background: rgba(255,255,255,0.1); padding: 4px 8px; border-radius: 6px; font-size: 0.7rem; color: var(--gold); }
-
-        /* NAVEGACIÓN INTERNA */
-        .sub-nav { 
-            display: flex; gap: 10px; background: white; padding: 10px; 
-            margin-bottom: 20px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+        .calendar-header {
+            font-weight: bold;
+            text-align: center;
+            padding: 10px 0;
+            background-color: #f3f4f6;
         }
-        .sub-tab { 
-            flex: 1; border: none; background: transparent; padding: 10px; 
-            font-weight: 700; color: var(--gray); cursor: pointer; border-radius: 8px; transition: 0.2s;
+        .today {
+            background-color: #3b82f6;
+            color: white;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto;
         }
-        .sub-tab.active { background: var(--dark); color: white; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
-
-        /* VISTAS */
-        .view { display: none; padding: 20px 15px; max-width: 900px; margin: auto; animation: fadeUp 0.3s ease; }
-        .view.active { display: block; }
-        @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-        /* TARJETAS */
-        .card { background: white; border-radius: 16px; padding: 18px; margin-bottom: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.02); border: 1px solid #e2e8f0; position: relative; }
-        
-        /* BOTONES */
-        .btn { width: 100%; padding: 14px; border: none; border-radius: 10px; font-weight: 800; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px; font-size: 0.85rem; text-transform: uppercase; margin-bottom: 8px; transition: transform 0.1s; }
-        .btn:active { transform: scale(0.98); }
-        .btn-pri { background: var(--dark); color: white; }
-        .btn-gold { background: var(--gold); color: white; }
-        .btn-magic { background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3); }
-        .btn-sec { background: #f1f5f9; color: var(--dark); border: 1px solid #cbd5e1; }
-
-        /* INPUTS */
-        .search-input { width: 100%; padding: 14px; border-radius: 10px; border: 2px solid #e2e8f0; font-size: 1rem; margin-bottom: 15px; }
-        .search-input:focus { border-color: var(--gold); }
-
-        /* FABRICA VISUAL */
-        .step-track { display: flex; gap: 5px; overflow-x: auto; padding: 10px 0; margin-bottom: 10px; scrollbar-width: none; }
-        .step-pill { 
-            white-space: nowrap; padding: 5px 12px; border-radius: 20px; font-size: 0.7rem; font-weight: bold; 
-            background: #f1f5f9; color: #94a3b8; display: flex; align-items: center; gap: 5px; 
-        }
-        .step-pill.done { background: var(--success); color: white; }
-        .step-pill.active { background: var(--gold); color: white; transform: scale(1.05); box-shadow: 0 2px 8px rgba(217,119,6,0.3); }
-
-        /* CALENDARIO REFORZADO */
-        .cal-header { text-align: center; font-weight: 900; font-size: 1.5rem; margin-bottom: 15px; text-transform: uppercase; color: var(--dark); letter-spacing: 1px; }
-        .cal-weekdays { display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; font-weight: bold; font-size: 0.8rem; margin-bottom: 5px; color: var(--gray); }
-        .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
-        .cal-day { aspect-ratio: 1; background: white; border-radius: 8px; border: 1px solid #e2e8f0; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; font-size: 0.9rem; cursor: pointer; }
-        .cal-day.today { border: 2px solid var(--gold); background: #fffbeb; color: var(--gold); font-weight: 900; }
-        .dot-marker { width: 8px; height: 8px; border-radius: 50%; margin-top: 3px; }
-
-        /* DOCK DE NAVEGACIÓN */
-        .dock { position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%); background: #0f172a; padding: 16px 35px; border-radius: 40px; display: flex; gap: 40px; box-shadow: 0 15px 40px rgba(0,0,0,0.5); z-index: 2000; }
-        .dock i { font-size: 1.5rem; color: #64748b; cursor: pointer; transition: 0.2s; }
-        .dock i.active { color: var(--gold); transform: translateY(-5px); }
     </style>
 </head>
-<body>
+<body class="bg-gray-100 font-sans text-gray-800">
 
-<header>
-    <div class="corp-title"><i class="fa-solid fa-scissors"></i> IDEAS TEXTILES</div>
-    <span class="version-badge">WORKWEAR AND CORPORATE</span>
-</header>
+    <div class="flex h-screen overflow-hidden">
+        
+        <aside class="w-64 bg-gray-900 text-white flex-shrink-0 hidden md:flex flex-col shadow-xl">
+            <div class="p-6 flex items-center justify-center border-b border-gray-700">
+                <i class="fas fa-scissors text-3xl text-yellow-500 mr-3"></i>
+                <h2 class="text-xl font-bold tracking-wider">GESTIÓN</h2>
+            </div>
+            <nav class="mt-6 flex-1 px-4 space-y-2">
+                <a href="#" onclick="showSection('dashboard')" class="nav-item block py-3 px-4 rounded hover:bg-gray-700 transition flex items-center bg-gray-800">
+                    <i class="fas fa-home w-6"></i> Dashboard
+                </a>
+                <a href="#" onclick="showSection('orders')" class="nav-item block py-3 px-4 rounded hover:bg-gray-700 transition flex items-center">
+                    <i class="fas fa-file-invoice w-6"></i> Órdenes (OC)
+                </a>
+                <a href="#" onclick="showSection('inventory')" class="nav-item block py-3 px-4 rounded hover:bg-gray-700 transition flex items-center">
+                    <i class="fas fa-boxes w-6"></i> Inventario
+                </a>
+                <a href="#" onclick="showSection('calendar')" class="nav-item block py-3 px-4 rounded hover:bg-gray-700 transition flex items-center">
+                    <i class="fas fa-calendar-alt w-6"></i> Calendario
+                </a>
+            </nav>
+            <div class="p-4 border-t border-gray-700">
+                <p class="text-xs text-gray-400 text-center">v2.4 - Sistema Corregido</p>
+            </div>
+        </aside>
 
-<section id="v-ops" class="view active">
-    <div class="sub-nav">
-        <button class="sub-tab active" onclick="App.UI.subTab('bodega', this)">BODEGA</button>
-        <button class="sub-tab" onclick="App.UI.subTab('fabrica', this)">FÁBRICA (<span id="fab-count">0</span>)</button>
-    </div>
-
-    <div id="mod-bodega">
-        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:15px;">
-            <button class="btn btn-magic" onclick="App.IA.importInventory()"><i class="fa-solid fa-wand-magic-sparkles"></i> IA: SUMAR STOCK</button>
-            <button class="btn btn-pri" onclick="App.Actions.prodModal()"><i class="fa-solid fa-plus"></i> NUEVO MANUAL</button>
-        </div>
-        <input type="text" id="search-inv" class="search-input" placeholder="🔍 Buscar SKU o Nombre..." oninput="App.Render.bodega()">
-        <div id="list-bodega"></div>
-    </div>
-
-    <div id="mod-fabrica" style="display:none;">
-        <div id="list-fabrica"></div>
-    </div>
-</section>
-
-<section id="v-ordenes" class="view">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-        <h2 style="margin:0">PEDIDOS</h2>
-        <span style="font-size:0.8rem; color:gray;">Gestión Comercial</span>
-    </div>
-    
-    <button class="btn btn-magic" onclick="App.IA.importOrders()"><i class="fa-solid fa-users-viewfinder"></i> IA: SEPARAR POR CLIENTE</button>
-    <button class="btn btn-gold" onclick="App.Actions.newOC()">📄 NUEVA OC INDIVIDUAL</button>
-    
-    <div id="list-ordenes" style="margin-top:20px;"></div>
-</section>
-
-<section id="v-agenda" class="view">
-    <div class="card">
-        <div id="cal-header" class="cal-header"></div> 
-        <div class="cal-weekdays">
-            <div>L</div><div>M</div><div>M</div><div>J</div><div>V</div><div>S</div><div>D</div>
-        </div>
-        <div id="cal-grid" class="cal-grid"></div>
-        <div style="text-align:center; font-size:0.75rem; color:#64748b; margin-top:10px;">
-            <span style="color:#ef4444">●</span> Entrega Pedido &nbsp; <span style="color:#d97706">●</span> Nota/Idea
-        </div>
-    </div>
-    <div style="background:#fff1f2; border-left:4px solid #ef4444; padding:15px; border-radius:10px; margin-top:15px;">
-        <h4 style="margin:0 0 10px 0; color:#991b1b;"><i class="fa-solid fa-triangle-exclamation"></i> URGENTE (7 DÍAS)</h4>
-        <div id="upcoming-list"></div>
-    </div>
-    <div class="card" style="margin-top:20px;">
-        <button class="btn btn-pri" onclick="App.Backup.download()">DESCARGAR REPORTE (PDF)</button>
-    </div>
-</section>
-
-<nav class="dock">
-    <i class="fa-solid fa-industry active" onclick="App.UI.go('ops', this)"></i>
-    <i class="fa-solid fa-file-invoice" onclick="App.UI.go('ordenes', this)"></i>
-    <i class="fa-solid fa-calendar-days" onclick="App.UI.go('agenda', this)"></i>
-</nav>
-
-<script>
-const firebaseConfig = { apiKey: "AIzaSyBg-Cx9SqZw35TyyMxtpVBEFlwZTjBXBew", authDomain: "ideastextilesapp.firebaseapp.com", databaseURL: "https://ideastextilesapp-default-rtdb.firebaseio.com", projectId: "ideastextilesapp", storageBucket: "ideastextilesapp.firebasestorage.app", messagingSenderId: "268995530035", appId: "1:268995530035:web:1890f45ac761cc81eb0246" };
-if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
-const db = firebase.database();
-
-const App = {
-    data: { inv: [], ord: [], fab: [], logs: {} },
-
-    init() {
-        db.ref('/').on('value', snap => {
-            const v = snap.val() || {};
-            // Aseguramos Arrays
-            App.data.inv = v.inv || [];
-            App.data.ord = v.ord || [];
-            App.data.fab = v.fab || [];
-            App.data.logs = v.logs || {};
+        <div class="flex-1 flex flex-col overflow-hidden">
             
-            App.data.ord.forEach(o => { if(!o.deadline) o.deadline = o.date; });
-            document.getElementById('fab-count').innerText = App.data.fab.length;
-            App.Render.all();
+            <header class="bg-white shadow-sm z-10 p-4 flex justify-between items-center border-b-4 border-yellow-500">
+                <div class="flex items-center">
+                    <button class="md:hidden mr-4 text-gray-600 focus:outline-none">
+                        <i class="fas fa-bars text-2xl"></i>
+                    </button>
+                    <h1 class="text-2xl font-black text-gray-800 tracking-wider uppercase flex items-center">
+                        WORKWEAR AND CORPORATE 
+                        <i class="fas fa-scissors ml-3 text-yellow-600"></i>
+                    </h1>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <span class="text-sm font-semibold text-gray-600" id="currentDateDisplay"></span>
+                    <div class="h-8 w-8 rounded-full bg-yellow-500 flex items-center justify-center text-white font-bold">
+                        A
+                    </div>
+                </div>
+            </header>
+
+            <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50 p-6" id="main-container">
+                
+                <div id="dashboard" class="section-content">
+                    <h2 class="text-2xl font-bold mb-6 text-gray-700">Resumen General</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                        <div class="bg-white p-6 rounded-lg shadow border-l-4 border-blue-500">
+                            <div class="flex items-center">
+                                <div class="p-3 rounded-full bg-blue-100 text-blue-500 mr-4">
+                                    <i class="fas fa-clipboard-list text-xl"></i>
+                                </div>
+                                <div>
+                                    <p class="text-gray-500 text-sm">Total Órdenes</p>
+                                    <p class="text-2xl font-bold" id="total-orders-count">0</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-white p-6 rounded-lg shadow border-l-4 border-green-500">
+                            <div class="flex items-center">
+                                <div class="p-3 rounded-full bg-green-100 text-green-500 mr-4">
+                                    <i class="fas fa-box-open text-xl"></i>
+                                </div>
+                                <div>
+                                    <p class="text-gray-500 text-sm">Items Inventario</p>
+                                    <p class="text-2xl font-bold" id="total-inventory-count">0</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-white p-6 rounded-lg shadow border-l-4 border-yellow-500">
+                            <div class="flex items-center">
+                                <div class="p-3 rounded-full bg-yellow-100 text-yellow-600 mr-4">
+                                    <i class="fas fa-clock text-xl"></i>
+                                </div>
+                                <div>
+                                    <p class="text-gray-500 text-sm">Pendientes</p>
+                                    <p class="text-2xl font-bold">3</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="orders" class="section-content hidden">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-2xl font-bold text-gray-700">Órdenes de Compra</h2>
+                        <button onclick="openModal('orderModal')" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded shadow flex items-center">
+                            <i class="fas fa-plus mr-2"></i> Nueva OC
+                        </button>
+                    </div>
+
+                    <div class="bg-white rounded-lg shadow overflow-hidden">
+                        <table class="min-w-full leading-normal">
+                            <thead>
+                                <tr>
+                                    <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">ID OC</th>
+                                    <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Cliente</th>
+                                    <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Fecha</th>
+                                    <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Estado</th>
+                                    <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="orders-table-body">
+                                </tbody>
+                        </table>
+                        <div id="no-orders-msg" class="p-5 text-center text-gray-500 hidden">No hay órdenes registradas.</div>
+                    </div>
+                </div>
+
+                <div id="inventory" class="section-content hidden">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-2xl font-bold text-gray-700">Inventario de Productos</h2>
+                        <button onclick="openModal('inventoryModal')" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded shadow flex items-center">
+                            <i class="fas fa-plus mr-2"></i> Nuevo Producto
+                        </button>
+                    </div>
+
+                    <div class="bg-white rounded-lg shadow overflow-hidden">
+                        <table class="min-w-full leading-normal">
+                            <thead>
+                                <tr>
+                                    <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">SKU</th>
+                                    <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Producto</th>
+                                    <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Categoría</th>
+                                    <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Stock</th>
+                                    <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="inventory-table-body">
+                                </tbody>
+                        </table>
+                        <div id="no-inventory-msg" class="p-5 text-center text-gray-500 hidden">Inventario vacío.</div>
+                    </div>
+                </div>
+
+                <div id="calendar" class="section-content hidden">
+                    <h2 class="text-2xl font-bold mb-6 text-gray-700">Agenda Mensual</h2>
+                    <div class="bg-white rounded-lg shadow p-4 max-w-4xl mx-auto">
+                        
+                        <div class="flex justify-between items-center mb-4">
+                            <button onclick="changeMonth(-1)" class="p-2 hover:bg-gray-200 rounded"><i class="fas fa-chevron-left"></i></button>
+                            <h3 id="calendar-month-year" class="text-xl font-bold uppercase">Enero 2026</h3>
+                            <button onclick="changeMonth(1)" class="p-2 hover:bg-gray-200 rounded"><i class="fas fa-chevron-right"></i></button>
+                        </div>
+
+                        <div class="grid grid-cols-7 mb-2 text-center text-sm font-semibold text-gray-500">
+                            <div>DOM</div>
+                            <div>LUN</div>
+                            <div>MAR</div>
+                            <div>MIE</div>
+                            <div>JUE</div>
+                            <div>VIE</div>
+                            <div>SAB</div>
+                        </div>
+
+                        <div id="calendar-days-grid" class="calendar-grid">
+                            </div>
+                    </div>
+                </div>
+
+            </main>
+        </div>
+    </div>
+
+    <div id="orderModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
+        <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-bold text-gray-900">Nueva Orden de Compra</h3>
+                <button onclick="closeModal('orderModal')" class="text-gray-500 hover:text-red-500"><i class="fas fa-times"></i></button>
+            </div>
+            <form id="orderForm">
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2">Cliente</label>
+                    <input type="text" id="orderClient" required class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="Ej: Minera Escondida">
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2">ID Orden</label>
+                    <input type="text" id="orderId" required class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="Ej: OC-2024-001">
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2">Fecha Entrega</label>
+                    <input type="date" id="orderDate" required class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                </div>
+                <div class="flex justify-end">
+                    <button type="button" onclick="closeModal('orderModal')" class="bg-gray-400 text-white px-4 py-2 rounded mr-2 hover:bg-gray-500">Cancelar</button>
+                    <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Guardar OC</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="inventoryModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
+        <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-bold text-gray-900">Nuevo Producto</h3>
+                <button onclick="closeModal('inventoryModal')" class="text-gray-500 hover:text-red-500"><i class="fas fa-times"></i></button>
+            </div>
+            <form id="inventoryForm">
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2">SKU / Código</label>
+                    <input type="text" id="prodSku" required class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2">Nombre Producto</label>
+                    <input type="text" id="prodName" required class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2">Categoría</label>
+                    <select id="prodCat" class="shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                        <option>Ropa Ignífuga</option>
+                        <option>Corporativo</option>
+                        <option>EPP</option>
+                        <option>Calzado</option>
+                    </select>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2">Stock Inicial</label>
+                    <input type="number" id="prodStock" required class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                </div>
+                <div class="flex justify-end">
+                    <button type="button" onclick="closeModal('inventoryModal')" class="bg-gray-400 text-white px-4 py-2 rounded mr-2 hover:bg-gray-500">Cancelar</button>
+                    <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">Guardar Item</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // --- BASE DE DATOS LOCAL (Arrays) ---
+        let orders = JSON.parse(localStorage.getItem('ordersData')) || [];
+        let inventory = JSON.parse(localStorage.getItem('inventoryData')) || [];
+
+        // --- INICIALIZACIÓN ---
+        document.addEventListener('DOMContentLoaded', () => {
+            renderOrders();
+            renderInventory();
+            updateDashboard();
+            renderCalendar(); // Inicializar calendario
+            
+            // Fecha actual en header
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            document.getElementById('currentDateDisplay').textContent = new Date().toLocaleDateString('es-ES', options);
         });
-    },
-    save() { db.ref('/').update(App.data); },
 
-    // --- CEREBRO IA (TEXTO A DATOS) ---
-    IA: {
-        parseLine(line) {
-            const clean = line.trim();
-            if(!clean) return null;
-            const parts = clean.split(/\s+/);
-            let qty = 1, size = 'UNICA', nameParts = [], foundQty = false;
-            // Tallas comunes para AYUDAR a detectar, pero NO limitar
-            const sizes = ['XS','S','M','L','XL','XXL','3XL'];
-
-            parts.forEach(p => {
-                const up = p.toUpperCase();
-                if(!foundQty && !isNaN(p) && p.length < 5) { qty = parseInt(p); foundQty = true; }
-                else if(sizes.includes(up)) { size = up; }
-                else { nameParts.push(p); }
-            });
-
-            const name = nameParts.join(' ').replace(/[^a-zA-Z0-9\sñÑ]/g, '').trim().toUpperCase();
-            if(!name) return null;
-            return { n: name, q: qty, sz: size };
-        },
-
-        async importInventory() {
-            const { value: text } = await Swal.fire({
-                title: 'IA: CARGA DE STOCK',
-                input: 'textarea',
-                inputPlaceholder: 'Copia de tu cuaderno:\n50 poleras M\n20 gorros',
-                inputAttributes: { style: 'height:200px' }
-            });
-            if(text) {
-                const lines = text.split('\n');
-                let c = 0;
-                lines.forEach(l => {
-                    const item = App.IA.parseLine(l);
-                    if(item) {
-                        if (!App.data.inv) App.data.inv = [];
-                        let p = App.data.inv.find(x => x.n === item.n);
-                        if(!p) { p = {n:item.n, sku:'REF-'+Math.floor(Math.random()*9999), s:{}}; App.data.inv.push(p); }
-                        p.s[item.sz] = (p.s[item.sz]||0) + item.q;
-                        c++;
-                    }
-                });
-                App.save();
-                App.Render.bodega(); // REFRESH VISUAL
-                Swal.fire('Listo', `Stock actualizado: ${c} líneas.`, 'success');
-            }
-        },
-
-        async importOrders() {
-            const { value: text } = await Swal.fire({
-                title: 'IA: SEPARAR PEDIDOS',
-                html: '<small>Detecta "CLIENTE:" y crea tarjetas separadas.</small>',
-                input: 'textarea',
-                inputPlaceholder: 'JUAN PEREZ:\n10 poleras\n\nCOLEGIO:\n50 buzos',
-                inputAttributes: { style: 'height:250px' }
-            });
-            if(text) {
-                const lines = text.split('\n');
-                let client = 'VARIOS', items = [], count = 0;
-                
-                const save = () => {
-                    if(items.length > 0) {
-                        App.data.ord.push({c:client, date:new Date().toLocaleDateString(), deadline:new Date().toLocaleDateString(), st:'PROCESO', items:items});
-                        count++; items = [];
-                    }
-                };
-
-                lines.forEach(l => {
-                    const clean = l.trim();
-                    if(!clean) return;
-                    if(clean.includes(':') || (isNaN(clean.charAt(0)) && clean.length<20 && !clean.match(/\d/))) {
-                        save(); client = clean.replace(':','').toUpperCase();
-                    } else {
-                        const it = App.IA.parseLine(clean);
-                        if(it) items.push({p:it.n, q:it.q, sz:it.sz, st:'PENDIENTE'});
-                    }
-                });
-                save();
-                App.save();
-                App.Render.ordenes(); // REFRESH VISUAL
-                Swal.fire('Procesado', `Se generaron ${count} pedidos.`, 'success');
-            }
+        // --- NAVEGACIÓN ---
+        function showSection(sectionId) {
+            // Ocultar todas las secciones
+            document.querySelectorAll('.section-content').forEach(el => el.classList.add('hidden'));
+            // Mostrar la seleccionada
+            document.getElementById(sectionId).classList.remove('hidden');
+            
+            // Actualizar estilo activo del sidebar
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('bg-gray-800'));
+            // (Lógica simple de highlight, se puede mejorar buscando el elemento clickeado)
         }
-    },
 
-    // --- ACCIONES MANUALES ---
-    Actions: {
-        // *** MANUAL CON LIBERTAD DE TALLA ***
-        async prodModal() {
-            const { value: form } = await Swal.fire({
-                title: 'NUEVO PRODUCTO',
-                html: `
-                    <input id="new-n" class="swal2-input" placeholder="Nombre (Ej: JEANS)">
-                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:15px;">
-                        <input id="new-sz" class="swal2-input" placeholder="Talla (Cualquiera)" style="margin:0">
-                        <input id="new-q" type="number" class="swal2-input" placeholder="Cantidad" style="margin:0">
-                    </div>
-                `,
-                focusConfirm: false,
-                preConfirm: () => {
-                    return {
-                        n: document.getElementById('new-n').value,
-                        sz: document.getElementById('new-sz').value,
-                        q: document.getElementById('new-q').value
-                    }
-                }
-            });
+        // --- MODALES ---
+        function openModal(modalId) {
+            document.getElementById(modalId).classList.remove('hidden');
+        }
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.add('hidden');
+        }
 
-            if(form && form.n && form.q) {
-                const sizeName = form.sz ? form.sz.toUpperCase() : 'UNICA';
-                const qty = parseInt(form.q);
-                
-                if (!App.data.inv) App.data.inv = [];
-                let exists = App.data.inv.find(p => p.n === form.n.toUpperCase());
-                
-                if (exists) {
-                    exists.s[sizeName] = (exists.s[sizeName] || 0) + qty;
-                } else {
-                    const stock = {}; stock[sizeName] = qty;
-                    App.data.inv.push({ n: form.n.toUpperCase(), sku: 'REF-'+Math.floor(Math.random()*99999), s: stock });
-                }
+        // --- LÓGICA DE ÓRDENES (OC) ---
+        const orderForm = document.getElementById('orderForm');
+        
+        orderForm.addEventListener('submit', function(e) {
+            // PIENSA: Evitar recarga
+            e.preventDefault(); 
 
-                App.save();
-                App.Render.bodega(); // ACTUALIZACIÓN INSTANTANEA
-                Swal.fire('Guardado', `${form.n} actualizado.`, 'success');
-            }
-        },
+            // Obtener valores
+            const client = document.getElementById('orderClient').value;
+            const id = document.getElementById('orderId').value;
+            const date = document.getElementById('orderDate').value;
 
-        delInv(i) {
-            Swal.fire({title:'¿Eliminar?', icon:'warning', showCancelButton:true}).then(r=>{
-                if(r.isConfirmed){ App.data.inv.splice(i,1); App.save(); App.Render.bodega(); }
-            });
-        },
+            // Crear objeto
+            const newOrder = {
+                id: id,
+                client: client,
+                date: date,
+                status: 'Pendiente'
+            };
 
-        async sendFab(i) {
-            const p = App.data.inv[i];
-            const {value:form} = await Swal.fire({
-                title: `PRODUCIR: ${p.n}`,
-                html: `
-                    <input id="f-q" type="number" class="swal2-input" placeholder="Cantidad Total">
-                    <label style="display:block;margin-top:10px;font-weight:bold;">Ruta (Separa con >):</label>
-                    <textarea id="f-r" class="swal2-textarea" style="margin:5px 0;">CORTE (JUAN) > TALLER > PLANCHA</textarea>
-                `,
-                preConfirm:() => ({q:document.getElementById('f-q').value, r:document.getElementById('f-r').value})
-            });
+            // Guardar en Array
+            orders.push(newOrder);
+            
+            // Guardar en LocalStorage
+            localStorage.setItem('ordersData', JSON.stringify(orders));
 
-            if(form && form.q && form.r) {
-                const steps = form.r.split('>').map(s => {
-                    const m = s.trim().match(/([^(]+)(?:\(([^)]+)\))?/);
-                    return { n: m[1].trim().toUpperCase(), r: m[2]?m[2].trim().toUpperCase():'TALLER' };
-                });
-                if(!App.data.fab) App.data.fab = [];
-                App.data.fab.push({ n:p.n, qty:parseInt(form.q), route:steps, stepIdx:0, start:Date.now() });
-                App.save();
-                App.UI.subTab('fabrica', document.querySelectorAll('.sub-tab')[1]);
-            }
-        },
+            // PIENSA: Actualizar la vista INMEDIATAMENTE
+            renderOrders();
+            updateDashboard();
 
-        advanceFab(i) {
-            const f = App.data.fab[i];
-            if(f.stepIdx < f.route.length-1) {
-                f.stepIdx++; App.save(); App.Render.fabrica();
+            // Limpiar y cerrar
+            orderForm.reset();
+            closeModal('orderModal');
+            
+            // Feedback
+            alert('OC Guardada Correctamente');
+        });
+
+        function renderOrders() {
+            const tbody = document.getElementById('orders-table-body');
+            const noDataMsg = document.getElementById('no-orders-msg');
+            
+            tbody.innerHTML = ''; // Limpiar tabla antes de pintar
+
+            if (orders.length === 0) {
+                noDataMsg.classList.remove('hidden');
+                return;
             } else {
-                Swal.fire({title:'¿Terminado?', text:'Vuelve a stock', showCancelButton:true}).then(r=>{
-                    if(r.isConfirmed) {
-                        let p = App.data.inv.find(x=>x.n===f.n);
-                        if(p) p.s['PROD'] = (p.s['PROD']||0) + parseInt(f.qty);
-                        App.data.fab.splice(i,1); App.save(); App.Render.fabrica();
-                    }
-                });
+                noDataMsg.classList.add('hidden');
             }
-        },
 
-        async newOC() {
-            const {value:form} = await Swal.fire({
-                title:'NUEVO PEDIDO',
-                html:`<input id="c" class="swal2-input" placeholder="Cliente"><input id="d" type="date" class="swal2-input">`,
-                preConfirm:()=>({c:document.getElementById('c').value, d:document.getElementById('d').value})
-            });
-            if(form) {
-                if(!App.data.ord) App.data.ord = [];
-                App.data.ord.push({c:form.c.toUpperCase(), deadline:form.d, st:'PROCESO', items:[]});
-                App.save();
-                App.Render.ordenes();
-            }
-        },
-
-        logDay(k) {
-            Swal.fire({title:'Nota del Día', input:'textarea', inputValue:App.data.logs[k]||''}).then(r=>{
-                if(r.value!==undefined) { App.data.logs[k]=r.value; App.save(); App.Render.calendar(); }
+            orders.forEach((order, index) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm font-bold text-gray-900">${order.id}</td>
+                    <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm text-gray-900">${order.client}</td>
+                    <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm text-gray-900">${order.date}</td>
+                    <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                        <span class="relative inline-block px-3 py-1 font-semibold text-orange-900 leading-tight">
+                            <span aria-hidden class="absolute inset-0 bg-orange-200 opacity-50 rounded-full"></span>
+                            <span class="relative">${order.status}</span>
+                        </span>
+                    </td>
+                    <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                        <button onclick="deleteOrder(${index})" class="text-red-600 hover:text-red-900"><i class="fas fa-trash"></i></button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
             });
         }
-    },
 
-    UI: {
-        go(id, el) {
-            document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
-            document.querySelectorAll('.dock i').forEach(i=>i.classList.remove('active'));
-            document.getElementById('v-'+id).classList.add('active');
-            el.classList.add('active');
-        },
-        subTab(t, el) {
-            document.getElementById('mod-bodega').style.display = t==='bodega'?'block':'none';
-            document.getElementById('mod-fabrica').style.display = t==='fabrica'?'block':'none';
-            document.querySelectorAll('.sub-tab').forEach(b=>b.classList.remove('active'));
-            el.classList.add('active');
+        function deleteOrder(index) {
+            if(confirm('¿Eliminar esta orden?')) {
+                orders.splice(index, 1);
+                localStorage.setItem('ordersData', JSON.stringify(orders));
+                renderOrders();
+                updateDashboard();
+            }
         }
-    },
 
-    Render: {
-        all() { this.bodega(); this.fabrica(); this.ordenes(); this.calendar(); },
+        // --- LÓGICA DE INVENTARIO ---
+        const inventoryForm = document.getElementById('inventoryForm');
 
-        bodega() {
-            const q = document.getElementById('search-inv').value.toUpperCase();
-            const list = App.data.inv || [];
-            document.getElementById('list-bodega').innerHTML = list.filter(x=>x.n.includes(q)).map((p,i)=>`
-                <div class="card">
-                    <div style="display:flex;justify-content:space-between;"><b>${p.n}</b> <small>${p.sku}</small></div>
-                    <div style="margin:5px 0; color:#64748b; font-size:0.8rem;">
-                        ${Object.entries(p.s).map(([k,v])=>`<span style="background:#f1f5f9;margin-right:5px;padding:2px 6px;border-radius:4px;">${k}:${v}</span>`).join('')}
-                    </div>
-                    <div style="display:flex; gap:10px; margin-top:10px;">
-                        <button class="btn btn-sec" onclick="App.Actions.sendFab(${i})">PRODUCIR</button>
-                        <button class="btn btn-sec" style="width:auto; color:red;" onclick="App.Actions.delInv(${i})"><i class="fa-solid fa-trash"></i></button>
-                    </div>
-                </div>`).join('');
-        },
+        inventoryForm.addEventListener('submit', function(e) {
+            e.preventDefault(); // PIENSA: Importante
 
-        fabrica() {
-            const list = App.data.fab || [];
-            document.getElementById('list-fabrica').innerHTML = list.map((f,i)=>`
-                <div class="card" style="border-left:4px solid var(--gold);">
-                    <div style="display:flex;justify-content:space-between;"><b>${f.n}</b> <b>${f.qty} un.</b></div>
-                    <div class="step-track">${f.route.map((s,x)=>`<div class="step-pill ${x<f.stepIdx?'done':(x===f.stepIdx?'active':'')}">${x+1}.${s.n}</div>`).join('')}</div>
-                    <button class="btn btn-pri" onclick="App.Actions.advanceFab(${i})">${f.stepIdx===f.route.length-1?'FINALIZAR':'AVANZAR ETAPA'}</button>
-                </div>`).join('');
-        },
+            const sku = document.getElementById('prodSku').value;
+            const name = document.getElementById('prodName').value;
+            const cat = document.getElementById('prodCat').value;
+            const stock = document.getElementById('prodStock').value;
 
-        ordenes() {
-            const list = App.data.ord || [];
-            document.getElementById('list-ordenes').innerHTML = list.map(o=>`
-                <div class="card">
-                    <div style="display:flex;justify-content:space-between;"><b>${o.c}</b> <small>${o.deadline}</small></div>
-                    <ul style="padding-left:20px;font-size:0.85rem;">${o.items.map(it=>`<li>${it.q} ${it.p} (${it.sz})</li>`).join('')}</ul>
-                </div>`).join('');
-        },
+            const newItem = { sku, name, cat, stock };
 
-        calendar() {
-            const d = new Date();
-            const months = ["ENERO","FEBRERO","MARZO","ABRIL","MAYO","JUNIO","JULIO","AGOSTO","SEPTIEMBRE","OCTUBRE","NOVIEMBRE","DICIEMBRE"];
-            // HEADER CALENDARIO
-            document.getElementById('cal-header').innerText = `${months[d.getMonth()]} ${d.getFullYear()}`;
+            inventory.push(newItem);
+            localStorage.setItem('inventoryData', JSON.stringify(inventory));
 
-            // LOGICA DIAS
-            const firstDay = new Date(d.getFullYear(), d.getMonth(), 1).getDay(); // Dia semana que empieza el mes
-            // Ajuste para Lunes = 1 (JS devuelve Domingo = 0)
-            const startOffset = firstDay === 0 ? 6 : firstDay - 1; 
+            renderInventory(); // PIENSA: Repintar
+            updateDashboard();
 
-            const daysInMonth = new Date(d.getFullYear(), d.getMonth()+1, 0).getDate();
-            let h = '';
+            inventoryForm.reset();
+            closeModal('inventoryModal');
+            alert('Producto Agregado');
+        });
+
+        function renderInventory() {
+            const tbody = document.getElementById('inventory-table-body');
+            const noDataMsg = document.getElementById('no-inventory-msg');
             
-            // Relleno dias vacios antes del 1
-            for(let j=0; j<startOffset; j++) h+=`<div></div>`;
+            tbody.innerHTML = '';
 
-            for(let i=1; i<=daysInMonth; i++) {
-                const dk = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(i).padStart(2,'0')}`;
-                const lk = `${i}-${d.getMonth()}-${d.getFullYear()}`;
-                const isToday = i === d.getDate();
-                const hasOc = (App.data.ord||[]).some(o=>o.deadline===dk);
-                const hasLog = (App.data.logs||{})[lk];
-
-                h+=`<div class="cal-day ${isToday?'today':''}" onclick="App.Actions.logDay('${lk}')">
-                    ${i} <div style="display:flex;gap:2px;">
-                        ${hasOc?'<div class="dot-marker" style="background:#ef4444"></div>':''}
-                        ${hasLog?'<div class="dot-marker" style="background:#d97706"></div>':''}
-                    </div>
-                </div>`;
+            if (inventory.length === 0) {
+                noDataMsg.classList.remove('hidden');
+                return;
+            } else {
+                noDataMsg.classList.add('hidden');
             }
-            document.getElementById('cal-grid').innerHTML = h;
-            
-            const up = (App.data.ord||[]).filter(o=>{
-                const diff = (new Date(o.deadline)-d)/(1000*60*60*24);
-                return diff>=-1 && diff<=7;
-            });
-            document.getElementById('upcoming-list').innerHTML = up.length ? up.map(o=>`<div><b>${o.c}</b>: ${o.deadline}</div>`).join('') : '<small>Todo en orden.</small>';
-        },
 
-        Backup: {
-            download() {
-                const doc = new window.jspdf.jsPDF();
-                doc.text("REPORTE V18",10,20);
-                doc.autoTable({startY:30, head:[['Producto','Stock']], body:App.data.inv.map(x=>[x.n, JSON.stringify(x.s)])});
-                doc.save('IdeasTextiles.pdf');
+            inventory.forEach((item, index) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm font-mono text-gray-600">${item.sku}</td>
+                    <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm font-bold text-gray-800">${item.name}</td>
+                    <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm text-gray-600">${item.cat}</td>
+                    <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm font-bold text-green-600">${item.stock} u.</td>
+                    <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                        <button onclick="deleteInventory(${index})" class="text-red-600 hover:text-red-900"><i class="fas fa-trash"></i></button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function deleteInventory(index) {
+            inventory.splice(index, 1);
+            localStorage.setItem('inventoryData', JSON.stringify(inventory));
+            renderInventory();
+            updateDashboard();
+        }
+
+        // --- DASHBOARD ---
+        function updateDashboard() {
+            document.getElementById('total-orders-count').innerText = orders.length;
+            document.getElementById('total-inventory-count').innerText = inventory.length;
+        }
+
+        // --- CALENDARIO TIPO CELULAR (GRID COMPLETO) ---
+        let currDate = new Date();
+        
+        function renderCalendar() {
+            const monthYear = document.getElementById('calendar-month-year');
+            const daysGrid = document.getElementById('calendar-days-grid');
+            
+            // Limpiar grid anterior
+            daysGrid.innerHTML = '';
+            
+            const year = currDate.getFullYear();
+            const month = currDate.getMonth();
+            
+            // Nombres de meses
+            const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+            
+            monthYear.innerText = `${monthNames[month]} ${year}`;
+            
+            // Primer día del mes (para saber dónde empezar a pintar)
+            const firstDayIndex = new Date(year, month, 1).getDay(); // 0 = Domingo
+            
+            // Total días en el mes actual
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            
+            // Total días mes anterior (para rellenar huecos)
+            const prevLastDay = new Date(year, month, 0).getDate();
+            
+            // FECHA DE HOY REAL (para marcar el círculo azul)
+            const todayReal = new Date();
+
+            // 1. Rellenar días vacíos del mes anterior (Grises)
+            for (let x = firstDayIndex; x > 0; x--) {
+                const dayDiv = document.createElement('div');
+                dayDiv.className = 'calendar-day text-gray-300 bg-gray-50';
+                dayDiv.innerText = prevLastDay - x + 1;
+                daysGrid.appendChild(dayDiv);
+            }
+            
+            // 2. Rellenar días del mes actual
+            for (let i = 1; i <= daysInMonth; i++) {
+                const dayDiv = document.createElement('div');
+                dayDiv.className = 'calendar-day bg-white hover:bg-blue-50 cursor-pointer';
+                
+                // Verificar si es HOY
+                if (i === todayReal.getDate() && month === todayReal.getMonth() && year === todayReal.getFullYear()) {
+                    dayDiv.innerHTML = `<div class="today">${i}</div>`;
+                } else {
+                    dayDiv.innerText = i;
+                }
+                
+                // Verificar si hay una OC ese día (Pequeño punto indicador)
+                // Formato fecha input: YYYY-MM-DD
+                const checkDateStr = `${year}-${String(month+1).padStart(2,'0')}-${String(i).padStart(2,'0')}`;
+                const hasOrder = orders.some(o => o.date === checkDateStr);
+                
+                if (hasOrder) {
+                    const dot = document.createElement('div');
+                    dot.className = 'absolute bottom-1 right-1 w-2 h-2 bg-yellow-500 rounded-full';
+                    dayDiv.appendChild(dot);
+                }
+
+                daysGrid.appendChild(dayDiv);
+            }
+            
+            // 3. Rellenar huecos finales (opcional, para cuadrar la grilla visualmente)
+            const totalSlots = daysGrid.children.length;
+            const nextDays = 42 - totalSlots; // 6 filas de 7 = 42
+            
+            for (let j = 1; j <= nextDays; j++) {
+                const dayDiv = document.createElement('div');
+                dayDiv.className = 'calendar-day text-gray-300 bg-gray-50';
+                dayDiv.innerText = j;
+                daysGrid.appendChild(dayDiv);
             }
         }
-    }
-};
 
-App.init();
-</script>
+        function changeMonth(dir) {
+            currDate.setMonth(currDate.getMonth() + dir);
+            renderCalendar();
+        }
+
+    </script>
 </body>
 </html>
