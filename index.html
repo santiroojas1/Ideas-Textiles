@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IDEASTEXTILESSPA</title>
+    <title>IDEASTEXTILES</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
@@ -49,7 +49,7 @@
     <aside class="w-64 bg-gray-900 text-white flex-col flex-shrink-0 hidden md:flex z-20 shadow-2xl no-print">
         <div class="p-6 flex items-center justify-center border-b border-gray-800">
             <i class="fas fa-scissors text-3xl text-yellow-500 mr-3"></i>
-            <h1 class="text-lg font-bold tracking-wider">GESTIÓN WW</h1>
+            <h1 class="text-lg font-bold tracking-wider">IDEAS TEXTILES</h1>
         </div>
         
         <nav class="mt-6 flex-1 px-4 space-y-2">
@@ -63,13 +63,13 @@
                 <i class="fas fa-calendar-alt w-6"></i> Calendario
             </button>
             <button onclick="showSection('analysis')" class="nav-item w-full text-left py-3 px-4 rounded hover:bg-gray-800 transition flex items-center">
-                <i class="fas fa-robot w-6"></i> IA / Análisis
+                <i class="fas fa-brain w-6"></i> IA / Análisis
             </button>
         </nav>
 
         <div class="p-4 border-t border-gray-800">
             <button onclick="confirmFullReset()" class="w-full bg-red-900 hover:bg-red-700 text-xs py-2 rounded text-red-200 transition">
-                <i class="fas fa-bomb mr-1"></i> DERECHOS RESERVADOS
+                <i class="fas fa-bomb mr-1"></i> RESET TOTAL SISTEMA
             </button>
         </div>
     </aside>
@@ -98,7 +98,7 @@
                 <div class="flex justify-between items-center mb-6">
                     <div>
                         <h2 class="text-3xl font-bold text-gray-800">Inventario</h2>
-                        <p class="text-sm text-gray-500">Gestión de productos, tallas y stock.</p>
+                        <p class="text-sm text-gray-500">Gestión de productos, tallas dinámicas y stock.</p>
                     </div>
                     <div class="space-x-2">
                         <button onclick="confirmReset('inventory')" class="bg-red-100 text-red-600 px-3 py-2 rounded hover:bg-red-200 text-sm">
@@ -154,9 +154,9 @@
                             <tr>
                                 <th class="px-5 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">ID OC</th>
                                 <th class="px-5 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Cliente</th>
-                                <th class="px-5 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Fecha / Entrega</th>
+                                <th class="px-5 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Entrega</th>
                                 <th class="px-5 py-3 text-center text-xs font-bold text-gray-600 uppercase tracking-wider">Estado</th>
-                                <th class="px-5 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Detalles Despacho</th>
+                                <th class="px-5 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Detalles</th>
                                 <th class="px-5 py-3 text-center text-xs font-bold text-gray-600 uppercase tracking-wider">Acciones</th>
                             </tr>
                         </thead>
@@ -189,19 +189,46 @@
 
             <div id="analysis" class="section-content hidden">
                 <h2 class="text-3xl font-bold text-gray-800 mb-6 flex items-center">
-                    <i class="fas fa-robot text-blue-500 mr-3"></i> Detección y Análisis IA
+                    <i class="fas fa-brain text-purple-600 mr-3"></i> Inteligencia de Negocio (IA)
                 </h2>
                 
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <div class="bg-white p-6 rounded-xl shadow-md border-l-4 border-purple-500 flex items-center justify-between">
+                        <div>
+                            <p class="text-sm text-gray-500 font-bold uppercase">Salud Operativa</p>
+                            <h3 id="ia-health-score" class="text-3xl font-black text-gray-800">100%</h3>
+                        </div>
+                        <i class="fas fa-heartbeat text-3xl text-purple-200"></i>
+                    </div>
+                     <div class="bg-white p-6 rounded-xl shadow-md border-l-4 border-blue-500 flex items-center justify-between">
+                        <div>
+                            <p class="text-sm text-gray-500 font-bold uppercase">En Producción</p>
+                            <h3 id="ia-production-count" class="text-3xl font-black text-gray-800">0</h3>
+                        </div>
+                        <i class="fas fa-tshirt text-3xl text-blue-200"></i>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow-md border-l-4 border-green-500 flex items-center justify-between">
+                        <div>
+                            <p class="text-sm text-gray-500 font-bold uppercase">Total Despachado</p>
+                            <h3 id="ia-shipped-count" class="text-3xl font-black text-gray-800">0</h3>
+                        </div>
+                        <i class="fas fa-shipping-fast text-3xl text-green-200"></i>
+                    </div>
+                </div>
+
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="bg-white p-6 rounded-xl shadow-lg border-t-4 border-blue-500">
-                        <h3 class="font-bold text-lg mb-4 text-gray-700">Estado del Sistema</h3>
-                        <div id="ia-status-list" class="space-y-3">
+                    <div class="bg-white p-6 rounded-xl shadow-lg">
+                        <h3 class="font-bold text-lg mb-4 text-gray-700 border-b pb-2">Diagnóstico del Sistema</h3>
+                        <div id="ia-diagnosis-list" class="space-y-4">
                             </div>
                     </div>
 
-                    <div class="bg-white p-6 rounded-xl shadow-lg border-t-4 border-red-500">
-                        <h3 class="font-bold text-lg mb-4 text-gray-700">Stock Crítico & Sugerencias</h3>
-                        <div id="ia-stock-list" class="space-y-3">
+                    <div class="bg-white p-6 rounded-xl shadow-lg">
+                        <h3 class="font-bold text-lg mb-4 text-gray-700 border-b pb-2 flex items-center">
+                            <i class="fas fa-magic text-yellow-500 mr-2"></i> Sugerencias de Reposición
+                        </h3>
+                        <p class="text-xs text-gray-400 mb-3">Basado en stock actual vs umbral de seguridad (20 un.)</p>
+                        <div id="ia-suggestion-list" class="space-y-3 max-h-64 overflow-y-auto">
                             </div>
                     </div>
                 </div>
@@ -234,18 +261,17 @@
                     <input type="text" id="prodName" required class="w-full border border-gray-300 rounded px-3 py-2 focus:ring-2 focus:ring-yellow-400 outline-none">
                 </div>
                 
-                <div class="mb-4 flex items-center">
-                    <input type="checkbox" id="hasSizes" class="mr-2 h-4 w-4" checked onchange="toggleSizeInputs()">
-                    <label for="hasSizes" class="text-sm font-semibold text-gray-700">Producto con Tallas (S, M, L...)</label>
+                <div class="mb-2 flex items-center justify-between">
+                    <div class="flex items-center">
+                        <input type="checkbox" id="hasSizes" class="mr-2 h-4 w-4" checked onchange="toggleSizeInputs()">
+                        <label for="hasSizes" class="text-sm font-semibold text-gray-700">Producto con Tallas</label>
+                    </div>
+                    <button type="button" id="btnAddSize" onclick="addCustomSizeInput()" class="text-xs bg-blue-100 text-blue-600 px-2 py-1 rounded font-bold hover:bg-blue-200 hidden">+ Nueva Talla</button>
                 </div>
 
-                <div id="sizeInputs" class="grid grid-cols-4 gap-2 mb-4 bg-gray-50 p-3 rounded border border-gray-200">
-                    <div><label class="text-xs font-bold text-center block">S</label><input type="number" id="stockS" value="0" class="w-full border rounded px-1 py-1 text-center"></div>
-                    <div><label class="text-xs font-bold text-center block">M</label><input type="number" id="stockM" value="0" class="w-full border rounded px-1 py-1 text-center"></div>
-                    <div><label class="text-xs font-bold text-center block">L</label><input type="number" id="stockL" value="0" class="w-full border rounded px-1 py-1 text-center"></div>
-                    <div><label class="text-xs font-bold text-center block">XL</label><input type="number" id="stockXL" value="0" class="w-full border rounded px-1 py-1 text-center"></div>
-                    <div><label class="text-xs font-bold text-center block">XXL</label><input type="number" id="stockXXL" value="0" class="w-full border rounded px-1 py-1 text-center"></div>
-                </div>
+                <div id="dynamicSizeContainer" class="grid grid-cols-4 gap-2 mb-4 bg-gray-50 p-3 rounded border border-gray-200 max-h-40 overflow-y-auto">
+                    </div>
+
                 <div id="singleStockInput" class="mb-4 hidden">
                     <label class="block text-sm font-bold text-gray-700 mb-1">Stock Total</label>
                     <input type="number" id="stockUnique" value="0" class="w-full border border-gray-300 rounded px-3 py-2">
@@ -262,7 +288,7 @@
     <div id="orderModal" class="fixed inset-0 bg-gray-900 bg-opacity-60 hidden z-50 flex items-center justify-center backdrop-blur-sm">
         <div class="bg-white rounded-lg shadow-2xl w-full max-w-4xl p-6 h-5/6 flex flex-col">
             <div class="flex justify-between items-center mb-4 border-b pb-2">
-                <h3 class="text-xl font-bold text-gray-800">Nueva Orden de Compra</h3>
+                <h3 class="text-xl font-bold text-gray-800" id="orderModalTitle">Nueva Orden de Compra</h3>
                 <button onclick="closeModal('orderModal')" class="text-gray-400 hover:text-red-500"><i class="fas fa-times text-xl"></i></button>
             </div>
             
@@ -291,8 +317,11 @@
                                 </select>
                             <button type="button" onclick="addProductToOrder()" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"><i class="fas fa-plus"></i></button>
                         </div>
-                        <div id="orderSizeInputs" class="flex gap-2 items-end hidden bg-blue-50 p-2 rounded mb-2">
+                        <div id="orderSizeInputs" class="flex flex-wrap gap-2 items-end hidden bg-blue-50 p-2 rounded mb-2">
                             </div>
+                        <div id="orderItemNoteContainer" class="hidden mt-2">
+                             <input type="text" id="addOrder_Note" placeholder="Añadir nota al producto: (ej: Logo bordado izq, Basta +2cm, etc.)" class="w-full border-2 border-yellow-200 rounded px-3 py-2 text-sm bg-yellow-50 focus:border-yellow-400 outline-none">
+                        </div>
                     </div>
 
                     <div class="bg-white border rounded shadow-inner min-h-[150px] overflow-hidden">
@@ -314,7 +343,7 @@
             </div>
 
             <div class="pt-4 border-t flex justify-between items-center">
-                <span class="text-xs text-gray-500">* Recuerda verificar el stock antes de guardar.</span>
+                <span class="text-xs text-gray-500">* Verifica stock antes de guardar.</span>
                 <div class="flex">
                     <button type="button" onclick="closeModal('orderModal')" class="mr-3 px-4 py-2 text-gray-600 hover:bg-gray-100 rounded">Cancelar</button>
                     <button type="button" onclick="saveOrder()" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded font-bold shadow">Guardar Orden</button>
@@ -326,8 +355,7 @@
     <div id="dispatchModal" class="fixed inset-0 bg-black bg-opacity-70 hidden z-[60] flex items-center justify-center">
         <div class="bg-white rounded-lg shadow-2xl w-96 p-6 border-l-4 border-green-600">
             <h3 class="text-xl font-bold text-gray-800 mb-2">Confirmar Despacho</h3>
-            <p class="text-sm text-gray-600 mb-4">Para marcar como "Despachado", es obligatorio ingresar los datos de facturación.</p>
-            
+            <p class="text-sm text-gray-600 mb-4">Ingrese datos de facturación para cerrar la orden.</p>
             <div class="mb-3">
                 <label class="block text-sm font-bold text-gray-700">Nro. Factura</label>
                 <input type="text" id="dispatchInvoice" class="w-full border-2 border-green-100 rounded px-3 py-2 focus:border-green-500 outline-none">
@@ -336,10 +364,9 @@
                 <label class="block text-sm font-bold text-gray-700">Cantidad de Cajas</label>
                 <input type="number" id="dispatchBoxes" class="w-full border-2 border-green-100 rounded px-3 py-2 focus:border-green-500 outline-none">
             </div>
-            
             <div class="flex justify-end">
                 <button onclick="closeModal('dispatchModal')" class="mr-2 text-gray-500 hover:text-gray-700 px-3 py-1">Cancelar</button>
-                <button onclick="confirmDispatch()" class="bg-green-600 text-white font-bold px-4 py-2 rounded hover:bg-green-700 shadow">Confirmar y Despachar</button>
+                <button onclick="confirmDispatch()" class="bg-green-600 text-white font-bold px-4 py-2 rounded hover:bg-green-700 shadow">Confirmar</button>
             </div>
         </div>
     </div>
@@ -354,26 +381,27 @@
         </div>
     </div>
 
-    <div id="print-area" class="print-only p-8">
-        </div>
+    <div id="print-area" class="print-only p-8"></div>
 
     <script>
-        // --- 1. GESTIÓN DE DATOS (LOCALSTORAGE) ---
+        // --- 1. DATOS ---
         let inventory = JSON.parse(localStorage.getItem('ww_inventory')) || [];
         let orders = JSON.parse(localStorage.getItem('ww_orders')) || [];
         let calendarNotes = JSON.parse(localStorage.getItem('ww_notes')) || {};
         
-        // Variables Temporales
         let tempOrderItems = []; 
         let currentDispatchOrderId = null;
         let currentDate = new Date();
         let currentNoteDate = null;
+        let editingOrderIndex = null; // Para saber si editamos o creamos
+
+        // Tallas base por defecto
+        const defaultSizes = ['S', 'M', 'L', 'XL', 'XXL'];
 
         // --- 2. INICIALIZACIÓN ---
         document.addEventListener('DOMContentLoaded', () => {
-            showSection('inventory'); // Inventario por defecto
+            showSection('inventory');
             renderInventory();
-            updateOrderProductSelect();
             updateAnalysis();
         });
 
@@ -381,12 +409,10 @@
             document.querySelectorAll('.section-content').forEach(el => el.classList.add('hidden'));
             document.getElementById(id).classList.remove('hidden');
             
-            // Renderizados específicos al entrar
             if(id === 'orders') renderOrders();
             if(id === 'calendar') renderCalendar();
             if(id === 'analysis') updateAnalysis();
             
-            // Actualizar Nav Activo
             document.querySelectorAll('.nav-item').forEach(btn => {
                 btn.classList.remove('bg-gray-800', 'text-yellow-500');
                 if(btn.getAttribute('onclick').includes(id)) {
@@ -395,26 +421,72 @@
             });
         }
 
-        // --- 3. LÓGICA DE INVENTARIO ---
+        // --- 3. INVENTARIO CON TALLAS DINÁMICAS ---
+        
         function openProductModal() {
             document.getElementById('productForm').reset();
-            // Generar SKU Automático: WW + (Total + 1) formateado a 4 dígitos
             let nextId = inventory.length + 1;
             document.getElementById('prodSku').value = `WW-${String(nextId).padStart(4, '0')}`;
+            
+            // Renderizar tallas por defecto
+            renderDynamicSizeInputs(defaultSizes, {});
+            
             toggleSizeInputs();
             document.getElementById('productModal').classList.remove('hidden');
         }
 
+        function renderDynamicSizeInputs(sizesArray, valuesObj) {
+            const container = document.getElementById('dynamicSizeContainer');
+            container.innerHTML = '';
+            
+            sizesArray.forEach(size => {
+                const val = valuesObj[size] || 0;
+                const div = document.createElement('div');
+                div.innerHTML = `
+                    <label class="text-xs font-bold text-center block text-gray-600">${size}</label>
+                    <input type="number" name="size_${size}" value="${val}" class="w-full border rounded px-1 py-1 text-center font-mono focus:border-blue-500 outline-none size-input-field" data-size="${size}">
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function addCustomSizeInput() {
+            const sizeName = prompt("Ingrese el nombre de la nueva talla (ej: XS, 3XL, 40):");
+            if(sizeName && sizeName.trim() !== "") {
+                const cleanName = sizeName.trim().toUpperCase();
+                // Verificar si ya existe en el DOM
+                const existing = document.querySelector(`input[data-size="${cleanName}"]`);
+                if(existing) {
+                    alert("Esa talla ya existe.");
+                    return;
+                }
+                
+                const container = document.getElementById('dynamicSizeContainer');
+                const div = document.createElement('div');
+                div.innerHTML = `
+                    <label class="text-xs font-bold text-center block text-blue-600">${cleanName}</label>
+                    <input type="number" name="size_${cleanName}" value="0" class="w-full border-2 border-blue-100 rounded px-1 py-1 text-center font-mono focus:border-blue-500 outline-none size-input-field" data-size="${cleanName}">
+                `;
+                container.appendChild(div);
+            }
+        }
+
         function toggleSizeInputs() {
             const hasSizes = document.getElementById('hasSizes').checked;
+            const container = document.getElementById('dynamicSizeContainer');
+            const btn = document.getElementById('btnAddSize');
+            const single = document.getElementById('singleStockInput');
+
             if(hasSizes) {
-                document.getElementById('sizeInputs').classList.remove('hidden');
-                document.getElementById('sizeInputs').classList.add('grid');
-                document.getElementById('singleStockInput').classList.add('hidden');
+                container.classList.remove('hidden');
+                container.classList.add('grid');
+                btn.classList.remove('hidden');
+                single.classList.add('hidden');
             } else {
-                document.getElementById('sizeInputs').classList.add('hidden');
-                document.getElementById('sizeInputs').classList.remove('grid');
-                document.getElementById('singleStockInput').classList.remove('hidden');
+                container.classList.add('hidden');
+                container.classList.remove('grid');
+                btn.classList.add('hidden');
+                single.classList.remove('hidden');
             }
         }
 
@@ -429,14 +501,16 @@
             let total = 0;
 
             if(hasSizes) {
-                stockData = {
-                    S: parseInt(document.getElementById('stockS').value) || 0,
-                    M: parseInt(document.getElementById('stockM').value) || 0,
-                    L: parseInt(document.getElementById('stockL').value) || 0,
-                    XL: parseInt(document.getElementById('stockXL').value) || 0,
-                    XXL: parseInt(document.getElementById('stockXXL').value) || 0
-                };
-                total = Object.values(stockData).reduce((a, b) => a + b, 0);
+                // Iterar sobre todos los inputs generados dinámicamente
+                const inputs = document.querySelectorAll('.size-input-field');
+                inputs.forEach(input => {
+                    const size = input.getAttribute('data-size');
+                    const qty = parseInt(input.value) || 0;
+                    if(qty > 0 || defaultSizes.includes(size)) { // Guardar si tiene cantidad o es standard
+                         stockData[size] = qty;
+                         total += qty;
+                    }
+                });
             } else {
                 total = parseInt(document.getElementById('stockUnique').value) || 0;
                 stockData = { unique: total };
@@ -447,7 +521,6 @@
             
             renderInventory();
             closeModal('productModal');
-            alert('Producto guardado correctamente');
         });
 
         function renderInventory() {
@@ -461,13 +534,11 @@
                 inventory.forEach((item, index) => {
                     let sizeStr = '';
                     if(item.hasSizes) {
-                        // Mostrar resumen de tallas
-                        sizeStr = `<div class="flex justify-center gap-1 text-xs">
-                            <span class="bg-gray-100 px-1 rounded">S:${item.stockData.S}</span>
-                            <span class="bg-gray-100 px-1 rounded">M:${item.stockData.M}</span>
-                            <span class="bg-gray-100 px-1 rounded">L:${item.stockData.L}</span>
-                            <span class="bg-gray-100 px-1 rounded">XL:${item.stockData.XL}</span>
-                        </div>`;
+                        sizeStr = `<div class="flex flex-wrap justify-center gap-1 text-xs">`;
+                        for (const [key, value] of Object.entries(item.stockData)) {
+                             sizeStr += `<span class="bg-gray-100 border border-gray-200 px-1 rounded text-gray-600">${key}:${value}</span>`;
+                        }
+                        sizeStr += `</div>`;
                     } else {
                         sizeStr = '<span class="text-gray-400 text-xs">Sin Talla</span>';
                     }
@@ -491,18 +562,41 @@
         }
 
         function deleteItem(index) {
-            if(confirm('¿Eliminar producto? Esta acción no se puede deshacer.')) {
+            if(confirm('¿Eliminar producto?')) {
                 inventory.splice(index, 1);
                 localStorage.setItem('ww_inventory', JSON.stringify(inventory));
                 renderInventory();
             }
         }
 
-        // --- 4. LÓGICA DE ÓRDENES (COMPLEJA) ---
+        // --- 4. ÓRDENES (CON EDICIÓN + NOTAS) ---
         
-        function openOrderModal() {
+        function openOrderModal(editIndex = null) {
             document.getElementById('orderForm').reset();
-            tempOrderItems = [];
+            document.getElementById('orderSizeInputs').innerHTML = '';
+            document.getElementById('orderSizeInputs').classList.add('hidden');
+            document.getElementById('orderItemNoteContainer').classList.add('hidden'); // Ocultar input nota
+            
+            editingOrderIndex = editIndex;
+
+            if(editIndex !== null) {
+                // MODO EDICIÓN
+                const ord = orders[editIndex];
+                document.getElementById('orderModalTitle').innerText = "Editar Orden " + ord.id;
+                document.getElementById('orderId').value = ord.id;
+                document.getElementById('orderId').readOnly = true; // No cambiar ID
+                document.getElementById('orderClient').value = ord.client;
+                document.getElementById('orderDate').value = ord.date;
+                
+                // Clonar items para no modificar referencia directa hasta guardar
+                tempOrderItems = JSON.parse(JSON.stringify(ord.items));
+            } else {
+                // MODO NUEVO
+                document.getElementById('orderModalTitle').innerText = "Nueva Orden de Compra";
+                document.getElementById('orderId').readOnly = false;
+                tempOrderItems = [];
+            }
+            
             renderTempOrderItems();
             document.getElementById('orderModal').classList.remove('hidden');
         }
@@ -513,7 +607,7 @@
             inventory.forEach((p, idx) => {
                 const opt = document.createElement('option');
                 opt.value = idx;
-                opt.text = `${p.sku} - ${p.name} (Stock: ${p.total})`;
+                opt.text = `${p.sku} - ${p.name}`;
                 select.appendChild(opt);
             });
         }
@@ -521,24 +615,28 @@
         function updateOrderSizeInputs() {
             const idx = document.getElementById('orderProductSelect').value;
             const container = document.getElementById('orderSizeInputs');
+            const noteContainer = document.getElementById('orderItemNoteContainer');
             container.innerHTML = '';
             
             if(idx === "") {
                 container.classList.add('hidden');
+                noteContainer.classList.add('hidden');
                 return;
             }
             
             const product = inventory[idx];
             container.classList.remove('hidden');
+            noteContainer.classList.remove('hidden'); // Mostrar campo nota
             
             if(product.hasSizes) {
-                ['S','M','L','XL','XXL'].forEach(size => {
+                // Generar inputs para TODAS las tallas que tenga el producto
+                for (const sizeKey of Object.keys(product.stockData)) {
                     container.innerHTML += `
                         <div class="flex flex-col">
-                            <span class="text-[10px] text-center font-bold">${size}</span>
-                            <input type="number" id="addOrder_${size}" placeholder="0" class="w-12 text-center border rounded text-sm">
+                            <span class="text-[10px] text-center font-bold text-gray-600">${sizeKey}</span>
+                            <input type="number" id="addOrder_${sizeKey}" placeholder="0" class="w-12 text-center border rounded text-sm focus:border-blue-500" data-size-key="${sizeKey}">
                         </div>`;
-                });
+                }
             } else {
                  container.innerHTML += `
                     <div class="flex flex-col flex-1">
@@ -553,22 +651,27 @@
             if(idx === "") return;
             
             const product = inventory[idx];
+            const note = document.getElementById('addOrder_Note').value; // CAPTURAR NOTA
+
             let itemEntry = {
                 sku: product.sku,
                 name: product.name,
                 hasSizes: product.hasSizes,
                 quantities: {},
-                totalItem: 0
+                totalItem: 0,
+                note: note || '' // GUARDAR NOTA
             };
 
             if(product.hasSizes) {
-                let s = parseInt(document.getElementById('addOrder_S').value) || 0;
-                let m = parseInt(document.getElementById('addOrder_M').value) || 0;
-                let l = parseInt(document.getElementById('addOrder_L').value) || 0;
-                let xl = parseInt(document.getElementById('addOrder_XL').value) || 0;
-                let xxl = parseInt(document.getElementById('addOrder_XXL').value) || 0;
-                itemEntry.quantities = { S:s, M:m, L:l, XL:xl, XXL:xxl };
-                itemEntry.totalItem = s+m+l+xl+xxl;
+                const inputs = document.querySelectorAll('#orderSizeInputs input');
+                inputs.forEach(inp => {
+                    const val = parseInt(inp.value) || 0;
+                    if(val > 0) {
+                        const sKey = inp.getAttribute('data-size-key');
+                        itemEntry.quantities[sKey] = val;
+                        itemEntry.totalItem += val;
+                    }
+                });
             } else {
                 let q = parseInt(document.getElementById('addOrder_Unique').value) || 0;
                 itemEntry.quantities = { unique: q };
@@ -578,8 +681,11 @@
             if(itemEntry.totalItem > 0) {
                 tempOrderItems.push(itemEntry);
                 renderTempOrderItems();
-                // Limpiar inputs
-                document.querySelectorAll('#orderSizeInputs input').forEach(i => i.value = '');
+                // Limpiar
+                document.getElementById('orderProductSelect').value = "";
+                document.getElementById('orderSizeInputs').classList.add('hidden');
+                document.getElementById('orderItemNoteContainer').classList.add('hidden');
+                document.getElementById('addOrder_Note').value = "";
             }
         }
 
@@ -595,15 +701,21 @@
                     let detail = '';
                     if(item.hasSizes) {
                         for(let [size, cant] of Object.entries(item.quantities)) {
-                            if(cant > 0) detail += `<span class="mr-2 text-xs bg-gray-200 px-1 rounded">${size}:${cant}</span>`;
+                            detail += `<span class="mr-2 text-xs bg-gray-200 px-1 rounded">${size}:${cant}</span>`;
                         }
                     } else {
                         detail = `${item.quantities.unique} Unidades`;
                     }
+                    
+                    // Mostrar Nota si existe
+                    let noteHtml = item.note ? `<div class="text-[10px] text-blue-600 font-bold mt-1 bg-blue-50 p-1 inline-block rounded"><i class="fas fa-comment-dots mr-1"></i>${item.note}</div>` : '';
 
                     tbody.innerHTML += `
                         <tr class="border-b">
-                            <td class="px-4 py-2 font-bold text-gray-700">${item.name}</td>
+                            <td class="px-4 py-2 font-bold text-gray-700">
+                                ${item.name}
+                                <br>${noteHtml}
+                            </td>
                             <td class="px-4 py-2 text-center text-gray-600">${detail}</td>
                             <td class="px-4 py-2 text-right font-bold">${item.totalItem}</td>
                             <td class="px-4 py-2 text-right">
@@ -621,21 +733,30 @@
             const date = document.getElementById('orderDate').value;
             
             if(!id || !client || !date || tempOrderItems.length === 0) {
-                alert('Por favor complete todos los datos y agregue productos.');
+                alert('Faltan datos o productos.');
                 return;
             }
 
-            orders.push({
+            const orderObj = {
                 id, client, date,
                 items: tempOrderItems,
-                status: 'Pendiente',
-                invoice: '',
-                boxes: ''
-            });
+                status: editingOrderIndex !== null ? orders[editingOrderIndex].status : 'Pendiente', // Mantener estado si edita
+                invoice: editingOrderIndex !== null ? orders[editingOrderIndex].invoice : '',
+                boxes: editingOrderIndex !== null ? orders[editingOrderIndex].boxes : ''
+            };
+
+            if(editingOrderIndex !== null) {
+                // Actualizar existente
+                orders[editingOrderIndex] = orderObj;
+            } else {
+                // Crear nueva
+                orders.push(orderObj);
+            }
 
             localStorage.setItem('ww_orders', JSON.stringify(orders));
             closeModal('orderModal');
             renderOrders();
+            updateAnalysis();
         }
 
         function renderOrders() {
@@ -647,37 +768,32 @@
             } else {
                 document.getElementById('empty-orders').classList.add('hidden');
                 orders.forEach((o, idx) => {
-                    // Colores de estado
                     let statusColor = "bg-gray-200 text-gray-800";
                     if(o.status === 'En Producción') statusColor = "bg-blue-100 text-blue-800";
                     if(o.status === 'Listo') statusColor = "bg-green-100 text-green-800";
                     if(o.status === 'Despachado') statusColor = "bg-green-600 text-white";
 
-                    // Resumen items
-                    let itemsSummary = o.items.map(i => `${i.name} (${i.totalItem})`).join(', ');
-                    if(itemsSummary.length > 30) itemsSummary = itemsSummary.substring(0,30) + '...';
+                    let itemsSummary = o.items.map(i => `${i.name}`).join(', ');
+                    if(itemsSummary.length > 25) itemsSummary = itemsSummary.substring(0,25) + '...';
 
-                    // Info despacho
                     let dispatchInfo = o.status === 'Despachado' 
-                        ? `<div class="text-xs">
-                             <p class="font-bold">FAC: ${o.invoice}</p>
-                             <p>Cajas: ${o.boxes}</p>
-                           </div>` 
-                        : '<span class="text-gray-400 text-xs">-</span>';
+                        ? `<div class="text-xs"><p class="font-bold">FAC: ${o.invoice}</p><p>Cajas: ${o.boxes}</p></div>` 
+                        : '<span class="text-gray-300 text-xs">-</span>';
 
                     const tr = document.createElement('tr');
                     tr.className = "hover:bg-gray-50 border-b";
                     tr.innerHTML = `
                         <td class="px-5 py-3 font-bold">${o.id}</td>
-                        <td class="px-5 py-3">${o.client}</td>
-                        <td class="px-5 py-3 text-sm">${o.date}</td>
+                        <td class="px-5 py-3 text-sm">${o.client}</td>
+                        <td class="px-5 py-3 text-xs text-gray-500">${o.date}</td>
                         <td class="px-5 py-3 text-center">
-                            <button onclick="cycleStatus(${idx})" class="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide cursor-pointer ${statusColor} shadow-sm transition hover:opacity-80">
+                            <button onclick="cycleStatus(${idx})" class="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wide cursor-pointer ${statusColor} shadow-sm transition hover:opacity-80">
                                 ${o.status}
                             </button>
                         </td>
                         <td class="px-5 py-3">${dispatchInfo}</td>
                         <td class="px-5 py-3 text-center flex justify-center space-x-2">
+                             <button onclick="openOrderModal(${idx})" class="text-blue-500 hover:text-blue-700" title="Editar OC"><i class="fas fa-edit"></i></button>
                              <button onclick="printTachas(${idx})" class="text-gray-600 hover:text-black" title="Imprimir Tachas"><i class="fas fa-print"></i></button>
                              <button onclick="deleteOrder(${idx})" class="text-red-500 hover:text-red-700" title="Eliminar"><i class="fas fa-trash"></i></button>
                         </td>
@@ -692,14 +808,12 @@
             const current = orders[index].status;
             let nextIndex = states.indexOf(current) + 1;
             
-            // Si va a pasar a Despachado, interceptar
             if (states[nextIndex] === 'Despachado') {
                 currentDispatchOrderId = index;
                 document.getElementById('dispatchModal').classList.remove('hidden');
                 return; 
             }
-            
-            if (nextIndex >= states.length) nextIndex = 0; // Loop (opcional)
+            if (nextIndex >= states.length) nextIndex = 0; 
             
             orders[index].status = states[nextIndex];
             localStorage.setItem('ww_orders', JSON.stringify(orders));
@@ -710,21 +824,15 @@
         function confirmDispatch() {
             const inv = document.getElementById('dispatchInvoice').value;
             const boxes = document.getElementById('dispatchBoxes').value;
-            
-            if(!inv || !boxes) {
-                alert("La factura y las cajas son obligatorias para despachar.");
-                return;
-            }
+            if(!inv || !boxes) return alert("Datos incompletos.");
             
             orders[currentDispatchOrderId].status = 'Despachado';
             orders[currentDispatchOrderId].invoice = inv;
             orders[currentDispatchOrderId].boxes = boxes;
-            
             localStorage.setItem('ww_orders', JSON.stringify(orders));
-            document.getElementById('dispatchModal').classList.add('hidden');
+            closeModal('dispatchModal');
             document.getElementById('dispatchInvoice').value = '';
             document.getElementById('dispatchBoxes').value = '';
-            
             renderOrders();
             updateAnalysis();
         }
@@ -734,39 +842,26 @@
             const grid = document.getElementById('calendar-grid');
             const header = document.getElementById('calendar-header');
             grid.innerHTML = '';
-            
             const year = currentDate.getFullYear();
             const month = currentDate.getMonth();
-            const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
-            
-            header.innerText = `${monthNames[month]} ${year}`;
+            header.innerText = new Date(year, month).toLocaleString('es-ES', { month: 'long', year: 'numeric' }).toUpperCase();
             
             const firstDay = new Date(year, month, 1).getDay();
             const daysInMonth = new Date(year, month + 1, 0).getDate();
             
-            // Días vacíos previos
-            for(let i=0; i<firstDay; i++) {
-                grid.innerHTML += `<div class="bg-gray-100"></div>`;
-            }
+            for(let i=0; i<firstDay; i++) grid.innerHTML += `<div class="bg-gray-100"></div>`;
             
-            // Días reales
             for(let day=1; day<=daysInMonth; day++) {
                 const dateKey = `${year}-${String(month+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
                 
-                // Buscar eventos (Despachos)
                 let eventsHtml = '';
-                orders.filter(o => o.status === 'Despachado').forEach(o => {
-                    // Aquí asumo que la fecha de la OC es la de entrega/despacho.
-                    if(o.date === dateKey) {
-                        eventsHtml += `<div class="bg-green-100 text-green-800 text-[10px] p-1 mb-1 rounded border border-green-200 truncate" title="Fac: ${o.invoice}">
-                            <i class="fas fa-truck"></i> ${o.client} (${o.invoice})
-                        </div>`;
-                    }
+                orders.filter(o => o.status === 'Despachado' && o.date === dateKey).forEach(o => {
+                    eventsHtml += `<div class="bg-green-100 text-green-800 text-[9px] p-1 mb-1 rounded border border-green-200 truncate">
+                        <i class="fas fa-check"></i> ${o.client} (#${o.invoice})
+                    </div>`;
                 });
-
-                // Notas manuales
                 if(calendarNotes[dateKey]) {
-                    eventsHtml += `<div class="bg-yellow-100 text-yellow-800 text-[10px] p-1 rounded border border-yellow-200 truncate">
+                    eventsHtml += `<div class="bg-yellow-100 text-yellow-800 text-[9px] p-1 rounded border border-yellow-200 truncate">
                         <i class="fas fa-sticky-note"></i> ${calendarNotes[dateKey]}
                     </div>`;
                 }
@@ -775,232 +870,148 @@
                 dayEl.className = 'calendar-day relative group';
                 dayEl.innerHTML = `
                     <div class="flex justify-between items-start">
-                        <span class="font-bold text-gray-700 ml-1 mt-1 ${day === new Date().getDate() && month === new Date().getMonth() ? 'bg-blue-500 text-white rounded-full w-6 h-6 flex items-center justify-center' : ''}">${day}</span>
-                        <button onclick="openNoteModal('${dateKey}')" class="opacity-0 group-hover:opacity-100 text-gray-400 hover:text-blue-500 mr-1 mt-1"><i class="fas fa-edit"></i></button>
+                        <span class="font-bold text-gray-700 ml-1 ${day === new Date().getDate() && month === new Date().getMonth() ? 'text-blue-600' : ''}">${day}</span>
+                        <button onclick="openNoteModal('${dateKey}')" class="opacity-0 group-hover:opacity-100 text-gray-400 hover:text-blue-500 mr-1"><i class="fas fa-edit"></i></button>
                     </div>
-                    <div class="flex-1 overflow-y-auto mt-1 px-1">
-                        ${eventsHtml}
-                    </div>
+                    <div class="flex-1 overflow-y-auto mt-1 px-1">${eventsHtml}</div>
                 `;
                 grid.appendChild(dayEl);
             }
         }
 
-        function changeMonth(delta) {
-            currentDate.setMonth(currentDate.getMonth() + delta);
-            renderCalendar();
-        }
-        
-        function openNoteModal(dateKey) {
-            currentNoteDate = dateKey;
-            document.getElementById('calendarNoteText').value = calendarNotes[dateKey] || '';
-            document.getElementById('noteModal').classList.remove('hidden');
-        }
-
+        function changeMonth(d) { currentDate.setMonth(currentDate.getMonth() + d); renderCalendar(); }
+        function openNoteModal(d) { currentNoteDate = d; document.getElementById('calendarNoteText').value = calendarNotes[d] || ''; document.getElementById('noteModal').classList.remove('hidden'); }
         function saveCalendarNote() {
             const txt = document.getElementById('calendarNoteText').value;
-            if(txt.trim()) {
-                calendarNotes[currentNoteDate] = txt;
-            } else {
-                delete calendarNotes[currentNoteDate];
-            }
+            if(txt.trim()) calendarNotes[currentNoteDate] = txt; else delete calendarNotes[currentNoteDate];
             localStorage.setItem('ww_notes', JSON.stringify(calendarNotes));
-            document.getElementById('noteModal').classList.add('hidden');
+            closeModal('noteModal');
             renderCalendar();
         }
 
-        // --- 6. IMPRESIÓN (PDF / TACHAS MULTIPLES) ---
-        function printTachas(orderIdx) {
-            const order = orders[orderIdx];
-            const area = document.getElementById('print-area');
-            
-            // Generar Grid de 2x2 para tachas (o lista vertical si son muchas)
-            let html = `<div class="grid grid-cols-2 gap-8 w-full h-full">`;
-            
-            // Generamos una "Tacha" por cada producto de la orden
-            order.items.forEach(item => {
-                // Tabla de tallas para la tacha
-                let tallasHtml = '';
-                if(item.hasSizes) {
-                    tallasHtml = `
-                    <table class="w-full text-xs border mt-2 text-center">
-                        <tr class="bg-gray-100 font-bold"><td>S</td><td>M</td><td>L</td><td>XL</td><td>XXL</td></tr>
-                        <tr>
-                            <td class="border p-1">${item.quantities.S}</td>
-                            <td class="border p-1">${item.quantities.M}</td>
-                            <td class="border p-1">${item.quantities.L}</td>
-                            <td class="border p-1">${item.quantities.XL}</td>
-                            <td class="border p-1">${item.quantities.XXL}</td>
-                        </tr>
-                    </table>`;
-                } else {
-                    tallasHtml = `<div class="mt-2 font-bold text-center border p-2">CANTIDAD ÚNICA: ${item.quantities.unique}</div>`;
-                }
-
-                html += `
-                <div class="border-4 border-gray-800 p-4 relative bg-white flex flex-col justify-between" style="min-height: 400px;">
-                    <div class="flex justify-between items-center border-b-2 border-gray-800 pb-2 mb-2">
-                        <div>
-                            <h1 class="font-black text-xl uppercase">Workwear & Corp <i class="fas fa-scissors"></i></h1>
-                            <p class="text-xs">Hoja de Control de Producción</p>
-                        </div>
-                        <div class="text-right">
-                            <p class="font-bold text-lg">OC: ${order.id}</p>
-                            <p class="text-sm">${order.client}</p>
-                        </div>
-                    </div>
-                    
-                    <div class="mb-4">
-                        <p class="font-bold text-lg">${item.name}</p>
-                        <p class="text-xs font-mono">SKU: ${item.sku}</p>
-                        ${tallasHtml}
-                    </div>
-
-                    <div class="grid grid-cols-3 gap-2 text-center text-xs font-bold mb-4">
-                        <div class="border p-2 pt-6 relative">CORTE <div class="absolute top-1 right-1 w-4 h-4 border border-black rounded-full"></div></div>
-                        <div class="border p-2 pt-6 relative">CONFECCIÓN <div class="absolute top-1 right-1 w-4 h-4 border border-black rounded-full"></div></div>
-                        <div class="border p-2 pt-6 relative">TERMINACIÓN <div class="absolute top-1 right-1 w-4 h-4 border border-black rounded-full"></div></div>
-                    </div>
-
-                    <div class="border-t-2 border-gray-800 pt-2 mt-auto">
-                        <div class="flex justify-between text-xs mb-4">
-                            <span>Factura: _________________</span>
-                            <span>Cajas: ____ / ____</span>
-                        </div>
-                        <div class="text-center mt-6">
-                            <div class="border-t border-black w-3/4 mx-auto"></div>
-                            <p class="text-[10px]">Firma Responsable / Control de Calidad</p>
-                        </div>
-                    </div>
-                </div>`;
-            });
-            html += `</div>`;
-            
-            area.innerHTML = html;
-            window.print();
-            // Limpiar área después de imprimir para no afectar layout normal (opcional)
-        }
-
-        // --- 7. IA / ANÁLISIS ---
+        // --- 6. IA / ANÁLISIS MEJORADO ---
         function updateAnalysis() {
-            const statusList = document.getElementById('ia-status-list');
-            const stockList = document.getElementById('ia-stock-list');
-            
-            // 1. Análisis de Estado
+            // Contadores
             let pending = orders.filter(o => o.status === 'Pendiente').length;
             let production = orders.filter(o => o.status === 'En Producción').length;
-            
-            let statusHtml = `
-                <div class="flex justify-between border-b pb-2"><span class="text-gray-600">Pendientes</span> <span class="font-bold">${pending}</span></div>
-                <div class="flex justify-between border-b pb-2"><span class="text-blue-600">En Taller</span> <span class="font-bold text-blue-600">${production}</span></div>
-            `;
-            
-            if(production > 5) {
-                statusHtml += `<div class="text-red-500 text-sm mt-2 flex items-center"><i class="fas fa-exclamation-triangle mr-1"></i> ¡Alerta! Cuello de botella en taller.</div>`;
-            }
-            statusList.innerHTML = statusHtml;
+            let shipped = orders.filter(o => o.status === 'Despachado').length;
+            let totalOrders = orders.length || 1; 
 
-            // 2. Análisis de Stock (Sugerencias simples)
-            // Revisamos productos con stock < 5
-            stockList.innerHTML = '';
-            let warnings = 0;
+            // Actualizar Tarjetas Superiores
+            document.getElementById('ia-production-count').innerText = production;
+            document.getElementById('ia-shipped-count').innerText = shipped;
+            
+            // Calculo de Score de Salud (Simple: Si hay mucho pendiente y poco despachado, baja el score)
+            let score = 100;
+            if (production > 5) score -= 20; // Cuello de botella
+            if (pending > 10) score -= 10;
+            if (shipped > 0) score += 5; // Bonificación por movimiento
+            if (score > 100) score = 100;
+            
+            const scoreEl = document.getElementById('ia-health-score');
+            scoreEl.innerText = score + '%';
+            scoreEl.className = `text-3xl font-black ${score > 80 ? 'text-green-600' : score > 50 ? 'text-yellow-600' : 'text-red-600'}`;
+
+            // Lista de Diagnóstico
+            const diagList = document.getElementById('ia-diagnosis-list');
+            diagList.innerHTML = '';
+            
+            if(production === 0 && pending > 0) {
+                 diagList.innerHTML += `<div class="p-3 bg-yellow-50 border-l-4 border-yellow-400 text-sm text-yellow-700">⚠️ La producción está detenida. Tienes órdenes pendientes sin iniciar.</div>`;
+            } else if (production > 5) {
+                 diagList.innerHTML += `<div class="p-3 bg-red-50 border-l-4 border-red-500 text-sm text-red-700">🚨 <strong>Sobrecarga:</strong> Hay demasiadas órdenes en taller simultáneamente.</div>`;
+            } else {
+                 diagList.innerHTML += `<div class="p-3 bg-green-50 border-l-4 border-green-500 text-sm text-green-700">✅ Flujo de trabajo óptimo.</div>`;
+            }
+
+            // Lista de Sugerencias de Stock (IA Predictiva Simple)
+            const suggestList = document.getElementById('ia-suggestion-list');
+            suggestList.innerHTML = '';
+            let hasSuggestions = false;
+            
             inventory.forEach(p => {
-                if(p.total < 10) {
-                    warnings++;
-                    stockList.innerHTML += `
-                        <div class="text-sm bg-red-50 p-2 rounded border border-red-100 flex items-center justify-between">
-                            <span><strong>${p.sku}</strong> ${p.name}</span>
-                            <span class="text-red-600 font-bold">${p.total} u.</span>
+                if(p.total < 20) {
+                    hasSuggestions = true;
+                    // Sugerencia: Reponer hasta llegar a 50
+                    let buyAmount = 50 - p.total;
+                    suggestList.innerHTML += `
+                        <div class="flex items-center justify-between bg-gray-50 p-2 rounded border border-gray-200 text-sm">
+                            <div>
+                                <span class="font-bold text-gray-700">${p.sku}</span> <span class="text-xs text-gray-500">${p.name}</span>
+                                <div class="text-xs text-red-500">Stock actual: ${p.total}</div>
+                            </div>
+                            <div class="text-right">
+                                <span class="block text-[10px] text-gray-400 uppercase">Sugerencia</span>
+                                <span class="font-bold text-blue-600">+${buyAmount} un.</span>
+                            </div>
                         </div>
                     `;
                 }
             });
-            if(warnings === 0) stockList.innerHTML = '<div class="text-green-500 text-sm">Inventario Saludable.</div>';
-        }
-
-        // --- 8. UTILS Y MODALES GENERICOS ---
-        function closeModal(id) {
-            document.getElementById(id).classList.add('hidden');
-        }
-        
-        function confirmReset(type) {
-            if(confirm('¿Estás SEGURO? Se borrará toda la información de ' + type)) {
-                if(type === 'inventory') {
-                    localStorage.removeItem('ww_inventory');
-                    inventory = [];
-                    renderInventory();
-                }
-                if(type === 'orders') {
-                    localStorage.removeItem('ww_orders');
-                    orders = [];
-                    renderOrders();
-                }
-                updateAnalysis();
-                alert('Reset completado.');
-            }
-        }
-        
-        function confirmFullReset() {
-            if(confirm('PELIGRO: ¿Borrar ABSOLUTAMENTE TODO el sistema? Esto no se puede deshacer.')) {
-                if(confirm('Confirma por segunda vez: ¿Borrar Todo?')) {
-                    localStorage.clear();
-                    location.reload();
-                }
-            }
-        }
-
-        function deleteOrder(idx) {
-             if(confirm('¿Eliminar orden?')) {
-                 orders.splice(idx, 1);
-                 localStorage.setItem('ww_orders', JSON.stringify(orders));
-                 renderOrders();
-                 updateAnalysis();
-             }
-        }
-
-        function generateCompanyReport() {
-            // Ejemplo básico usando html2pdf o window.print de un div oculto.
-            // Por simplicidad y robustez, usaremos window.print sobre un area formateada.
-            const area = document.getElementById('print-area');
-            const date = new Date().toLocaleDateString();
             
-            area.innerHTML = `
-                <div class="max-w-4xl mx-auto p-8 border-4 border-gray-800">
-                    <div class="text-center border-b-4 border-gray-800 pb-4 mb-6">
-                        <h1 class="text-4xl font-black uppercase">Workwear & Corporate <i class="fas fa-scissors"></i></h1>
-                        <h2 class="text-xl mt-2 text-gray-600">Informe General de Gestión</h2>
-                        <p class="text-sm mt-1">Fecha de emisión: ${date}</p>
-                    </div>
-                    
-                    <div class="mb-8">
-                        <h3 class="text-2xl font-bold mb-4 border-b-2 border-gray-400">1. Resumen Financiero & Operativo</h3>
-                        <div class="grid grid-cols-3 gap-4 text-center">
-                            <div class="bg-gray-100 p-4 rounded">
-                                <p class="text-sm text-gray-500">Total Productos Inv.</p>
-                                <p class="text-3xl font-bold">${inventory.length}</p>
-                            </div>
-                            <div class="bg-gray-100 p-4 rounded">
-                                <p class="text-sm text-gray-500">Órdenes Activas</p>
-                                <p class="text-3xl font-bold text-blue-600">${orders.filter(o => o.status !== 'Despachado').length}</p>
-                            </div>
-                            <div class="bg-gray-100 p-4 rounded">
-                                <p class="text-sm text-gray-500">Despachadas Mes</p>
-                                <p class="text-3xl font-bold text-green-600">${orders.filter(o => o.status === 'Despachado').length}</p>
-                            </div>
-                        </div>
-                    </div>
+            if(!hasSuggestions) {
+                suggestList.innerHTML = '<div class="text-gray-400 text-sm text-center italic">Inventario suficiente. No se requieren compras.</div>';
+            }
+        }
 
-                    <div class="mb-8">
-                        <h3 class="text-2xl font-bold mb-4 border-b-2 border-gray-400">2. Alertas de Stock (IA)</h3>
-                         <ul class="list-disc pl-5">
-                            ${inventory.filter(i => i.total < 10).map(i => `<li class="text-red-600"><strong>${i.sku}</strong> ${i.name}: Quedan solo ${i.total} unidades.</li>`).join('') || '<li>Sin alertas de stock.</li>'}
-                         </ul>
+        // --- 7. IMPRESIÓN CON NOTAS ---
+        function printTachas(orderIdx) {
+            const order = orders[orderIdx];
+            const area = document.getElementById('print-area');
+            let html = `<div class="grid grid-cols-2 gap-8 w-full">`;
+            
+            order.items.forEach(item => {
+                let tallasHtml = '';
+                if(item.hasSizes) {
+                    tallasHtml = `<table class="w-full text-xs border mt-2 text-center"><tr class="bg-gray-200 font-bold">`;
+                    // Cabeceras dinámicas
+                    for (const size in item.quantities) tallasHtml += `<td>${size}</td>`;
+                    tallasHtml += `</tr><tr>`;
+                    // Valores
+                    for (const size in item.quantities) tallasHtml += `<td class="border p-1">${item.quantities[size]}</td>`;
+                    tallasHtml += `</tr></table>`;
+                } else {
+                    tallasHtml = `<div class="mt-2 font-bold text-center border p-2">CANT: ${item.quantities.unique}</div>`;
+                }
+                
+                // RENDERIZAR NOTA EN LA TACHA
+                let noteDiv = item.note ? `<div class="mt-2 border-2 border-dashed border-gray-400 bg-gray-50 p-2 text-sm font-bold uppercase text-gray-800">NOTA: ${item.note}</div>` : '';
+
+                html += `
+                <div class="border-4 border-gray-800 p-4 bg-white flex flex-col justify-between" style="min-height: 400px; page-break-inside: avoid;">
+                    <div class="flex justify-between border-b-2 border-gray-800 pb-2 mb-2">
+                        <div><h1 class="font-black text-xl uppercase">WW CORP <i class="fas fa-scissors"></i></h1><p class="text-xs">Control de Producción</p></div>
+                        <div class="text-right"><p class="font-bold text-lg">OC: ${order.id}</p><p class="text-xs">${order.client}</p></div>
                     </div>
-                    
-                    <div class="text-center text-xs text-gray-400 mt-10">Generado por Sistema de Gestión WW v3.0</div>
-                </div>
-            `;
+                    <div class="mb-4">
+                        <p class="font-bold text-lg">${item.name}</p>
+                        <p class="text-xs font-mono mb-2">${item.sku}</p>
+                        ${tallasHtml}
+                        ${noteDiv}
+                    </div>
+                    <div class="grid grid-cols-3 gap-2 text-center text-xs font-bold mb-4">
+                        <div class="border p-2 pt-6 relative">CORTE</div>
+                        <div class="border p-2 pt-6 relative">CONFECCIÓN</div>
+                        <div class="border p-2 pt-6 relative">TERMINACIÓN</div>
+                    </div>
+                    <div class="border-t-2 border-gray-800 pt-2 mt-auto text-xs">
+                        <div class="flex justify-between mb-4"><span>Factura: ____________</span><span>Cajas: ____/____</span></div>
+                    </div>
+                </div>`;
+            });
+            html += `</div>`;
+            area.innerHTML = html;
             window.print();
+        }
+
+        // --- UTILS ---
+        function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+        function deleteOrder(idx) { if(confirm('¿Eliminar?')) { orders.splice(idx, 1); localStorage.setItem('ww_orders', JSON.stringify(orders)); renderOrders(); updateAnalysis(); } }
+        function confirmReset(t) { if(confirm('¿Resetear ' + t + '?')) { localStorage.removeItem('ww_' + t); location.reload(); } }
+        function confirmFullReset() { if(confirm('¿BORRAR TODO?')) { localStorage.clear(); location.reload(); } }
+        
+        function generateCompanyReport() {
+            window.print(); 
         }
 
     </script>
