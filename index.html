@@ -3,10 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IDEASTEXTILES</title>
+    <title>Workwear & Corporate - Sistema de Gestión</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    
+    <script src='https://unpkg.com/tesseract.js@v2.1.0/dist/tesseract.min.js'></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
     <style>
         /* Estilos específicos para impresión y calendario */
@@ -49,7 +52,7 @@
     <aside class="w-64 bg-gray-900 text-white flex-col flex-shrink-0 hidden md:flex z-20 shadow-2xl no-print">
         <div class="p-6 flex items-center justify-center border-b border-gray-800">
             <i class="fas fa-scissors text-3xl text-yellow-500 mr-3"></i>
-            <h1 class="text-lg font-bold tracking-wider">IDEAS TEXTILES</h1>
+            <h1 class="text-lg font-bold tracking-wider">GESTIÓN WW</h1>
         </div>
         
         <nav class="mt-6 flex-1 px-4 space-y-2">
@@ -100,12 +103,17 @@
                         <h2 class="text-3xl font-bold text-gray-800">Inventario</h2>
                         <p class="text-sm text-gray-500">Gestión de productos, tallas dinámicas y stock.</p>
                     </div>
-                    <div class="space-x-2">
+                    <div class="flex items-center space-x-2">
+                        <input type="file" id="invMagicInput" class="hidden" accept="image/*, .xlsx, .xls" onchange="processInventoryFile(this)">
+                        <button onclick="document.getElementById('invMagicInput').click()" class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded shadow flex items-center transition transform hover:scale-105" title="Subir Foto de Cuaderno o Excel">
+                            <i class="fas fa-magic mr-2"></i> IA Import
+                        </button>
+                        
                         <button onclick="confirmReset('inventory')" class="bg-red-100 text-red-600 px-3 py-2 rounded hover:bg-red-200 text-sm">
-                            <i class="fas fa-trash-alt mr-1"></i> Reset Inv.
+                            <i class="fas fa-trash-alt mr-1"></i>
                         </button>
                         <button onclick="openProductModal()" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded shadow-lg flex items-center transition transform hover:scale-105">
-                            <i class="fas fa-plus mr-2"></i> Nuevo Producto
+                            <i class="fas fa-plus mr-2"></i> Nuevo
                         </button>
                     </div>
                 </div>
@@ -138,9 +146,14 @@
                         <h2 class="text-3xl font-bold text-gray-800">Órdenes de Compra</h2>
                         <p class="text-sm text-gray-500">Seguimiento de producción y despachos.</p>
                     </div>
-                    <div class="space-x-2">
+                    <div class="flex items-center space-x-2">
+                        <input type="file" id="orderMagicInput" class="hidden" accept=".xlsx, .xls" onchange="processOrdersFile(this)">
+                        <button onclick="document.getElementById('orderMagicInput').click()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded shadow flex items-center transition transform hover:scale-105" title="Cargar Excel con Multiples OC">
+                            <i class="fas fa-file-import mr-2"></i> Cargar Excel
+                        </button>
+
                         <button onclick="confirmReset('orders')" class="bg-red-100 text-red-600 px-3 py-2 rounded hover:bg-red-200 text-sm">
-                            <i class="fas fa-trash-alt mr-1"></i> Reset OCs
+                            <i class="fas fa-trash-alt mr-1"></i>
                         </button>
                         <button onclick="openOrderModal()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded shadow-lg flex items-center transition transform hover:scale-105">
                             <i class="fas fa-plus mr-2"></i> Nueva OC
@@ -1004,7 +1017,190 @@
             window.print();
         }
 
-        // --- UTILS ---
+        // --- 8. MÓDULO DE INTELIGENCIA DE IMPORTACIÓN (NUEVO) ---
+
+        // A. PROCESADOR DE INVENTARIO (Foto o Excel Simple)
+        async function processInventoryFile(input) {
+            const file = input.files[0];
+            if (!file) return;
+            showLoadingToast('Analizando inventario...');
+
+            try {
+                if (file.type.includes('image')) {
+                    // OCR Tesseract para Cuadernos
+                    const worker = Tesseract.createWorker();
+                    await worker.load(); await worker.loadLanguage('spa'); await worker.initialize('spa');
+                    const { data: { text } } = await worker.recognize(file);
+                    await worker.terminate();
+                    parseInventoryText(text);
+                } else {
+                    // Excel Simple
+                    const data = await file.arrayBuffer();
+                    const workbook = XLSX.read(data);
+                    const jsonData = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]], {header: 1});
+                    parseInventoryExcel(jsonData);
+                }
+            } catch (e) { alert('Error: ' + e.message); } 
+            finally { removeToast(); input.value = ''; }
+        }
+
+        function parseInventoryText(text) {
+            const lines = text.split('\n');
+            let count = 0;
+            lines.forEach(line => {
+                // Busca patrón: "Nombre Producto 50"
+                if(line.length > 3) {
+                    const numbers = line.match(/\d+/g);
+                    if(numbers) {
+                        const qty = parseInt(numbers[numbers.length-1]);
+                        const name = line.replace(qty, '').replace(/[^\w\s]/g, '').trim();
+                        if(name.length > 2) { addOrUpdateInventory(name, qty); count++; }
+                    }
+                }
+            });
+            alert(`✅ Se detectaron ${count} productos desde la imagen.`);
+            renderInventory(); updateAnalysis();
+        }
+
+        function parseInventoryExcel(rows) {
+            let count = 0;
+            rows.forEach((row, i) => {
+                if(i===0) return; // Cabecera
+                if(row[0]) {
+                    addOrUpdateInventory(String(row[0]), parseInt(row[1])||0);
+                    count++;
+                }
+            });
+            alert(`✅ Se importaron ${count} productos del Excel.`);
+            renderInventory(); updateAnalysis();
+        }
+
+        function addOrUpdateInventory(name, qty) {
+            // BUSCAR SI YA EXISTE (Inteligencia de coincidencia)
+            const existingIdx = inventory.findIndex(p => p.name.toLowerCase() === name.toLowerCase());
+            
+            if (existingIdx >= 0) {
+                // Si existe, suma al stock
+                inventory[existingIdx].total += qty;
+                if(!inventory[existingIdx].hasSizes) inventory[existingIdx].stockData.unique += qty;
+            } else {
+                // Si no, crea uno nuevo
+                let nextId = inventory.length + 1;
+                inventory.push({
+                    sku: `WW-IMP-${String(nextId).padStart(3,'0')}`,
+                    name: name,
+                    cat: 'Importado',
+                    hasSizes: false,
+                    stockData: { unique: qty },
+                    total: qty
+                });
+            }
+            localStorage.setItem('ww_inventory', JSON.stringify(inventory));
+        }
+
+        // B. PROCESADOR DE ÓRDENES COMPLEJAS (Separador Automático)
+        async function processOrdersFile(input) {
+            const file = input.files[0];
+            if (!file) return;
+            showLoadingToast('Procesando Tabla de Órdenes...');
+
+            try {
+                const data = await file.arrayBuffer();
+                const workbook = XLSX.read(data);
+                const jsonData = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]], {header: 1});
+                parseComplexOrderExcel(jsonData);
+            } catch (e) { alert('Error en OC: ' + e.message); }
+            finally { removeToast(); input.value = ''; }
+        }
+
+        function parseComplexOrderExcel(rows) {
+            // Lógica basada en tu PDF: Agrupar filas por ID DE ORDEN
+            // Estructura esperada columnas (aprox): 
+            // [1] ID, [2] Nombre/Lugar, [3] Cliente/Valor, [4] Producto, [5] Talla, [6] Cantidad
+            
+            const ordersMap = {}; // Diccionario temporal para agrupar
+
+            rows.forEach((row, index) => {
+                if (index < 1 || !row[1]) return; // Saltar cabecera o filas vacías
+
+                const idRaw = String(row[1]).trim(); // Columna ID ORDEN
+                const clientRaw = String(row[3] || "Cliente Genérico").split('$')[0].trim(); // Limpiar valor monetario
+                const prodName = row[4];
+                const sizeRaw = String(row[5] || "UNICA").trim().toUpperCase();
+                const qty = parseInt(row[6]) || 0;
+
+                // Si es una fila válida de producto
+                if (idRaw && prodName && qty > 0) {
+                    
+                    // 1. Si la orden no existe en el mapa, crearla (SEPARACIÓN AUTOMÁTICA)
+                    if (!ordersMap[idRaw]) {
+                        ordersMap[idRaw] = {
+                            id: idRaw,
+                            client: clientRaw,
+                            date: new Date().toISOString().split('T')[0], // Fecha hoy por defecto
+                            status: 'Pendiente',
+                            items: [], // Lista de items
+                            invoice: '',
+                            boxes: ''
+                        };
+                    }
+
+                    // 2. Agregar el item a esa orden específica
+                    let existingItem = ordersMap[idRaw].items.find(i => i.name === prodName);
+                    
+                    if (existingItem) {
+                        // Si ya existe el producto en la orden, agregamos la talla
+                        if (existingItem.hasSizes) {
+                            existingItem.quantities[sizeRaw] = (existingItem.quantities[sizeRaw] || 0) + qty;
+                            existingItem.totalItem += qty;
+                        }
+                    } else {
+                        // Nuevo item en la orden
+                        let newItem = {
+                            sku: 'OC-IMP', // SKU genérico
+                            name: prodName,
+                            hasSizes: true, 
+                            quantities: {},
+                            totalItem: qty,
+                            note: ''
+                        };
+                        newItem.quantities[sizeRaw] = qty;
+                        ordersMap[idRaw].items.push(newItem);
+                    }
+                }
+            });
+
+            // 3. Convertir el mapa a Array y guardar
+            let addedOrders = 0;
+            Object.values(ordersMap).forEach(order => {
+                orders.push(order);
+                addedOrders++;
+            });
+
+            if (addedOrders > 0) {
+                localStorage.setItem('ww_orders', JSON.stringify(orders));
+                alert(`✅ Éxito Inteligente: Se detectaron y separaron ${addedOrders} Órdenes de Compra distintas.`);
+                renderOrders();
+                updateAnalysis();
+            } else {
+                alert('⚠️ No se pudieron detectar órdenes. Verifica que el Excel tenga las columnas ID, Cliente, Producto, Talla y Cantidad.');
+            }
+        }
+
+        // Utils visuales para la IA
+        function showLoadingToast(msg) {
+            const div = document.createElement('div');
+            div.id = 'loading-toast';
+            div.className = 'fixed bottom-5 right-5 bg-gray-800 text-white px-6 py-4 rounded shadow-2xl z-50 flex items-center animate-pulse';
+            div.innerHTML = `<i class="fas fa-circle-notch fa-spin mr-3 text-yellow-500"></i> ${msg}`;
+            document.body.appendChild(div);
+        }
+        function removeToast() {
+            const el = document.getElementById('loading-toast');
+            if(el) el.remove();
+        }
+
+        // --- UTILS GENERALES ---
         function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
         function deleteOrder(idx) { if(confirm('¿Eliminar?')) { orders.splice(idx, 1); localStorage.setItem('ww_orders', JSON.stringify(orders)); renderOrders(); updateAnalysis(); } }
         function confirmReset(t) { if(confirm('¿Resetear ' + t + '?')) { localStorage.removeItem('ww_' + t); location.reload(); } }
