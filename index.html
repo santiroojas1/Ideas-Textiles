@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>IDEAS TEXTILES SPA - Sistema Maestro v.Final 3.1 (Fixed)</title>
+    <title>IDEAS TEXTILES SPA </title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <script src='https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js'></script>
+    
     <script src="//mozilla.github.io/pdf.js/build/pdf.js"></script>
     <script>pdfjsLib.GlobalWorkerOptions.workerSrc = '//mozilla.github.io/pdf.js/build/pdf.worker.js';</script>
 
@@ -19,6 +19,8 @@
         .table-responsive { display: block; width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; white-space: nowrap; }
         button { touch-action: manipulation; transition: all 0.2s ease-in-out; }
         button:active { transform: scale(0.95); }
+        
+        /* UTILIDADES VISUALES */
         ::-webkit-scrollbar { width: 8px; height: 8px; }
         ::-webkit-scrollbar-track { background: #e2e8f0; }
         ::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 4px; }
@@ -28,28 +30,20 @@
         .calendar-day { background-color: white; min-height: 100px; padding: 4px; font-size: 0.75rem; display: flex; flex-direction: column; justify-content: space-between; }
         .calendar-day.today { background-color: #eff6ff; }
         .day-number.today-num { background-color: #3b82f6; color: white; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
-        .has-event-dot { width: 6px; height: 6px; background-color: #f59e0b; border-radius: 50%; margin: 2px auto; }
         .stage-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem; padding: 0.5rem; border-radius: 0.375rem; border: 1px solid #e2e8f0; }
         .stage-row.completed { background-color: #f0fdf4; border-color: #86efac; }
-        .oc-check { width: 20px; height: 20px; cursor: pointer; accent-color: #1e293b; }
-
-        /* ESTILOS PDF OCULTOS (Crucial para Tachas) */
-        #pdf-container {
-            position: absolute;
+        
+        /* ESTILOS CRÍTICOS PARA PDF (SOLUCIÓN BLANK PAGE) */
+        #pdf-generator-container {
+            position: fixed; /* Fixed para evitar scroll */
             left: -9999px;
             top: 0;
-            width: 800px;
+            width: 850px; /* Ancho fijo carta */
+            z-index: -10;
+            background: white;
         }
-        /* Plantilla Reporte General (Oculta) */
-        #pdf-report-template {
-            width: 800px; padding: 40px; background: white; font-family: 'Helvetica', sans-serif; display: none;
-        }
-        #pdf-report-template.pdf-visible { display: block; position: absolute; left: -9999px; top: 0; }
-        .pdf-header { border-bottom: 3px solid #f59e0b; padding-bottom: 20px; margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; }
-        .pdf-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 12px; }
-        .pdf-table th { background: #1e293b; color: white; padding: 8px; text-align: left; }
-        .pdf-table td { border-bottom: 1px solid #e2e8f0; padding: 8px; color: #334155; }
-        .pdf-row-even { background-color: #f8fafc; }
+        .pdf-page-render { padding: 40px; font-family: sans-serif; background: white; }
+        .pdf-visible { display: block !important; }
 
     </style>
 </head>
@@ -57,17 +51,20 @@
 
     <aside id="sidebar" class="fixed inset-y-0 left-0 z-50 w-64 bg-slate-900 text-white transform -translate-x-full md:relative md:translate-x-0 transition-transform duration-300 ease-in-out shadow-2xl flex flex-col h-full">
         <div class="p-6 flex items-center justify-center border-b border-slate-800 relative">
-            <i class="fas fa-scissors text-3xl text-yellow-500 mr-3"></i>
-            <div><h1 class="text-lg font-bold tracking-wider">IDEAS TEXTILES</h1><p class="text-[10px] text-slate-400 uppercase tracking-widest">Control Maestro</p></div>
+            <i class="fas fa-network-wired text-3xl text-yellow-500 mr-3"></i>
+            <div><h1 class="text-lg font-bold tracking-wider">IDEAS TEXTILES</h1><p class="text-[10px] text-slate-400 uppercase tracking-widest">System v4.0</p></div>
             <button onclick="toggleSidebar()" class="md:hidden absolute top-6 right-4 text-slate-400"><i class="fas fa-times text-xl"></i></button>
         </div>
         <nav class="mt-6 flex-1 px-4 space-y-3 overflow-y-auto">
-            <button onclick="showSection('inventory')" id="nav-inventory" class="nav-item w-full text-left py-4 px-4 rounded hover:bg-slate-800 transition flex items-center border-l-4 border-yellow-500 bg-slate-800"><i class="fas fa-boxes w-6 text-yellow-500 text-lg"></i> <span class="ml-3 font-medium text-yellow-500">Inventario & Taller</span></button>
-            <button onclick="showSection('orders')" id="nav-orders" class="nav-item w-full text-left py-4 px-4 rounded hover:bg-slate-800 transition flex items-center"><i class="fas fa-file-invoice w-6 text-slate-400 text-lg"></i> <span class="ml-3 font-medium">Órdenes (OC)</span></button>
-            <button onclick="showSection('calendar')" id="nav-calendar" class="nav-item w-full text-left py-4 px-4 rounded hover:bg-slate-800 transition flex items-center"><i class="fas fa-calendar-alt w-6 text-slate-400 text-lg"></i> <span class="ml-3 font-medium">Calendario</span></button>
-            <button onclick="showSection('analysis')" id="nav-analysis" class="nav-item w-full text-left py-4 px-4 rounded hover:bg-slate-800 transition flex items-center"><i class="fas fa-brain w-6 text-slate-400 text-lg"></i> <span class="ml-3 font-medium">IA / Análisis</span></button>
+            <button onclick="router.navigate('inventory')" id="nav-inventory" class="nav-item w-full text-left py-4 px-4 rounded hover:bg-slate-800 transition flex items-center border-l-4 border-yellow-500 bg-slate-800"><i class="fas fa-boxes w-6 text-yellow-500 text-lg"></i> <span class="ml-3 font-medium text-yellow-500">Inventario & Taller</span></button>
+            <button onclick="router.navigate('orders')" id="nav-orders" class="nav-item w-full text-left py-4 px-4 rounded hover:bg-slate-800 transition flex items-center"><i class="fas fa-file-invoice w-6 text-slate-400 text-lg"></i> <span class="ml-3 font-medium">Órdenes (OC)</span></button>
+            <button onclick="router.navigate('calendar')" id="nav-calendar" class="nav-item w-full text-left py-4 px-4 rounded hover:bg-slate-800 transition flex items-center"><i class="fas fa-calendar-alt w-6 text-slate-400 text-lg"></i> <span class="ml-3 font-medium">Calendario</span></button>
+            <button onclick="router.navigate('analysis')" id="nav-analysis" class="nav-item w-full text-left py-4 px-4 rounded hover:bg-slate-800 transition flex items-center"><i class="fas fa-brain w-6 text-slate-400 text-lg"></i> <span class="ml-3 font-medium">IA / Análisis</span></button>
         </nav>
-        <div class="p-4 border-t border-slate-800"><button onclick="confirmFullReset()" class="w-full bg-red-900 hover:bg-red-700 text-xs py-3 rounded text-red-200 font-bold flex items-center justify-center shadow-inner"><i class="fas fa-database mr-2"></i> RESET SYSTEM</button></div>
+        <div class="p-4 border-t border-slate-800">
+            <div class="text-[9px] text-slate-500 mb-2 text-center flex items-center justify-center"><i class="fas fa-wifi mr-1 text-green-500"></i> Local Adapter Active</div>
+            <button onclick="systemCore.secureReset()" class="w-full bg-red-900 hover:bg-red-700 text-xs py-3 rounded text-red-200 font-bold flex items-center justify-center shadow-inner"><i class="fas fa-shield-alt mr-2"></i> EXPORT & RESET</button>
+        </div>
     </aside>
     <div id="sidebar-overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black bg-opacity-50 z-40 hidden md:hidden"></div>
 
@@ -79,7 +76,7 @@
             </div>
             <div class="flex items-center space-x-3">
                 <span class="hidden md:inline text-xs text-slate-500 font-bold uppercase" id="currentDateDisplay"></span>
-                <button onclick="generateGeneralPDFReport()" class="bg-slate-800 hover:bg-slate-700 text-white px-3 py-2 rounded text-xs font-bold flex items-center transition shadow-lg"><i class="fas fa-file-pdf md:mr-2"></i> <span class="hidden md:inline">Reporte PDF</span></button>
+                <button onclick="systemCore.generateReport()" class="bg-slate-800 hover:bg-slate-700 text-white px-3 py-2 rounded text-xs font-bold flex items-center transition shadow-lg"><i class="fas fa-file-pdf md:mr-2"></i> <span class="hidden md:inline">Reporte PDF</span></button>
                 <div class="h-9 w-9 rounded-full bg-yellow-500 flex items-center justify-center text-white font-bold shadow-md border-2 border-white text-sm">A</div>
             </div>
         </header>
@@ -90,7 +87,7 @@
                 <div class="mb-8 bg-white p-4 rounded-xl shadow-sm border border-slate-200">
                     <div class="flex justify-between items-center mb-4">
                         <h3 class="text-xl font-bold text-slate-800 flex items-center"><i class="fas fa-industry text-orange-500 mr-2"></i> TALLER</h3>
-                        <button onclick="openProductionModal()" class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded shadow text-xs font-bold flex items-center"><i class="fas fa-plus-circle mr-2"></i> NUEVO LOTE</button>
+                        <button onclick="ui.openProductionModal()" class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded shadow text-xs font-bold flex items-center"><i class="fas fa-plus-circle mr-2"></i> NUEVO LOTE</button>
                     </div>
                     <div id="production-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
                 </div>
@@ -98,9 +95,9 @@
                 <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
                     <div><h2 class="text-2xl font-bold text-slate-800">Bodega</h2><p class="text-sm text-slate-500">Stock físico.</p></div>
                     <div class="flex flex-wrap items-center gap-2">
-                        <input type="file" id="invFileInput" class="hidden" accept=".xlsx, .xls" onchange="processInventoryFile(this)">
+                        <input type="file" id="invFileInput" class="hidden" accept=".xlsx, .xls" onchange="aiPipeline.ingest(this, 'inv')">
                         <button onclick="document.getElementById('invFileInput').click()" class="bg-purple-100 text-purple-700 hover:bg-purple-200 px-3 py-2 rounded text-xs font-bold flex items-center shadow-sm"><i class="fas fa-file-upload mr-2"></i> Importar Excel</button>
-                        <button onclick="openProductModal()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded text-xs font-bold shadow flex items-center"><i class="fas fa-plus mr-2"></i> Nuevo Item</button>
+                        <button onclick="ui.openProductModal()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded text-xs font-bold shadow flex items-center"><i class="fas fa-plus mr-2"></i> Nuevo Item</button>
                     </div>
                 </div>
                 <div class="bg-white rounded-xl shadow-lg overflow-hidden border border-slate-200 mb-8">
@@ -112,7 +109,6 @@
                                     <th class="px-5 py-3 text-left font-bold text-slate-600">Producto</th>
                                     <th class="px-5 py-3 text-center font-bold text-slate-600">Stock Tallas</th>
                                     <th class="px-5 py-3 text-right font-bold text-slate-600">Total</th>
-                                    <th class="px-5 py-3 text-center font-bold text-slate-600">Movimientos</th>
                                     <th class="px-5 py-3 text-center font-bold text-slate-600">Acciones</th>
                                 </tr>
                             </thead>
@@ -127,15 +123,15 @@
                 <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
                     <div><h2 class="text-3xl font-bold text-slate-800">Órdenes de Compra</h2><p class="text-sm text-slate-500">Gestión de Pedidos.</p></div>
                     <div class="flex flex-wrap items-center gap-2">
-                        <input type="file" id="orderMagicInput" class="hidden" accept=".xlsx, .xls" onchange="processOrdersFile(this)">
-                        <button onclick="document.getElementById('orderMagicInput').click()" class="bg-indigo-100 text-indigo-700 hover:bg-indigo-200 px-3 py-2 rounded text-xs font-bold flex items-center shadow-sm"><i class="fas fa-file-import mr-2"></i> IA OC (Excel/PDF)</button>
-                        <button onclick="openOrderModal()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-xs font-bold shadow flex items-center"><i class="fas fa-plus mr-2"></i> Nueva OC</button>
+                        <input type="file" id="orderMagicInput" class="hidden" accept=".xlsx, .xls" onchange="aiPipeline.ingest(this, 'oc')">
+                        <button onclick="document.getElementById('orderMagicInput').click()" class="bg-indigo-100 text-indigo-700 hover:bg-indigo-200 px-3 py-2 rounded text-xs font-bold flex items-center shadow-sm"><i class="fas fa-robot mr-2"></i> IA Pipeline (Excel)</button>
+                        <button onclick="ui.openOrderModal()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-xs font-bold shadow flex items-center"><i class="fas fa-plus mr-2"></i> Nueva OC</button>
                     </div>
                 </div>
                 <div class="bg-white rounded-xl shadow-lg overflow-hidden border border-slate-200 mb-4">
                     <div class="p-3 bg-slate-50 border-b flex items-center justify-between">
-                        <div class="flex items-center"><input type="checkbox" id="selectAllOC" class="oc-check mr-2" onchange="toggleAllOCs(this)"><span class="text-xs font-bold text-slate-600">Seleccionar Todo</span></div>
-                        <button onclick="printSelectedTachas()" class="bg-slate-800 text-white px-3 py-1 rounded text-xs font-bold hover:bg-slate-900 transition flex items-center shadow"><i class="fas fa-print mr-2"></i> Generar Tachas PDF</button>
+                        <div class="flex items-center"><input type="checkbox" id="selectAllOC" class="oc-check mr-2" onchange="ui.toggleAllOCs(this)"><span class="text-xs font-bold text-slate-600">Seleccionar Todo</span></div>
+                        <button onclick="ui.printSelectedTachas()" class="bg-slate-800 text-white px-3 py-1 rounded text-xs font-bold hover:bg-slate-900 transition flex items-center shadow"><i class="fas fa-print mr-2"></i> Generar Tachas PDF</button>
                     </div>
                     <div class="table-responsive"><table class="min-w-full leading-normal text-sm"><thead class="bg-slate-100 border-b border-slate-200"><tr><th class="px-3 py-3 w-10 text-center">✓</th><th class="px-5 py-3 text-left font-bold text-slate-600">ID OC</th><th class="px-5 py-3 text-left font-bold text-slate-600">Cliente</th><th class="px-5 py-3 text-left font-bold text-slate-600">Entrega</th><th class="px-5 py-3 text-center font-bold text-slate-600">Estado</th><th class="px-5 py-3 text-left font-bold text-slate-600">Items / Notas</th><th class="px-5 py-3 text-center font-bold text-slate-600">Gestión</th></tr></thead><tbody id="orders-table-body"></tbody></table></div>
                     <div id="empty-orders" class="p-10 text-center text-slate-400 hidden"><i class="fas fa-clipboard-list text-4xl mb-3 block"></i> Sin órdenes.</div>
@@ -147,14 +143,10 @@
                     <div class="flex-1 bg-white p-4 rounded-lg shadow-sm border border-slate-200">
                         <div class="flex justify-between items-center mb-4">
                             <h2 class="text-2xl font-bold text-slate-800">Calendario</h2>
-                            <div class="flex items-center space-x-4"><button onclick="changeMonth(-1)"><i class="fas fa-chevron-left text-slate-600"></i></button><h3 id="calendar-header" class="text-lg font-bold uppercase w-40 text-center"></h3><button onclick="changeMonth(1)"><i class="fas fa-chevron-right text-slate-600"></i></button></div>
+                            <div class="flex items-center space-x-4"><button onclick="ui.changeMonth(-1)"><i class="fas fa-chevron-left text-slate-600"></i></button><h3 id="calendar-header" class="text-lg font-bold uppercase w-40 text-center"></h3><button onclick="ui.changeMonth(1)"><i class="fas fa-chevron-right text-slate-600"></i></button></div>
                         </div>
                         <div class="grid grid-cols-7 text-center font-bold text-slate-500 bg-slate-200 py-2 rounded-t-lg text-xs"><div>DOM</div><div>LUN</div><div>MAR</div><div>MIE</div><div>JUE</div><div>VIE</div><div>SAB</div></div>
                         <div id="calendar-grid" class="calendar-grid bg-white shadow-lg rounded-b-lg border-l border-r border-b border-slate-300"></div>
-                    </div>
-                    <div class="w-full md:w-80 bg-orange-50 p-4 rounded-lg shadow-sm border border-orange-200">
-                        <h3 class="font-bold text-orange-800 mb-3 flex items-center"><i class="fas fa-calendar-check mr-2"></i> ALERTAS</h3>
-                        <div id="calendar-alerts" class="space-y-2 text-sm"></div>
                     </div>
                 </div>
             </div>
@@ -180,31 +172,31 @@
                     <div class="flex gap-2 mb-2">
                         <select id="prodSelect" class="flex-1 border rounded p-1 text-sm"></select>
                         <input type="number" id="prodQtyInput" placeholder="Cant." class="w-20 border rounded p-1 text-sm text-center">
-                        <button onclick="addProdToLoteList()" class="bg-blue-600 text-white px-2 rounded"><i class="fas fa-plus"></i></button>
+                        <button onclick="ui.addProdToLoteList()" class="bg-blue-600 text-white px-2 rounded"><i class="fas fa-plus"></i></button>
                     </div>
                     <div id="tempProdList" class="bg-white border rounded h-24 overflow-y-auto p-2 text-xs"></div>
                 </div>
             </div>
             <div class="flex justify-end mt-6 pt-4 border-t">
-                <button onclick="closeModal('prodItemModal')" class="mr-3 text-slate-500 font-bold text-sm">Cancelar</button>
-                <button onclick="createWorkOrder()" class="bg-orange-600 text-white px-6 py-2 rounded font-bold shadow">Crear Lote</button>
+                <button onclick="ui.closeModal('prodItemModal')" class="mr-3 text-slate-500 font-bold text-sm">Cancelar</button>
+                <button onclick="ui.createWorkOrder()" class="bg-orange-600 text-white px-6 py-2 rounded font-bold shadow">Crear Lote</button>
             </div>
         </div>
     </div>
 
     <div id="productModal" class="fixed inset-0 bg-slate-900 bg-opacity-70 hidden z-50 flex items-center justify-center backdrop-blur-sm p-4">
         <div class="bg-white rounded-lg shadow-2xl w-full max-w-lg p-6">
-            <div class="flex justify-between items-center mb-4 border-b pb-2"><h3 class="text-xl font-bold text-slate-800" id="productModalTitle">Producto</h3><button onclick="closeModal('productModal')" class="text-slate-400 hover:text-red-500 text-2xl">&times;</button></div>
+            <div class="flex justify-between items-center mb-4 border-b pb-2"><h3 class="text-xl font-bold text-slate-800" id="productModalTitle">Producto</h3><button onclick="ui.closeModal('productModal')" class="text-slate-400 hover:text-red-500 text-2xl">&times;</button></div>
             <form id="productForm">
                 <div class="mb-4"><label class="block text-xs font-bold text-slate-500">SKU</label><input type="text" id="prodSku" readonly class="w-full bg-slate-100 border rounded p-2 text-xs"></div>
                 <div class="mb-4"><label class="block text-xs font-bold text-slate-500">Nombre</label><input type="text" id="prodName" required class="w-full border-2 rounded p-2 focus:border-yellow-400 outline-none"></div>
                 <div class="mb-3 flex items-center justify-between bg-slate-50 p-2 rounded">
-                    <div class="flex items-center"><input type="checkbox" id="hasSizes" class="mr-2 h-5 w-5 text-yellow-500" checked onchange="toggleSizeInputs()"><label class="text-sm font-bold text-slate-700">Tallas</label></div>
-                    <button type="button" id="btnAddSize" onclick="addCustomSizeInput()" class="text-xs bg-blue-100 text-blue-600 px-3 py-1 rounded font-bold">+ Talla</button>
+                    <div class="flex items-center"><input type="checkbox" id="hasSizes" class="mr-2 h-5 w-5 text-yellow-500" checked onchange="ui.toggleSizeInputs()"><label class="text-sm font-bold text-slate-700">Tallas</label></div>
+                    <button type="button" id="btnAddSize" onclick="ui.addCustomSizeInput()" class="text-xs bg-blue-100 text-blue-600 px-3 py-1 rounded font-bold">+ Talla</button>
                 </div>
                 <div id="dynamicSizeContainer" class="grid grid-cols-2 md:grid-cols-4 gap-2 mb-4 bg-slate-50 p-3 rounded border border-slate-200 max-h-40 overflow-y-auto"></div>
                 <input type="number" id="stockUnique" placeholder="Stock Único" class="w-full border-2 rounded p-2 mb-3 text-center hidden">
-                <div class="flex justify-end pt-4 border-t"><button type="button" onclick="closeModal('productModal')" class="mr-3 px-4 py-2 text-slate-600 rounded text-sm font-bold">Cancelar</button><button type="submit" class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded text-sm font-bold shadow">Guardar</button></div>
+                <div class="flex justify-end pt-4 border-t"><button type="button" onclick="ui.closeModal('productModal')" class="mr-3 px-4 py-2 text-slate-600 rounded text-sm font-bold">Cancelar</button><button type="submit" class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded text-sm font-bold shadow">Guardar</button></div>
             </form>
         </div>
     </div>
@@ -219,13 +211,13 @@
                 <div><label class="text-xs font-bold text-slate-600">Origen / Destino</label><input type="text" id="moveDestination" class="w-full border rounded p-2"></div>
                 <div><label class="text-xs font-bold text-slate-600">Responsable</label><input type="text" id="moveResponsible" class="w-full border rounded p-2"></div>
             </div>
-            <div class="flex justify-end pt-6 mt-2"><button onclick="closeModal('moveStockModal')" class="mr-3 text-slate-500 font-bold text-sm">Cancelar</button><button onclick="executeStockMove()" class="bg-yellow-600 text-white px-4 py-2 rounded text-sm font-bold shadow hover:bg-yellow-700">Generar Tacha PDF</button></div>
+            <div class="flex justify-end pt-6 mt-2"><button onclick="ui.closeModal('moveStockModal')" class="mr-3 text-slate-500 font-bold text-sm">Cancelar</button><button onclick="ui.executeStockMove()" class="bg-yellow-600 text-white px-4 py-2 rounded text-sm font-bold shadow hover:bg-yellow-700">Generar Tacha PDF</button></div>
         </div>
     </div>
 
     <div id="orderModal" class="fixed inset-0 bg-slate-900 bg-opacity-70 hidden z-50 flex items-center justify-center p-4 backdrop-blur-sm">
         <div class="bg-white rounded-lg w-full max-w-4xl p-6 h-5/6 flex flex-col shadow-2xl">
-            <div class="flex justify-between items-center mb-4 border-b pb-2"><h3 class="text-xl font-bold text-slate-800" id="orderModalTitle">Nueva Orden de Compra</h3><button onclick="closeModal('orderModal')" class="text-slate-400 hover:text-red-500 text-2xl">&times;</button></div>
+            <div class="flex justify-between items-center mb-4 border-b pb-2"><h3 class="text-xl font-bold text-slate-800" id="orderModalTitle">Nueva Orden de Compra</h3><button onclick="ui.closeModal('orderModal')" class="text-slate-400 hover:text-red-500 text-2xl">&times;</button></div>
             <div class="flex-1 overflow-y-auto pr-2">
                 <form id="orderForm">
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 bg-slate-50 p-4 rounded border border-slate-200">
@@ -236,8 +228,8 @@
                     <div class="mb-4">
                         <h4 class="font-bold text-slate-700 mb-2 border-b pb-1">Productos</h4>
                         <div class="flex flex-col md:flex-row gap-2 mb-3">
-                            <select id="orderProductSelect" class="flex-1 border rounded p-2 text-sm" onchange="updateOrderSizeInputs()"><option value="">Seleccione Producto...</option></select>
-                            <button type="button" onclick="addProductToOrder()" class="bg-blue-600 text-white px-6 py-2 rounded font-bold shadow">AGREGAR</button>
+                            <select id="orderProductSelect" class="flex-1 border rounded p-2 text-sm" onchange="ui.updateOrderSizeInputs()"><option value="">Seleccione Producto...</option></select>
+                            <button type="button" onclick="ui.addProductToOrder()" class="bg-blue-600 text-white px-6 py-2 rounded font-bold shadow">AGREGAR</button>
                         </div>
                         <div id="orderSizeInputs" class="flex flex-wrap gap-2 items-end hidden bg-blue-50 p-3 rounded mb-2 border border-blue-100"></div>
                         <div id="orderItemNoteContainer" class="hidden mt-2"><input type="text" id="addOrder_Note" placeholder="Nota..." class="w-full border-2 border-yellow-200 rounded px-3 py-2 text-sm bg-yellow-50"></div>
@@ -245,7 +237,7 @@
                     <div class="bg-white border rounded shadow-inner min-h-[150px] overflow-hidden"><table class="min-w-full text-sm"><thead class="bg-slate-100 text-slate-600"><tr><th class="px-4 py-2 text-left">Producto</th><th class="px-4 py-2 text-center">Cantidades</th><th class="px-4 py-2 text-right">Total</th><th class="px-4 py-2"></th></tr></thead><tbody id="orderItemsList"></tbody></table></div>
                 </form>
             </div>
-            <div class="pt-4 border-t flex justify-end"><button onclick="closeModal('orderModal')" class="mr-3 text-slate-500 font-bold">Cancelar</button><button onclick="saveOrder()" class="bg-blue-600 text-white px-6 py-2 rounded font-bold shadow">Guardar</button></div>
+            <div class="pt-4 border-t flex justify-end"><button onclick="ui.closeModal('orderModal')" class="mr-3 text-slate-500 font-bold">Cancelar</button><button onclick="ui.saveOrder()" class="bg-blue-600 text-white px-6 py-2 rounded font-bold shadow">Guardar</button></div>
         </div>
     </div>
 
@@ -257,7 +249,7 @@
                 <div><label class="text-xs font-bold text-slate-600">Cantidad Cajas</label><input type="number" id="dispBox" class="w-full border-2 border-green-100 rounded p-2"></div>
                 <div class="bg-slate-100 p-3 rounded border border-dashed border-slate-400 text-center"><label class="text-xs font-bold text-slate-600 block mb-2">📸 FOTO TACHA</label><input type="file" id="dispPhoto" class="w-full text-xs" accept="image/*" capture="environment"></div>
             </div>
-            <div class="flex justify-end mt-6"><button onclick="closeModal('dispatchModal')" class="mr-3 text-slate-500 font-bold">Cancelar</button><button onclick="confirmDispatch()" class="bg-green-600 text-white px-6 py-2 rounded font-bold shadow">DESPACHAR</button></div>
+            <div class="flex justify-end mt-6"><button onclick="ui.closeModal('dispatchModal')" class="mr-3 text-slate-500 font-bold">Cancelar</button><button onclick="ui.confirmDispatch()" class="bg-green-600 text-white px-6 py-2 rounded font-bold shadow">DESPACHAR</button></div>
         </div>
     </div>
 
@@ -265,382 +257,558 @@
         <div class="bg-white rounded-lg w-full max-w-sm p-6 shadow-2xl">
             <h3 class="font-bold mb-4 text-slate-800 text-lg border-b pb-2">Generar Tacha PDF</h3>
             <div class="space-y-3"><input type="text" id="printBultos" placeholder="Nro Bultos" class="w-full border rounded p-2"><input type="text" id="printCarrier" placeholder="Chofer" class="w-full border rounded p-2"><input type="text" id="printReceiver" placeholder="Recibe" class="w-full border rounded p-2"></div>
-            <button onclick="executePrintOc()" class="w-full bg-slate-800 hover:bg-black text-white py-3 rounded font-bold mt-6 shadow-lg">DESCARGAR PDF</button>
+            <button onclick="ui.executePrintOc()" class="w-full bg-slate-800 hover:bg-black text-white py-3 rounded font-bold mt-6 shadow-lg">DESCARGAR PDF</button>
         </div>
     </div>
 
-    <div id="pdf-container"></div>
-    <div id="pdf-report-template">
-        <div class="pdf-header"><div><h1 style="font-size:24px; font-weight:900; color:#0f172a;">IDEAS TEXTILES SPA</h1><p style="color:#64748b;">Reporte de Estado</p></div><div style="text-align:right;"><h2 style="font-size:14px; font-weight:bold; color:#f59e0b;" id="pdf-date"></h2></div></div>
-        <h3 style="font-weight:bold; border-bottom:1px solid #000; margin-bottom:10px;">INVENTARIO BODEGA</h3>
-        <table class="pdf-table"><thead><tr><th>SKU</th><th>PRODUCTO</th><th>TOTAL</th></tr></thead><tbody id="pdf-inventory-body"></tbody></table>
-        <h3 style="font-weight:bold; border-bottom:1px solid #000; margin-bottom:10px; margin-top:30px;">ÓRDENES PENDIENTES</h3>
-        <table class="pdf-table"><thead><tr><th>ID</th><th>CLIENTE</th><th>FECHA</th><th>ESTADO</th></tr></thead><tbody id="pdf-pending-body"></tbody></table>
-        <h3 style="font-weight:bold; border-bottom:1px solid #000; margin-bottom:10px; margin-top:30px;">DESPACHOS MES</h3>
-        <table class="pdf-table"><thead><tr><th>FECHA</th><th>CLIENTE</th><th>FACTURA</th><th>CAJAS</th><th>ESTADO</th></tr></thead><tbody id="pdf-shipped-body"></tbody></table>
-    </div>
+    <div id="pdf-generator-container"></div>
 
-    <div id="loading-toast" class="fixed bottom-5 right-5 bg-slate-800 text-white px-6 py-4 rounded shadow-2xl z-[100] hidden items-center animate-pulse"><i class="fas fa-brain fa-spin mr-3 text-purple-400"></i> <span id="loading-text">Procesando con IA...</span></div>
+    <div id="loading-toast" class="fixed bottom-5 right-5 bg-slate-800 text-white px-6 py-4 rounded shadow-2xl z-[100] hidden items-center animate-pulse"><i class="fas fa-brain fa-spin mr-3 text-purple-400"></i> <span id="loading-text">IA Procesando Pipeline...</span></div>
 
     <script>
-        // DATA
-        let inventory = JSON.parse(localStorage.getItem('ww_inventory')) || [];
-        let orders = JSON.parse(localStorage.getItem('ww_orders')) || [];
-        let calendarNotes = JSON.parse(localStorage.getItem('ww_notes')) || {};
-        let productionWorks = JSON.parse(localStorage.getItem('ww_production_works')) || [];
+        // ==========================================
+        // CAPA DE PERSISTENCIA (ADAPTER PATTERN)
+        // Preparado para Supabase / Firebase / API
+        // ==========================================
+        class StorageAdapter {
+            constructor(provider = 'local') {
+                this.provider = provider; // 'local' or 'cloud'
+            }
+
+            get(key, defaultVal) {
+                if (this.provider === 'local') {
+                    const val = localStorage.getItem(key);
+                    return val ? JSON.parse(val) : defaultVal;
+                }
+                // Aquí iría la lógica de Supabase: await supabase.from(key).select('*')
+                return defaultVal;
+            }
+
+            save(key, data) {
+                if (this.provider === 'local') {
+                    localStorage.setItem(key, JSON.stringify(data));
+                }
+                // Aquí iría: await supabase.from(key).upsert(data)
+            }
+
+            clear() {
+                localStorage.clear();
+            }
+        }
+
+        // ==========================================
+        // PIPELINE DE IA UNIFICADO
+        // Normaliza entradas (Excel, PDF, Foto) a JSON
+        // ==========================================
+        class AIPipeline {
+            async ingest(input, type) {
+                const file = input.files[0];
+                if (!file) return;
+                
+                ui.toggleLoader(true);
+                try {
+                    // Simulación de Router de IA: Si es Excel usa parser local, si fuera imagen usaría OCR API
+                    if (file.name.match(/\.(xlsx|xls)$/)) {
+                        const data = await this.parseExcel(file);
+                        if(type === 'oc') this.normalizeOrders(data);
+                        else this.normalizeInventory(data);
+                    } else {
+                        alert("Formato no soportado por el Pipeline Local. Use Excel.");
+                    }
+                } catch (e) {
+                    alert("Error en Pipeline IA: " + e.message);
+                } finally {
+                    ui.toggleLoader(false);
+                    input.value = '';
+                }
+            }
+
+            parseExcel(file) {
+                return new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        const wb = XLSX.read(e.target.result, {type: 'array'});
+                        const ws = wb.Sheets[wb.SheetNames[0]];
+                        resolve(XLSX.utils.sheet_to_json(ws, {header: 1}));
+                    };
+                    reader.onerror = reject;
+                    reader.readAsArrayBuffer(file);
+                });
+            }
+
+            normalizeOrders(rows) {
+                let map = {}, count = 0;
+                rows.forEach((row, i) => {
+                    if(i < 1) return; // Header
+                    // Mapeo Inteligente de Columnas (Excel Standard)
+                    let id = row[1] ? String(row[1]).trim() : null;
+                    let client = row[3] || 'Cliente Importado';
+                    let prodName = row[4];
+                    let size = row[5] || 'U';
+                    let qty = parseInt(row[6]);
+
+                    if(id && prodName && qty > 0) {
+                        if(!map[id]) {
+                            map[id] = { id, client, date: new Date().toISOString().split('T')[0], status: 'Pendiente', items: [], invoice:'', boxes:'' };
+                            count++;
+                        }
+                        let existing = map[id].items.find(it => it.name === prodName);
+                        if(existing) {
+                            existing.quantities[size] = (existing.quantities[size] || 0) + qty;
+                            existing.total += qty;
+                            existing.hasSizes = true;
+                        } else {
+                            let newItem = { name: prodName, sku: 'IA-'+Date.now(), hasSizes: true, quantities: {}, total: qty, note: '' };
+                            newItem.quantities[size] = qty;
+                            map[id].items.push(newItem);
+                        }
+                    }
+                });
+                
+                if(count === 0) return alert("IA: 0 Órdenes detectadas. Revise estructura Excel (Col B: ID, Col E: Prod).");
+                Object.values(map).forEach(o => state.orders.push(o));
+                db.save('ww_orders', state.orders);
+                ui.renderOrders();
+                alert(`Pipeline Finalizado: ${count} Órdenes procesadas.`);
+            }
+
+            normalizeInventory(rows) {
+                let count = 0;
+                rows.forEach((r, i) => {
+                    if(i > 0 && r[0]) {
+                        let n = r[0], q = parseInt(r[1]) || 0;
+                        if(n && q >= 0) { 
+                            state.inventory.push({sku: 'XLS-'+Date.now()+i, name: n, hasSizes: false, stockData: {unique: q}, total: q}); 
+                            count++; 
+                        }
+                    }
+                });
+                db.save('ww_inventory', state.inventory);
+                ui.renderInventory();
+                alert(`Pipeline Finalizado: ${count} Items ingresados.`);
+            }
+        }
+
+        // ==========================================
+        // STATE MANAGEMENT & CORE
+        // ==========================================
+        const db = new StorageAdapter();
+        const aiPipeline = new AIPipeline();
         
-        let tempOrderItems=[], tempProdList=[], currentDispatchId=null, currentDate=new Date(), editingOrderIdx=null, editingProdIdx=null, currentMoveIdx=null, currentMoveType=null, currentPrintList=[];
+        let state = {
+            inventory: db.get('ww_inventory', []),
+            orders: db.get('ww_orders', []),
+            production: db.get('ww_production_works', [])
+        };
+
+        // Variables temporales de UI
+        let tempOrderItems=[], tempProdList=[], currentDispatchId=null, editingOrderIdx=null, editingProdIdx=null;
+        let currentDate = new Date();
         const defaultSizes=['S','M','L','XL','XXL'];
 
-        document.addEventListener('DOMContentLoaded', () => {
-            showSection('inventory'); renderInventory(); renderProductionDashboard(); updateAnalysis();
-            document.getElementById('currentDateDisplay').textContent = new Date().toLocaleDateString('es-CL', {weekday:'long', year:'numeric', month:'long', day:'numeric'});
-        });
+        // ==========================================
+        // SYSTEM CORE: EXPORT & RESET SEGURO
+        // ==========================================
+        const systemCore = {
+            secureReset: () => {
+                if(!confirm("⚠️ RESET DEL SISTEMA ⚠️\n\nSe requiere exportar los datos antes de borrar. ¿Continuar?")) return;
+                
+                // 1. Exportar JSON Completo
+                const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state));
+                const dlAnchorElem = document.createElement('a');
+                dlAnchorElem.setAttribute("href", dataStr);
+                dlAnchorElem.setAttribute("download", "BACKUP_IDEAS_TEXTILES_" + new Date().toISOString() + ".json");
+                dlAnchorElem.click();
 
-        // NAVEGACIÓN
-        function showSection(id) {
-            document.querySelectorAll('.section-content').forEach(el=>el.classList.add('hidden'));
-            document.getElementById(id).classList.remove('hidden');
-            if(id==='orders') renderOrders(); if(id==='calendar') renderCalendar(); if(id==='analysis') updateAnalysis();
-            document.querySelectorAll('.nav-item').forEach(btn => {
-                btn.classList.remove('bg-slate-800', 'border-l-4', 'border-yellow-500', 'text-yellow-500');
-                btn.querySelector('i').classList.remove('text-yellow-500');
-                if(btn.id === 'nav-'+id) { btn.classList.add('bg-slate-800', 'border-l-4', 'border-yellow-500', 'text-yellow-500'); btn.querySelector('i').classList.add('text-yellow-500'); }
-            });
-            if(window.innerWidth < 768) { document.getElementById('sidebar').classList.add('-translate-x-full'); document.getElementById('sidebar-overlay').classList.add('hidden'); }
-        }
-        function toggleSidebar() { document.getElementById('sidebar').classList.toggle('-translate-x-full'); document.getElementById('sidebar-overlay').classList.toggle('hidden'); }
-
-        // PRODUCCIÓN
-        function openProductionModal() { 
-            document.getElementById('prodWorkName').value=''; tempProdList=[]; 
-            document.getElementById('prodSelect').innerHTML='<option value="">Producto...</option>';
-            inventory.forEach((p,i)=>document.getElementById('prodSelect').innerHTML+=`<option value="${i}">${p.sku} ${p.name}</option>`);
-            document.getElementById('prodItemModal').classList.remove('hidden'); renderTempProdList();
-        }
-        function addProdToLoteList() {
-            let idx = document.getElementById('prodSelect').value, qty = parseInt(document.getElementById('prodQtyInput').value)||0;
-            if(!idx || qty<=0) return alert("Seleccione producto y cantidad");
-            let p = inventory[idx]; tempProdList.push({name: p.name, qty: qty, sku: p.sku});
-            renderTempProdList(); document.getElementById('prodQtyInput').value='';
-        }
-        function renderTempProdList() { document.getElementById('tempProdList').innerHTML = tempProdList.map((it,i) => `<div class="flex justify-between border-b p-1"><span>${it.name} (${it.qty})</span><button onclick="tempProdList.splice(${i},1);renderTempProdList()" class="text-red-500">x</button></div>`).join(''); }
-        function createWorkOrder() {
-            const name = document.getElementById('prodWorkName').value;
-            if(!name || tempProdList.length===0) return alert("Faltan datos");
-            productionWorks.push({ id: Date.now(), name, qty: tempProdList.reduce((a,b)=>a+b.qty,0), items: tempProdList, stages: [{ key: 'corte', label: 'Corte', done: false, resp: '' }, { key: 'confeccion', label: 'Confección', done: false, resp: '' }, { key: 'bordado', label: 'Bordado', done: false, resp: '' }, { key: 'bodega', label: 'A Bodega', done: false, resp: '' }] });
-            localStorage.setItem('ww_production_works', JSON.stringify(productionWorks)); renderProductionDashboard(); closeModal('prodItemModal');
-        }
-        function renderProductionDashboard() {
-            const c = document.getElementById('production-grid'); c.innerHTML = '';
-            productionWorks.forEach((w, i) => {
-                let stagesHtml = w.stages.map((s, si) => `<div class="stage-row ${s.done ? 'completed' : 'pending'}"><div class="flex items-center cursor-pointer" onclick="toggleStage(${i}, ${si})"><i class="fas ${s.done ? 'fa-check-circle text-green-600' : 'fa-circle text-slate-300'} mr-2"></i><span class="text-xs font-bold ${s.done ? 'text-green-800':'text-slate-500'}">${s.label}</span></div><input type="text" placeholder="Resp." value="${s.resp}" class="text-[10px] w-20 bg-white border rounded px-1" onchange="updateResp(${i}, ${si}, this.value)"></div>`).join('');
-                c.innerHTML += `<div class="bg-white rounded-lg shadow border border-slate-200 p-4"><div class="flex justify-between items-start mb-3"><div><h4 class="font-bold text-slate-700 text-sm uppercase">${w.name}</h4><p class="text-[10px] text-slate-500">${w.items ? w.items.map(x=>x.name).join(', ') : 'Lote'}</p><p class="text-xs text-slate-500 font-mono">Total: <strong>${w.qty} Unid.</strong></p></div><button onclick="deleteWork(${i})" class="text-slate-300 hover:text-red-500 px-2"><i class="fas fa-trash"></i></button></div><div class="space-y-1">${stagesHtml}</div></div>`;
-            });
-        }
-        function toggleStage(idx, sIdx) {
-            let w = productionWorks[idx], s = w.stages[sIdx];
-            if(s.key === 'bodega' && !s.done) {
-                if(!confirm(`¿Finalizar "${w.name}" e ingresar a INVENTARIO?`)) return;
-                (w.items || [{name:w.name, qty:w.qty}]).forEach(it => addToInv(it.name, it.qty));
-                s.done = true; s.resp = "SISTEMA"; alert("Ingresado a bodega."); if(confirm("¿Archivar lote?")) { deleteWork(idx); return; }
-            } else s.done = !s.done;
-            localStorage.setItem('ww_production_works', JSON.stringify(productionWorks)); renderProductionDashboard();
-        }
-        function updateResp(i, si, v) { productionWorks[i].stages[si].resp = v; localStorage.setItem('ww_production_works', JSON.stringify(productionWorks)); }
-        function deleteWork(i) { productionWorks.splice(i, 1); localStorage.setItem('ww_production_works', JSON.stringify(productionWorks)); renderProductionDashboard(); }
-        function addToInv(n, q) {
-            let i = inventory.findIndex(p => p.name.toLowerCase() === n.toLowerCase());
-            if (i >= 0) { inventory[i].total += q; if(!inventory[i].hasSizes) inventory[i].stockData.unique += q; } 
-            else { inventory.push({ sku: `PROD-${Date.now()}`, name: n, hasSizes: false, stockData: { unique: q }, total: q }); }
-            localStorage.setItem('ww_inventory', JSON.stringify(inventory)); renderInventory();
-        }
-
-        // --- INVENTARIO (CORREGIDO LÁPIZ) ---
-        function openProductModal(idx = null) {
-            document.getElementById('productForm').reset(); editingProdIdx = idx;
-            if(idx !== null) {
-                let p = inventory[idx];
-                document.getElementById('productModalTitle').innerText = "Editar: " + p.name;
-                document.getElementById('prodSku').value = p.sku; document.getElementById('prodName').value = p.name;
-                document.getElementById('hasSizes').checked = p.hasSizes; 
-                toggleSizeInputs(); // Important: call this before accessing input elements
-                if(p.hasSizes) renderDynamicSizeInputs(Object.keys(p.stockData), p.stockData); 
-                else document.getElementById('stockUnique').value = p.total;
-            } else {
-                document.getElementById('productModalTitle').innerText = "Nuevo Item";
-                document.getElementById('prodSku').value = 'WW-' + String(inventory.length + 1).padStart(4,'0');
-                renderDynamicSizeInputs(defaultSizes, {}); toggleSizeInputs();
+                // 2. Confirmar Borrado
+                setTimeout(() => {
+                    if(confirm("Backup descargado. ¿BORRAR DEFINITIVAMENTE TODA LA BASE DE DATOS LOCAL?")) {
+                        db.clear();
+                        location.reload();
+                    }
+                }, 1000);
+            },
+            
+            generateReport: async () => {
+                const c = document.getElementById('pdf-generator-container');
+                c.innerHTML = `
+                <div class="pdf-page-render">
+                    <h1 style="border-bottom: 2px solid #f59e0b; padding-bottom:10px;">REPORTE GENERAL</h1>
+                    <h3>Inventario Actual</h3>
+                    <table style="width:100%; border-collapse: collapse; font-size:12px;">
+                        <tr style="background:#1e293b; color:white;"><th>SKU</th><th>Producto</th><th>Total</th></tr>
+                        ${state.inventory.map(p => `<tr><td style="border:1px solid #ddd; padding:4px;">${p.sku}</td><td style="border:1px solid #ddd;">${p.name}</td><td style="border:1px solid #ddd;">${p.total}</td></tr>`).join('')}
+                    </table>
+                </div>`;
+                
+                // Espera renderizado del DOM (Fix pantalla blanca)
+                await new Promise(r => setTimeout(r, 500));
+                
+                const opt = { margin:0.5, filename: 'Reporte_General.pdf', image:{type:'jpeg', quality:0.98}, html2canvas:{scale:2}, jsPDF:{unit:'in', format:'letter'} };
+                html2pdf().set(opt).from(c).save().then(() => c.innerHTML = '');
             }
-            document.getElementById('productModal').classList.remove('hidden');
-        }
-        function renderDynamicSizeInputs(sizes, vals) {
-            let c = document.getElementById('dynamicSizeContainer'); c.innerHTML = '';
-            sizes.forEach(s => {
-                let v = vals && vals[s] ? vals[s] : 0; // Robust check
-                c.innerHTML += `<div class="flex flex-col items-center relative p-1 bg-slate-50 rounded border"><button type="button" onclick="this.parentElement.remove()" class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-4 h-4 text-[10px] flex items-center justify-center shadow">x</button><label class="text-[10px] font-bold text-slate-500">${s}</label><input type="number" name="size_${s}" value="${v}" data-size="${s}" class="size-input w-full border text-center p-1 text-sm rounded"></div>`;
-            });
-        }
-        function addCustomSizeInput() {
-            let s = prompt("Nombre Talla:"); if(s) { s = s.toUpperCase().trim(); document.getElementById('dynamicSizeContainer').innerHTML += `<div class="flex flex-col items-center relative p-1 bg-blue-50 rounded border border-blue-200"><button type="button" onclick="this.parentElement.remove()" class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-4 h-4 text-[10px] flex items-center justify-center shadow">x</button><label class="text-[10px] font-bold text-blue-600">${s}</label><input type="number" name="size_${s}" value="0" data-size="${s}" class="size-input w-full border-2 border-blue-100 text-center p-1 text-sm rounded"></div>`; }
-        }
-        function toggleSizeInputs() {
-            let on = document.getElementById('hasSizes').checked;
-            document.getElementById('dynamicSizeContainer').classList.toggle('hidden', !on);
-            document.getElementById('stockUnique').classList.toggle('hidden', on);
-            document.getElementById('btnAddSize').classList.toggle('hidden', !on);
-        }
+        };
+
+        // ==========================================
+        // UI CONTROLLER & ROUTER
+        // ==========================================
+        const router = {
+            navigate: (viewId) => {
+                document.querySelectorAll('.section-content').forEach(el => el.classList.add('hidden'));
+                document.getElementById(viewId).classList.remove('hidden');
+                
+                // Actualizar Sidebar Activo
+                document.querySelectorAll('.nav-item').forEach(btn => {
+                    btn.classList.remove('bg-slate-800', 'border-l-4', 'border-yellow-500', 'text-yellow-500');
+                    btn.querySelector('i').classList.remove('text-yellow-500');
+                    if(btn.id === 'nav-'+viewId) { 
+                        btn.classList.add('bg-slate-800', 'border-l-4', 'border-yellow-500', 'text-yellow-500'); 
+                        btn.querySelector('i').classList.add('text-yellow-500'); 
+                    }
+                });
+
+                // Render Views
+                if(viewId === 'orders') ui.renderOrders();
+                if(viewId === 'inventory') ui.renderInventory();
+                if(viewId === 'calendar') ui.renderCalendar();
+                if(viewId === 'analysis') ui.updateDashboard();
+                
+                // Mobile Sidebar Logic
+                if(window.innerWidth < 768) { 
+                    document.getElementById('sidebar').classList.add('-translate-x-full'); 
+                    document.getElementById('sidebar-overlay').classList.add('hidden'); 
+                }
+            }
+        };
+
+        const ui = {
+            toggleLoader: (show) => {
+                const l = document.getElementById('loading-toast');
+                show ? (l.classList.remove('hidden'), l.classList.add('flex')) : (l.classList.add('hidden'), l.classList.remove('flex'));
+            },
+
+            // --- INVENTARIO ---
+            openProductModal: (idx = null) => {
+                document.getElementById('productForm').reset();
+                editingProdIdx = idx;
+                if(idx !== null) {
+                    let p = state.inventory[idx];
+                    document.getElementById('productModalTitle').innerText = "Editar: " + p.name;
+                    document.getElementById('prodSku').value = p.sku;
+                    document.getElementById('prodName').value = p.name;
+                    document.getElementById('hasSizes').checked = p.hasSizes;
+                    ui.toggleSizeInputs();
+                    if(p.hasSizes) ui.renderDynamicSizeInputs(Object.keys(p.stockData), p.stockData);
+                    else document.getElementById('stockUnique').value = p.total;
+                } else {
+                    document.getElementById('productModalTitle').innerText = "Nuevo Item";
+                    document.getElementById('prodSku').value = 'WW-' + String(state.inventory.length + 1).padStart(4,'0');
+                    ui.renderDynamicSizeInputs(defaultSizes, {});
+                    ui.toggleSizeInputs();
+                }
+                document.getElementById('productModal').classList.remove('hidden');
+            },
+            
+            toggleSizeInputs: () => {
+                let on = document.getElementById('hasSizes').checked;
+                document.getElementById('dynamicSizeContainer').classList.toggle('hidden', !on);
+                document.getElementById('stockUnique').classList.toggle('hidden', on);
+                document.getElementById('btnAddSize').classList.toggle('hidden', !on);
+            },
+
+            renderDynamicSizeInputs: (sizes, vals) => {
+                let c = document.getElementById('dynamicSizeContainer'); c.innerHTML = '';
+                sizes.forEach(s => {
+                    let v = vals && vals[s] ? vals[s] : 0;
+                    c.innerHTML += `<div class="flex flex-col items-center relative p-1 bg-slate-50 rounded border"><button type="button" onclick="this.parentElement.remove()" class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-4 h-4 text-[10px] flex items-center justify-center shadow">x</button><label class="text-[10px] font-bold text-slate-500">${s}</label><input type="number" name="size_${s}" value="${v}" data-size="${s}" class="size-input w-full border text-center p-1 text-sm rounded"></div>`;
+                });
+            },
+
+            addCustomSizeInput: () => {
+                let s = prompt("Nombre Talla:"); 
+                if(s) { 
+                    s = s.toUpperCase().trim(); 
+                    document.getElementById('dynamicSizeContainer').innerHTML += `<div class="flex flex-col items-center relative p-1 bg-blue-50 rounded border border-blue-200"><button type="button" onclick="this.parentElement.remove()" class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-4 h-4 text-[10px] flex items-center justify-center shadow">x</button><label class="text-[10px] font-bold text-blue-600">${s}</label><input type="number" name="size_${s}" value="0" data-size="${s}" class="size-input w-full border-2 border-blue-100 text-center p-1 text-sm rounded"></div>`; 
+                }
+            },
+
+            renderInventory: () => {
+                let t = document.getElementById('inventory-table-body'); t.innerHTML = '';
+                if(state.inventory.length === 0) { document.getElementById('empty-inventory').classList.remove('hidden'); return; }
+                document.getElementById('empty-inventory').classList.add('hidden');
+                
+                state.inventory.forEach((p, i) => {
+                    let sizeHtml = p.hasSizes ? Object.entries(p.stockData).map(([k,v]) => `<span class="text-[10px] bg-slate-100 border px-1 rounded mx-1">${k}:${v}</span>`).join('') : '<span class="text-xs text-slate-400">Único</span>';
+                    t.innerHTML += `
+                    <tr class="border-b hover:bg-slate-50">
+                        <td class="px-5 py-3 text-xs font-mono font-bold text-slate-500">${p.sku}</td>
+                        <td class="px-5 py-3 text-sm font-bold">${p.name}</td>
+                        <td class="px-5 py-3 text-center flex flex-wrap justify-center gap-1">${sizeHtml}</td>
+                        <td class="px-5 py-3 text-right font-bold ${p.total<10?'text-red-600':'text-green-600'}">${p.total}</td>
+                        <td class="px-5 py-3 text-center">
+                            <button onclick="ui.openProductModal(${i})" class="text-blue-500 hover:text-blue-700 mr-2"><i class="fas fa-pencil-alt"></i></button>
+                            <button onclick="ui.deleteInv(${i})" class="text-red-400 hover:text-red-600"><i class="fas fa-trash"></i></button>
+                        </td>
+                    </tr>`;
+                });
+                ui.updateOrderProductSelect();
+            },
+
+            deleteInv: (i) => {
+                if(confirm("¿Eliminar Item?")) { state.inventory.splice(i, 1); db.save('ww_inventory', state.inventory); ui.renderInventory(); }
+            },
+
+            // --- PRODUCCIÓN ---
+            openProductionModal: () => {
+                document.getElementById('prodWorkName').value=''; tempProdList=[];
+                const sel = document.getElementById('prodSelect');
+                sel.innerHTML='<option value="">Producto...</option>';
+                state.inventory.forEach((p,i)=> sel.innerHTML+=`<option value="${i}">${p.sku} ${p.name}</option>`);
+                document.getElementById('prodItemModal').classList.remove('hidden');
+                ui.renderTempProdList();
+            },
+
+            addProdToLoteList: () => {
+                let idx = document.getElementById('prodSelect').value, qty = parseInt(document.getElementById('prodQtyInput').value)||0;
+                if(!idx || qty<=0) return alert("Seleccione producto y cantidad");
+                let p = state.inventory[idx];
+                tempProdList.push({name: p.name, qty: qty, sku: p.sku});
+                ui.renderTempProdList();
+                document.getElementById('prodQtyInput').value='';
+            },
+
+            renderTempProdList: () => {
+                document.getElementById('tempProdList').innerHTML = tempProdList.map((it,i) => `<div class="flex justify-between border-b p-1"><span>${it.name} (${it.qty})</span><button onclick="tempProdList.splice(${i},1);ui.renderTempProdList()" class="text-red-500">x</button></div>`).join('');
+            },
+
+            createWorkOrder: () => {
+                const name = document.getElementById('prodWorkName').value;
+                if(!name || tempProdList.length===0) return alert("Datos incompletos");
+                state.production.push({ id: Date.now(), name, qty: tempProdList.reduce((a,b)=>a+b.qty,0), items: tempProdList, stages: [{ key: 'corte', label: 'Corte', done: false, resp: '' }, { key: 'confeccion', label: 'Confección', done: false, resp: '' }, { key: 'bordado', label: 'Bordado', done: false, resp: '' }, { key: 'bodega', label: 'A Bodega', done: false, resp: '' }] });
+                db.save('ww_production_works', state.production);
+                ui.renderProductionDashboard();
+                ui.closeModal('prodItemModal');
+            },
+
+            renderProductionDashboard: () => {
+                const c = document.getElementById('production-grid'); c.innerHTML = '';
+                state.production.forEach((w, i) => {
+                    let stagesHtml = w.stages.map((s, si) => `<div class="stage-row ${s.done ? 'completed' : 'pending'}"><div class="flex items-center cursor-pointer" onclick="ui.toggleStage(${i}, ${si})"><i class="fas ${s.done ? 'fa-check-circle text-green-600' : 'fa-circle text-slate-300'} mr-2"></i><span class="text-xs font-bold ${s.done ? 'text-green-800':'text-slate-500'}">${s.label}</span></div><input type="text" placeholder="Resp." value="${s.resp}" class="text-[10px] w-20 bg-white border rounded px-1" onchange="ui.updateResp(${i}, ${si}, this.value)"></div>`).join('');
+                    c.innerHTML += `<div class="bg-white rounded-lg shadow border border-slate-200 p-4"><div class="flex justify-between items-start mb-3"><div><h4 class="font-bold text-slate-700 text-sm uppercase">${w.name}</h4><p class="text-[10px] text-slate-500">${w.items ? w.items.map(x=>x.name).join(', ') : 'Lote'}</p><p class="text-xs text-slate-500 font-mono">Total: <strong>${w.qty} Unid.</strong></p></div><button onclick="ui.deleteWork(${i})" class="text-slate-300 hover:text-red-500 px-2"><i class="fas fa-trash"></i></button></div><div class="space-y-1">${stagesHtml}</div></div>`;
+                });
+            },
+
+            toggleStage: (idx, sIdx) => {
+                let w = state.production[idx], s = w.stages[sIdx];
+                if(s.key === 'bodega' && !s.done) {
+                    if(!confirm(`¿Finalizar "${w.name}" e ingresar a INVENTARIO?`)) return;
+                    (w.items || [{name:w.name, qty:w.qty}]).forEach(it => ui.addToInv(it.name, it.qty));
+                    s.done = true; s.resp = "SISTEMA";
+                    alert("Ingresado a bodega.");
+                } else s.done = !s.done;
+                db.save('ww_production_works', state.production);
+                ui.renderProductionDashboard();
+            },
+
+            updateResp: (i, si, v) => {
+                state.production[i].stages[si].resp = v; db.save('ww_production_works', state.production);
+            },
+            
+            deleteWork: (i) => {
+                state.production.splice(i, 1); db.save('ww_production_works', state.production); ui.renderProductionDashboard();
+            },
+
+            addToInv: (n, q) => {
+                let i = state.inventory.findIndex(p => p.name.toLowerCase() === n.toLowerCase());
+                if (i >= 0) { 
+                    state.inventory[i].total += q; 
+                    if(!state.inventory[i].hasSizes) state.inventory[i].stockData.unique += q; 
+                } else { 
+                    state.inventory.push({ sku: `PROD-${Date.now()}`, name: n, hasSizes: false, stockData: { unique: q }, total: q }); 
+                }
+                db.save('ww_inventory', state.inventory);
+                ui.renderInventory();
+            },
+
+            // --- ÓRDENES ---
+            openOrderModal: (idx = null) => {
+                document.getElementById('orderForm').reset(); editingOrderIdx = idx; tempOrderItems = [];
+                document.getElementById('orderSizeInputs').innerHTML = ''; document.getElementById('orderItemsList').innerHTML = '';
+                document.getElementById('orderSizeInputs').classList.add('hidden'); document.getElementById('orderItemNoteContainer').classList.add('hidden');
+                
+                if(idx !== null) {
+                    let o = state.orders[idx];
+                    document.getElementById('orderModalTitle').innerText = "Editar OC: " + o.id;
+                    document.getElementById('orderId').value = o.id;
+                    document.getElementById('orderClient').value = o.client;
+                    document.getElementById('orderDate').value = o.date;
+                    tempOrderItems = JSON.parse(JSON.stringify(o.items));
+                    ui.renderOrderItems();
+                } else { document.getElementById('orderModalTitle').innerText = "Nueva OC"; }
+                document.getElementById('orderModal').classList.remove('hidden');
+            },
+
+            updateOrderProductSelect: () => {
+                let s = document.getElementById('orderProductSelect'); 
+                s.innerHTML = '<option value="">Seleccione...</option>'; 
+                state.inventory.forEach((p, i) => s.innerHTML += `<option value="${i}">${p.sku} - ${p.name}</option>`);
+            },
+
+            updateOrderSizeInputs: () => {
+                let idx = document.getElementById('orderProductSelect').value, c = document.getElementById('orderSizeInputs'), n = document.getElementById('orderItemNoteContainer'); c.innerHTML = '';
+                if(!idx) { c.classList.add('hidden'); n.classList.add('hidden'); return; }
+                c.classList.remove('hidden'); n.classList.remove('hidden');
+                let p = state.inventory[idx];
+                if(p.hasSizes) { Object.keys(p.stockData).forEach(k => { c.innerHTML += `<div class="flex flex-col"><span class="text-[9px] font-bold text-center">${k}</span><input type="number" data-size="${k}" class="oc-size w-10 text-center border p-1 text-xs rounded"></div>`; }); } 
+                else { c.innerHTML = `<div class="flex flex-col flex-1"><span class="text-[9px] font-bold">Cantidad</span><input type="number" id="ocUniqueQty" class="w-full text-center border p-1 text-xs rounded"></div>`; }
+            },
+
+            addProductToOrder: () => {
+                let idx = document.getElementById('orderProductSelect').value; if(!idx) return;
+                let p = state.inventory[idx], note = document.getElementById('addOrder_Note').value;
+                let item = { name: p.name, sku: p.sku, hasSizes: p.hasSizes, quantities: {}, total: 0, note: note };
+                
+                if(p.hasSizes) { 
+                    document.querySelectorAll('.oc-size').forEach(i => { let v = parseInt(i.value) || 0; if(v > 0) { item.quantities[i.dataset.size] = v; item.total += v; } }); 
+                } else { 
+                    item.total = parseInt(document.getElementById('ocUniqueQty').value) || 0; item.quantities.unique = item.total; 
+                }
+                
+                if(item.total > 0) { tempOrderItems.push(item); ui.renderOrderItems(); }
+            },
+
+            renderOrderItems: () => {
+                let l = document.getElementById('orderItemsList'); l.innerHTML = '';
+                tempOrderItems.forEach((it, i) => {
+                    let det = it.hasSizes ? Object.entries(it.quantities).map(([k,v])=>`${k}:${v}`).join(', ') : it.total;
+                    l.innerHTML += `<tr class="border-b"><td class="px-4 py-2 font-bold">${it.name} <br> <span class="text-xs text-blue-500">${it.note||''}</span></td><td class="px-4 py-2 text-center text-xs">${det}</td><td class="px-4 py-2 text-right font-bold">${it.total}</td><td class="px-4 py-2 text-right"><button onclick="tempOrderItems.splice(${i},1);ui.renderOrderItems()" class="text-red-400">×</button></td></tr>`;
+                });
+            },
+
+            saveOrder: () => {
+                let id = document.getElementById('orderId').value; if(!id || tempOrderItems.length === 0) return alert("Faltan datos");
+                let obj = { id, client: document.getElementById('orderClient').value, date: document.getElementById('orderDate').value, items: tempOrderItems, status: editingOrderIdx !== null ? state.orders[editingOrderIdx].status : 'Pendiente', invoice: '', boxes: '' };
+                if(editingOrderIdx !== null) state.orders[editingOrderIdx] = obj; else state.orders.push(obj);
+                db.save('ww_orders', state.orders); ui.closeModal('orderModal'); ui.renderOrders();
+            },
+
+            renderOrders: () => {
+                let t = document.getElementById('orders-table-body'); t.innerHTML = '';
+                if(state.orders.length === 0) { document.getElementById('empty-orders').classList.remove('hidden'); return; }
+                document.getElementById('empty-orders').classList.add('hidden');
+                
+                state.orders.forEach((o, i) => {
+                    let st = o.status, color = st==='Despachado'?'bg-green-600 text-white':st==='Pendiente'?'bg-slate-200 text-slate-600':'bg-blue-100 text-blue-800';
+                    t.innerHTML += `<tr class="border-b hover:bg-slate-50"><td class="p-3 text-center"><input type="checkbox" class="oc-check" value="${i}"></td><td class="px-4 py-3 font-bold text-xs">${o.id}</td><td class="px-4 py-3 text-xs">${o.client}</td><td class="px-4 py-3 text-xs">${o.date}</td><td class="px-4 py-3 text-center"><button onclick="ui.cycleStatus(${i})" class="${color} px-2 py-1 rounded text-[10px] font-bold shadow uppercase">${st}</button></td><td class="px-4 py-3 text-xs"><span class="font-bold">${o.items.length} items</span></td><td class="px-4 py-3 text-center flex justify-center gap-2"><button onclick="ui.openOrderModal(${i})" class="text-blue-500"><i class="fas fa-edit"></i></button><button onclick="ui.deleteOrd(${i})" class="text-red-400"><i class="fas fa-trash"></i></button></td></tr>`;
+                });
+            },
+
+            cycleStatus: (i) => {
+                let s = ['Pendiente','En Producción','Listo','Despachado'], n = s.indexOf(state.orders[i].status)+1;
+                if(s[n]==='Despachado'){ currentDispatchId=i; document.getElementById('dispatchModal').classList.remove('hidden'); }
+                else { state.orders[i].status=s[n]||s[0]; db.save('ww_orders', state.orders); ui.renderOrders(); }
+            },
+
+            confirmDispatch: () => {
+                state.orders[currentDispatchId].status='Despachado';
+                state.orders[currentDispatchId].invoice=document.getElementById('dispInv').value;
+                state.orders[currentDispatchId].boxes=document.getElementById('dispBox').value;
+                db.save('ww_orders', state.orders); ui.closeModal('dispatchModal'); ui.renderOrders();
+            },
+            
+            deleteOrd: (i) => { if(confirm("¿Borrar OC?")) { state.orders.splice(i, 1); db.save('ww_orders', state.orders); ui.renderOrders(); } },
+            
+            toggleAllOCs: (el) => { document.querySelectorAll('.oc-check').forEach(c => c.checked = el.checked); },
+
+            // --- TACHAS PDF (FIXED BLANK PAGES) ---
+            printSelectedTachas: () => {
+                let sel = []; document.querySelectorAll('.oc-check:checked').forEach(c => sel.push(parseInt(c.value)));
+                if(sel.length===0) return alert("Selecciona al menos una OC");
+                currentPrintList = sel; document.getElementById('printOcModal').classList.remove('hidden');
+            },
+
+            executePrintOc: async () => {
+                ui.toggleLoader(true);
+                let b = document.getElementById('printBultos').value, c = document.getElementById('printCarrier').value, r = document.getElementById('printReceiver').value;
+                let container = document.getElementById('pdf-generator-container');
+                
+                let html = `<div class="pdf-page-render" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">`;
+                currentPrintList.forEach(idx => {
+                    let o = state.orders[idx];
+                    o.items.forEach(it => {
+                        let sizes = it.hasSizes ? Object.entries(it.quantities).map(([k,v])=>`<b>${k}:</b> ${v}`).join('&nbsp;&nbsp;') : `Cant: ${it.total}`;
+                        html += `
+                        <div style="border: 3px solid #000; padding: 15px; page-break-inside: avoid; background: #fff;">
+                            <div style="display: flex; justify-content: space-between; border-bottom: 2px solid #000; padding-bottom: 5px; margin-bottom: 10px;">
+                                <span style="font-weight:900; font-size: 16px;">OC: ${o.id}</span>
+                                <span style="font-size: 14px;">${o.client}</span>
+                            </div>
+                            <h2 style="font-size: 18px; font-weight: bold; margin: 5px 0; text-transform: uppercase;">${it.name}</h2>
+                            <div style="font-size: 14px; margin: 10px 0; background: #f1f5f9; padding: 5px;">${sizes}</div>
+                            ${it.note ? `<p style="font-size:11px; font-style:italic; color:#666;">Nota: ${it.note}</p>` : ''}
+                            <div style="margin-top: 15px; border-top: 1px dashed #000; padding-top: 10px; font-size: 12px; display: grid; grid-template-columns: 1fr 1fr;">
+                                <div><strong>Bultos:</strong> ${b}</div>
+                                <div><strong>Chofer:</strong> ${c}</div>
+                                <div style="grid-column: span 2; margin-top:5px;"><strong>Recibe:</strong> ${r}</div>
+                            </div>
+                        </div>`;
+                    });
+                });
+                html += `</div>`;
+                container.innerHTML = html;
+
+                // FORCE BROWSER RENDER WAIT (CRITICAL FIX)
+                await new Promise(resolve => setTimeout(resolve, 800));
+
+                const opt = { margin: 0.5, filename: 'Tachas_OC.pdf', image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2 }, jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' } };
+                await html2pdf().set(opt).from(container).save();
+                
+                container.innerHTML = '';
+                ui.closeModal('printOcModal');
+                ui.toggleLoader(false);
+            },
+
+            // --- UTILS ---
+            closeModal: (id) => document.getElementById(id).classList.add('hidden'),
+            
+            // --- CALENDAR ---
+            renderCalendar: () => {
+                let g = document.getElementById('calendar-grid'), m = currentDate.getMonth(), y = currentDate.getFullYear(); g.innerHTML = '';
+                document.getElementById('calendar-header').innerText = new Date(y, m).toLocaleString('es-ES', { month: 'long', year: 'numeric' }).toUpperCase();
+                let f = new Date(y, m, 1).getDay(), d = new Date(y, m + 1, 0).getDate();
+                for(let i=0; i<f; i++) g.innerHTML += `<div class="bg-gray-100"></div>`;
+                for(let i=1; i<=d; i++) {
+                    let k = `${y}-${String(m+1).padStart(2,'0')}-${String(i).padStart(2,'0')}`, evs = state.orders.filter(o=>o.date===k).map(o=>`<div class="text-[9px] bg-blue-100 text-blue-800 rounded px-1 mb-1 truncate">${o.client}</div>`).join('');
+                    g.innerHTML += `<div class="calendar-day ${i===new Date().getDate()?'today':''}"><span class="day-number ${i===new Date().getDate()?'today-num':''}">${i}</span><div class="overflow-y-auto">${evs}</div></div>`;
+                }
+            },
+            changeMonth: (v) => { currentDate.setMonth(currentDate.getMonth()+v); ui.renderCalendar(); },
+            
+            updateDashboard: () => {
+                document.getElementById('ia-production-count').innerText = state.production.length;
+                document.getElementById('ia-shipped-count').innerText = state.orders.filter(o => o.status === 'Despachado').length;
+            }
+        };
+
+        // EVENT LISTENERS & PROD FORM FIX
         document.getElementById('productForm').addEventListener('submit', (e) => {
             e.preventDefault();
             let name = document.getElementById('prodName').value, hasSizes = document.getElementById('hasSizes').checked, stockData = {}, total = 0;
             if(hasSizes) { document.querySelectorAll('.size-input').forEach(i => { let v = parseInt(i.value)||0; stockData[i.dataset.size] = v; total += v; }); } 
             else { total = parseInt(document.getElementById('stockUnique').value)||0; stockData = { unique: total }; }
             let item = { sku: document.getElementById('prodSku').value, name, hasSizes, stockData, total };
-            if(editingProdIdx !== null) inventory[editingProdIdx] = item; else inventory.push(item);
-            localStorage.setItem('ww_inventory', JSON.stringify(inventory)); closeModal('productModal'); renderInventory();
+            if(editingProdIdx !== null) state.inventory[editingProdIdx] = item; else state.inventory.push(item);
+            db.save('ww_inventory', state.inventory); ui.closeModal('productModal'); ui.renderInventory();
         });
-        function renderInventory() {
-            let t = document.getElementById('inventory-table-body'); t.innerHTML = '';
-            if(inventory.length === 0) { document.getElementById('empty-inventory').classList.remove('hidden'); return; }
-            document.getElementById('empty-inventory').classList.add('hidden');
-            inventory.forEach((p, i) => {
-                let sizeHtml = p.hasSizes ? Object.entries(p.stockData).map(([k,v]) => `<span class="text-[10px] bg-slate-100 border px-1 rounded mx-1">${k}:${v}</span>`).join('') : '<span class="text-xs text-slate-400">Único</span>';
-                t.innerHTML += `<tr class="border-b hover:bg-slate-50"><td class="px-5 py-3 text-xs font-mono font-bold text-slate-500">${p.sku}</td><td class="px-5 py-3 text-sm font-bold">${p.name}</td><td class="px-5 py-3 text-center flex flex-wrap justify-center gap-1">${sizeHtml}</td><td class="px-5 py-3 text-right font-bold ${p.total<10?'text-red-600':'text-green-600'}">${p.total}</td><td class="px-5 py-3 text-center"><button onclick="openMoveStock(${i}, 'in')" class="bg-green-100 text-green-700 w-6 h-6 rounded-full font-bold mr-1">+</button><button onclick="openMoveStock(${i}, 'out')" class="bg-red-100 text-red-700 w-6 h-6 rounded-full font-bold">-</button></td><td class="px-5 py-3 text-center"><button onclick="openProductModal(${i})" class="text-blue-500 hover:text-blue-700 mr-2"><i class="fas fa-pencil-alt"></i></button><button onclick="deleteInv(${i})" class="text-red-400 hover:text-red-600"><i class="fas fa-trash"></i></button></td></tr>`;
-            });
-            updateOrderProductSelect();
-        }
-        function deleteInv(i) { if(confirm("¿Eliminar?")) { inventory.splice(i, 1); localStorage.setItem('ww_inventory', JSON.stringify(inventory)); renderInventory(); } }
 
-        // --- MOVIMIENTOS & TACHAS PDF (CORREGIDO) ---
-        function openMoveStock(idx, type) {
-            currentMoveIdx = idx; currentMoveType = type;
-            document.getElementById('moveQty').value = ''; document.getElementById('moveDestination').value = ''; document.getElementById('moveResponsible').value = '';
-            document.getElementById('moveStockModal').classList.remove('hidden');
-        }
-        function executeStockMove() {
-            let q = parseInt(document.getElementById('moveQty').value) || 0, dest = document.getElementById('moveDestination').value, resp = document.getElementById('moveResponsible').value;
-            if(q <= 0 || !dest || !resp) return alert("Datos incompletos.");
-            let p = inventory[currentMoveIdx];
-            if(currentMoveType === 'out' && p.total < q) return alert("Stock insuficiente.");
-            if(currentMoveType === 'in') { p.total += q; if(!p.hasSizes) p.stockData.unique += q; } else { p.total -= q; if(!p.hasSizes) p.stockData.unique -= q; }
-            localStorage.setItem('ww_inventory', JSON.stringify(inventory));
-            
-            // Generar PDF
-            const container = document.getElementById('pdf-container');
-            container.innerHTML = `
-            <div style="padding: 40px; font-family: monospace; border: 2px solid #000;">
-                <h1 style="text-align:center; border-bottom: 2px solid black; padding-bottom:10px;">CONTROL DE BODEGA</h1>
-                <p><strong>MOVIMIENTO:</strong> ${currentMoveType === 'in' ? 'INGRESO (+)' : 'SALIDA (-)'}</p>
-                <p><strong>FECHA:</strong> ${new Date().toLocaleString()}</p>
-                <p><strong>PRODUCTO:</strong> ${p.name} (${p.sku})</p>
-                <p><strong>CANTIDAD:</strong> <span style="font-size: 20px; font-weight:bold;">${q}</span> Unidades</p>
-                <hr style="margin: 15px 0; border: 0; border-top: 1px dashed black;">
-                <p><strong>DESTINO:</strong> ${dest}</p>
-                <p><strong>RESPONSABLE:</strong> ${resp}</p>
-                <div style="margin-top: 50px; text-align: center; border-top: 1px solid black; width: 60%; margin-left:auto; margin-right:auto; padding-top:5px;">FIRMA</div>
-            </div>`;
-            html2pdf().from(container).save(`Tacha_${p.sku}.pdf`).then(()=>{ container.innerHTML = ''; closeModal('moveStockModal'); renderInventory(); });
-        }
+        function toggleSidebar() { document.getElementById('sidebar').classList.toggle('-translate-x-full'); document.getElementById('sidebar-overlay').classList.toggle('hidden'); }
 
-        // --- ÓRDENES ---
-        function openOrderModal(idx = null) {
-            document.getElementById('orderForm').reset(); editingOrderIdx = idx; tempOrderItems = [];
-            document.getElementById('orderSizeInputs').innerHTML = ''; document.getElementById('orderItemsList').innerHTML = '';
-            document.getElementById('orderSizeInputs').classList.add('hidden'); document.getElementById('orderItemNoteContainer').classList.add('hidden');
-            if(idx !== null) {
-                let o = orders[idx]; document.getElementById('orderModalTitle').innerText = "Editar OC: " + o.id;
-                document.getElementById('orderId').value = o.id; document.getElementById('orderClient').value = o.client; document.getElementById('orderDate').value = o.date;
-                tempOrderItems = JSON.parse(JSON.stringify(o.items)); renderOrderItems();
-            } else { document.getElementById('orderModalTitle').innerText = "Nueva OC"; }
-            document.getElementById('orderModal').classList.remove('hidden');
-        }
-        function updateOrderProductSelect() { let s = document.getElementById('orderProductSelect'); s.innerHTML = '<option value="">Seleccione...</option>'; inventory.forEach((p, i) => s.innerHTML += `<option value="${i}">${p.sku} - ${p.name}</option>`); }
-        function updateOrderSizeInputs() {
-            let idx = document.getElementById('orderProductSelect').value, c = document.getElementById('orderSizeInputs'), n = document.getElementById('orderItemNoteContainer'); c.innerHTML = '';
-            if(!idx) { c.classList.add('hidden'); n.classList.add('hidden'); return; }
-            c.classList.remove('hidden'); n.classList.remove('hidden');
-            let p = inventory[idx];
-            if(p.hasSizes) { Object.keys(p.stockData).forEach(k => { c.innerHTML += `<div class="flex flex-col"><span class="text-[9px] font-bold text-center">${k}</span><input type="number" data-size="${k}" class="oc-size w-10 text-center border p-1 text-xs rounded"></div>`; }); } 
-            else { c.innerHTML = `<div class="flex flex-col flex-1"><span class="text-[9px] font-bold">Cantidad</span><input type="number" id="ocUniqueQty" class="w-full text-center border p-1 text-xs rounded"></div>`; }
-        }
-        function addProductToOrder() {
-            let idx = document.getElementById('orderProductSelect').value; if(!idx) return;
-            let p = inventory[idx], note = document.getElementById('addOrder_Note').value;
-            let item = { name: p.name, sku: p.sku, hasSizes: p.hasSizes, quantities: {}, total: 0, note: note };
-            if(p.hasSizes) { document.querySelectorAll('.oc-size').forEach(i => { let v = parseInt(i.value) || 0; if(v > 0) { item.quantities[i.dataset.size] = v; item.total += v; } }); } 
-            else { item.total = parseInt(document.getElementById('ocUniqueQty').value) || 0; item.quantities.unique = item.total; }
-            if(item.total > 0) { tempOrderItems.push(item); renderOrderItems(); }
-        }
-        function renderOrderItems() {
-            let l = document.getElementById('orderItemsList'); l.innerHTML = '';
-            tempOrderItems.forEach((it, i) => {
-                let det = it.hasSizes ? Object.entries(it.quantities).map(([k,v])=>`${k}:${v}`).join(', ') : it.total;
-                l.innerHTML += `<tr class="border-b"><td class="px-4 py-2 font-bold">${it.name} <br> <span class="text-xs text-blue-500">${it.note||''}</span></td><td class="px-4 py-2 text-center text-xs">${det}</td><td class="px-4 py-2 text-right font-bold">${it.total}</td><td class="px-4 py-2 text-right"><button onclick="tempOrderItems.splice(${i},1);renderOrderItems()" class="text-red-400">×</button></td></tr>`;
-            });
-        }
-        function saveOrder() {
-            let id = document.getElementById('orderId').value; if(!id || tempOrderItems.length === 0) return alert("Faltan datos");
-            let obj = { id, client: document.getElementById('orderClient').value, date: document.getElementById('orderDate').value, items: tempOrderItems, status: editingOrderIdx !== null ? orders[editingOrderIdx].status : 'Pendiente', evidence: '', invoice: '', boxes: '' };
-            if(editingOrderIdx !== null) orders[editingOrderIdx] = obj; else orders.push(obj);
-            localStorage.setItem('ww_orders', JSON.stringify(orders)); closeModal('orderModal'); renderOrders();
-        }
-        function renderOrders() {
-            let t = document.getElementById('orders-table-body'); t.innerHTML = '';
-            if(orders.length === 0) { document.getElementById('empty-orders').classList.remove('hidden'); return; }
-            document.getElementById('empty-orders').classList.add('hidden');
-            orders.forEach((o, i) => {
-                let st = o.status, color = st==='Despachado'?'bg-green-600 text-white':st==='Pendiente'?'bg-slate-200 text-slate-600':'bg-blue-100 text-blue-800';
-                t.innerHTML += `<tr class="border-b hover:bg-slate-50"><td class="p-3 text-center"><input type="checkbox" class="oc-check" value="${i}"></td><td class="px-4 py-3 font-bold text-xs">${o.id}</td><td class="px-4 py-3 text-xs">${o.client}</td><td class="px-4 py-3 text-xs">${o.date}</td><td class="px-4 py-3 text-center"><button onclick="cycleStatus(${i})" class="${color} px-2 py-1 rounded text-[10px] font-bold shadow uppercase">${st}</button></td><td class="px-4 py-3 text-xs"><span class="font-bold">${o.items.length} items</span></td><td class="px-4 py-3 text-center flex justify-center gap-2"><button onclick="openOrderModal(${i})" class="text-blue-500"><i class="fas fa-edit"></i></button><button onclick="deleteOrd(${i})" class="text-red-400"><i class="fas fa-trash"></i></button></td></tr>`;
-            });
-        }
-        function cycleStatus(i) {
-            let s = ['Pendiente','En Producción','Listo','Despachado'], n = s.indexOf(orders[i].status)+1;
-            if(s[n]==='Despachado'){ currentDispatchId=i; document.getElementById('dispatchModal').classList.remove('hidden'); }
-            else { orders[i].status=s[n]||s[0]; localStorage.setItem('ww_orders', JSON.stringify(orders)); renderOrders(); }
-        }
-        function confirmDispatch() { orders[currentDispatchId].status='Despachado'; orders[currentDispatchId].invoice=document.getElementById('dispInv').value; orders[currentDispatchId].boxes=document.getElementById('dispBox').value; localStorage.setItem('ww_orders',JSON.stringify(orders)); closeModal('dispatchModal'); renderOrders(); }
-        function deleteOrd(i) { if(confirm("¿Borrar?")) { orders.splice(i, 1); localStorage.setItem('ww_orders', JSON.stringify(orders)); renderOrders(); } }
-        function toggleAllOCs(el) { document.querySelectorAll('.oc-check').forEach(c => c.checked = el.checked); }
-        
-        // --- PRINT TACHAS PDF (CORREGIDO Y PROFESIONAL) ---
-        function printSelectedTachas() {
-            let sel = []; document.querySelectorAll('.oc-check:checked').forEach(c => sel.push(parseInt(c.value)));
-            if(sel.length===0) return alert("Selecciona al menos una OC");
-            currentPrintList = sel; document.getElementById('printOcModal').classList.remove('hidden');
-        }
-        function executePrintOc() {
-            let b = document.getElementById('printBultos').value, c = document.getElementById('printCarrier').value, r = document.getElementById('printReceiver').value;
-            let container = document.getElementById('pdf-container');
-            
-            // Construir HTML Estructurado para PDF
-            let htmlContent = `<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; font-family: sans-serif;">`;
-            
-            currentPrintList.forEach(idx => {
-                let o = orders[idx];
-                o.items.forEach(it => {
-                    let sizes = it.hasSizes ? Object.entries(it.quantities).map(([k,v])=>`<b>${k}:</b> ${v}`).join('&nbsp;&nbsp;') : `Cant: ${it.total}`;
-                    htmlContent += `
-                    <div style="border: 3px solid #000; padding: 15px; page-break-inside: avoid; background: #fff;">
-                        <div style="display: flex; justify-content: space-between; border-bottom: 2px solid #000; padding-bottom: 5px; margin-bottom: 10px;">
-                            <span style="font-weight:900; font-size: 16px;">OC: ${o.id}</span>
-                            <span style="font-size: 14px;">${o.client}</span>
-                        </div>
-                        <h2 style="font-size: 18px; font-weight: bold; margin: 5px 0; text-transform: uppercase;">${it.name}</h2>
-                        <div style="font-size: 14px; margin: 10px 0; background: #f1f5f9; padding: 5px;">${sizes}</div>
-                        ${it.note ? `<p style="font-size:11px; font-style:italic; color:#666;">Nota: ${it.note}</p>` : ''}
-                        <div style="margin-top: 15px; border-top: 1px dashed #000; padding-top: 10px; font-size: 12px; display: grid; grid-template-columns: 1fr 1fr;">
-                            <div><strong>Bultos:</strong> ${b}</div>
-                            <div><strong>Chofer:</strong> ${c}</div>
-                            <div style="grid-column: span 2; margin-top:5px;"><strong>Recibe:</strong> ${r}</div>
-                        </div>
-                    </div>`;
-                });
-            });
-            htmlContent += `</div>`;
-            container.innerHTML = htmlContent;
-
-            // Generar PDF
-            const opt = { margin: 0.5, filename: 'Tachas_OC.pdf', image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2 }, jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' } };
-            html2pdf().set(opt).from(container).save().then(() => { container.innerHTML = ''; closeModal('printOcModal'); });
-        }
-
-        function generateGeneralPDFReport() {
-            const t = document.getElementById('pdf-report-template');
-            document.getElementById('pdf-date').innerText = new Date().toLocaleDateString();
-            document.getElementById('pdf-inventory-body').innerHTML = inventory.map((p,i)=>`<tr class="${i%2===0?'pdf-row-even':''}"><td>${p.sku}</td><td>${p.name}</td><td>${p.total}</td></tr>`).join('');
-            document.getElementById('pdf-pending-body').innerHTML = orders.filter(o=>o.status!=='Despachado').map((o,i)=>`<tr class="${i%2===0?'pdf-row-even':''}"><td>${o.id}</td><td>${o.client}</td><td>${o.date}</td><td>${o.status}</td></tr>`).join('');
-            document.getElementById('pdf-shipped-body').innerHTML = orders.filter(o=>o.status==='Despachado').map((o,i)=>`<tr class="${i%2===0?'pdf-row-even':''}"><td>${o.date}</td><td>${o.client}</td><td>#${o.invoice}</td><td>${o.boxes}</td><td>Ok</td></tr>`).join('');
-            t.classList.add('pdf-visible');
-            html2pdf().from(t).save('Reporte_General.pdf').then(()=>t.classList.remove('pdf-visible'));
-        }
-
-        // --- IA INTELIGENTE (CORREGIDA PARA EXCEL COMPLEJO) ---
-        async function processInventoryFile(i) { await runAI(i, 'inv'); }
-        async function processOrdersFile(i) { await runAI(i, 'oc'); }
-        async function runAI(inp, mode) {
-            let f = inp.files[0]; if(!f) return;
-            document.getElementById('loading-toast').classList.remove('hidden'); document.getElementById('loading-toast').classList.add('flex');
-            try {
-                if(f.name.endsWith('.xlsx') || f.name.endsWith('.xls')) {
-                    let d = await f.arrayBuffer(), wb = XLSX.read(d), j = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], {header:1});
-                    mode === 'inv' ? parseXlsInv(j) : parseComplexOrderExcel(j);
-                } else { alert("Por favor usa Excel (.xlsx) para mejor precisión."); }
-            } catch(e) { alert("Error: " + e.message); } 
-            finally { document.getElementById('loading-toast').classList.add('hidden'); document.getElementById('loading-toast').classList.remove('flex'); inp.value = ''; }
-        }
-        
-        // --- CEREBRO IA CORREGIDO (AGRUPACIÓN POR OC) ---
-        function parseComplexOrderExcel(rows) {
-            let map = {}, count = 0;
-            // Detectar cabeceras o asumir estructura estándar
-            // Estructura esperada aprox: [?, ID OC, ?, CLIENTE, PRODUCTO, TALLA, CANTIDAD, ...]
-            rows.forEach((row, i) => {
-                if(i < 1) return; // Skip header
-                // Buscamos columnas clave. Ajusta los índices [1], [4] según tu Excel real si cambia.
-                // Asumimos: Col 1 = ID OC, Col 3 = Cliente, Col 4 = Producto, Col 5 = Talla, Col 6 = Cantidad
-                let id = row[1] ? String(row[1]).trim() : null;
-                let client = row[3] || 'Cliente Excel';
-                let prodName = row[4];
-                let size = row[5] || 'U';
-                let qty = parseInt(row[6]);
-
-                if(id && prodName && qty > 0) {
-                    if(!map[id]) {
-                        map[id] = { id: id, client: client, date: new Date().toISOString().split('T')[0], status: 'Pendiente', items: [], invoice:'', boxes:'' };
-                        count++;
-                    }
-                    // Buscar si el producto ya existe en esta OC para sumar tallas
-                    let existingItem = map[id].items.find(it => it.name === prodName);
-                    if(existingItem) {
-                        existingItem.quantities[size] = (existingItem.quantities[size] || 0) + qty;
-                        existingItem.total += qty;
-                        if(!existingItem.hasSizes) existingItem.hasSizes = true; // Si aparece talla, activamos flag
-                    } else {
-                        let newItem = { name: prodName, sku: 'EXP-'+Date.now(), hasSizes: true, quantities: {}, total: qty, note: '' };
-                        newItem.quantities[size] = qty;
-                        map[id].items.push(newItem);
-                    }
-                }
-            });
-
-            if(count === 0) return alert("0 OCs reconocidas. Verifica que el Excel tenga datos en Columna B (ID) y Columna E (Producto).");
-            
-            Object.values(map).forEach(o => orders.push(o));
-            localStorage.setItem('ww_orders', JSON.stringify(orders));
-            renderOrders();
-            alert(`¡Éxito! ${count} Órdenes importadas y agrupadas correctamente.`);
-        }
-
-        function parseXlsInv(rows) {
-            let c = 0;
-            rows.forEach((r, i) => {
-                if(i > 0 && r[0]) {
-                    let n = r[0], q = parseInt(r[1]) || 0;
-                    if(n && q >= 0) { inventory.push({sku: 'XLS-'+Date.now()+i, name: n, hasSizes: false, stockData: {unique: q}, total: q}); c++; }
-                }
-            });
-            localStorage.setItem('ww_inventory', JSON.stringify(inventory)); renderInventory(); alert(`Importados ${c} items.`);
-        }
-
-        // --- CALENDARIO & UTILS ---
-        function renderCalendar() {
-            let g = document.getElementById('calendar-grid'), m = currentDate.getMonth(), y = currentDate.getFullYear(); g.innerHTML = '';
-            document.getElementById('calendar-header').innerText = new Date(y, m).toLocaleString('es-ES', { month: 'long', year: 'numeric' }).toUpperCase();
-            let f = new Date(y, m, 1).getDay(), d = new Date(y, m + 1, 0).getDate();
-            for(let i=0; i<f; i++) g.innerHTML += `<div class="bg-gray-100"></div>`;
-            for(let i=1; i<=d; i++) {
-                let k = `${y}-${String(m+1).padStart(2,'0')}-${String(i).padStart(2,'0')}`, evs = orders.filter(o=>o.date===k).map(o=>`<div class="text-[9px] bg-blue-100 text-blue-800 rounded px-1 mb-1 truncate">${o.client}</div>`).join('');
-                g.innerHTML += `<div class="calendar-day ${i===new Date().getDate()?'today':''}"><span class="day-number ${i===new Date().getDate()?'today-num':''}">${i}</span><div class="overflow-y-auto">${evs}</div></div>`;
-            }
-        }
-        function changeMonth(v) { currentDate.setMonth(currentDate.getMonth()+v); renderCalendar(); }
-        function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
-        function confirmFullReset() { if(confirm("¿BORRAR TODO?")) { localStorage.clear(); location.reload(); } }
-        function updateAnalysis() { 
-            document.getElementById('ia-production-count').innerText = productionWorks.length; 
-            document.getElementById('ia-shipped-count').innerText = orders.filter(o => o.status === 'Despachado').length; 
-        }
-
+        // INIT
+        document.addEventListener('DOMContentLoaded', () => {
+            router.navigate('inventory');
+            ui.renderProductionDashboard();
+            document.getElementById('currentDateDisplay').textContent = new Date().toLocaleDateString('es-CL', {weekday:'long', year:'numeric', month:'long', day:'numeric'});
+        });
     </script>
 </body>
 </html>
