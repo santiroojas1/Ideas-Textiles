@@ -34,14 +34,18 @@
         .calendar-day.today { border: 2px solid #f59e0b; background-color: #fffbeb; }
         .cal-event { font-size: 0.65rem; padding: 2px 4px; border-radius: 3px; margin-bottom: 2px; color: white; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-        /* PRODUCCIÓN (TALLER) */
+        /* TALLER */
         .stage-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; padding: 4px; border: 1px solid #e2e8f0; border-radius: 4px; background: white; }
         .stage-row.completed { background-color: #f0fdf4; border-color: #86efac; }
 
-        /* ESTILOS PDF OCULTOS (Tachas Visuales) */
+        /* ESTILOS PDF (OCULTO PERO RENDERIZABLE) */
         #pdf-container { position: fixed; left: -5000px; top: 0; width: 210mm; min-height: 297mm; background: white; z-index: -100; }
+        
+        /* HOJA 6-UP (2 Columnas x 3 Filas) */
         .pdf-sheet-6up { width: 100%; height: 270mm; display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr 1fr; gap: 15px; padding: 15px; box-sizing: border-box; page-break-after: always; }
         .pdf-sheet-6up:last-child { page-break-after: avoid; }
+        
+        /* TARJETA TACHA */
         .tacha-card-6up { border: 2px dashed #94a3b8; background: #fff; padding: 0; display: flex; flex-direction: column; height: 100%; border-radius: 6px; overflow: hidden; position: relative; }
 
         /* TABLAS */
@@ -66,17 +70,15 @@
             <div class="p-6 border-b border-slate-700 flex justify-between items-center md:block">
                 <div>
                     <h1 class="text-2xl font-black tracking-tighter text-white">WORK<span class="text-amber-500">WEAR</span></h1>
-                    <p class="text-xs text-slate-400 mt-1">IDEASTEXTILES</p>
+                    <p class="text-xs text-slate-400 mt-1">IDEAS TEXTILES</p>
                 </div>
                 <button onclick="document.getElementById('mobile-menu').classList.toggle('hidden')" class="md:hidden text-2xl"><i class="fas fa-bars"></i></button>
             </div>
             
             <div id="mobile-menu" class="hidden md:flex flex-col flex-1 p-4 space-y-2 overflow-y-auto bg-slate-900 md:bg-transparent absolute md:static top-20 left-0 w-full md:w-auto h-full md:h-auto">
-                <p class="text-xs font-bold text-slate-500 uppercase px-2 mb-1">Módulos</p>
                 <a onclick="ui.showSection('calendar')" class="nav-btn p-3 rounded-lg hover:bg-slate-800 cursor-pointer flex items-center gap-3 bg-slate-800 text-amber-400 font-bold transition-all"><i class="fas fa-calendar-alt w-5 text-center"></i> Calendario</a>
                 <a onclick="ui.showSection('inventory')" class="nav-btn p-3 rounded-lg hover:bg-slate-800 cursor-pointer flex items-center gap-3 transition-all"><i class="fas fa-boxes w-5 text-center"></i> Inventario & Taller</a>
                 <a onclick="ui.showSection('orders')" class="nav-btn p-3 rounded-lg hover:bg-slate-800 cursor-pointer flex items-center gap-3 transition-all"><i class="fas fa-clipboard-list w-5 text-center"></i> Órdenes (OC)</a>
-                
                 <div class="mt-auto border-t border-slate-700 pt-4">
                     <p class="text-xs font-bold text-slate-500 uppercase px-2 mb-2">Herramientas</p>
                     <a onclick="ReportEngine.generateGeneralPDF()" class="p-2 text-sm text-slate-300 hover:text-white cursor-pointer block rounded hover:bg-slate-800"><i class="fas fa-file-pdf mr-2 text-red-400"></i> Reporte General</a>
@@ -99,24 +101,17 @@
                     </div>
                     <div id="calendar-body" class="calendar-grid"></div>
                 </div>
-                <div class="p-4 bg-blue-50 text-blue-800 rounded-lg text-sm border border-blue-100 flex items-center">
-                    <i class="fas fa-info-circle mr-3 text-lg"></i>
-                    Las Órdenes de Compra (OC) y las fechas de despacho aparecen automáticamente aquí. Toca un día para añadir notas.
-                </div>
             </section>
 
             <section id="inventory" class="hidden space-y-8 animate-fade-in">
-                
                 <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 relative overflow-hidden">
                     <div class="absolute top-0 left-0 w-2 h-full bg-orange-500"></div>
                     <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
                         <div>
                             <h3 class="text-xl font-bold text-slate-800 flex items-center"><i class="fas fa-industry text-orange-500 mr-2"></i> TALLER DE CONFECCIÓN</h3>
-                            <p class="text-xs text-slate-500 mt-1">Gestión de lotes activos (Corte -> Bodega)</p>
+                            <p class="text-xs text-slate-500 mt-1">Lotes en producción</p>
                         </div>
-                        <button onclick="ui.openProductionModal()" class="bg-orange-500 hover:bg-orange-600 text-white px-5 py-2.5 rounded-lg shadow font-bold text-sm flex items-center gap-2 transition transform active:scale-95">
-                            <i class="fas fa-plus-circle"></i> NUEVO LOTE
-                        </button>
+                        <button onclick="ui.openProductionModal()" class="bg-orange-500 hover:bg-orange-600 text-white px-5 py-2.5 rounded-lg shadow font-bold text-sm flex items-center gap-2"><i class="fas fa-plus-circle"></i> NUEVO LOTE</button>
                     </div>
                     <div id="production-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
                 </div>
@@ -125,13 +120,9 @@
                     <div class="flex flex-col md:flex-row justify-between items-center gap-3">
                         <h2 class="text-2xl font-bold text-slate-800">Bodega Principal</h2>
                         <div class="flex gap-2">
-                            <button onclick="document.getElementById('ai-input-inv').click()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg shadow text-sm font-medium transition flex items-center gap-2">
-                                <i class="fas fa-magic"></i> Importar IA
-                            </button>
+                            <button onclick="document.getElementById('ai-input-inv').click()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg shadow text-sm font-medium flex items-center gap-2"><i class="fas fa-magic"></i> Importar IA</button>
                             <input type="file" id="ai-input-inv" hidden onchange="IAEngine.process(this.files[0], 'inv')">
-                            <button onclick="ui.openEditItemModal()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg shadow text-sm font-medium transition flex items-center gap-2">
-                                <i class="fas fa-box"></i> Nuevo Item
-                            </button>
+                            <button onclick="ui.openEditItemModal()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg shadow text-sm font-medium flex items-center gap-2"><i class="fas fa-box"></i> Nuevo Item</button>
                         </div>
                     </div>
                     <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden table-responsive">
@@ -145,26 +136,17 @@
 
             <section id="orders" class="hidden space-y-6 animate-fade-in">
                 <div class="flex flex-col md:flex-row justify-between items-center gap-3">
-                    <div>
-                        <h2 class="text-2xl font-bold text-slate-800">Órdenes de Compra</h2>
-                        <p class="text-xs text-slate-500">Gestión de pedidos y despachos</p>
-                    </div>
+                    <h2 class="text-2xl font-bold text-slate-800">Órdenes de Compra</h2>
                     <div class="flex gap-2 flex-wrap justify-end">
-                        <button onclick="document.getElementById('ai-input-oc').click()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg shadow text-sm font-medium transition flex items-center gap-2">
-                            <i class="fas fa-file-import"></i> Importar
-                        </button>
+                        <button onclick="document.getElementById('ai-input-oc').click()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg shadow text-sm font-medium flex items-center gap-2"><i class="fas fa-file-import"></i> Importar</button>
                         <input type="file" id="ai-input-oc" hidden onchange="IAEngine.process(this.files[0], 'oc')">
-                        <button onclick="ui.printSelectedOrders()" class="bg-slate-800 hover:bg-slate-900 text-white px-4 py-2 rounded-lg shadow text-sm font-medium transition flex items-center gap-2">
-                            <i class="fas fa-print"></i> Tachas PDF
-                        </button>
-                        <button onclick="ui.openOrderModal()" class="bg-amber-500 hover:bg-amber-600 text-white px-4 py-2 rounded-lg shadow text-sm font-medium transition flex items-center gap-2">
-                            <i class="fas fa-plus"></i> Nueva OC
-                        </button>
+                        <button onclick="ui.printSelectedOrders()" class="bg-slate-800 hover:bg-slate-900 text-white px-4 py-2 rounded-lg shadow text-sm font-medium flex items-center gap-2"><i class="fas fa-print"></i> Tachas Venta</button>
+                        <button onclick="ui.openOrderModal()" class="bg-amber-500 hover:bg-amber-600 text-white px-4 py-2 rounded-lg shadow text-sm font-medium flex items-center gap-2"><i class="fas fa-plus"></i> Nueva OC</button>
                     </div>
                 </div>
                 <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden table-responsive">
                     <table class="custom-table">
-                        <thead><tr><th class="w-10 text-center"><input type="checkbox" onchange="ui.selectAll(this)" class="w-4 h-4 rounded border-gray-300"></th><th>OC / Cliente</th><th>Fecha</th><th>Estado</th><th class="text-right">Gestión</th></tr></thead>
+                        <thead><tr><th class="w-10 text-center"><input type="checkbox" onchange="ui.selectAll(this)" class="w-4 h-4"></th><th>OC / Cliente</th><th>Fecha</th><th>Estado</th><th class="text-right">Gestión</th></tr></thead>
                         <tbody id="orders-table-body" class="divide-y divide-slate-100"></tbody>
                     </table>
                 </div>
@@ -174,22 +156,23 @@
 
     <div id="prodItemModal" class="fixed inset-0 bg-black/60 hidden z-50 flex items-center justify-center p-4 backdrop-blur-sm">
         <div class="bg-white w-full max-w-lg rounded-2xl shadow-2xl p-6">
-            <h3 class="text-xl font-bold mb-4 text-orange-600 flex items-center gap-2"><i class="fas fa-cut"></i> Nuevo Lote Producción</h3>
+            <h3 class="text-xl font-bold mb-4 text-orange-600 flex items-center gap-2"><i class="fas fa-cut"></i> Nuevo Lote</h3>
             <div class="space-y-4">
-                <input id="prodWorkName" class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-orange-200 outline-none" placeholder="Nombre Lote (Ej: Lote Pantalones)">
+                <input id="prodWorkName" class="w-full p-3 border rounded-lg" placeholder="Nombre Lote / Referencia">
                 <div class="bg-slate-50 p-4 rounded-lg border border-slate-200">
                     <h4 class="text-xs font-bold text-slate-500 mb-2 uppercase">Configurar Items</h4>
-                    <div class="flex gap-2 mb-3">
+                    <div class="flex gap-2 mb-2">
                         <select id="prodSelect" class="flex-1 p-2 border rounded text-sm bg-white"></select>
+                        <input type="text" id="prodSizeInput" class="w-24 p-2 border rounded text-center text-sm" placeholder="Talla">
                         <input type="number" id="prodQtyInput" class="w-20 p-2 border rounded text-center text-sm" placeholder="Cant">
-                        <button onclick="actions.addProdToLote()" class="bg-blue-600 text-white px-3 rounded hover:bg-blue-700"><i class="fas fa-plus"></i></button>
+                        <button onclick="actions.addProdToLote()" class="bg-blue-600 text-white px-3 rounded"><i class="fas fa-plus"></i></button>
                     </div>
                     <div id="tempProdList" class="space-y-1 max-h-32 overflow-y-auto"></div>
                 </div>
             </div>
             <div class="flex justify-end gap-3 mt-6">
-                <button onclick="ui.closeModal('prodItemModal')" class="px-4 py-2 text-slate-500 hover:bg-slate-100 rounded-lg font-medium">Cancelar</button>
-                <button onclick="actions.createWorkOrder()" class="px-6 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 font-bold shadow-lg">Lanzar Lote</button>
+                <button onclick="ui.closeModal('prodItemModal')" class="px-4 py-2 text-slate-500">Cancelar</button>
+                <button onclick="actions.createWorkOrder()" class="px-6 py-2 bg-orange-500 text-white rounded-lg font-bold shadow-lg">Lanzar Lote</button>
             </div>
         </div>
     </div>
@@ -198,13 +181,13 @@
         <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl p-6">
             <h3 class="text-xl font-bold mb-4 text-slate-800" id="itemModalTitle">Item</h3>
             <div class="space-y-3">
-                <input id="itemSku" class="w-full p-3 border rounded-lg bg-slate-50 font-mono text-sm" placeholder="SKU (Auto)">
-                <input id="itemName" class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-100 outline-none" placeholder="Nombre del Producto">
-                <input id="itemQty" type="number" class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-100 outline-none" placeholder="Stock Inicial">
+                <input id="itemSku" class="w-full p-3 border rounded-lg bg-slate-50" placeholder="SKU">
+                <input id="itemName" class="w-full p-3 border rounded-lg" placeholder="Nombre del Producto">
+                <input id="itemQty" type="number" class="w-full p-3 border rounded-lg" placeholder="Stock Inicial">
             </div>
             <div class="flex justify-end gap-3 mt-6">
-                <button onclick="ui.closeModal('itemModal')" class="px-4 py-2 text-slate-500 hover:bg-slate-100 rounded-lg font-medium">Cerrar</button>
-                <button onclick="actions.saveItem()" class="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-bold shadow-lg">Guardar</button>
+                <button onclick="ui.closeModal('itemModal')" class="px-4 py-2 text-slate-500">Cerrar</button>
+                <button onclick="actions.saveItem()" class="px-6 py-2 bg-green-600 text-white rounded-lg font-bold shadow-lg">Guardar</button>
             </div>
         </div>
     </div>
@@ -213,37 +196,48 @@
         <div class="bg-white w-full max-w-xl rounded-2xl shadow-2xl p-6 flex flex-col max-h-[90vh]">
             <h3 class="text-xl font-bold mb-4 text-slate-800" id="orderModalTitle">Orden de Compra</h3>
             <div class="grid grid-cols-2 gap-4 mb-4">
-                <input id="orderId" class="p-3 border rounded-lg bg-slate-50 font-mono" placeholder="ID OC">
+                <input id="orderId" class="p-3 border rounded-lg bg-slate-50" placeholder="ID OC">
                 <input id="orderDate" type="date" class="p-3 border rounded-lg">
             </div>
-            <input id="orderClient" class="w-full p-3 border rounded-lg mb-4 focus:ring-2 focus:ring-amber-100 outline-none" placeholder="Nombre del Cliente">
+            <input id="orderClient" class="w-full p-3 border rounded-lg mb-4" placeholder="Nombre del Cliente">
             <select id="orderStatus" class="w-full p-3 border rounded-lg mb-4 bg-white"><option value="Pendiente">Pendiente</option><option value="En Proceso">En Proceso</option><option value="Despachado">Despachado</option></select>
-            
-            <div class="flex-1 overflow-y-auto border rounded-lg p-3 bg-slate-50 mb-4">
-                <div id="orderItemsList" class="space-y-2"></div>
-                <button onclick="actions.addTempItemToOrder()" class="mt-3 text-sm text-blue-600 font-bold hover:text-blue-800 flex items-center gap-1"><i class="fas fa-plus-circle"></i> Agregar Producto</button>
-            </div>
-            <div class="flex justify-end gap-3">
-                <button onclick="ui.closeModal('orderModal')" class="px-4 py-2 text-slate-500 hover:bg-slate-100 rounded-lg font-medium">Cancelar</button>
-                <button onclick="actions.saveOrder()" class="px-6 py-2 bg-amber-500 text-white rounded-lg hover:bg-amber-600 font-bold shadow-lg">Guardar OC</button>
-            </div>
+            <div class="flex-1 overflow-y-auto border rounded-lg p-3 bg-slate-50 mb-4"><div id="orderItemsList" class="space-y-2"></div><button onclick="actions.addTempItemToOrder()" class="mt-3 text-sm text-blue-600 font-bold hover:text-blue-800 flex items-center gap-1"><i class="fas fa-plus-circle"></i> Agregar Producto</button></div>
+            <div class="flex justify-end gap-3"><button onclick="ui.closeModal('orderModal')" class="px-4 py-2 text-slate-500">Cancelar</button><button onclick="actions.saveOrder()" class="px-6 py-2 bg-amber-500 text-white rounded-lg font-bold shadow-lg">Guardar OC</button></div>
         </div>
     </div>
 
     <div id="printOcModal" class="fixed inset-0 bg-black/60 hidden z-50 flex items-center justify-center p-4 backdrop-blur-sm">
         <div class="bg-white w-full max-w-sm rounded-2xl shadow-2xl p-6">
-            <h3 class="text-xl font-bold mb-4 text-slate-800 flex items-center gap-2"><i class="fas fa-shipping-fast text-slate-600"></i> Datos Despacho</h3>
+            <h3 class="text-xl font-bold mb-4 text-slate-800"><i class="fas fa-truck mr-2"></i> Tacha de Venta</h3>
             <div class="space-y-4">
                 <input id="printBultos" type="text" placeholder="Total Bultos (Ej: 3 Cajas)" class="w-full p-3 border rounded-lg">
                 <input id="printCarrier" type="text" placeholder="Chofer / Transporte" class="w-full p-3 border rounded-lg">
-                <input id="printReceiver" type="text" placeholder="Quien Recibe" class="w-full p-3 border rounded-lg">
+                <input id="printReceiver" type="text" placeholder="Quien Recibe (Cliente)" class="w-full p-3 border rounded-lg">
             </div>
             <div class="mt-6 flex justify-end gap-3">
-                <button onclick="ui.closeModal('printOcModal')" class="px-4 py-2 text-slate-500 hover:bg-slate-100 rounded-lg font-medium">Cancelar</button>
-                <button onclick="ReportEngine.generateTachas()" class="px-6 py-2 bg-slate-800 text-white rounded-lg hover:bg-slate-900 font-bold shadow-lg">Descargar PDF</button>
+                <button onclick="ui.closeModal('printOcModal')" class="px-4 py-2 text-slate-500">Cancelar</button>
+                <button onclick="ReportEngine.generateTachaVenta()" class="px-6 py-2 bg-slate-800 text-white rounded-lg font-bold shadow-lg">Imprimir PDF</button>
             </div>
         </div>
     </div>
+
+    <div id="exitStockModal" class="fixed inset-0 bg-black/60 hidden z-50 flex items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-white w-full max-w-sm rounded-2xl shadow-2xl p-6 border-l-8 border-red-500">
+            <h3 class="text-xl font-bold mb-2 text-slate-800">Salida de Inventario</h3>
+            <p id="exitItemName" class="text-sm text-slate-500 mb-4 font-bold">Producto</p>
+            <div class="space-y-4">
+                <input id="exitQty" type="number" placeholder="Cantidad a retirar" class="w-full p-3 border rounded-lg text-lg font-bold text-center">
+                <input id="exitReason" type="text" placeholder="Destino / Motivo (Ej: Muestras)" class="w-full p-3 border rounded-lg">
+                <input id="exitResp" type="text" placeholder="Responsable (Quién autoriza)" class="w-full p-3 border rounded-lg">
+            </div>
+            <div class="mt-6 flex justify-end gap-3">
+                <button onclick="ui.closeModal('exitStockModal')" class="px-4 py-2 text-slate-500">Cancelar</button>
+                <button onclick="actions.confirmExitStock()" class="px-6 py-2 bg-red-600 text-white rounded-lg font-bold shadow-lg">Retirar & PDF</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="calNoteModal" class="fixed inset-0 bg-black/60 hidden z-50 flex items-center justify-center p-4"><div class="bg-white w-full max-w-sm rounded-xl p-6"><h3 class="text-lg font-bold mb-2">Nota del Día</h3><p id="calSelectedDate" class="text-xs text-gray-500 mb-3"></p><textarea id="calNoteText" class="w-full p-3 border rounded mb-3 h-24" placeholder="Escribe un recordatorio..."></textarea><div class="flex justify-end gap-2"><button onclick="ui.closeModal('calNoteModal')" class="text-gray-500">Cancelar</button><button onclick="actions.saveCalNote()" class="bg-blue-600 text-white px-4 py-2 rounded">Guardar</button></div></div></div>
 
     <script>
         // --- 1. CORE DB ---
@@ -255,13 +249,14 @@
         let state = {
             inventory: db.load('ww_inv_v8'),
             orders: db.load('ww_ord_v8'),
-            production: db.load('ww_prod_v8'), // RECUPERADO
+            production: db.load('ww_prod_v8'),
             calendarNotes: db.load('ww_cal_v8')
         };
 
         let editingIndex = -1, tempOrderItems = [], tempProdList = [], currentPrintList = [], currentDate = new Date();
+        let currentExitItemIdx = null; // Para control de salida de stock
 
-        // --- 2. IA ENGINE (INDEX LOGIC) ---
+        // --- 2. IA ENGINE ---
         const IAEngine = {
             async process(f, type) {
                 if(!f) return;
@@ -272,7 +267,6 @@
                         reader.onload = (e) => {
                             const wb = XLSX.read(e.target.result, {type:'array'});
                             const js = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], {header:1});
-                            // Detección Inteligente de Cabeceras
                             let map = {prod:-1, qty:-1, client:-1}, hRow = 0;
                             for(let i=0; i<Math.min(js.length,10); i++) {
                                 const row = js[i].map(x=>String(x).toUpperCase());
@@ -283,7 +277,6 @@
                                 });
                                 if(map.prod!==-1 && map.qty!==-1){ hRow=i+1; break; }
                             }
-                            // Procesar
                             let cnt=0;
                             if(type==='inv'){
                                 for(let i=hRow; i<js.length; i++){
@@ -310,7 +303,6 @@
                         };
                         reader.readAsArrayBuffer(f);
                     } else {
-                        // OCR
                         const {data:{text}} = await Tesseract.recognize(f,'spa');
                         let lines = text.split('\n'), cnt=0;
                         lines.forEach(l=>{
@@ -328,36 +320,31 @@
             }
         };
 
-        // --- 3. REPORT ENGINE (HYBRID PDF) ---
+        // --- 3. REPORT ENGINE (TACHAS SEPARADAS) ---
         const ReportEngine = {
             async generateGeneralPDF() {
                 ui.toggleLoader(true);
                 const { jsPDF } = window.jspdf;
                 const doc = new jsPDF();
                 const now = new Date().toLocaleDateString();
-
                 doc.setFillColor(15, 23, 42); doc.rect(0,0,210,40,'F');
                 doc.setTextColor(255); doc.setFontSize(22); doc.setFont("helvetica","bold");
                 doc.text("IDEAS TEXTILES SPA", 105, 20, {align:"center"});
-                doc.setFontSize(10); doc.setFont("helvetica","normal");
-                doc.text(`REPORTE AL ${now}`, 105, 30, {align:"center"});
-
+                doc.setFontSize(10); doc.text(`REPORTE AL ${now}`, 105, 30, {align:"center"});
                 let y=50;
-                doc.setTextColor(0); doc.setFontSize(14); doc.setFont("helvetica","bold");
-                doc.text("1. INVENTARIO", 14, y); y+=5;
+                doc.setTextColor(0); doc.setFontSize(14); doc.text("1. INVENTARIO", 14, y); y+=5;
                 const invBody = state.inventory.map(p=>[p.sku, p.name, p.total]);
                 doc.autoTable({startY:y, head:[['SKU','PRODUCTO','STOCK']], body:invBody, theme:'striped', headStyles:{fillColor:[59,130,246]}});
-                
                 y = doc.lastAutoTable.finalY + 15;
                 doc.text("2. PEDIDOS PENDIENTES", 14, y); y+=5;
                 const ordBody = state.orders.filter(o=>o.status!=='Despachado').map(o=>[o.client, o.items.map(i=>`${i.name}(${i.total})`).join(', '), o.status]);
                 doc.autoTable({startY:y, head:[['CLIENTE','DETALLE','ESTADO']], body:ordBody, theme:'grid', headStyles:{fillColor:[245,158,11]}});
-
                 doc.save(`Reporte_General_${Date.now()}.pdf`);
                 ui.toggleLoader(false);
             },
 
-            async generateTachas() {
+            // --- TACHA DE VENTA (OC / DESPACHO CLIENTE) ---
+            async generateTachaVenta() {
                 ui.toggleLoader(true);
                 const bultos = document.getElementById('printBultos').value || "--";
                 const carrier = document.getElementById('printCarrier').value || "--";
@@ -380,7 +367,7 @@
                     page.forEach(it => {
                         html += `
                         <div class="tacha-card-6up">
-                            <div style="background:#1e293b; color:white; text-align:center; font-weight:bold; font-size:12px; padding:6px; margin:-8px -8px 5px -8px;">IDEAS TEXTILES WORKWEAR</div>
+                            <div style="background:#1e293b; color:white; text-align:center; font-weight:bold; font-size:12px; padding:6px; margin:-8px -8px 5px -8px;">IDEAS TEXTILES - TACHA DE VENTA</div>
                             <div style="display:flex; justify-content:space-between; border-bottom:2px solid #f59e0b; padding-bottom:4px; align-items:end;">
                                 <div style="width:70%"><div style="font-weight:900; font-size:16px;">OC #${it.orderId}</div><div style="font-size:11px; overflow:hidden; white-space:nowrap;">${it.client}</div></div>
                                 <div style="font-weight:bold; font-size:20px; color:#1e293b;">${it.total}<span style="font-size:10px">un</span></div>
@@ -390,7 +377,7 @@
                                 ${it.note?`<div style="background:#fee2e2; color:#991b1b; padding:4px; font-size:10px; border-radius:4px;">⚠️ ${it.note}</div>`:''}
                             </div>
                             <div style="background:#f8fafc; padding:8px; border-radius:4px; font-size:10px; border:1px solid #e2e8f0; margin-top:5px;">
-                                <div style="display:flex; justify-content:space-between; margin-bottom:4px;"><span>📦 <b>${bultos}</b></span><span>🚛 <b>${carrier}</b></span></div>
+                                <div style="display:flex; justify-content:space-between; margin-bottom:4px;"><span>📦 BULTOS: <b>${bultos}</b></span><span>🚛 <b>${carrier}</b></span></div>
                                 <div style="text-align:center; border-top:1px solid #e2e8f0; padding-top:2px;">RECIBE: <b>${receiver}</b></div>
                             </div>
                         </div>`;
@@ -399,11 +386,40 @@
                 });
                 html += `</div>`;
 
-                const c = document.getElementById('pdf-container');
-                c.innerHTML = html;
-                await new Promise(r=>setTimeout(r,1000));
-                await html2pdf().set({margin:0, filename:'Etiquetas.pdf', image:{type:'jpeg', quality:0.98}, html2canvas:{scale:2}, jsPDF:{unit:'mm', format:'a4'}}).from(c).save();
+                const c = document.getElementById('pdf-container'); c.innerHTML = html;
+                await new Promise(r=>setTimeout(r,1500)); // ESPERA RENDERIZADO
+                await html2pdf().set({margin:0, filename:'Tachas_Venta.pdf', image:{type:'jpeg', quality:0.98}, html2canvas:{scale:2}, jsPDF:{unit:'mm', format:'a4'}}).from(c).save();
                 c.innerHTML=''; ui.closeModal('printOcModal'); ui.toggleLoader(false);
+            },
+
+            // --- TACHA DE PEDIDO (INTERNO / SALIDA STOCK) ---
+            async generateTachaInventario(item, qty, reason, resp) {
+                ui.toggleLoader(true);
+                const now = new Date().toLocaleString();
+                let html = `
+                <div class="pdf-sheet-6up" style="font-family:Arial, sans-serif;">
+                    <div class="tacha-card-6up">
+                        <div style="background:#dc2626; color:white; text-align:center; font-weight:bold; font-size:12px; padding:6px; margin:-8px -8px 5px -8px;">IDEAS TEXTILES - TACHA DE PEDIDO</div>
+                        <div style="border-bottom:2px solid #dc2626; padding-bottom:5px; margin-bottom:10px;">
+                            <div style="font-size:10px; color:#64748b;">FECHA: ${now}</div>
+                            <div style="font-weight:bold; font-size:14px;">DESTINO: ${reason.toUpperCase()}</div>
+                            <div style="font-size:11px;">RESPONSABLE: ${resp.toUpperCase()}</div>
+                        </div>
+                        <div style="flex-grow:1; text-align:center; display:flex; flex-direction:column; justify-content:center;">
+                            <div style="font-size:40px; font-weight:900; color:#dc2626;">${qty}</div>
+                            <div style="font-size:14px; font-weight:bold;">${item.name}</div>
+                            <div style="font-size:10px; color:#64748b;">SKU: ${item.sku}</div>
+                        </div>
+                        <div style="background:#fef2f2; padding:10px; text-align:center; border-top:1px dashed #dc2626; font-size:10px;">
+                            FIRMA ENTREGA _________________
+                        </div>
+                    </div>
+                </div>`;
+
+                const c = document.getElementById('pdf-container'); c.innerHTML = html;
+                await new Promise(r=>setTimeout(r,1500)); // ESPERA RENDERIZADO
+                await html2pdf().set({margin:0, filename:`Tacha_Salida_${item.sku}.pdf`, image:{type:'jpeg', quality:0.98}, html2canvas:{scale:2}, jsPDF:{unit:'mm', format:'a4'}}).from(c).save();
+                c.innerHTML=''; ui.toggleLoader(false);
             }
         };
 
@@ -420,7 +436,8 @@
                     const k = `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
                     const isToday = new Date().toISOString().split('T')[0]===k;
                     let evs = state.orders.filter(o=>o.date===k).map(o=>`<div class="cal-event ${o.status==='Despachado'?'bg-green-500':'bg-blue-500'}">📦 ${o.client}</div>`).join('');
-                    c.innerHTML += `<div class="calendar-day ${isToday?'today':''}"><div class="font-bold text-slate-700">${d}</div><div class="overflow-hidden">${evs}</div></div>`;
+                    if(state.calendarNotes[k]) evs += `<div class="cal-event bg-purple-500">📝 Nota</div>`;
+                    c.innerHTML += `<div onclick="ui.openCalNote('${k}')" class="calendar-day ${isToday?'today':''}"><div class="font-bold text-slate-700">${d}</div><div class="overflow-hidden">${evs}</div></div>`;
                 }
             }
         };
@@ -431,21 +448,25 @@
                 document.querySelectorAll('main>section').forEach(s=>s.classList.add('hidden'));
                 document.getElementById(id).classList.remove('hidden');
                 document.getElementById('mobile-menu').classList.add('hidden');
-                document.querySelectorAll('.nav-btn').forEach(b=>{b.classList.remove('bg-slate-800','text-amber-400','font-bold');});
-                // Highlight logic could be added here
                 if(id==='calendar') cal.render();
-                if(id==='inventory') ui.renderInventory();
+                if(id==='inventory') { ui.renderInventory(); ui.renderProduction(); }
                 if(id==='orders') ui.renderOrders();
-                // Render Production if inventory shown
-                if(id==='inventory') ui.renderProduction();
             },
             openModal: (id) => document.getElementById(id).classList.remove('hidden'),
             closeModal: (id) => document.getElementById(id).classList.add('hidden'),
             
-            // --- RENDERERS ---
             renderInventory: () => {
                 document.getElementById('inventory-table-body').innerHTML = state.inventory.map((p,i)=>
-                    `<tr class="hover:bg-slate-50"><td class="p-3 font-mono text-slate-500 text-xs font-bold">${p.sku}</td><td class="p-3 font-medium text-slate-800">${p.name}</td><td class="p-3 text-center"><span class="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs font-bold">${p.total}</span></td><td class="p-3 text-right"><button onclick="actions.delItem(${i})" class="text-red-400 hover:text-red-600"><i class="fas fa-trash"></i></button></td></tr>`
+                    `<tr class="hover:bg-slate-50">
+                        <td class="p-3 font-mono text-slate-500 text-xs font-bold">${p.sku}</td>
+                        <td class="p-3 font-medium text-slate-800">${p.name}</td>
+                        <td class="p-3 text-center"><span class="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs font-bold">${p.total}</span></td>
+                        <td class="p-3 text-right flex justify-end gap-2">
+                            <button onclick="actions.openExitModal(${i})" class="bg-red-100 text-red-600 px-2 py-1 rounded text-xs font-bold hover:bg-red-200">Salida</button>
+                            <button onclick="ui.openEditItemModal(${i})" class="text-blue-500 hover:text-blue-700"><i class="fas fa-edit"></i></button>
+                            <button onclick="actions.delItem(${i})" class="text-red-400 hover:text-red-600"><i class="fas fa-trash"></i></button>
+                        </td>
+                    </tr>`
                 ).join('');
             },
             renderOrders: () => {
@@ -454,7 +475,6 @@
                 ).join('');
             },
             renderProduction: () => {
-                // RENDERIZADO DEL TALLER (Recuperado)
                 const c = document.getElementById('production-grid'); c.innerHTML='';
                 state.production.forEach((w,i)=>{
                     const pct = Math.round((w.stages.filter(s=>s.done).length/4)*100);
@@ -464,16 +484,34 @@
                     c.innerHTML += `<div class="bg-white rounded-lg shadow border border-slate-200 p-4 hover:shadow-md transition"><div class="flex justify-between mb-2"><div><h4 class="font-bold text-slate-700 text-sm uppercase">${w.name}</h4><span class="text-xs text-slate-500">${w.total} Unid.</span></div><button onclick="actions.delProdWork(${i})" class="text-slate-300 hover:text-red-500"><i class="fas fa-trash"></i></button></div><div class="h-1.5 w-full bg-slate-100 rounded-full mb-3"><div class="h-1.5 bg-orange-500 rounded-full transition-all duration-500" style="width:${pct}%"></div></div><div class="space-y-1">${stagesHtml}</div></div>`;
                 });
             },
-
-            // --- MODAL LOGIC ---
-            openEditItemModal: () => { document.getElementById('itemSku').value='PROD-'+Date.now(); document.getElementById('itemName').value=''; document.getElementById('itemQty').value=''; ui.openModal('itemModal'); },
+            
+            // MODALES LOGICA
+            openEditItemModal: (i = -1) => { 
+                editingIndex = i;
+                document.getElementById('itemModalTitle').innerText = i===-1 ? "Nuevo Item" : "Editar Item";
+                if(i>=0) {
+                    let p = state.inventory[i];
+                    document.getElementById('itemSku').value = p.sku;
+                    document.getElementById('itemName').value = p.name;
+                    document.getElementById('itemQty').value = p.total;
+                } else {
+                    document.getElementById('itemSku').value = 'PROD-'+Date.now();
+                    document.getElementById('itemName').value = '';
+                    document.getElementById('itemQty').value = '';
+                }
+                ui.openModal('itemModal'); 
+            },
             openProductionModal: () => { 
                 tempProdList=[]; document.getElementById('prodWorkName').value=''; 
-                const s = document.getElementById('prodSelect'); s.innerHTML='<option>Seleccione...</option>';
+                const s = document.getElementById('prodSelect'); s.innerHTML='<option value="">Seleccione...</option>';
                 state.inventory.forEach((p,i)=>s.innerHTML+=`<option value="${i}">${p.name}</option>`);
                 ui.renderTempProdList(); ui.openModal('prodItemModal'); 
             },
-            renderTempProdList: () => { document.getElementById('tempProdList').innerHTML = tempProdList.map((x,i)=>`<div class="flex justify-between text-sm border-b pb-1"><span>${x.name} (${x.qty})</span><button onclick="actions.remProdFromLote(${i})" class="text-red-500">x</button></div>`).join(''); },
+            renderTempProdList: () => { 
+                document.getElementById('tempProdList').innerHTML = tempProdList.map((x,i)=>
+                    `<div class="flex justify-between text-sm border-b pb-1"><span>${x.name} (${x.size||'U'}) - ${x.qty} un</span><button onclick="actions.remProdFromLote(${i})" class="text-red-500">x</button></div>`
+                ).join(''); 
+            },
             
             openOrderModal: (i=-1) => {
                 editingIndex = i;
@@ -492,48 +530,75 @@
             renderTempOrderItems: () => {
                 document.getElementById('orderItemsList').innerHTML = tempOrderItems.map((it,ix)=>`<div class="flex justify-between items-center text-sm bg-white p-2 rounded border"><span>${it.name} (${it.total})</span> <input class="border text-xs p-1 w-24" placeholder="Nota..." value="${it.note||''}" onchange="actions.updOrdNote(${ix},this.value)"> <button onclick="actions.remOrdItem(${ix})" class="text-red-500"><i class="fas fa-times"></i></button></div>`).join('');
             },
+            openCalNote: (k) => { document.getElementById('calSelectedDate').innerText=k; document.getElementById('calSelectedDate').dataset.val=k; document.getElementById('calNoteText').value=state.calendarNotes[k]||''; ui.openModal('calNoteModal'); },
+            
             selectAll: (e) => document.querySelectorAll('.order-check').forEach(c=>c.checked=e.checked),
             printSelectedOrders: () => { if(document.querySelectorAll('.order-check:checked').length===0)return alert("Selecciona OCs"); ui.openModal('printOcModal'); }
         };
 
         // --- 5. ACTIONS ---
         const actions = {
-            // Inv
-            saveItem: () => { const n=document.getElementById('itemName').value, q=parseInt(document.getElementById('itemQty').value); if(n&&q){ state.inventory.push({sku:document.getElementById('itemSku').value, name:n, total:q, hasSizes:false, stockData:{unique:q}}); db.save('ww_inv_v8',state.inventory); ui.renderInventory(); ui.closeModal('itemModal'); } },
+            // INVENTARIO
+            saveItem: () => { 
+                const n=document.getElementById('itemName').value, q=parseInt(document.getElementById('itemQty').value), s=document.getElementById('itemSku').value;
+                if(n && q >= 0) { 
+                    if(editingIndex >= 0) {
+                        state.inventory[editingIndex] = {sku:s, name:n, total:q, hasSizes:false, stockData:{unique:q}};
+                    } else {
+                        state.inventory.push({sku:s, name:n, total:q, hasSizes:false, stockData:{unique:q}}); 
+                    }
+                    db.save('ww_inv_v8',state.inventory); ui.renderInventory(); ui.closeModal('itemModal'); 
+                }
+            },
             delItem: (i) => { if(confirm("Borrar?")){ state.inventory.splice(i,1); db.save('ww_inv_v8',state.inventory); ui.renderInventory(); } },
             
-            // Production
+            // TACHA INTERNA / SALIDA STOCK
+            openExitModal: (i) => {
+                currentExitItemIdx = i;
+                document.getElementById('exitItemName').innerText = state.inventory[i].name;
+                document.getElementById('exitQty').value = '';
+                document.getElementById('exitReason').value = '';
+                document.getElementById('exitResp').value = '';
+                ui.openModal('exitStockModal');
+            },
+            confirmExitStock: () => {
+                const qty = parseInt(document.getElementById('exitQty').value);
+                const reason = document.getElementById('exitReason').value;
+                const resp = document.getElementById('exitResp').value;
+                
+                if(!qty || qty <= 0 || !reason || !resp) return alert("Completa todos los campos");
+                
+                let item = state.inventory[currentExitItemIdx];
+                if(item.total < qty) return alert("Stock insuficiente");
+                
+                // Descontar
+                item.total -= qty;
+                if(item.stockData) item.stockData.unique -= qty;
+                db.save('ww_inv_v8', state.inventory);
+                ui.renderInventory();
+                ui.closeModal('exitStockModal');
+                
+                // Generar PDF
+                ReportEngine.generateTachaInventario(item, qty, reason, resp);
+            },
+
+            // PRODUCCION (Lotes con Talla Manual)
             addProdToLote: () => { 
-                const idx=document.getElementById('prodSelect').value, q=parseInt(document.getElementById('prodQtyInput').value);
-                if(idx && q) { const p=state.inventory[idx]; tempProdList.push({name:p.name, qty:q}); ui.renderTempProdList(); }
+                const idx=document.getElementById('prodSelect').value, q=parseInt(document.getElementById('prodQtyInput').value), sz=document.getElementById('prodSizeInput').value || 'Unica';
+                if(idx && q) { const p=state.inventory[idx]; tempProdList.push({name:p.name, qty:q, size:sz}); ui.renderTempProdList(); }
             },
             remProdFromLote: (i) => { tempProdList.splice(i,1); ui.renderTempProdList(); },
             createWorkOrder: () => {
                 const n=document.getElementById('prodWorkName').value;
-                if(n && tempProdList.length) {
-                    state.production.push({ id:Date.now(), name:n, total: tempProdList.reduce((a,b)=>a+b.qty,0), items:tempProdList, stages:[{label:'Corte',done:false},{label:'Confección',done:false},{label:'Terminación',done:false},{label:'Bodega',done:false}] });
+                if(n && tempProdList.length > 0) {
+                    state.production.push({ id:Date.now(), name:n, total:tempProdList.reduce((a,b)=>a+b.qty,0), items:tempProdList, stages:[{label:'Corte',done:false},{label:'Confección',done:false},{label:'Terminación',done:false},{label:'Bodega',done:false}] });
                     db.save('ww_prod_v8', state.production); ui.renderProduction(); ui.closeModal('prodItemModal');
-                }
+                } else { alert("Agrega items al lote primero."); }
             },
             delProdWork: (i) => { if(confirm("Borrar Lote?")){ state.production.splice(i,1); db.save('ww_prod_v8',state.production); ui.renderProduction(); } },
-            toggleStage: (i, si) => {
-                let w = state.production[i];
-                if(w.stages[si].label==='Bodega' && !w.stages[si].done) {
-                    if(confirm("¿Ingresar a inventario?")) {
-                        w.items.forEach(it => {
-                            let p = state.inventory.find(x=>x.name===it.name);
-                            if(p) { p.total+=it.qty; if(p.stockData) p.stockData.unique+=it.qty; }
-                            else { state.inventory.push({sku:'PROD-'+Date.now(), name:it.name, total:it.qty, hasSizes:false, stockData:{unique:it.qty}}); }
-                        });
-                        db.save('ww_inv_v8', state.inventory);
-                        w.stages[si].done=true; 
-                        if(confirm("Lote finalizado. ¿Archivar?")) state.production.splice(i,1);
-                    }
-                } else w.stages[si].done = !w.stages[si].done;
-                db.save('ww_prod_v8', state.production); ui.renderProduction();
-            },
+            toggleStage: (i, si) => { let w = state.production[i]; if(w.stages[si].label==='Bodega'&&!w.stages[si].done) { if(confirm("¿Ingresar a inventario?")) { w.items.forEach(it=>{ let p=state.inventory.find(x=>x.name===it.name); if(p){ p.total+=it.qty; if(p.stockData) p.stockData.unique+=it.qty; } else { state.inventory.push({sku:'PROD-'+Date.now(), name:it.name, total:it.qty, hasSizes:false, stockData:{unique:it.qty}}); } }); db.save('ww_inv_v8', state.inventory); w.stages[si].done=true; if(confirm("Lote finalizado. ¿Archivar?")) state.production.splice(i,1); } } else w.stages[si].done=!w.stages[si].done; db.save('ww_prod_v8', state.production); ui.renderProduction(); },
 
-            // Orders
+            // ORDENES
             addTempItemToOrder: () => { const n=prompt("Producto"), q=prompt("Cantidad"); if(n&&q) { tempOrderItems.push({name:n, total:parseInt(q), note:''}); ui.renderTempOrderItems(); } },
             remOrdItem: (i) => { tempOrderItems.splice(i,1); ui.renderTempOrderItems(); },
             updOrdNote: (i,v) => { tempOrderItems[i].note=v; },
@@ -546,7 +611,7 @@
                 }
             },
             delOrd: (i) => { if(confirm("Borrar OC?")){ state.orders.splice(i,1); db.save('ww_ord_v8',state.orders); ui.renderOrders(); } },
-            
+            saveCalNote: () => { const k = document.getElementById('calSelectedDate').dataset.val; const txt = document.getElementById('calNoteText').value; if(txt) state.calendarNotes[k]=txt; else delete state.calendarNotes[k]; db.save('ww_cal_v8', state.calendarNotes); cal.render(); ui.closeModal('calNoteModal'); },
             factoryReset: () => { if(confirm("¿RESET TOTAL?")){ localStorage.clear(); location.reload(); } }
         };
 
