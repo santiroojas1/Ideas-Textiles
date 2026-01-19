@@ -3,17 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>IDEAS TEXTILES - SISTEMA DE GESTIÓN</title>
+    <title>IDEAS TEXTILES</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://unpkg.com/tesseract.js@4.0.2/dist/tesseract.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
-
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <script>pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';</script>
 
@@ -24,7 +22,7 @@
         :root { --primary: #f59e0b; --dark: #0f172a; }
         body { font-family: 'Inter', system-ui, sans-serif; background: #f8fafc; color: #1e293b; -webkit-tap-highlight-color: transparent; }
         
-        /* ESTADOS DE SINCRONIZACIÓN */
+        /* SYNC STATUS */
         .sync-indicator { position: fixed; top: 20px; right: 20px; z-index: 999; display: flex; align-items: center; gap: 8px; padding: 6px 12px; border-radius: 50px; font-size: 11px; font-weight: 800; text-transform: uppercase; transition: all 0.3s; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
         .sync-online { background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
         .sync-offline { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
@@ -35,47 +33,49 @@
         .nav-link:hover { background: #1e293b; color: white; }
         .nav-link.active { background: var(--primary); color: var(--dark); }
 
-        /* COMPONENTES */
-        .card-stat { background: white; border: 1px solid #e2e8f0; border-radius: 16px; padding: 20px; transition: transform 0.2s; }
-        .card-stat:active { transform: scale(0.98); }
-        .lote-card { background: white; border-radius: 16px; border-left: 6px solid var(--primary); padding: 16px; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05); margin-bottom: 10px; }
+        /* ESTILOS DE TARJETAS */
+        .card-stat { background: white; border: 1px solid #e2e8f0; border-radius: 16px; padding: 20px; }
+        .lote-card { background: white; border-radius: 16px; border-left: 6px solid var(--primary); padding: 16px; margin-bottom: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
         .step-pill { padding: 4px 10px; border-radius: 6px; font-size: 10px; font-weight: 800; border: 1px solid #e2e8f0; cursor: pointer; transition: 0.2s; display: inline-block; margin-right: 4px; margin-bottom: 4px; }
         .step-done { background: #22c55e; color: white; border-color: #22c55e; }
 
-        /* PDF WORKSPACE (CORREGIDO PARA EVITAR HOJAS EN BLANCO) */
+        /* --- PDF CONTAINER FIXED (SOLUCIÓN SENIOR) --- */
+        /* Debe estar en el DOM siempre, pero fuera de la vista visual */
         #pdf-workspace { 
             position: fixed; 
+            left: -9999px; /* Fuera de pantalla */
             top: 0; 
-            left: 0; 
             width: 210mm; 
             min-height: 297mm; 
             background: white; 
-            visibility: hidden; 
-            pointer-events: none; 
-            z-index: 999; 
+            z-index: 10000;
         }
         
+        /* Diseño de hoja PDF */
+        .pdf-sheet-6up { width: 100%; height: 270mm; display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr 1fr; gap: 15px; padding: 15px; box-sizing: border-box; page-break-after: always; background: white; }
+        .tacha-card-6up { border: 2px dashed #94a3b8; background: #fff; padding: 0; display: flex; flex-direction: column; height: 100%; border-radius: 6px; overflow: hidden; position: relative; }
+
         /* CALENDARIO */
         .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 1px; background: #e2e8f0; border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden; }
         .calendar-day { min-height: 80px; background: white; padding: 4px; font-size: 0.8rem; cursor: pointer; }
         .calendar-day.today { background: #fffbeb; }
-        .cal-event { font-size: 0.65rem; padding: 2px 4px; border-radius: 4px; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: bold; }
+        .cal-event { font-size: 0.65rem; padding: 2px 4px; border-radius: 3px; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: white; font-weight: bold; }
 
-        /* MÓVIL */
+        /* MÓVIL FIX (Espacio inferior) */
         @media (max-width: 1024px) {
             .sidebar { position: fixed; width: 100%; height: auto; bottom: 0; top: auto; flex-direction: row; padding: 10px; justify-content: space-around; border-top: 1px solid #334155; }
             .sidebar h1, .sidebar p, .sidebar .mt-auto { display: none; }
             .nav-link span { display: none; }
             .nav-link { padding: 10px; justify-content: center; }
-            main { padding-bottom: 100px; }
+            main { padding-bottom: 150px !important; } /* AUMENTADO PARA QUE NO TAPE */
         }
     </style>
 </head>
 <body>
 
-    <div id="loader" class="fixed inset-0 bg-white/95 z-[9999] flex flex-col justify-center items-center transition-opacity duration-500 hidden opacity-0">
+    <div id="loader" class="fixed inset-0 bg-white/95 z-[9999] flex flex-col justify-center items-center transition-opacity duration-500">
         <div class="w-12 h-12 border-4 border-slate-200 border-t-amber-500 rounded-full animate-spin mb-4"></div>
-        <h2 class="font-bold text-slate-700 text-sm tracking-widest">PROCESANDO...</h2>
+        <h2 class="font-bold text-slate-700 text-sm tracking-widest">CARGANDO...</h2>
     </div>
 
     <div id="pdf-workspace"></div>
@@ -122,7 +122,7 @@
                 <div class="flex justify-between items-center mb-6">
                     <h2 class="text-2xl font-black text-slate-800">BODEGA</h2>
                     <div class="flex gap-2">
-                        <button onclick="document.getElementById('ai-file').click()" class="bg-indigo-600 text-white w-10 h-10 rounded-xl flex items-center justify-center shadow-lg hover:bg-indigo-700" title="Importar (PDF/Excel/Foto)"><i class="fas fa-file-import"></i></button>
+                        <button onclick="document.getElementById('ai-file').click()" class="bg-indigo-600 text-white w-10 h-10 rounded-xl flex items-center justify-center shadow-lg hover:bg-indigo-700"><i class="fas fa-file-import"></i></button>
                         <button onclick="ui.modalItem()" class="bg-slate-900 text-white px-4 py-2 rounded-xl text-xs font-bold shadow-lg">+ ITEM</button>
                     </div>
                 </div>
@@ -171,28 +171,25 @@
     </div>
 
     <div id="modal-wrapper" class="fixed inset-0 bg-slate-900/80 z-[100] hidden flex items-center justify-center p-4 backdrop-blur-sm">
-        <div id="modal-content" class="bg-white w-full max-w-md rounded-3xl p-6 shadow-2xl transform transition-all scale-95 opacity-0">
-            </div>
+        <div id="modal-content" class="bg-white w-full max-w-md rounded-3xl p-6 shadow-2xl transform transition-all scale-95 opacity-0"></div>
     </div>
 
     <input type="file" id="ai-file" hidden accept=".xlsx,.xls,.csv,.pdf,image/*" onchange="IA.process(this)">
 
     <script>
-        // === UTILIDADES ===
-        // Sanitización básica de strings
+        // UTILIDADES
         function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;'); }
 
-        // === CONFIGURACIÓN FIREBASE ===
+        // FIREBASE
         const firebaseConfig = { apiKey: "AIzaSyBg-Cx9SqZw35TyyMxtpVBEFlwZTjBXBew", authDomain: "ideastextilesapp.firebaseapp.com", databaseURL: "https://ideastextilesapp-default-rtdb.firebaseio.com", projectId: "ideastextilesapp", storageBucket: "ideastextilesapp.firebasestorage.app", messagingSenderId: "268995530035", appId: "1:268995530035:web:1890f45ac761cc81eb0246" };
         firebase.initializeApp(firebaseConfig);
         const dbRef = firebase.database().ref();
 
-        // === ESTADO DE LA APLICACIÓN ===
+        // ESTADO
         let state = { inv: [], ord: [], prod: [], cal: {} };
-        let tempItems = [];
-        let iaDetectedItems = []; // Almacena temporalmente items leídos por IA
+        let tempItems = [], iaDetectedItems = [];
 
-        // === SINCRONIZACIÓN (SYNC) ===
+        // SYNC
         const Sync = {
             init() {
                 firebase.database().ref('.info/connected').on('value', snap => {
@@ -203,15 +200,16 @@
                 });
 
                 const nodes = ['inv', 'ord', 'prod', 'cal'];
+                let loadedCount = 0;
                 nodes.forEach(node => {
                     dbRef.child(node).on('value', snap => {
-                        // Protección contra estructuras de datos corruptas
                         let data = snap.val() || (node==='cal'?{}:[]);
                         if(node!=='cal' && data && typeof data==='object' && !Array.isArray(data)) data = Object.values(data);
                         state[node] = data;
-                        
                         ui.refresh(node);
                         ui.updateStats();
+                        loadedCount++;
+                        if(loadedCount >= 1) ui.toggleLoader(false);
                     });
                 });
             },
@@ -220,22 +218,15 @@
             }
         };
 
-        // === INTERFAZ DE USUARIO (UI) ===
+        // UI
         const ui = {
             toggleLoader(show, txt){ 
                 const l=document.getElementById('loader'); 
                 if(!l) return; 
                 if(txt) document.querySelector('#loader h2').innerText = txt;
-                if(show){ 
-                    l.style.display='flex'; 
-                    l.classList.remove('hidden');
-                    setTimeout(()=>l.style.opacity='1',10); 
-                } else { 
-                    l.style.opacity='0'; 
-                    setTimeout(()=>{ l.style.display='none'; l.classList.add('hidden'); }, 400); 
-                } 
+                if(show){ l.style.display='flex'; setTimeout(()=>l.style.opacity='1',10); } 
+                else { l.style.opacity='0'; setTimeout(()=>l.style.display='none',400); } 
             },
-
             show(id) {
                 document.querySelectorAll('main > section').forEach(s => s.classList.add('hidden'));
                 document.getElementById(id).classList.remove('hidden');
@@ -243,13 +234,11 @@
                 const btn = document.getElementById('btn-'+id); if(btn) btn.classList.add('active');
                 if(id==='calendar') cal.render();
             },
-            
             updateStats() {
                 document.getElementById('st-inv').innerText = state.inv.length;
                 document.getElementById('st-prod').innerText = state.prod.length;
                 document.getElementById('st-ord').innerText = state.ord.filter(o=>o.st!=='Despachado').length;
             },
-
             refresh(node) {
                 if(node === 'inv') {
                     document.getElementById('tb-inv').innerHTML = state.inv.map((p,i) => `
@@ -266,12 +255,19 @@
                     `).join('');
                 }
                 if(node === 'ord') {
-                    document.getElementById('tb-ord').innerHTML = state.ord.map((o,i) => `
+                    document.getElementById('tb-ord').innerHTML = state.ord.map((o,i) => {
+                        // DETALLE DE PRODUCTOS EN LA LISTA
+                        let itemsSummary = (o.its||[]).map(it => `${it.n} (${it.q})`).join(', ');
+                        if(itemsSummary.length > 50) itemsSummary = itemsSummary.substring(0,50) + '...';
+                        if(!itemsSummary) itemsSummary = "Sin productos";
+
+                        return `
                         <tr class="border-b border-slate-50 hover:bg-slate-50 transition border-l-4 ${o.st==='Pendiente'?'border-l-amber-400':(o.st==='Despachado'?'border-l-green-500':'border-l-blue-500')}">
                             <td class="p-4 text-center"><input type="checkbox" class="chk-ord w-4 h-4" value="${i}"></td>
                             <td class="p-4">
                                 <div class="font-bold text-slate-800 text-sm">#${esc(o.id)}</div>
                                 <div class="text-[10px] text-slate-500 uppercase font-bold tracking-wide">${esc(o.c)}</div>
+                                <div class="text-[10px] text-slate-400 mt-1 italic"><i class="fas fa-box-open mr-1"></i>${itemsSummary}</div>
                             </td>
                             <td class="p-4"><span class="px-2 py-1 rounded-md text-[10px] font-bold uppercase ${o.st==='Pendiente'?'bg-amber-100 text-amber-700':(o.st==='Despachado'?'bg-green-100 text-green-700':'bg-blue-100 text-blue-700')}">${esc(o.st)}</span></td>
                             <td class="p-4 text-right">
@@ -279,7 +275,7 @@
                                 <button onclick="actions.del('ord',${i})" class="text-slate-400 hover:text-red-500"><i class="fas fa-trash"></i></button>
                             </td>
                         </tr>
-                    `).join('');
+                    `}).join('');
                 }
                 if(node === 'prod') {
                     document.getElementById('grid-prod').innerHTML = state.prod.map((w,i) => {
@@ -299,8 +295,6 @@
                     }).join('');
                 }
             },
-            
-            // MODALES
             openModal(html, wide=false) {
                 const w = document.getElementById('modal-wrapper');
                 const c = document.getElementById('modal-content');
@@ -315,8 +309,6 @@
                 c.classList.add('scale-95', 'opacity-0');
                 setTimeout(() => w.classList.add('hidden'), 200);
             },
-
-            // Builders
             modalItem(i=-1) {
                 window.currInv = i;
                 const p = i>=0 ? state.inv[i] : {sku:'SKU-'+Date.now(), n:'', q:0};
@@ -386,8 +378,6 @@
                     <button onclick="ReportEngine.tachasVenta()" class="w-full bg-slate-800 text-white p-3 rounded-xl font-bold">IMPRIMIR</button>
                 `);
             },
-            
-            // --- NUEVO: Modal de Verificación de Importación ---
             verifyIA(items) {
                 iaDetectedItems = items;
                 window.renderIATable = () => {
@@ -401,10 +391,9 @@
                     `).join('');
                     document.getElementById('ia-tbody').innerHTML = html;
                 };
-                
                 this.openModal(`
                     <h3 class="text-xl font-black text-indigo-600 mb-2">Revisión de Datos</h3>
-                    <p class="text-xs text-gray-500 mb-4">Confirma los datos detectados antes de importar a la bodega.</p>
+                    <p class="text-xs text-gray-500 mb-4">Confirma los datos detectados antes de importar.</p>
                     <div class="bg-gray-50 border rounded-xl h-64 overflow-y-auto mb-4 p-2">
                         <table class="w-full">
                             <thead class="bg-gray-200 text-xs text-gray-600 sticky top-0"><tr><th>SKU</th><th>Descripción</th><th>Cant</th><th></th></tr></thead>
@@ -416,12 +405,12 @@
                         <button onclick="ui.closeModal()" class="px-4 py-3 text-slate-400 font-bold text-xs">CANCELAR</button>
                         <button onclick="actions.confirmIA()" class="flex-1 bg-indigo-600 text-white py-2 rounded-xl font-bold hover:bg-indigo-700">CONFIRMAR IMPORTACIÓN</button>
                     </div>
-                `, true); // wide mode
+                `, true); 
                 window.renderIATable();
             }
         };
 
-        // === ACCIONES (ACTIONS) ===
+        // ACTIONS
         const actions = {
             saveItem() {
                 const p = { sku: document.getElementById('m-sku').value, n: document.getElementById('m-n').value, q: parseInt(document.getElementById('m-q').value) };
@@ -480,49 +469,32 @@
                 } else { w.s[si].d = !w.s[si].d; Sync.save('prod'); }
             },
             reset() { if(confirm("¿BORRAR TODOS LOS DATOS?")) firebase.database().ref('/').set(null); },
-
-            // Acción Final Importación IA
             confirmIA() {
                 let count = 0;
                 iaDetectedItems.forEach(it => {
                     if(it.n && it.q > 0) {
-                        state.inv.push({
-                            sku: it.sku || 'IMP-'+Date.now(), 
-                            n: it.n, 
-                            q: it.q
-                        });
+                        state.inv.push({sku: it.sku || 'IMP-'+Date.now(), n: it.n, q: it.q});
                         count++;
                     }
                 });
-
                 if(count > 0) {
                     Sync.save('inv');
-                    alert(`✅ ${count} productos importados correctamente.`);
+                    alert(`✅ ${count} productos importados.`);
                     ui.closeModal();
-                } else {
-                    alert("⚠️ La lista está vacía o incompleta.");
-                }
+                } else alert("Datos incompletos.");
             }
         };
 
-        // === MÓDULO IMPORTACIÓN INTELIGENTE (EXCEL + PDF + OCR) ===
+        // IA ENGINE
         const IA = {
             process(input) {
                 const f = input.files[0]; if(!f) return;
-                ui.toggleLoader(true, "Analizando documento...");
-
-                if(f.name.match(/\.(xlsx|xls|csv)$/i)) {
-                    this.parseExcel(f);
-                } 
-                else if(f.type === 'application/pdf') {
-                    this.parsePDF(f);
-                }
-                else if(f.type.startsWith('image/')) {
-                    this.parseImage(f);
-                }
-                input.value = ''; // Reset input
+                ui.toggleLoader(true, "Analizando...");
+                if(f.name.match(/\.(xlsx|xls|csv)$/i)) this.parseExcel(f);
+                else if(f.type === 'application/pdf') this.parsePDF(f);
+                else if(f.type.startsWith('image/')) this.parseImage(f);
+                input.value = '';
             },
-
             parseExcel(f) {
                 const reader = new FileReader();
                 reader.onload = (e) => {
@@ -539,7 +511,6 @@
                 };
                 reader.readAsArrayBuffer(f);
             },
-
             async parsePDF(f) {
                 try {
                     const reader = new FileReader();
@@ -557,37 +528,29 @@
                     reader.readAsArrayBuffer(f);
                 } catch(e) { alert("Error PDF: " + e.message); ui.toggleLoader(false); }
             },
-
             async parseImage(f) {
                 try {
                     const { data: { text } } = await Tesseract.recognize(f, 'spa');
                     this.analyzeText(text);
                 } catch(e) { alert("Error OCR: " + e.message); ui.toggleLoader(false); }
             },
-
             analyzeText(text) {
                 const lines = text.split('\n');
                 let found = [];
                 lines.forEach(line => {
                     const clean = line.replace(/[^\w\sñÑáéíóúÁÉÍÓÚ\(\)\.\-]/g, '').trim();
                     if(clean.length < 5) return;
-                    
-                    // Busca patrón: Texto ... Número
                     let m = clean.match(/^([a-zA-Z\sñÑ\(\)\.\-]+)\s+(\d+)$/);
-                    // Busca patrón: Número ... Texto
                     if(!m) m = clean.match(/^(\d+)\s+([a-zA-Z\sñÑ\(\)\.\-]+)$/);
-
                     if(m) {
                         const val1 = m[1].trim(); const val2 = m[2].trim();
                         let n, q;
                         if(isNaN(val1)) { n = val1; q = val2; } else { q = val1; n = val2; }
-                        
                         if(n.length > 3 && parseInt(q) > 0) found.push({sku: 'SCAN', n: n, q: parseInt(q)});
                     }
                 });
                 this.finish(found);
             },
-
             finish(items) {
                 ui.toggleLoader(false);
                 if(items.length === 0) items.push({sku:'', n:'', q:0});
@@ -595,15 +558,14 @@
             }
         };
 
-        // === REPORTES (GENERADOR PDF) ===
+        // REPORTES
         const ReportEngine = {
             async generateGeneralPDF() {
                 const { jsPDF } = window.jspdf; const doc = new jsPDF();
-                doc.text("REPORTE GENERAL DE INVENTARIO", 14, 20);
+                doc.text("IDEAS TEXTILES - REPORTE GENERAL", 14, 20);
                 doc.autoTable({startY:30, head:[['SKU','Item','Stock']], body:state.inv.map(x=>[x.sku,x.n,x.q])});
-                doc.save('Reporte_Inventario.pdf');
+                doc.save('Reporte.pdf');
             },
-            
             async tachasVenta() {
                 const b = document.getElementById('pr-b').value, t = document.getElementById('pr-t').value, r = document.getElementById('pr-r').value;
                 let html = '<div style="font-family:sans-serif; display:grid; grid-template-columns:1fr 1fr; gap:10px; padding:10px;">';
@@ -628,9 +590,8 @@
                     });
                 });
                 html += '</div>';
-                this.renderPDF(html, 'Etiquetas_Despacho.pdf');
+                this.renderPDF(html, 'Tachas_Venta.pdf');
             },
-            
             async tachaInterna(item, q, m, r) {
                 const html = `
                 <div style="font-family:sans-serif; border:4px solid #ef4444; padding:20px; text-align:center; width:100%;">
@@ -647,15 +608,11 @@
                 </div>`;
                 this.renderPDF(html, `Salida_${item.sku}.pdf`);
             },
-            
-            // Renderizador PDF corregido (sin páginas en blanco)
             async renderPDF(html, name){ 
                 ui.toggleLoader(true); 
                 const c=document.getElementById('pdf-workspace'); 
                 c.innerHTML=html; 
-                c.style.visibility='visible'; 
                 
-                // Espera renderizado
                 await new Promise(r=>requestAnimationFrame(r)); 
                 await new Promise(r=>requestAnimationFrame(r)); 
                 
@@ -668,13 +625,12 @@
                 }).from(c).save(); 
                 
                 c.innerHTML=''; 
-                c.style.visibility='hidden'; 
                 ui.toggleLoader(false); 
                 ui.closeModal(); 
             }
         };
 
-        // === CALENDARIO ===
+        // CALENDARIO
         let curDate = new Date();
         const cal = {
             move(d) { curDate.setMonth(curDate.getMonth()+d); this.render(); },
@@ -715,7 +671,7 @@
             }
         };
 
-        // INICIALIZACIÓN
+        // START
         Sync.init();
         ui.show('dashboard');
     </script>
