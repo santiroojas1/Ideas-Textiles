@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>IDEAS TEXTILES</title>
+    <title>IDEAS TEXTILES | SISTEMA INTEGRAL</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
@@ -33,26 +33,29 @@
         .nav-link:hover { background: #1e293b; color: white; }
         .nav-link.active { background: var(--primary); color: var(--dark); }
 
-        /* ESTILOS DE TARJETAS */
+        /* TARJETAS */
         .card-stat { background: white; border: 1px solid #e2e8f0; border-radius: 16px; padding: 20px; }
         .lote-card { background: white; border-radius: 16px; border-left: 6px solid var(--primary); padding: 16px; margin-bottom: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
         .step-pill { padding: 4px 10px; border-radius: 6px; font-size: 10px; font-weight: 800; border: 1px solid #e2e8f0; cursor: pointer; transition: 0.2s; display: inline-block; margin-right: 4px; margin-bottom: 4px; }
         .step-done { background: #22c55e; color: white; border-color: #22c55e; }
 
-        /* --- PDF CONTAINER FIXED (SOLUCIÓN SENIOR) --- */
-        /* Debe estar en el DOM siempre, pero fuera de la vista visual */
+        /* --- PDF WORKSPACE (SOLUCIÓN TACHA BLANCA) --- */
+        /* Ahora es un overlay visible que tapa la pantalla mientras genera */
         #pdf-workspace { 
             position: fixed; 
-            left: -9999px; /* Fuera de pantalla */
             top: 0; 
-            width: 210mm; 
-            min-height: 297mm; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
             background: white; 
-            z-index: 10000;
+            z-index: 20000; /* Encima de todo */
+            overflow-y: auto;
+            display: none; /* Se muestra solo al imprimir */
+            padding: 20px;
         }
         
-        /* Diseño de hoja PDF */
-        .pdf-sheet-6up { width: 100%; height: 270mm; display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr 1fr; gap: 15px; padding: 15px; box-sizing: border-box; page-break-after: always; background: white; }
+        /* Diseño Hoja A4 */
+        .pdf-sheet-6up { width: 210mm; min-height: 297mm; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr 1fr; gap: 15px; padding: 10px; box-sizing: border-box; page-break-after: always; background: white; border: 1px solid #eee; }
         .tacha-card-6up { border: 2px dashed #94a3b8; background: #fff; padding: 0; display: flex; flex-direction: column; height: 100%; border-radius: 6px; overflow: hidden; position: relative; }
 
         /* CALENDARIO */
@@ -256,7 +259,7 @@
                 }
                 if(node === 'ord') {
                     document.getElementById('tb-ord').innerHTML = state.ord.map((o,i) => {
-                        // DETALLE DE PRODUCTOS EN LA LISTA
+                        // DETALLE EN LISTA (SOLICITADO)
                         let itemsSummary = (o.its||[]).map(it => `${it.n} (${it.q})`).join(', ');
                         if(itemsSummary.length > 50) itemsSummary = itemsSummary.substring(0,50) + '...';
                         if(!itemsSummary) itemsSummary = "Sin productos";
@@ -608,14 +611,20 @@
                 </div>`;
                 this.renderPDF(html, `Salida_${item.sku}.pdf`);
             },
+            // [SOLUCIÓN DEFINITIVA PDF]
+            // Forzar renderizado visible + pausa para móviles
             async renderPDF(html, name){ 
-                ui.toggleLoader(true); 
-                const c=document.getElementById('pdf-workspace'); 
-                c.innerHTML=html; 
+                ui.toggleLoader(true, "Generando PDF..."); 
+                const c = document.getElementById('pdf-workspace'); 
                 
-                await new Promise(r=>requestAnimationFrame(r)); 
-                await new Promise(r=>requestAnimationFrame(r)); 
+                // 1. Mostrar contenedor (Overlay)
+                c.style.display = 'block'; 
+                c.innerHTML = html;
                 
+                // 2. Espera OBLIGATORIA (El móvil necesita tiempo para pintar)
+                await new Promise(r => setTimeout(r, 2000)); 
+                
+                // 3. Captura
                 await html2pdf().set({ 
                     margin:5, 
                     filename:name, 
@@ -624,7 +633,9 @@
                     jsPDF:{unit:'mm',format:'a4',orientation:'portrait'} 
                 }).from(c).save(); 
                 
-                c.innerHTML=''; 
+                // 4. Limpieza
+                c.style.display = 'none'; 
+                c.innerHTML = ''; 
                 ui.toggleLoader(false); 
                 ui.closeModal(); 
             }
@@ -671,7 +682,7 @@
             }
         };
 
-        // START
+        // INICIALIZACIÓN
         Sync.init();
         ui.show('dashboard');
     </script>
