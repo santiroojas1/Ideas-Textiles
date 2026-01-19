@@ -3,15 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>IDEAS TEXTILES | WORKWEAR AND CORPORATE</title>
+    <title>IDEAS TEXTILES - SISTEMA DE GESTIÓN</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://unpkg.com/tesseract.js@4.0.2/dist/tesseract.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script>pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';</script>
 
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
@@ -20,76 +24,58 @@
         :root { --primary: #f59e0b; --dark: #0f172a; }
         body { font-family: 'Inter', system-ui, sans-serif; background: #f8fafc; color: #1e293b; -webkit-tap-highlight-color: transparent; }
         
-        /* Indicador Sync */
+        /* ESTADOS DE SINCRONIZACIÓN */
         .sync-indicator { position: fixed; top: 20px; right: 20px; z-index: 999; display: flex; align-items: center; gap: 8px; padding: 6px 12px; border-radius: 50px; font-size: 11px; font-weight: 800; text-transform: uppercase; transition: all 0.3s; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
         .sync-online { background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
         .sync-offline { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
         
-        /* Layout */
+        /* LAYOUT */
         .sidebar { background: var(--dark); height: 100vh; position: sticky; top: 0; transition: all 0.3s; z-index: 50; }
         .nav-link { display: flex; align-items: center; padding: 12px 16px; border-radius: 12px; color: #94a3b8; font-weight: 600; transition: 0.2s; cursor: pointer; margin-bottom: 4px; }
         .nav-link:hover { background: #1e293b; color: white; }
         .nav-link.active { background: var(--primary); color: var(--dark); }
 
-        /* Componentes */
+        /* COMPONENTES */
         .card-stat { background: white; border: 1px solid #e2e8f0; border-radius: 16px; padding: 20px; transition: transform 0.2s; }
         .card-stat:active { transform: scale(0.98); }
         .lote-card { background: white; border-radius: 16px; border-left: 6px solid var(--primary); padding: 16px; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05); margin-bottom: 10px; }
         .step-pill { padding: 4px 10px; border-radius: 6px; font-size: 10px; font-weight: 800; border: 1px solid #e2e8f0; cursor: pointer; transition: 0.2s; display: inline-block; margin-right: 4px; margin-bottom: 4px; }
         .step-done { background: #22c55e; color: white; border-color: #22c55e; }
 
-        /* --- ARREGLO PDF (OVERLAY VISIBLE) --- */
+        /* PDF WORKSPACE (CORREGIDO PARA EVITAR HOJAS EN BLANCO) */
         #pdf-workspace { 
             position: fixed; 
             top: 0; 
             left: 0; 
-            width: 100%; 
-            height: 100%; 
-            z-index: 10000; 
-            background: white; 
-            overflow-y: auto;
-            display: none; /* Se activa SOLO al imprimir */
-            padding: 20px;
-        }
-        
-        .pdf-sheet-6up { 
             width: 210mm; 
             min-height: 297mm; 
-            margin: 0 auto;
-            display: grid; 
-            grid-template-columns: 1fr 1fr; 
-            grid-template-rows: 1fr 1fr 1fr; 
-            gap: 15px; 
-            padding: 10px; 
-            box-sizing: border-box; 
-            page-break-after: always; 
             background: white; 
+            visibility: hidden; 
+            pointer-events: none; 
+            z-index: 999; 
         }
-        .tacha-card-6up { border: 2px dashed #94a3b8; background: #fff; padding: 0; display: flex; flex-direction: column; height: 100%; border-radius: 6px; overflow: hidden; position: relative; }
-
-        /* Calendario */
+        
+        /* CALENDARIO */
         .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 1px; background: #e2e8f0; border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden; }
         .calendar-day { min-height: 80px; background: white; padding: 4px; font-size: 0.8rem; cursor: pointer; }
         .calendar-day.today { background: #fffbeb; }
-        /* ARREGLO COLORES CALENDARIO */
         .cal-event { font-size: 0.65rem; padding: 2px 4px; border-radius: 4px; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: bold; }
 
-        /* MÓVIL (CORRECCIÓN MENÚ TAPA TODO) */
+        /* MÓVIL */
         @media (max-width: 1024px) {
-            .sidebar { position: fixed; width: 100%; height: auto; bottom: 0; top: auto; flex-direction: row; padding: 10px; justify-content: space-around; border-top: 1px solid #334155; background: var(--dark); }
-            .sidebar h1, .sidebar p, .sidebar .mt-auto { display: none; } 
+            .sidebar { position: fixed; width: 100%; height: auto; bottom: 0; top: auto; flex-direction: row; padding: 10px; justify-content: space-around; border-top: 1px solid #334155; }
+            .sidebar h1, .sidebar p, .sidebar .mt-auto { display: none; }
             .nav-link span { display: none; }
-            .nav-link { padding: 12px; justify-content: center; }
-            /* ESPACIO EXTRA ABAJO PARA QUE NO SE TAPE */
-            main { padding-bottom: 120px !important; } 
+            .nav-link { padding: 10px; justify-content: center; }
+            main { padding-bottom: 100px; }
         }
     </style>
 </head>
 <body>
 
-    <div id="loader" class="fixed inset-0 bg-white/95 z-[9999] flex flex-col justify-center items-center transition-opacity duration-500">
+    <div id="loader" class="fixed inset-0 bg-white/95 z-[9999] flex flex-col justify-center items-center transition-opacity duration-500 hidden opacity-0">
         <div class="w-12 h-12 border-4 border-slate-200 border-t-amber-500 rounded-full animate-spin mb-4"></div>
-        <h2 class="font-bold text-slate-700 text-sm tracking-widest">CARGANDO SISTEMA...</h2>
+        <h2 class="font-bold text-slate-700 text-sm tracking-widest">PROCESANDO...</h2>
     </div>
 
     <div id="pdf-workspace"></div>
@@ -102,7 +88,7 @@
         <aside class="sidebar w-full lg:w-72 flex flex-col p-6 shadow-2xl">
             <div class="mb-10 hidden lg:block">
                 <h1 class="text-white text-2xl font-black tracking-tighter italic">IDEAS<span class="text-amber-500">TEXTILES</span></h1>
-                <p class="text-[10px] text-slate-500 font-bold uppercase tracking-[3px]">Workwear & Corporate</p>
+                <p class="text-[10px] text-slate-500 font-bold uppercase tracking-[3px]">Gestión Integral</p>
             </div>
 
             <nav class="flex-1 lg:space-y-2 flex lg:block w-full justify-between lg:justify-start">
@@ -120,7 +106,7 @@
             </div>
         </aside>
 
-        <main class="flex-1 p-4 lg:p-10 overflow-x-hidden scroll-smooth">
+        <main class="flex-1 p-4 lg:p-10 overflow-x-hidden">
             
             <section id="dashboard" class="animate-in fade-in">
                 <h2 class="text-2xl font-black text-slate-800 mb-6">PANEL DE CONTROL</h2>
@@ -128,7 +114,7 @@
                     <div class="card-stat"><div class="text-slate-400 text-[10px] font-bold uppercase">Items Bodega</div><div class="text-3xl font-black text-slate-800" id="st-inv">0</div></div>
                     <div class="card-stat"><div class="text-slate-400 text-[10px] font-bold uppercase">Lotes Activos</div><div class="text-3xl font-black text-amber-500" id="st-prod">0</div></div>
                     <div class="card-stat"><div class="text-slate-400 text-[10px] font-bold uppercase">OC Pendientes</div><div class="text-3xl font-black text-blue-600" id="st-ord">0</div></div>
-                    <div class="card-stat cursor-pointer hover:bg-red-50" onclick="actions.reset()"><div class="text-red-400 text-[10px] font-bold uppercase">Zona de Peligro</div><div class="text-xs font-bold text-red-600 mt-2">RESET TOTAL</div></div>
+                    <div class="card-stat cursor-pointer hover:bg-red-50" onclick="actions.reset()"><div class="text-red-400 text-[10px] font-bold uppercase">Zona de Peligro</div><div class="text-xs font-bold text-red-600 mt-2">RESET DATOS</div></div>
                 </div>
             </section>
 
@@ -136,7 +122,7 @@
                 <div class="flex justify-between items-center mb-6">
                     <h2 class="text-2xl font-black text-slate-800">BODEGA</h2>
                     <div class="flex gap-2">
-                        <button onclick="document.getElementById('ai-file').click()" class="bg-indigo-600 text-white w-10 h-10 rounded-xl flex items-center justify-center shadow-lg"><i class="fas fa-robot"></i></button>
+                        <button onclick="document.getElementById('ai-file').click()" class="bg-indigo-600 text-white w-10 h-10 rounded-xl flex items-center justify-center shadow-lg hover:bg-indigo-700" title="Importar (PDF/Excel/Foto)"><i class="fas fa-file-import"></i></button>
                         <button onclick="ui.modalItem()" class="bg-slate-900 text-white px-4 py-2 rounded-xl text-xs font-bold shadow-lg">+ ITEM</button>
                     </div>
                 </div>
@@ -189,27 +175,24 @@
             </div>
     </div>
 
-    <input type="file" id="ai-file" hidden accept=".xlsx,.xls,.csv,image/*" onchange="IA.process(this)">
+    <input type="file" id="ai-file" hidden accept=".xlsx,.xls,.csv,.pdf,image/*" onchange="IA.process(this)">
 
     <script>
+        // === UTILIDADES ===
+        // Sanitización básica de strings
+        function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;'); }
+
         // === CONFIGURACIÓN FIREBASE ===
-        const firebaseConfig = { 
-            apiKey: "AIzaSyBg-Cx9SqZw35TyyMxtpVBEFlwZTjBXBew", 
-            authDomain: "ideastextilesapp.firebaseapp.com", 
-            databaseURL: "https://ideastextilesapp-default-rtdb.firebaseio.com", 
-            projectId: "ideastextilesapp", 
-            storageBucket: "ideastextilesapp.firebasestorage.app", 
-            messagingSenderId: "268995530035", 
-            appId: "1:268995530035:web:1890f45ac761cc81eb0246" 
-        };
+        const firebaseConfig = { apiKey: "AIzaSyBg-Cx9SqZw35TyyMxtpVBEFlwZTjBXBew", authDomain: "ideastextilesapp.firebaseapp.com", databaseURL: "https://ideastextilesapp-default-rtdb.firebaseio.com", projectId: "ideastextilesapp", storageBucket: "ideastextilesapp.firebasestorage.app", messagingSenderId: "268995530035", appId: "1:268995530035:web:1890f45ac761cc81eb0246" };
         firebase.initializeApp(firebaseConfig);
         const dbRef = firebase.database().ref();
 
-        // === ESTADO ===
+        // === ESTADO DE LA APLICACIÓN ===
         let state = { inv: [], ord: [], prod: [], cal: {} };
         let tempItems = [];
+        let iaDetectedItems = []; // Almacena temporalmente items leídos por IA
 
-        // === SYNC ===
+        // === SINCRONIZACIÓN (SYNC) ===
         const Sync = {
             init() {
                 firebase.database().ref('.info/connected').on('value', snap => {
@@ -220,30 +203,39 @@
                 });
 
                 const nodes = ['inv', 'ord', 'prod', 'cal'];
-                let loadedCount = 0;
                 nodes.forEach(node => {
-                    dbRef.child(node).on('value', snapshot => {
-                        const val = snapshot.val();
-                        state[node] = val || (node === 'cal' ? {} : []);
-                        ui.render(node);
-                        ui.updateStats();
+                    dbRef.child(node).on('value', snap => {
+                        // Protección contra estructuras de datos corruptas
+                        let data = snap.val() || (node==='cal'?{}:[]);
+                        if(node!=='cal' && data && typeof data==='object' && !Array.isArray(data)) data = Object.values(data);
+                        state[node] = data;
                         
-                        loadedCount++;
-                        if(loadedCount >= 1) {
-                            document.getElementById('loader').classList.add('opacity-0');
-                            setTimeout(() => document.getElementById('loader').style.display='none', 500);
-                        }
+                        ui.refresh(node);
+                        ui.updateStats();
                     });
                 });
-                setTimeout(() => document.getElementById('loader').style.display='none', 3000);
             },
             save(node) {
                 dbRef.child(node).set(state[node]).catch(e => alert("Error guardando: "+e.message));
             }
         };
 
-        // === UI ===
+        // === INTERFAZ DE USUARIO (UI) ===
         const ui = {
+            toggleLoader(show, txt){ 
+                const l=document.getElementById('loader'); 
+                if(!l) return; 
+                if(txt) document.querySelector('#loader h2').innerText = txt;
+                if(show){ 
+                    l.style.display='flex'; 
+                    l.classList.remove('hidden');
+                    setTimeout(()=>l.style.opacity='1',10); 
+                } else { 
+                    l.style.opacity='0'; 
+                    setTimeout(()=>{ l.style.display='none'; l.classList.add('hidden'); }, 400); 
+                } 
+            },
+
             show(id) {
                 document.querySelectorAll('main > section').forEach(s => s.classList.add('hidden'));
                 document.getElementById(id).classList.remove('hidden');
@@ -251,17 +243,19 @@
                 const btn = document.getElementById('btn-'+id); if(btn) btn.classList.add('active');
                 if(id==='calendar') cal.render();
             },
+            
             updateStats() {
                 document.getElementById('st-inv').innerText = state.inv.length;
                 document.getElementById('st-prod').innerText = state.prod.length;
                 document.getElementById('st-ord').innerText = state.ord.filter(o=>o.st!=='Despachado').length;
             },
-            render(node) {
-                if(node === 'inv' || node === 'all') {
+
+            refresh(node) {
+                if(node === 'inv') {
                     document.getElementById('tb-inv').innerHTML = state.inv.map((p,i) => `
                         <tr class="border-b border-slate-50 hover:bg-slate-50 transition">
-                            <td class="p-4 font-mono text-xs text-slate-500 font-bold">${p.sku}</td>
-                            <td class="p-4 font-medium">${p.n}</td>
+                            <td class="p-4 font-mono text-xs text-slate-500 font-bold">${esc(p.sku)}</td>
+                            <td class="p-4 font-medium">${esc(p.n)}</td>
                             <td class="p-4 text-center"><span class="bg-blue-100 text-blue-700 px-2 py-1 rounded-md text-xs font-bold">${p.q}</span></td>
                             <td class="p-4 text-right flex justify-end gap-2">
                                 <button onclick="actions.openSalida(${i})" class="bg-red-50 text-red-600 px-2 py-1 rounded-md text-[10px] font-bold border border-red-100">SALIDA</button>
@@ -271,35 +265,29 @@
                         </tr>
                     `).join('');
                 }
-                if(node === 'ord' || node === 'all') {
-                    document.getElementById('tb-ord').innerHTML = state.ord.map((o,i) => {
-                        let itemsSummary = (o.its||[]).map(it => `${it.n} (${it.q})`).join(', ');
-                        if(itemsSummary.length > 50) itemsSummary = itemsSummary.substring(0,50) + '...';
-                        if(!itemsSummary) itemsSummary = "Sin productos";
-
-                        return `
+                if(node === 'ord') {
+                    document.getElementById('tb-ord').innerHTML = state.ord.map((o,i) => `
                         <tr class="border-b border-slate-50 hover:bg-slate-50 transition border-l-4 ${o.st==='Pendiente'?'border-l-amber-400':(o.st==='Despachado'?'border-l-green-500':'border-l-blue-500')}">
                             <td class="p-4 text-center"><input type="checkbox" class="chk-ord w-4 h-4" value="${i}"></td>
                             <td class="p-4">
-                                <div class="font-bold text-slate-800 text-sm">#${o.id}</div>
-                                <div class="text-[10px] text-slate-500 uppercase font-bold tracking-wide">${o.c}</div>
-                                <div class="text-[10px] text-slate-400 mt-1 italic"><i class="fas fa-box-open mr-1"></i>${itemsSummary}</div>
+                                <div class="font-bold text-slate-800 text-sm">#${esc(o.id)}</div>
+                                <div class="text-[10px] text-slate-500 uppercase font-bold tracking-wide">${esc(o.c)}</div>
                             </td>
-                            <td class="p-4"><span class="px-2 py-1 rounded-md text-[10px] font-bold uppercase ${o.st==='Pendiente'?'bg-amber-100 text-amber-700':(o.st==='Despachado'?'bg-green-100 text-green-700':'bg-blue-100 text-blue-700')}">${o.st}</span></td>
+                            <td class="p-4"><span class="px-2 py-1 rounded-md text-[10px] font-bold uppercase ${o.st==='Pendiente'?'bg-amber-100 text-amber-700':(o.st==='Despachado'?'bg-green-100 text-green-700':'bg-blue-100 text-blue-700')}">${esc(o.st)}</span></td>
                             <td class="p-4 text-right">
                                 <button onclick="ui.modalOrder(${i})" class="text-slate-400 hover:text-blue-500 mr-2"><i class="fas fa-edit"></i></button>
                                 <button onclick="actions.del('ord',${i})" class="text-slate-400 hover:text-red-500"><i class="fas fa-trash"></i></button>
                             </td>
                         </tr>
-                    `}).join('');
+                    `).join('');
                 }
-                if(node === 'prod' || node === 'all') {
+                if(node === 'prod') {
                     document.getElementById('grid-prod').innerHTML = state.prod.map((w,i) => {
                         const pct = Math.round((w.s.filter(s=>s.d).length/4)*100);
                         return `
                         <div class="lote-card">
                             <div class="flex justify-between mb-2">
-                                <h4 class="font-bold text-sm uppercase">${w.n}</h4>
+                                <h4 class="font-bold text-sm uppercase">${esc(w.n)}</h4>
                                 <button onclick="actions.del('prod',${i})" class="text-slate-300 hover:text-red-500"><i class="fas fa-times"></i></button>
                             </div>
                             <div class="text-xs text-slate-500 mb-3 font-mono">${w.total} UNIDADES</div>
@@ -313,9 +301,10 @@
             },
             
             // MODALES
-            openModal(html) {
+            openModal(html, wide=false) {
                 const w = document.getElementById('modal-wrapper');
                 const c = document.getElementById('modal-content');
+                c.className = `bg-white rounded-3xl p-6 shadow-2xl transform transition-all scale-95 opacity-0 ${wide?'w-full max-w-2xl':'w-full max-w-md'}`;
                 c.innerHTML = html;
                 w.classList.remove('hidden');
                 setTimeout(() => { c.classList.remove('scale-95', 'opacity-0'); }, 10);
@@ -329,19 +318,19 @@
 
             // Builders
             modalItem(i=-1) {
-                window.currentEditId = i;
+                window.currInv = i;
                 const p = i>=0 ? state.inv[i] : {sku:'SKU-'+Date.now(), n:'', q:0};
                 this.openModal(`
                     <h3 class="text-xl font-black text-slate-800 mb-4">${i>=0?'Editar':'Nuevo'} Producto</h3>
-                    <input id="m-sku" class="w-full bg-slate-50 p-3 rounded-xl mb-3 border border-slate-200 font-mono text-sm" value="${p.sku}">
-                    <input id="m-n" class="w-full bg-slate-50 p-3 rounded-xl mb-3 border border-slate-200" placeholder="Nombre" value="${p.n}">
+                    <input id="m-sku" class="w-full bg-slate-50 p-3 rounded-xl mb-3 border border-slate-200 font-mono text-sm" value="${esc(p.sku)}">
+                    <input id="m-n" class="w-full bg-slate-50 p-3 rounded-xl mb-3 border border-slate-200" placeholder="Nombre" value="${esc(p.n)}">
                     <input id="m-q" type="number" class="w-full bg-slate-50 p-3 rounded-xl mb-6 border border-slate-200" placeholder="Stock" value="${p.q}">
                     <button onclick="actions.saveItem()" class="w-full bg-slate-900 text-white p-3 rounded-xl font-bold">GUARDAR</button>
                     <button onclick="ui.closeModal()" class="w-full mt-2 text-slate-400 text-xs">CANCELAR</button>
                 `);
             },
             modalOrder(i=-1) {
-                window.currentEditId = i;
+                window.currOrd = i;
                 const o = i>=0 ? state.ord[i] : {id:Math.floor(Math.random()*10000), c:'', d:new Date().toISOString().split('T')[0], st:'Pendiente', its:[]};
                 tempItems = JSON.parse(JSON.stringify(o.its||[]));
                 window.renderTempOrd = () => {
@@ -350,10 +339,10 @@
                 this.openModal(`
                     <h3 class="text-xl font-black text-slate-800 mb-4">Orden de Compra</h3>
                     <div class="grid grid-cols-2 gap-2 mb-2">
-                        <input id="m-id" class="bg-slate-50 p-2 rounded-lg border text-sm" value="${o.id}">
+                        <input id="m-id" class="bg-slate-50 p-2 rounded-lg border text-sm" value="${esc(o.id)}">
                         <input id="m-d" type="date" class="bg-slate-50 p-2 rounded-lg border text-sm" value="${o.d}">
                     </div>
-                    <input id="m-c" class="w-full bg-slate-50 p-3 rounded-xl mb-3 border" placeholder="Cliente" value="${o.c}">
+                    <input id="m-c" class="w-full bg-slate-50 p-3 rounded-xl mb-3 border" placeholder="Cliente" value="${esc(o.c)}">
                     <select id="m-st" class="w-full bg-white p-3 rounded-xl mb-3 border"><option>${o.st}</option><option>Pendiente</option><option>En Proceso</option><option>Despachado</option></select>
                     <div class="bg-slate-50 p-3 rounded-xl mb-4 border h-32 overflow-y-auto">
                         <div class="flex gap-2 mb-2"><input id="tmp-n" class="w-full p-1 text-xs border rounded" placeholder="Prod"><input id="tmp-q" class="w-12 p-1 text-xs border rounded" placeholder="#"><button onclick="if(document.getElementById('tmp-n').value){tempItems.push({n:document.getElementById('tmp-n').value, q:document.getElementById('tmp-q').value}); renderTempOrd();}" class="bg-blue-500 text-white px-2 rounded">+</button></div>
@@ -396,18 +385,51 @@
                     <input id="pr-r" class="w-full p-3 border rounded-xl mb-4" placeholder="Quien Recibe">
                     <button onclick="ReportEngine.tachasVenta()" class="w-full bg-slate-800 text-white p-3 rounded-xl font-bold">IMPRIMIR</button>
                 `);
+            },
+            
+            // --- NUEVO: Modal de Verificación de Importación ---
+            verifyIA(items) {
+                iaDetectedItems = items;
+                window.renderIATable = () => {
+                    const html = iaDetectedItems.map((it, idx) => `
+                        <tr class="text-xs border-b">
+                            <td><input class="w-full p-1 border rounded" value="${it.sku||''}" onchange="iaDetectedItems[${idx}].sku=this.value"></td>
+                            <td><input class="w-full p-1 border rounded" value="${it.n||''}" onchange="iaDetectedItems[${idx}].n=this.value"></td>
+                            <td><input class="w-12 p-1 border rounded text-center" value="${it.q||0}" onchange="iaDetectedItems[${idx}].q=parseInt(this.value)"></td>
+                            <td class="text-center text-red-500 cursor-pointer font-bold" onclick="iaDetectedItems.splice(${idx},1); renderIATable()">X</td>
+                        </tr>
+                    `).join('');
+                    document.getElementById('ia-tbody').innerHTML = html;
+                };
+                
+                this.openModal(`
+                    <h3 class="text-xl font-black text-indigo-600 mb-2">Revisión de Datos</h3>
+                    <p class="text-xs text-gray-500 mb-4">Confirma los datos detectados antes de importar a la bodega.</p>
+                    <div class="bg-gray-50 border rounded-xl h-64 overflow-y-auto mb-4 p-2">
+                        <table class="w-full">
+                            <thead class="bg-gray-200 text-xs text-gray-600 sticky top-0"><tr><th>SKU</th><th>Descripción</th><th>Cant</th><th></th></tr></thead>
+                            <tbody id="ia-tbody"></tbody>
+                        </table>
+                        <button onclick="iaDetectedItems.push({sku:'',n:'',q:0}); renderIATable()" class="w-full mt-2 py-2 border-2 border-dashed border-gray-300 text-xs text-gray-500 font-bold rounded">+ AGREGAR FILA</button>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="ui.closeModal()" class="px-4 py-3 text-slate-400 font-bold text-xs">CANCELAR</button>
+                        <button onclick="actions.confirmIA()" class="flex-1 bg-indigo-600 text-white py-2 rounded-xl font-bold hover:bg-indigo-700">CONFIRMAR IMPORTACIÓN</button>
+                    </div>
+                `, true); // wide mode
+                window.renderIATable();
             }
         };
 
-        // === ACTIONS ===
+        // === ACCIONES (ACTIONS) ===
         const actions = {
             saveItem() {
                 const p = { sku: document.getElementById('m-sku').value, n: document.getElementById('m-n').value, q: parseInt(document.getElementById('m-q').value) };
-                if(p.n){ if(window.currentEditId>=0) state.inv[window.currentEditId]=p; else state.inv.push(p); Sync.save('inv'); ui.closeModal(); }
+                if(p.n){ if(window.currInv>=0) state.inv[window.currInv]=p; else state.inv.push(p); Sync.save('inv'); ui.closeModal(); }
             },
             saveOrder() {
                 const o = { id:document.getElementById('m-id').value, c:document.getElementById('m-c').value, d:document.getElementById('m-d').value, st:document.getElementById('m-st').value, its:tempItems };
-                if(o.c){ if(window.currentEditId>=0) state.ord[window.currentEditId]=o; else state.ord.push(o); Sync.save('ord'); ui.closeModal(); }
+                if(o.c){ if(window.currOrd>=0) state.ord[window.currOrd]=o; else state.ord.push(o); Sync.save('ord'); ui.closeModal(); }
             },
             createLote() {
                 const n = document.getElementById('p-n').value;
@@ -417,9 +439,9 @@
                     Sync.save('prod'); ui.closeModal();
                 }
             },
-            del(node, i) { if(confirm("¿Eliminar?")) { state[node].splice(i,1); Sync.save(node); } },
+            del(node, i) { if(confirm("¿Eliminar registro?")) { state[node].splice(i,1); Sync.save(node); } },
             openSalida(i) {
-                window.currentExitId = i;
+                window.currInv = i;
                 ui.openModal(`
                     <h3 class="text-xl font-black text-red-600 mb-2">Salida Stock</h3>
                     <p class="text-sm font-bold text-slate-500 mb-4">${state.inv[i].n}</p>
@@ -434,7 +456,7 @@
                 const m = document.getElementById('out-m').value;
                 const r = document.getElementById('out-r').value;
                 if(q && m && r) {
-                    const item = state.inv[window.currentExitId];
+                    const item = state.inv[window.currInv];
                     if(item.q >= q) {
                         item.q -= q;
                         Sync.save('inv');
@@ -452,34 +474,147 @@
                             if(ex) ex.q += it.q; else state.inv.push({sku:'LOTE-'+Date.now(), n:it.n, q:it.q});
                         });
                         Sync.save('inv'); w.s[si].d = true; 
-                        if(confirm("¿Archivar lote?")) state.prod.splice(i,1);
+                        if(confirm("¿Archivar lote finalizado?")) state.prod.splice(i,1);
                         Sync.save('prod');
                     }
                 } else { w.s[si].d = !w.s[si].d; Sync.save('prod'); }
             },
-            reset() { if(confirm("¿BORRAR TODO?")) firebase.database().ref('/').set(null); }
+            reset() { if(confirm("¿BORRAR TODOS LOS DATOS?")) firebase.database().ref('/').set(null); },
+
+            // Acción Final Importación IA
+            confirmIA() {
+                let count = 0;
+                iaDetectedItems.forEach(it => {
+                    if(it.n && it.q > 0) {
+                        state.inv.push({
+                            sku: it.sku || 'IMP-'+Date.now(), 
+                            n: it.n, 
+                            q: it.q
+                        });
+                        count++;
+                    }
+                });
+
+                if(count > 0) {
+                    Sync.save('inv');
+                    alert(`✅ ${count} productos importados correctamente.`);
+                    ui.closeModal();
+                } else {
+                    alert("⚠️ La lista está vacía o incompleta.");
+                }
+            }
         };
 
-        // === REPORTES (MOTOR FANTASMA PDF SOLUCIONADO) ===
+        // === MÓDULO IMPORTACIÓN INTELIGENTE (EXCEL + PDF + OCR) ===
+        const IA = {
+            process(input) {
+                const f = input.files[0]; if(!f) return;
+                ui.toggleLoader(true, "Analizando documento...");
+
+                if(f.name.match(/\.(xlsx|xls|csv)$/i)) {
+                    this.parseExcel(f);
+                } 
+                else if(f.type === 'application/pdf') {
+                    this.parsePDF(f);
+                }
+                else if(f.type.startsWith('image/')) {
+                    this.parseImage(f);
+                }
+                input.value = ''; // Reset input
+            },
+
+            parseExcel(f) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const wb = XLSX.read(e.target.result, {type:'array'});
+                    const js = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], {header:1});
+                    let found = [];
+                    js.forEach(row => {
+                        const r = row.map(c=>String(c));
+                        const nIdx = r.findIndex(c => c.length > 3 && isNaN(c)); 
+                        const qIdx = r.findIndex(c => c.match(/^\d+$/) && parseInt(c) < 10000);
+                        if(nIdx !== -1 && qIdx !== -1) found.push({sku: 'XLS', n: r[nIdx].trim(), q: parseInt(r[qIdx])});
+                    });
+                    this.finish(found);
+                };
+                reader.readAsArrayBuffer(f);
+            },
+
+            async parsePDF(f) {
+                try {
+                    const reader = new FileReader();
+                    reader.onload = async (e) => {
+                        const typedarray = new Uint8Array(e.target.result);
+                        const pdf = await pdfjsLib.getDocument(typedarray).promise;
+                        let fullText = '';
+                        for(let i=1; i<=pdf.numPages; i++) {
+                            const page = await pdf.getPage(i);
+                            const content = await page.getTextContent();
+                            fullText += content.items.map(item => item.str).join(' ') + '\n';
+                        }
+                        this.analyzeText(fullText);
+                    };
+                    reader.readAsArrayBuffer(f);
+                } catch(e) { alert("Error PDF: " + e.message); ui.toggleLoader(false); }
+            },
+
+            async parseImage(f) {
+                try {
+                    const { data: { text } } = await Tesseract.recognize(f, 'spa');
+                    this.analyzeText(text);
+                } catch(e) { alert("Error OCR: " + e.message); ui.toggleLoader(false); }
+            },
+
+            analyzeText(text) {
+                const lines = text.split('\n');
+                let found = [];
+                lines.forEach(line => {
+                    const clean = line.replace(/[^\w\sñÑáéíóúÁÉÍÓÚ\(\)\.\-]/g, '').trim();
+                    if(clean.length < 5) return;
+                    
+                    // Busca patrón: Texto ... Número
+                    let m = clean.match(/^([a-zA-Z\sñÑ\(\)\.\-]+)\s+(\d+)$/);
+                    // Busca patrón: Número ... Texto
+                    if(!m) m = clean.match(/^(\d+)\s+([a-zA-Z\sñÑ\(\)\.\-]+)$/);
+
+                    if(m) {
+                        const val1 = m[1].trim(); const val2 = m[2].trim();
+                        let n, q;
+                        if(isNaN(val1)) { n = val1; q = val2; } else { q = val1; n = val2; }
+                        
+                        if(n.length > 3 && parseInt(q) > 0) found.push({sku: 'SCAN', n: n, q: parseInt(q)});
+                    }
+                });
+                this.finish(found);
+            },
+
+            finish(items) {
+                ui.toggleLoader(false);
+                if(items.length === 0) items.push({sku:'', n:'', q:0});
+                ui.verifyIA(items);
+            }
+        };
+
+        // === REPORTES (GENERADOR PDF) ===
         const ReportEngine = {
             async generateGeneralPDF() {
                 const { jsPDF } = window.jspdf; const doc = new jsPDF();
-                doc.text("IDEAS TEXTILES - REPORTE GENERAL", 14, 20);
+                doc.text("REPORTE GENERAL DE INVENTARIO", 14, 20);
                 doc.autoTable({startY:30, head:[['SKU','Item','Stock']], body:state.inv.map(x=>[x.sku,x.n,x.q])});
-                doc.save('Reporte.pdf');
+                doc.save('Reporte_Inventario.pdf');
             },
+            
             async tachasVenta() {
                 const b = document.getElementById('pr-b').value, t = document.getElementById('pr-t').value, r = document.getElementById('pr-r').value;
                 let html = '<div style="font-family:sans-serif; display:grid; grid-template-columns:1fr 1fr; gap:10px; padding:10px;">';
                 const selected = Array.from(document.querySelectorAll('.chk-ord:checked'));
                 if(selected.length === 0) return alert("Selecciona OCs");
-
                 selected.forEach(c => {
                     const o = state.ord[c.value];
                     o.its.forEach(it => {
                         html += `
                         <div style="border:2px dashed #999; padding:10px; height:250px; display:flex; flex-direction:column; justify-content:space-between;">
-                            <div style="background:#1e293b; color:white; padding:5px; text-align:center; font-size:10px; font-weight:bold;">IDEAS TEXTILES - WORKWEAR</div>
+                            <div style="background:#1e293b; color:white; padding:5px; text-align:center; font-size:10px; font-weight:bold;">IDEAS TEXTILES</div>
                             <div>
                                 <div style="font-size:14px; font-weight:bold;">OC #${o.id}</div>
                                 <div style="font-size:10px;">${o.c}</div>
@@ -493,8 +628,9 @@
                     });
                 });
                 html += '</div>';
-                this.renderPDF(html, 'Tachas_Venta.pdf');
+                this.renderPDF(html, 'Etiquetas_Despacho.pdf');
             },
+            
             async tachaInterna(item, q, m, r) {
                 const html = `
                 <div style="font-family:sans-serif; border:4px solid #ef4444; padding:20px; text-align:center; width:100%;">
@@ -511,66 +647,34 @@
                 </div>`;
                 this.renderPDF(html, `Salida_${item.sku}.pdf`);
             },
-            async renderPDF(html, name) {
-                // SOLUCIÓN DEFINITIVA: MOSTRAR EN PANTALLA
-                const c = document.getElementById('pdf-workspace');
-                c.innerHTML = html;
-                c.style.display = 'block'; // Mostrar overlay
-                c.style.zIndex = '10000'; // Traer al frente
-                c.style.background = 'white';
-                c.style.left = '0'; // Poner en pantalla
-
-                // Esperar a que el navegador dibuje (2s)
-                await new Promise(r => setTimeout(r, 2000)); 
-
-                await html2pdf().set({
-                    margin: 5, 
-                    filename: name, 
-                    image: {type:'jpeg',quality:0.98}, 
-                    html2canvas: {scale: 2, useCORS: true}, 
-                    jsPDF: {unit:'mm',format:'a4'}
-                }).from(c).save();
-
-                // Ocultar de nuevo
-                c.style.left = '-9999px';
-                c.style.zIndex = '-1';
-                c.innerHTML = '';
-                ui.closeModal();
+            
+            // Renderizador PDF corregido (sin páginas en blanco)
+            async renderPDF(html, name){ 
+                ui.toggleLoader(true); 
+                const c=document.getElementById('pdf-workspace'); 
+                c.innerHTML=html; 
+                c.style.visibility='visible'; 
+                
+                // Espera renderizado
+                await new Promise(r=>requestAnimationFrame(r)); 
+                await new Promise(r=>requestAnimationFrame(r)); 
+                
+                await html2pdf().set({ 
+                    margin:5, 
+                    filename:name, 
+                    image:{type:'jpeg',quality:0.98}, 
+                    html2canvas:{scale:2,useCORS:true,backgroundColor:'#ffffff'}, 
+                    jsPDF:{unit:'mm',format:'a4',orientation:'portrait'} 
+                }).from(c).save(); 
+                
+                c.innerHTML=''; 
+                c.style.visibility='hidden'; 
+                ui.toggleLoader(false); 
+                ui.closeModal(); 
             }
         };
 
-        // === IA (Simulada para velocidad, puedes descomentar la lógica real si prefieres) ===
-        const IA = {
-            process(input) {
-                const f = input.files[0]; if(!f) return;
-                // Aquí usamos la lógica del index(4)
-                if(f.name.match(/\.(xlsx|xls|csv)$/i)) {
-                    const reader = new FileReader();
-                    reader.onload = (e) => {
-                        const wb = XLSX.read(e.target.result, {type:'array'});
-                        const js = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], {header:1});
-                        let cnt = 0;
-                        js.forEach(r => {
-                            // Búsqueda simple de columnas
-                            const n = r.find(c => typeof c === 'string' && c.length > 3);
-                            const q = r.find(c => typeof c === 'number');
-                            if(n && q) {
-                                state.inv.push({sku: 'IMP-'+Date.now(), n: n, q: q});
-                                cnt++;
-                            }
-                        });
-                        Sync.save('inv'); alert("Importado: " + cnt);
-                    };
-                    reader.readAsArrayBuffer(f);
-                } else {
-                    Tesseract.recognize(f, 'spa').then(({ data: { text } }) => {
-                        alert("Texto detectado: " + text.substring(0,50) + "...");
-                    });
-                }
-            }
-        };
-
-        // === CALENDARIO (CORREGIDO CON COLORES) ===
+        // === CALENDARIO ===
         let curDate = new Date();
         const cal = {
             move(d) { curDate.setMonth(curDate.getMonth()+d); this.render(); },
@@ -584,16 +688,12 @@
                 for(let i=1; i<=days; i++) {
                     const k = `${y}-${(m+1).toString().padStart(2,'0')}-${i.toString().padStart(2,'0')}`;
                     const hasNote = state.cal[k] ? `<div class="cal-event bg-purple-500 text-white">📝 Nota</div>` : '';
-                    
-                    // LÓGICA DE COLORES DE OC
+                    const ords = state.ord.filter(o=>o.d===k);
                     let ocHtml = '';
-                    state.ord.filter(o=>o.d===k).forEach(o => {
-                        let color = 'bg-blue-500';
-                        if(o.st === 'Pendiente') color = 'bg-amber-500';
-                        if(o.st === 'Despachado') color = 'bg-green-500';
-                        ocHtml += `<div class="cal-event ${color} text-white">📦 ${o.c}</div>`;
+                    ords.forEach(o => {
+                        let col = o.st==='Pendiente'?'bg-amber-500':(o.st==='Despachado'?'bg-green-500':'bg-blue-500');
+                        ocHtml += `<div class="cal-event ${col} text-white">📦 ${o.c}</div>`;
                     });
-
                     html += `<div onclick="cal.open('${k}')" class="calendar-day border rounded p-1 hover:bg-slate-50 ${k===new Date().toISOString().split('T')[0]?'today':''}"><div class="font-bold">${i}</div>${hasNote}${ocHtml}</div>`;
                 }
                 document.getElementById('cal-grid').innerHTML = html;
@@ -615,7 +715,7 @@
             }
         };
 
-        // INIT
+        // INICIALIZACIÓN
         Sync.init();
         ui.show('dashboard');
     </script>
