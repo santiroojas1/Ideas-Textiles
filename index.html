@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>IDEAS TEXTILES </title>
+    <title>IDEAS TEXTILES | WORKWEAR AND CORPORATE</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
@@ -38,18 +38,17 @@
         .step-pill { padding: 4px 10px; border-radius: 6px; font-size: 10px; font-weight: 800; border: 1px solid #e2e8f0; cursor: pointer; transition: 0.2s; display: inline-block; margin-right: 4px; margin-bottom: 4px; }
         .step-done { background: #22c55e; color: white; border-color: #22c55e; }
 
-        /* --- SOLUCIÓN PDF BLANCO: OVERLAY VISIBLE --- */
-        /* En lugar de ocultarlo, lo mostramos encima de todo (z-index alto) con fondo blanco */
+        /* --- ARREGLO PDF (OVERLAY VISIBLE) --- */
         #pdf-workspace { 
             position: fixed; 
             top: 0; 
             left: 0; 
             width: 100%; 
             height: 100%; 
-            z-index: 10000; /* Encima de todo */
+            z-index: 10000; 
             background: white; 
             overflow-y: auto;
-            display: none; /* Se activa solo al imprimir */
+            display: none; /* Se activa SOLO al imprimir */
             padding: 20px;
         }
         
@@ -72,7 +71,8 @@
         .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 1px; background: #e2e8f0; border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden; }
         .calendar-day { min-height: 80px; background: white; padding: 4px; font-size: 0.8rem; cursor: pointer; }
         .calendar-day.today { background: #fffbeb; }
-        .cal-event { font-size: 0.65rem; padding: 2px 4px; background: #3b82f6; color: white; border-radius: 4px; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        /* ARREGLO COLORES CALENDARIO */
+        .cal-event { font-size: 0.65rem; padding: 2px 4px; border-radius: 4px; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: bold; }
 
         /* MÓVIL (CORRECCIÓN MENÚ TAPA TODO) */
         @media (max-width: 1024px) {
@@ -80,7 +80,7 @@
             .sidebar h1, .sidebar p, .sidebar .mt-auto { display: none; } 
             .nav-link span { display: none; }
             .nav-link { padding: 12px; justify-content: center; }
-            /* AUMENTO DE MARGEN INFERIOR PARA QUE SE VEA TODO */
+            /* ESPACIO EXTRA ABAJO PARA QUE NO SE TAPE */
             main { padding-bottom: 120px !important; } 
         }
     </style>
@@ -273,7 +273,6 @@
                 }
                 if(node === 'ord' || node === 'all') {
                     document.getElementById('tb-ord').innerHTML = state.ord.map((o,i) => {
-                        // SOLUCIÓN "DETALLE OC": Mostrar resumen de items
                         let itemsSummary = (o.its||[]).map(it => `${it.n} (${it.q})`).join(', ');
                         if(itemsSummary.length > 50) itemsSummary = itemsSummary.substring(0,50) + '...';
                         if(!itemsSummary) itemsSummary = "Sin productos";
@@ -480,7 +479,7 @@
                     o.its.forEach(it => {
                         html += `
                         <div style="border:2px dashed #999; padding:10px; height:250px; display:flex; flex-direction:column; justify-content:space-between;">
-                            <div style="background:#1e293b; color:white; padding:5px; text-align:center; font-size:10px; font-weight:bold;">IDEAS TEXTILES</div>
+                            <div style="background:#1e293b; color:white; padding:5px; text-align:center; font-size:10px; font-weight:bold;">IDEAS TEXTILES - WORKWEAR</div>
                             <div>
                                 <div style="font-size:14px; font-weight:bold;">OC #${o.id}</div>
                                 <div style="font-size:10px;">${o.c}</div>
@@ -513,15 +512,15 @@
                 this.renderPDF(html, `Salida_${item.sku}.pdf`);
             },
             async renderPDF(html, name) {
-                // AQUÍ ESTÁ LA SOLUCIÓN DEL PDF BLANCO: OVERLAY VISIBLE TEMPORAL
+                // SOLUCIÓN DEFINITIVA: MOSTRAR EN PANTALLA
                 const c = document.getElementById('pdf-workspace');
                 c.innerHTML = html;
-                c.style.display = 'block'; // Mostrar
+                c.style.display = 'block'; // Mostrar overlay
                 c.style.zIndex = '10000'; // Traer al frente
                 c.style.background = 'white';
                 c.style.left = '0'; // Poner en pantalla
 
-                // Esperar a que el navegador dibuje
+                // Esperar a que el navegador dibuje (2s)
                 await new Promise(r => setTimeout(r, 2000)); 
 
                 await html2pdf().set({
@@ -571,7 +570,7 @@
             }
         };
 
-        // === CALENDARIO ===
+        // === CALENDARIO (CORREGIDO CON COLORES) ===
         let curDate = new Date();
         const cal = {
             move(d) { curDate.setMonth(curDate.getMonth()+d); this.render(); },
@@ -584,9 +583,18 @@
                 for(let i=0; i<start; i++) html += '<div></div>';
                 for(let i=1; i<=days; i++) {
                     const k = `${y}-${(m+1).toString().padStart(2,'0')}-${i.toString().padStart(2,'0')}`;
-                    const hasNote = state.cal[k] ? `<div class="cal-event bg-purple-500">📝 Nota</div>` : '';
-                    const hasOrd = state.ord.filter(o=>o.d===k).length ? `<div class="cal-event bg-blue-500">📦 OCs</div>` : '';
-                    html += `<div onclick="cal.open('${k}')" class="calendar-day border rounded p-1 hover:bg-slate-50 ${k===new Date().toISOString().split('T')[0]?'today':''}"><div class="font-bold">${i}</div>${hasNote}${hasOrd}</div>`;
+                    const hasNote = state.cal[k] ? `<div class="cal-event bg-purple-500 text-white">📝 Nota</div>` : '';
+                    
+                    // LÓGICA DE COLORES DE OC
+                    let ocHtml = '';
+                    state.ord.filter(o=>o.d===k).forEach(o => {
+                        let color = 'bg-blue-500';
+                        if(o.st === 'Pendiente') color = 'bg-amber-500';
+                        if(o.st === 'Despachado') color = 'bg-green-500';
+                        ocHtml += `<div class="cal-event ${color} text-white">📦 ${o.c}</div>`;
+                    });
+
+                    html += `<div onclick="cal.open('${k}')" class="calendar-day border rounded p-1 hover:bg-slate-50 ${k===new Date().toISOString().split('T')[0]?'today':''}"><div class="font-bold">${i}</div>${hasNote}${ocHtml}</div>`;
                 }
                 document.getElementById('cal-grid').innerHTML = html;
             },
