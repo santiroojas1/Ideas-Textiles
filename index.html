@@ -8,16 +8,15 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
-    
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://unpkg.com/tesseract.js@4.0.2/dist/tesseract.min.js"></script>
     
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
 
     <style>
         :root {
@@ -64,6 +63,17 @@
         .card-glass:hover {
             transform: translateY(-2px); box-shadow: var(--shadow-hover);
             border-color: #cbd5e1;
+        }
+
+        /* INPUTS DE BUSQUEDA */
+        .search-input {
+            background: #f1f5f9; border: 1px solid #e2e8f0; border-radius: 12px;
+            padding: 10px 16px; font-size: 0.85rem; font-weight: 600; color: #334155;
+            transition: all 0.3s; width: 100%;
+        }
+        .search-input:focus {
+            background: white; border-color: var(--brand-primary); outline: none;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
         }
 
         /* BOTONES E INTERACCION */
@@ -121,7 +131,7 @@
             <i class="fas fa-scissors absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-xl text-white"></i>
         </div>
         <h2 class="font-black text-2xl tracking-[6px] uppercase">Ideas Textiles</h2>
-        <p class="text-[10px] font-bold text-slate-500 mt-2 uppercase tracking-widest">Iniciando Sistema...</p>
+        <p class="text-[10px] font-bold text-slate-500 mt-2 uppercase tracking-widest">Cargando Sistema...</p>
     </div>
 
     <div id="connection-widget" class="fixed top-4 right-4 z-50 bg-white/90 backdrop-blur px-3 py-1.5 rounded-full border border-slate-200 shadow-lg flex items-center gap-2 transition-all">
@@ -137,7 +147,7 @@
             <div class="sidebar-logo z-10 mb-8">
                 <div class="flex items-center gap-3 text-white">
                     <div class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center shadow-lg shadow-blue-500/40">
-                        <i class="fas fa-layer-group text-xl"></i>
+                        <i class="fas fa-scissors text-xl"></i>
                     </div>
                     <div>
                         <h1 class="font-black italic text-lg leading-none tracking-tight">IDEAS<br><span class="text-blue-500">TEXTILES</span></h1>
@@ -169,7 +179,7 @@
             <div class="sidebar-footer z-10 mt-auto pt-4 border-t border-slate-800">
                 <div class="flex items-center gap-3">
                     <div class="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center text-xs font-bold text-white">AC</div>
-                    <div><p class="text-xs font-bold text-white">Alejandro Cisterna O.</p><p class="text-[10px] text-slate-500">GERENTE GENERAL</p></div>
+                    <div><p class="text-xs font-bold text-white">Alejandro Cisterna</p><p class="text-[10px] text-slate-500">Administrador</p></div>
                 </div>
             </div>
         </aside>
@@ -182,6 +192,9 @@
                         <h2 class="text-3xl font-black text-slate-800">Panel de Control</h2>
                         <p class="text-slate-500 text-sm font-medium mt-1">Resumen de operaciones diarias</p>
                     </div>
+                    <button onclick="App.PDF.generateManagementReport()" class="btn-action bg-slate-800 text-white px-5 py-3 rounded-xl font-bold text-xs shadow-lg flex items-center gap-2 hover:bg-slate-900 border border-slate-700">
+                        <i class="fas fa-file-contract"></i> REPORTE PDF
+                    </button>
                 </header>
                 
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
@@ -222,7 +235,13 @@
             <section id="view-inventory" class="hidden fade-in">
                 <header class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
                     <div><h2 class="text-3xl font-black text-slate-800">Bodega</h2><p class="text-slate-500 text-sm">Gestión de inventario SKU</p></div>
-                    <button onclick="App.UI.Modals.newProduct()" class="btn-action bg-slate-900 text-white px-6 py-3 rounded-xl font-bold shadow-lg flex items-center gap-2 text-sm hover:bg-slate-800"><i class="fas fa-plus"></i> NUEVO PRODUCTO</button>
+                    <div class="flex gap-3 w-full md:w-auto items-center">
+                        <div class="relative w-full md:w-64">
+                            <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 text-xs"></i>
+                            <input type="text" class="search-input pl-9" placeholder="Buscar por Nombre o SKU..." oninput="App.Actions.filter('inventory', this.value)">
+                        </div>
+                        <button onclick="App.UI.Modals.newProduct()" class="btn-action bg-slate-900 text-white px-6 py-3 rounded-xl font-bold shadow-lg flex items-center gap-2 text-sm hover:bg-slate-800 whitespace-nowrap"><i class="fas fa-plus"></i> NUEVO</button>
+                    </div>
                 </header>
                 <div id="inventory-grid" class="grid grid-cols-1 gap-4"></div>
             </section>
@@ -253,22 +272,28 @@
             <section id="view-orders" class="hidden fade-in">
                 <header class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
                     <div><h2 class="text-3xl font-black text-slate-800">Órdenes</h2><p class="text-slate-500 text-sm">Flujo de Trabajo (Pipeline)</p></div>
-                    <button onclick="App.UI.Modals.newOrder()" class="btn-action bg-blue-600 text-white px-6 py-3 rounded-xl font-bold shadow-lg flex items-center gap-2 text-sm hover:bg-blue-700"><i class="fas fa-cart-shopping"></i> CREAR OC</button>
+                    <div class="flex gap-3 w-full md:w-auto items-center">
+                        <div class="relative w-full md:w-72">
+                            <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 text-xs"></i>
+                            <input type="text" class="search-input pl-9" placeholder="Buscar Cliente, OC, Fac o Estado..." oninput="App.Actions.filter('orders', this.value)">
+                        </div>
+                        <button onclick="App.UI.Modals.newOrder()" class="btn-action bg-blue-600 text-white px-6 py-3 rounded-xl font-bold shadow-lg flex items-center gap-2 text-sm hover:bg-blue-700 whitespace-nowrap"><i class="fas fa-cart-shopping"></i> CREAR OC</button>
+                    </div>
                 </header>
                 <div id="orders-grid" class="grid grid-cols-1 gap-6"></div>
             </section>
 
             <section id="view-scanner" class="hidden fade-in">
                 <header class="mb-8">
-                    <h2 class="text-3xl font-black text-slate-800">Scanner IA </h2>
-                    <p class="text-slate-500 text-sm">Procesamiento de Archivos </p>
+                    <h2 class="text-3xl font-black text-slate-800">Scanner IA Universal</h2>
+                    <p class="text-slate-500 text-sm">Procesamiento de Archivos No Estructurados (Excel, OCR)</p>
                 </header>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <div class="card-glass border-dashed border-2 border-blue-200 flex flex-col items-center justify-center p-12 text-center group cursor-pointer hover:bg-blue-50 transition" onclick="document.getElementById('file-ia').click()">
                         <i class="fas fa-brain text-5xl text-blue-400 group-hover:scale-110 transition mb-4"></i>
                         <h4 class="font-bold text-slate-700">Cargar Archivo</h4>
                         <p class="text-xs text-slate-400 mt-2">Soporta: Excel (.xlsx), Imágenes (.png, .jpg)</p>
-                        <p class="text-[10px] text-slate-400 mt-1">Busca patrones idénticos automáticamente</p>
+                        <p class="text-[10px] text-slate-400 mt-1">Busca patrones semánticos automáticamente</p>
                         <input type="file" id="file-ia" class="hidden" accept="image/*,.xlsx,.csv" onchange="App.Logic.Scanner.handleFile(this)">
                     </div>
                     <div class="card-glass bg-slate-50">
@@ -319,12 +344,12 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
         import { getDatabase, ref, set, onValue, update } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
 
-        // CONFIGURACION FIREBASE
+        // CONFIGURACION FIREBASE (DATOS)
         const firebaseConfig = { apiKey: "AIzaSyBg-Cx9SqZw35TyyMxtpVBEFlwZTjBXBew", authDomain: "ideastextilesapp.firebaseapp.com", databaseURL: "https://ideastextilesapp-default-rtdb.firebaseio.com", projectId: "ideastextilesapp", storageBucket: "ideastextilesapp.firebasestorage.app", messagingSenderId: "268995530035", appId: "1:268995530035:web:1890f45ac761cc81eb0246" };
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        // ESTADO GLOBAL
+        // ESTADO GLOBAL DE LA APLICACIÓN (MODELO)
         const State = {
             inventory: [],
             orders: [],
@@ -332,7 +357,11 @@
             movements: [],
             tasks: [], // Planner
             dateContext: new Date(),
-            scannerBuffer: []
+            scannerBuffer: [],
+            filters: { // Filtros para búsqueda en tiempo real
+                inventory: '',
+                orders: ''
+            }
         };
 
         // CONSTANTES DE FLUJO (PIPELINE)
@@ -340,7 +369,7 @@
         
         window.App = {
             init: () => {
-                // LISTENERS EN TIEMPO REAL
+                // LISTENERS EN TIEMPO REAL (DATA BINDING)
                 onValue(ref(db, 'inventory'), s => { State.inventory = s.val() || []; App.UI.renderInventory(); App.UI.updateDashboard(); });
                 onValue(ref(db, 'orders'), s => { State.orders = s.val() || []; App.UI.renderOrders(); App.UI.updateDashboard(); App.Logic.Calendar.render(); });
                 onValue(ref(db, 'calendar'), s => { State.calendar = s.val() || {}; App.Logic.Calendar.render(); });
@@ -373,7 +402,7 @@
             },
 
             // --------------------------------------------------------------------------------
-            // CAPA DE INTERFAZ (UI RENDERING)
+            // CAPA DE INTERFAZ (UI RENDERING & FILTRADO)
             // --------------------------------------------------------------------------------
             UI: {
                 updateDashboard: () => {
@@ -400,29 +429,38 @@
 
                 renderInventory: () => {
                     const grid = document.getElementById('inventory-grid');
-                    if(State.inventory.length === 0) { grid.innerHTML = '<div class="text-center text-slate-400 py-10">No hay productos en bodega.</div>'; return; }
+                    const searchTerm = State.filters.inventory.toUpperCase();
                     
-                    grid.innerHTML = State.inventory.map((p, i) => {
+                    // FILTRO EN TIEMPO REAL
+                    const filtered = State.inventory.filter(p => 
+                        p.name.includes(searchTerm) || p.sku.includes(searchTerm)
+                    );
+
+                    if(filtered.length === 0) { grid.innerHTML = '<div class="text-center text-slate-400 py-10">No se encontraron productos.</div>'; return; }
+                    
+                    grid.innerHTML = filtered.map((p, i) => {
                         let badges = ''; let total = 0;
                         if(p.stock) Object.entries(p.stock).forEach(([sz, qty]) => {
                             badges += `<span class="bg-slate-100 text-slate-600 border border-slate-200 px-2 py-1 rounded text-[10px] font-black mr-2 mb-1 inline-block min-w-[30px] text-center">${sz}: ${qty}</span>`;
                             total += qty;
                         });
+                        // Buscar índice original para edición correcta
+                        const realIndex = State.inventory.indexOf(p);
                         return `
-                        <div class="card-glass flex flex-col md:flex-row justify-between items-center group hover:border-blue-300 transition-colors">
+                        <div class="card-glass flex flex-col md:flex-row justify-between items-center group hover:border-blue-300 transition-colors animate__animated animate__fadeIn">
                             <div class="flex items-center gap-4 w-full md:w-auto">
                                 <div class="w-12 h-12 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center font-bold text-xl shadow-inner">${p.name.charAt(0)}</div>
                                 <div>
                                     <div class="font-bold text-slate-800 text-lg">${p.name}</div>
-                                    <div class="text-[10px] text-slate-400 font-mono tracking-wide">SKU: ${p.sku}</div>
+                                    <div class="text-[10px] text-slate-400 font-mono tracking-wide bg-slate-50 px-2 py-0.5 rounded inline-block border border-slate-100">SKU: ${p.sku}</div>
                                     <div class="mt-2 flex flex-wrap">${badges}</div>
                                 </div>
                             </div>
                             <div class="text-right flex items-center gap-8 mt-4 md:mt-0 w-full md:w-auto justify-between md:justify-end">
                                 <div><div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Total Stock</div><div class="text-3xl font-black text-slate-700">${total}</div></div>
                                 <div class="flex gap-2">
-                                    <button onclick="App.UI.Modals.editProduct(${i})" class="w-10 h-10 rounded-full bg-slate-50 hover:bg-blue-50 text-slate-400 hover:text-blue-600 transition shadow-sm border border-slate-100"><i class="fas fa-pencil-alt"></i></button>
-                                    <button onclick="App.Actions.deleteProduct(${i})" class="w-10 h-10 rounded-full bg-slate-50 hover:bg-red-50 text-slate-400 hover:text-red-600 transition shadow-sm border border-slate-100"><i class="fas fa-trash"></i></button>
+                                    <button onclick="App.UI.Modals.editProduct(${realIndex})" class="w-10 h-10 rounded-full bg-slate-50 hover:bg-blue-50 text-slate-400 hover:text-blue-600 transition shadow-sm border border-slate-100"><i class="fas fa-pencil-alt"></i></button>
+                                    <button onclick="App.Actions.deleteProduct(${realIndex})" class="w-10 h-10 rounded-full bg-slate-50 hover:bg-red-50 text-slate-400 hover:text-red-600 transition shadow-sm border border-slate-100"><i class="fas fa-trash"></i></button>
                                 </div>
                             </div>
                         </div>`;
@@ -447,7 +485,20 @@
 
                 renderOrders: () => {
                     const grid = document.getElementById('orders-grid');
-                    grid.innerHTML = State.orders.map((o, idx) => {
+                    const searchTerm = State.filters.orders.toUpperCase();
+
+                    // SUPER BUSCADOR: CLIENTE, ID, ESTADO, FACTURA
+                    const filtered = State.orders.filter(o => 
+                        o.client.includes(searchTerm) || 
+                        o.id.toString().includes(searchTerm) ||
+                        o.status.toUpperCase().includes(searchTerm) ||
+                        (o.invoice && o.invoice.toString().includes(searchTerm))
+                    );
+
+                    grid.innerHTML = filtered.map((o) => {
+                        // Buscar índice original
+                        const idx = State.orders.indexOf(o);
+
                         const itemsHtml = o.items.map(it => `
                             <div class="text-xs py-2 border-b border-slate-100 last:border-0 flex justify-between items-center group-hover:bg-white/50 transition">
                                 <span class="flex items-center gap-2"><span class="font-black text-blue-600 w-6 text-right">${it.qty}</span> x ${it.name} <span class="bg-slate-200 px-1.5 rounded text-[10px] font-bold text-slate-600">${it.size}</span></span>
@@ -456,13 +507,11 @@
                         
                         const deliveryTag = o.deliveryDate ? `<span class="ml-2 text-[10px] bg-blue-50 text-blue-600 px-2 py-1 rounded border border-blue-100 font-bold"><i class="fas fa-calendar-check mr-1"></i>Entrega: ${o.deliveryDate}</span>` : '';
                         
-                        // Determinar clase visual según estado
                         let statusClass = 'st-pendiente';
                         if(o.status === 'En Proceso') statusClass = 'st-proceso';
                         if(o.status === 'Empaquetado') statusClass = 'st-empaquetado';
                         if(o.status === 'Despachado') statusClass = 'st-despachado';
 
-                        // Botón de Pipeline Bidireccional
                         let actionBtn = '';
                         if (o.status !== 'Despachado') {
                             actionBtn = `
@@ -476,7 +525,7 @@
                         }
 
                         return `
-                        <div class="card-glass border-l-4 ${o.status==='Despachado'?'border-l-green-500 bg-slate-50/50':'border-l-blue-500'} transition-all hover:shadow-lg">
+                        <div class="card-glass border-l-4 ${o.status==='Despachado'?'border-l-green-500 bg-slate-50/50':'border-l-blue-500'} transition-all hover:shadow-lg animate__animated animate__fadeIn">
                             <div class="flex justify-between items-start mb-4">
                                 <div>
                                     <div class="flex items-center gap-3">
@@ -507,12 +556,34 @@
 
                 Modals: {
                     newProduct: async () => {
+                        // AUTOMATIZACIÓN DE SKU: ITEX001 -> ITEX002
+                        let nextNum = 1;
+                        if(State.inventory.length > 0) {
+                            const nums = State.inventory.map(p => {
+                                const m = p.sku.match(/ITEX(\d+)/);
+                                return m ? parseInt(m[1]) : 0;
+                            });
+                            nextNum = Math.max(...nums) + 1;
+                        }
+                        const autoSku = `ITEX${String(nextNum).padStart(3, '0')}`;
+
                         const { value: res } = await Swal.fire({
                             title: 'Nuevo Producto',
-                            html: `<div class="text-left"><label class="text-xs font-bold text-slate-400">NOMBRE</label><input id="np-name" class="swal2-input m-0 mb-3" placeholder="Ej: POLERA PIQUE"></div><div id="size-rows-container"></div><button type="button" onclick="App.UI.Helpers.addSizeRow()" class="mt-2 w-full py-2 bg-slate-100 hover:bg-slate-200 rounded text-xs font-bold text-slate-600 transition">+ AGREGAR TALLA</button>`,
+                            html: `
+                            <div class="text-left">
+                                <label class="text-xs font-bold text-slate-400">SKU (AUTO)</label>
+                                <input id="np-sku" class="swal2-input m-0 mb-3 bg-slate-100 text-slate-500 font-mono" value="${autoSku}" readonly>
+                            </div>
+                            <div class="text-left">
+                                <label class="text-xs font-bold text-slate-400">NOMBRE</label>
+                                <input id="np-name" class="swal2-input m-0 mb-3" placeholder="Ej: POLERA PIQUE">
+                            </div>
+                            <div id="size-rows-container"></div>
+                            <button type="button" onclick="App.UI.Helpers.addSizeRow()" class="mt-2 w-full py-2 bg-slate-100 hover:bg-slate-200 rounded text-xs font-bold text-slate-600 transition">+ AGREGAR TALLA</button>`,
                             didOpen: () => App.UI.Helpers.addSizeRow(),
                             preConfirm: () => {
                                 const name = document.getElementById('np-name').value.toUpperCase();
+                                const sku = document.getElementById('np-sku').value;
                                 let stock = {};
                                 document.querySelectorAll('.size-row').forEach(r => {
                                     const sz = r.querySelector('.sz-in').value.toUpperCase() || 'ÚNICA';
@@ -520,7 +591,7 @@
                                     stock[sz] = qt;
                                 });
                                 if(!name) return Swal.showValidationMessage('El nombre es obligatorio');
-                                return { name, stock };
+                                return { sku, name, stock };
                             }
                         });
                         if(res) App.Logic.Inventory.add(res);
@@ -615,7 +686,7 @@
                     },
 
                     // -----------------------------------------------------
-                    // EDITOR DE ORDENES (REPARADO - DEEP COPY LOGIC)
+                    // EDITOR DE ORDENES (DEEP COPY LOGIC)
                     // -----------------------------------------------------
                     editFullOrder: async (idx) => {
                         const o = State.orders[idx];
@@ -809,14 +880,15 @@
             },
 
             // --------------------------------------------------------------------------------
-            // CAPA LÓGICA DE NEGOCIO (BUSINESS LOGIC)
+            // CAPA DE NEGOCIO (LOGICA PRINCIPAL)
             // --------------------------------------------------------------------------------
             Logic: {
                 Inventory: {
                     add: (data) => {
+                        // REGLA: Si el SKU ya existe, rechazar. Si el nombre existe, sumar stock.
                         let p = State.inventory.find(x => x.name === data.name);
                         if(p) { Object.keys(data.stock).forEach(s => p.stock[s] = (p.stock[s]||0) + data.stock[s]); }
-                        else { State.inventory.push({ sku: 'IT-'+Date.now().toString().slice(-4), name: data.name, stock: data.stock }); }
+                        else { State.inventory.push({ sku: data.sku, name: data.name, stock: data.stock }); }
                         set(ref(db, 'inventory'), State.inventory);
                         Swal.fire('Guardado', 'Inventario actualizado', 'success');
                     }
@@ -880,7 +952,7 @@
                 },
 
                 // -----------------------------------------------------
-                // SCANNER IA SEMÁNTICO (FIX 3: ALL-TERRAIN)
+                // SCANNER IA SEMÁNTICO (ALL-TERRAIN)
                 // -----------------------------------------------------
                 Scanner: {
                     handleFile: async (input) => {
@@ -913,7 +985,6 @@
                             input.forEach(row => {
                                 // Buscar valores en todas las columnas de la fila
                                 const values = Object.values(row).map(v => String(v).toUpperCase());
-                                const keys = Object.keys(row).map(k => k.toUpperCase());
                                 
                                 // Heurística: Identificar ID
                                 let id = 'EXT-GEN';
@@ -966,12 +1037,10 @@
                             lines.forEach(line => {
                                 const upper = line.toUpperCase();
                                 // Buscar patrones de cantidad y talla cercanos
-                                // Ej: "Polera Pique ... XL ... 5"
                                 const sizeMatch = upper.match(/\b(XS|S|M|L|XL|XXL)\b/);
                                 const qtyMatch = upper.match(/\b(\d+)\b/);
                                 
                                 if(sizeMatch && qtyMatch) {
-                                    // Asumir que el resto del texto es el producto
                                     let clean = upper.replace(sizeMatch[0], '').replace(qtyMatch[0], '').replace(/[.,$]/g,'').trim();
                                     if(clean.length > 3) {
                                         items.push({ name: clean, size: sizeMatch[0], qty: parseInt(qtyMatch[0]) });
@@ -1021,9 +1090,16 @@
             },
 
             // --------------------------------------------------------------------------------
-            // CAPA DE ACCIONES (ACTIONS)
+            // CAPA DE ACCIONES (CONTROL DE EVENTOS Y ACTUALIZACIONES)
             // --------------------------------------------------------------------------------
             Actions: {
+                // FILTRO EN TIEMPO REAL
+                filter: (context, value) => {
+                    State.filters[context] = value;
+                    if(context === 'inventory') App.UI.renderInventory();
+                    if(context === 'orders') App.UI.renderOrders();
+                },
+
                 registerMovement: (data) => {
                     const p = State.inventory.find(x => x.name === data.p);
                     if(data.t === 'Ingreso') p.stock[data.s] += data.q;
@@ -1038,7 +1114,7 @@
                     Swal.fire('Registrado', 'Kárdex actualizado correctamente', 'success');
                 },
 
-                // FIX 2: FLUJO BIDIRECCIONAL DE ESTADOS
+                // FLUJO BIDIRECCIONAL DE ESTADOS
                 changeStatus: async (index, direction) => {
                     const o = State.orders[index];
                     const currentIdx = ORDER_STATUS_FLOW.indexOf(o.status);
@@ -1099,9 +1175,96 @@
             },
 
             // --------------------------------------------------------------------------------
-            // MOTOR PDF PROFESIONAL (FIX 1: TACHAS 2.0 CON LOGICA ESPACIAL)
+            // MOTOR DE REPORTES PDF Y ETIQUETAS
             // --------------------------------------------------------------------------------
             PDF: {
+                // GENERADOR DE REPORTE GERENCIAL (B&N)
+                generateManagementReport: () => {
+                    const { jsPDF } = window.jspdf;
+                    const doc = new jsPDF();
+                    const now = new Date();
+
+                    // 1. ENCABEZADO CORPORATIVO B&N
+                    doc.setFont("helvetica", "bold");
+                    doc.setFontSize(22);
+                    doc.text("IDEAS TEXTILES SPA", 15, 20);
+                    
+                    doc.setFontSize(10);
+                    doc.setFont("helvetica", "normal");
+                    doc.text("REPORTE DE GESTIÓN INTEGRAL", 15, 26);
+                    doc.text(`Fecha Emisión: ${now.toLocaleString()}`, 15, 31);
+                    doc.line(15, 35, 195, 35);
+
+                    // 2. RESUMEN EJECUTIVO (KPIs)
+                    let totalItems = 0;
+                    State.inventory.forEach(p => { if(p.stock) totalItems += Object.values(p.stock).reduce((a,b)=>a+b,0); });
+                    const pendingOrders = State.orders.filter(o => o.status !== 'Despachado').length;
+                    
+                    // Cajas de KPIs
+                    const startY = 45;
+                    // Caja 1
+                    doc.rect(15, startY, 40, 25);
+                    doc.setFontSize(8); doc.text("TOTAL STOCK (UN)", 35, startY+6, {align:'center'});
+                    doc.setFontSize(14); doc.setFont("helvetica", "bold"); doc.text(String(totalItems), 35, startY+16, {align:'center'});
+                    
+                    // Caja 2
+                    doc.rect(60, startY, 40, 25);
+                    doc.setFont("helvetica", "normal"); doc.setFontSize(8); doc.text("PEDIDOS ACTIVOS", 80, startY+6, {align:'center'});
+                    doc.setFont("helvetica", "bold"); doc.setFontSize(14); doc.text(String(pendingOrders), 80, startY+16, {align:'center'});
+                    
+                    // Caja 3
+                    doc.rect(105, startY, 40, 25);
+                    doc.setFont("helvetica", "normal"); doc.setFontSize(8); doc.text("PRODUCTOS TOTAL", 125, startY+6, {align:'center'});
+                    doc.setFont("helvetica", "bold"); doc.setFontSize(14); doc.text(String(State.inventory.length), 125, startY+16, {align:'center'});
+
+                    // 3. TABLA DE INVENTARIO (Autotable)
+                    doc.setFontSize(11);
+                    doc.text("ESTADO DE BODEGA", 15, startY+35);
+                    
+                    const invRows = State.inventory.map(p => {
+                        const stockStr = p.stock ? Object.entries(p.stock).map(([k,v])=>`${k}:${v}`).join(', ') : '0';
+                        return [p.sku, p.name, stockStr];
+                    });
+
+                    doc.autoTable({
+                        startY: startY+40,
+                        head: [['SKU', 'Producto', 'Detalle Stock']],
+                        body: invRows,
+                        theme: 'plain',
+                        headStyles: { fillColor: [220, 220, 220], textColor: 0, fontStyle: 'bold' },
+                        styles: { fontSize: 8, cellPadding: 2 }
+                    });
+
+                    let finalY = doc.lastAutoTable.finalY + 15;
+
+                    // 4. TABLA DE MOVIMIENTOS RECIENTES
+                    doc.text("ÚLTIMOS MOVIMIENTOS (Bitácora)", 15, finalY);
+                    
+                    const movRows = State.movements.slice(-10).reverse().map(m => [m.date, m.type, m.product, m.qty, m.reason]);
+                    
+                    doc.autoTable({
+                        startY: finalY + 5,
+                        head: [['Fecha', 'Tipo', 'Producto', 'Cant', 'Motivo']],
+                        body: movRows,
+                        theme: 'plain',
+                        headStyles: { fillColor: [220, 220, 220], textColor: 0, fontStyle: 'bold' },
+                        styles: { fontSize: 7 }
+                    });
+
+                    // 5. BLOQUE DE FIRMA (SIN USUARIO, SOLO ESPACIO)
+                    finalY = doc.lastAutoTable.finalY + 40;
+                    if(finalY > 260) { doc.addPage(); finalY = 40; } // Salto página si falta espacio
+
+                    doc.setLineWidth(0.5);
+                    doc.line(70, finalY, 140, finalY); // Línea central
+                    doc.setFontSize(9);
+                    doc.setFont("helvetica", "bold");
+                    doc.text("FIRMA RESPONSABLE / V°B°", 105, finalY + 5, {align:'center'});
+
+                    doc.save(`Reporte_Gerencial_${now.toISOString().slice(0,10)}.pdf`);
+                },
+
+                // GENERADOR DE ETIQUETAS "TACHAS" (ACTUALIZADO CON FACTURA EN HEADER)
                 downloadTachas: (idx) => {
                     const o = State.orders[idx];
                     const { jsPDF } = window.jspdf;
@@ -1113,33 +1276,39 @@
                     const cols = 2;
                     const rows = 3;
                     const margin = 8;
-                    const w = (216 - (margin * 2)) / cols; // ~100mm ancho útil por etiqueta
-                    const h = (356 - (margin * 2)) / rows; // ~113mm alto útil por etiqueta
+                    const w = (216 - (margin * 2)) / cols; 
+                    const h = (356 - (margin * 2)) / rows; 
                     
                     let x = margin;
                     let y = margin;
                     let count = 0;
 
                     o.items.forEach((it, i) => {
-                        // 1. DIBUJAR CONTENEDOR (Bordes Finos)
+                        // 1. DIBUJAR CONTENEDOR
                         doc.setDrawColor(50); 
                         doc.setLineWidth(0.2);
                         doc.rect(x, y, w, h);
 
-                        // 2. CABECERA CORPORATIVA
+                        // 2. CABECERA CORPORATIVA + FACTURA
                         doc.setFont("helvetica", "bold");
                         doc.setFontSize(14);
                         doc.text("IDEAS TEXTILES SPA", x + w/2, y + 10, { align: "center" });
+                        
                         doc.setFontSize(9);
                         doc.text("RUT: 76.577.458-6", x + w/2, y + 15, { align: "center" });
                         doc.line(x + 5, y + 18, x + w - 5, y + 18);
 
-                        // 3. DATOS CLIENTE & DESPACHO
+                        // 3. DATOS CLIENTE & FACTURA (LÓGICA NUEVA)
+                        const invoiceTxt = o.invoice ? `FAC: ${o.invoice}` : `FAC: _______`;
+                        
                         doc.setFontSize(8);
-                        doc.text(`CLIENTE: ${o.client.substring(0, 35)}`, x + 6, y + 24);
-                        doc.text(`DIRECCIÓN: ${o.place || '_______________________'}`, x + 6, y + 29);
-                        doc.setFontSize(10);
-                        doc.text(`OC: ${o.id}`, x + w - 25, y + 24, { align: "right" });
+                        doc.text(`CLIENTE: ${o.client.substring(0, 30)}`, x + 6, y + 24);
+                        
+                        // OC a la izquierda, FACTURA a la derecha
+                        doc.text(`OC: ${o.id}`, x + 6, y + 29);
+                        doc.setFont("helvetica", "bold");
+                        doc.text(invoiceTxt, x + w - 30, y + 29); // Posición derecha
+                        doc.setFont("helvetica", "normal");
 
                         // 4. NOMBRE PRODUCTO (DINÁMICO - CURSOR INTELIGENTE)
                         let cursorY = y + 42;
@@ -1152,7 +1321,7 @@
                         
                         // Calcular cuánto bajó el cursor según líneas usadas
                         const titleHeight = splitTitle.length * 6; 
-                        cursorY += titleHeight + 5; // Espacio dinámico
+                        cursorY += titleHeight + 5; 
 
                         // 5. TALLA (CAJA CENTRAL)
                         doc.setLineWidth(0.8);
