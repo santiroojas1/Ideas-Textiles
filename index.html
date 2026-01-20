@@ -3,14 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>IDEAS TEXTILES SPA </title>
+    <title>IDEAS TEXTILES SPA | ERP SYSTEM</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://unpkg.com/tesseract.js@4.0.2/dist/tesseract.min.js"></script>
+    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
 
     <style>
@@ -34,83 +39,53 @@
             overflow-x: hidden;
         }
 
+        /* COMPONENTES UI */
         .nav-bubble {
-            position: relative;
-            transition: all 0.3s var(--transition-bounce);
-            overflow: hidden;
-            border: 1px solid transparent;
+            position: relative; transition: all 0.3s var(--transition-bounce); overflow: hidden; border: 1px solid transparent;
         }
-        
         .nav-bubble:hover {
-            transform: translateY(-4px) scale(1.02);
-            background: rgba(255, 255, 255, 0.1);
-            border-color: rgba(255, 255, 255, 0.2);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+            transform: translateY(-4px) scale(1.02); background: rgba(255, 255, 255, 0.1); border-color: rgba(255, 255, 255, 0.2); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
         }
-
         .nav-bubble.active {
-            background: white;
-            color: var(--brand-dark);
-            box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
-            transform: scale(1.05);
+            background: white; color: var(--brand-dark); box-shadow: 0 0 20px rgba(255, 255, 255, 0.2); transform: scale(1.05);
         }
-        
         .nav-bubble.active i { color: var(--brand-primary); }
 
         .card-glass {
-            background: white;
-            border-radius: 20px;
-            border: 1px solid #e2e8f0;
-            padding: 24px;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
+            background: white; border-radius: 20px; border: 1px solid #e2e8f0; padding: 24px; transition: all 0.3s ease; position: relative; overflow: hidden;
         }
-
         .card-glass:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-ios-lg);
-            border-color: #cbd5e1;
+            transform: translateY(-2px); box-shadow: var(--shadow-ios-lg); border-color: #cbd5e1;
         }
 
         .btn-ios { transition: all 0.2s active; }
         .btn-ios:active { transform: scale(0.95); }
 
+        /* CALENDARIO CSS */
         .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; }
-        
         .cal-day {
-            min-height: 110px;
-            background: white;
-            border-radius: 16px;
-            border: 1px solid #f1f5f9;
-            padding: 8px;
-            display: flex; flex-direction: column;
-            cursor: pointer; transition: 0.2s;
+            min-height: 110px; background: white; border-radius: 16px; border: 1px solid #f1f5f9; padding: 8px; display: flex; flex-direction: column; cursor: pointer; transition: 0.2s;
         }
-        
         .cal-day:hover { border-color: var(--brand-primary); background: #f8fafc; }
         .cal-day.today { background: #eff6ff; border: 2px solid var(--brand-primary); }
         
         .cal-event {
-            font-size: 0.6rem; padding: 4px 6px; border-radius: 6px; margin-top: 3px;
-            font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-            display: flex; align-items: center; gap: 4px; border-left-width: 3px;
+            font-size: 0.6rem; padding: 4px 6px; border-radius: 6px; margin-top: 3px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; gap: 4px; border-left-width: 3px;
         }
         .evt-pending { background: #fffbeb; color: #b45309; border-color: #fcd34d; }
         .evt-dispatch { background: #f0fdf4; color: #15803d; border-color: #4ade80; }
+        .evt-move { background: #f1f5f9; color: #475569; border-color: #94a3b8; border-left-style: dashed; }
+        /* NUEVO ESTILO PARA FECHA DE ENTREGA */
+        .evt-delivery { background: #e0f2fe; color: #0369a1; border-color: #0ea5e9; border-left: 3px solid #0284c7; }
 
         @media (max-width: 1024px) {
             .sidebar {
-                position: fixed; bottom: 0; left: 0; width: 100%; height: auto;
-                flex-direction: row; justify-content: space-evenly;
-                border-radius: 24px 24px 0 0; padding: 10px; z-index: 50;
-                background: rgba(15, 23, 42, 0.98); backdrop-filter: blur(20px);
+                position: fixed; bottom: 0; left: 0; width: 100%; height: auto; flex-direction: row; justify-content: space-evenly; border-radius: 24px 24px 0 0; padding: 10px; z-index: 50; background: rgba(15, 23, 42, 0.98); backdrop-filter: blur(20px);
             }
             .sidebar-logo, .nav-label, .sidebar-footer { display: none; }
-            .nav-bubble { padding: 12px; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; border-radius: 50%; }
+            .nav-bubble { padding: 12px; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; border-radius: 50%; }
             main { padding-bottom: 110px; }
         }
-
         .hidden { display: none !important; }
         .fade-in { animation: fadeIn 0.4s ease-out; }
     </style>
@@ -123,7 +98,7 @@
             <i class="fas fa-scissors absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-2xl text-white"></i>
         </div>
         <h2 class="font-black text-3xl tracking-[8px] uppercase">Ideas Textiles</h2>
-        <p class="text-xs font-bold text-slate-500 mt-2 uppercase tracking-widest">Cargando ...</p>
+        <p class="text-xs font-bold text-slate-500 mt-2 uppercase tracking-widest">Cargando Inteligencia Artificial...</p>
     </div>
 
     <div id="connection-widget" class="fixed top-4 right-4 z-50 bg-white/90 backdrop-blur px-3 py-1.5 rounded-full border border-slate-200 shadow-lg flex items-center gap-2 transition-all">
@@ -145,22 +120,25 @@
                         <h1 class="font-black italic text-lg leading-none tracking-tight">IDEAS<br><span class="text-blue-500">TEXTILES</span></h1>
                     </div>
                 </div>
-                <div class="mt-4 pt-4 border-t border-slate-800">
-                    <p class="text-[9px] font-bold text-slate-500 tracking-[2px] uppercase">Workwear & Corporate</p>
-                </div>
             </div>
 
-            <nav class="flex lg:flex-col gap-2 w-full lg:flex-1 z-10">
-                <div onclick="App.Router.go('dashboard')" id="nav-dashboard" class="nav-bubble active p-3 rounded-xl cursor-pointer flex items-center gap-3 text-sm font-bold text-slate-400">
+            <nav class="flex lg:flex-col gap-2 w-full lg:flex-1 z-10 overflow-x-auto lg:overflow-visible pb-2 lg:pb-0">
+                <div onclick="App.Router.go('dashboard')" id="nav-dashboard" class="nav-bubble active p-3 rounded-xl cursor-pointer flex items-center gap-3 text-sm font-bold text-slate-400 shrink-0">
                     <i class="fas fa-chart-pie w-6 text-center"></i> <span class="nav-label">Dashboard</span>
                 </div>
-                <div onclick="App.Router.go('inventory')" id="nav-inventory" class="nav-bubble p-3 rounded-xl cursor-pointer flex items-center gap-3 text-sm font-bold text-slate-400">
+                <div onclick="App.Router.go('inventory')" id="nav-inventory" class="nav-bubble p-3 rounded-xl cursor-pointer flex items-center gap-3 text-sm font-bold text-slate-400 shrink-0">
                     <i class="fas fa-tshirt w-6 text-center"></i> <span class="nav-label">Bodega</span>
                 </div>
-                <div onclick="App.Router.go('orders')" id="nav-orders" class="nav-bubble p-3 rounded-xl cursor-pointer flex items-center gap-3 text-sm font-bold text-slate-400">
+                <div onclick="App.Router.go('movements')" id="nav-movements" class="nav-bubble p-3 rounded-xl cursor-pointer flex items-center gap-3 text-sm font-bold text-slate-400 shrink-0">
+                    <i class="fas fa-exchange-alt w-6 text-center"></i> <span class="nav-label">Movimientos</span>
+                </div>
+                <div onclick="App.Router.go('orders')" id="nav-orders" class="nav-bubble p-3 rounded-xl cursor-pointer flex items-center gap-3 text-sm font-bold text-slate-400 shrink-0">
                     <i class="fas fa-file-invoice w-6 text-center"></i> <span class="nav-label">Órdenes</span>
                 </div>
-                <div onclick="App.Router.go('calendar')" id="nav-calendar" class="nav-bubble p-3 rounded-xl cursor-pointer flex items-center gap-3 text-sm font-bold text-slate-400">
+                <div onclick="App.Router.go('scanner')" id="nav-scanner" class="nav-bubble p-3 rounded-xl cursor-pointer flex items-center gap-3 text-sm font-bold text-slate-400 shrink-0">
+                    <i class="fas fa-robot w-6 text-center text-blue-400"></i> <span class="nav-label">Scanner IA</span>
+                </div>
+                <div onclick="App.Router.go('calendar')" id="nav-calendar" class="nav-bubble p-3 rounded-xl cursor-pointer flex items-center gap-3 text-sm font-bold text-slate-400 shrink-0">
                     <i class="fas fa-calendar-alt w-6 text-center"></i> <span class="nav-label">Agenda</span>
                 </div>
             </nav>
@@ -168,54 +146,36 @@
             <div class="sidebar-footer z-10 mt-auto pt-4 border-t border-slate-800">
                 <div class="flex items-center gap-3">
                     <div class="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center text-xs font-bold text-white">AC</div>
-                    <div>
-                        <p class="text-xs font-bold text-white">Alejandro Cisterna</p>
-                        <p class="text-[10px] text-slate-500">Gerente General</p>
-                    </div>
+                    <div><p class="text-xs font-bold text-white">Alejandro Cisterna</p></div>
                 </div>
             </div>
-            <div class="absolute top-0 right-0 w-48 h-48 bg-blue-600 rounded-full mix-blend-multiply filter blur-3xl opacity-10 pointer-events-none"></div>
         </aside>
 
         <main class="flex-1 p-4 lg:p-8 overflow-y-auto relative scroll-smooth">
+            
             <section id="view-dashboard" class="fade-in">
                 <header class="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-4">
                     <div>
                         <h2 class="text-3xl font-black text-slate-800">Panel General</h2>
                         <p class="text-slate-500 text-sm font-medium mt-1">Visión global de operaciones</p>
                     </div>
-                    <button onclick="App.Actions.systemReset()" class="btn-ios text-[10px] font-bold text-red-500 bg-red-50 px-4 py-2 rounded-lg hover:bg-red-100 transition">
-                        <i class="fas fa-exclamation-triangle mr-1"></i> RESET DB
-                    </button>
                 </header>
-
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div class="card-glass bg-gradient-to-br from-slate-800 to-slate-900 text-white border-none">
                         <div class="flex justify-between">
-                            <div>
-                                <p class="text-xs font-bold opacity-60 uppercase">Items en Bodega</p>
-                                <h3 class="text-4xl font-black mt-2" id="dash-stock">0</h3>
-                            </div>
+                            <div><p class="text-xs font-bold opacity-60 uppercase">Items en Bodega</p><h3 class="text-4xl font-black mt-2" id="dash-stock">0</h3></div>
                             <div class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center"><i class="fas fa-box text-lg"></i></div>
                         </div>
                     </div>
-                    
                     <div class="card-glass">
                         <div class="flex justify-between">
-                            <div>
-                                <p class="text-xs font-bold text-slate-400 uppercase">Órdenes Activas</p>
-                                <h3 class="text-4xl font-black text-slate-800 mt-2" id="dash-pending">0</h3>
-                            </div>
+                            <div><p class="text-xs font-bold text-slate-400 uppercase">Órdenes Activas</p><h3 class="text-4xl font-black text-slate-800 mt-2" id="dash-pending">0</h3></div>
                             <div class="w-10 h-10 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center"><i class="fas fa-clock text-lg"></i></div>
                         </div>
                     </div>
-
                     <div class="card-glass">
                         <div class="flex justify-between">
-                            <div>
-                                <p class="text-xs font-bold text-slate-400 uppercase">Despachos Mes</p>
-                                <h3 class="text-4xl font-black text-slate-800 mt-2" id="dash-dispatch">0</h3>
-                            </div>
+                            <div><p class="text-xs font-bold text-slate-400 uppercase">Despachos Mes</p><h3 class="text-4xl font-black text-slate-800 mt-2" id="dash-dispatch">0</h3></div>
                             <div class="w-10 h-10 bg-green-50 text-green-600 rounded-full flex items-center justify-center"><i class="fas fa-truck text-lg"></i></div>
                         </div>
                     </div>
@@ -224,44 +184,90 @@
 
             <section id="view-inventory" class="hidden fade-in">
                 <header class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
-                    <div>
-                        <h2 class="text-3xl font-black text-slate-800">Bodega</h2>
-                        <p class="text-slate-500 text-sm">Gestión de stock multi-talla</p>
-                    </div>
-                    <button onclick="App.UI.Modals.newProduct()" class="btn-ios bg-[#0f172a] text-white px-6 py-3 rounded-xl font-bold shadow-lg shadow-slate-300 flex items-center gap-2 text-sm hover:bg-slate-800">
-                        <i class="fas fa-plus"></i> NUEVO PRODUCTO
-                    </button>
+                    <div><h2 class="text-3xl font-black text-slate-800">Bodega</h2><p class="text-slate-500 text-sm">Gestión de stock multi-talla</p></div>
+                    <button onclick="App.UI.Modals.newProduct()" class="btn-ios bg-[#0f172a] text-white px-6 py-3 rounded-xl font-bold shadow-lg flex items-center gap-2 text-sm"><i class="fas fa-plus"></i> NUEVO PRODUCTO</button>
                 </header>
                 <div id="inventory-grid" class="grid grid-cols-1 gap-4"></div>
             </section>
 
+            <section id="view-movements" class="hidden fade-in">
+                <header class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
+                    <div><h2 class="text-3xl font-black text-slate-800">Movimientos</h2><p class="text-slate-500 text-sm">Registro de Entradas y Salidas</p></div>
+                    <button onclick="App.UI.Modals.registerMovement()" class="btn-ios bg-slate-800 text-white px-6 py-3 rounded-xl font-bold text-sm shadow-lg flex items-center gap-2">
+                        <i class="fas fa-exchange-alt"></i> REGISTRAR MOVIMIENTO
+                    </button>
+                </header>
+                <div class="card-glass overflow-x-auto">
+                    <table class="w-full text-left">
+                        <thead>
+                            <tr class="text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100">
+                                <th class="pb-3 px-2">FECHA</th>
+                                <th class="pb-3 px-2">TIPO</th>
+                                <th class="pb-3 px-2">PRODUCTO</th>
+                                <th class="pb-3 px-2">CANT</th>
+                                <th class="pb-3 px-2">MOTIVO</th>
+                            </tr>
+                        </thead>
+                        <tbody id="movements-list" class="text-sm"></tbody>
+                    </table>
+                </div>
+            </section>
+
             <section id="view-orders" class="hidden fade-in">
                 <header class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
-                    <div>
-                        <h2 class="text-3xl font-black text-slate-800">Órdenes</h2>
-                        <p class="text-slate-500 text-sm">Ventas, Despachos y Etiquetas</p>
-                    </div>
-                    <button onclick="App.UI.Modals.newOrder()" class="btn-ios bg-blue-600 text-white px-6 py-3 rounded-xl font-bold shadow-lg shadow-blue-200 flex items-center gap-2 text-sm hover:bg-blue-700">
-                        <i class="fas fa-cart-shopping"></i> CREAR OC
-                    </button>
+                    <div><h2 class="text-3xl font-black text-slate-800">Órdenes</h2><p class="text-slate-500 text-sm">Ventas y Despachos</p></div>
+                    <button onclick="App.UI.Modals.newOrder()" class="btn-ios bg-blue-600 text-white px-6 py-3 rounded-xl font-bold shadow-lg flex items-center gap-2 text-sm"><i class="fas fa-cart-shopping"></i> CREAR OC</button>
                 </header>
                 <div id="orders-grid" class="grid grid-cols-1 gap-6"></div>
             </section>
 
+            <section id="view-scanner" class="hidden fade-in">
+                <header class="mb-8">
+                    <h2 class="text-3xl font-black text-slate-800">Scanner IA (Junaeb/Itexx)</h2>
+                    <p class="text-slate-500 text-sm">Carga masiva desde Fotos o Excel</p>
+                </header>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div class="card-glass border-dashed border-2 border-blue-200 flex flex-col items-center justify-center p-12 text-center group cursor-pointer hover:bg-blue-50 transition" onclick="document.getElementById('file-ia').click()">
+                        <i class="fas fa-cloud-upload-alt text-5xl text-blue-400 group-hover:scale-110 transition mb-4"></i>
+                        <h4 class="font-bold text-slate-700">Subir Foto o Excel</h4>
+                        <p class="text-xs text-slate-400 mt-2">Compatible con Junaeb, Excel Itexx y Facturas</p>
+                        <input type="file" id="file-ia" class="hidden" accept="image/*,.xlsx,.csv" onchange="App.Logic.Scanner.handleFile(this)">
+                    </div>
+                    <div class="card-glass bg-slate-50">
+                        <h4 class="font-bold text-slate-800 mb-4"><i class="fas fa-robot mr-2 text-blue-500"></i>Capacidades IA</h4>
+                        <ul class="text-xs text-slate-500 space-y-3">
+                            <li><i class="fas fa-check text-green-500 mr-2"></i> <b>Separación de OC:</b> Detecta múltiples órdenes en un archivo.</li>
+                            <li><i class="fas fa-check text-green-500 mr-2"></i> <b>Grillas de Tallas:</b> Lee columnas S, M, L, XL desde Excel.</li>
+                            <li><i class="fas fa-check text-green-500 mr-2"></i> <b>Auto-Creación:</b> Crea productos inexistentes (Stock 0).</li>
+                            <li><i class="fas fa-info-circle text-blue-500 mr-2"></i> Formato Excel: Requiere columnas PRODUCTO, TALLA, CANTIDAD.</li>
+                        </ul>
+                    </div>
+                </div>
+                <div id="scanner-preview" class="mt-8 hidden">
+                    <div class="card-glass border-blue-500">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="font-black text-slate-800">RESULTADOS DETECTADOS</h3>
+                            <button onclick="App.Logic.Scanner.confirmAll()" class="bg-blue-600 text-white px-4 py-2 rounded-lg font-bold text-xs shadow-lg">CARGAR TODO AL SISTEMA</button>
+                        </div>
+                        <div id="scanner-results" class="space-y-4"></div>
+                    </div>
+                </div>
+            </section>
+
             <section id="view-calendar" class="hidden fade-in">
                 <div class="card-glass p-6 mb-6 flex justify-between items-center">
-                    <button onclick="App.Logic.Calendar.move(-1)" class="w-10 h-10 rounded-full bg-slate-100 hover:bg-white hover:shadow flex items-center justify-center transition"><i class="fas fa-chevron-left"></i></button>
+                    <button onclick="App.Logic.Calendar.move(-1)" class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center"><i class="fas fa-chevron-left"></i></button>
                     <h2 class="text-xl font-black text-slate-800 uppercase tracking-widest" id="cal-month-title">MES AÑO</h2>
-                    <button onclick="App.Logic.Calendar.move(1)" class="w-10 h-10 rounded-full bg-slate-100 hover:bg-white hover:shadow flex items-center justify-center transition"><i class="fas fa-chevron-right"></i></button>
+                    <button onclick="App.Logic.Calendar.move(1)" class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center"><i class="fas fa-chevron-right"></i></button>
                 </div>
                 <div class="grid grid-cols-7 gap-8 text-center mb-4">
-                    <div class="text-xs font-bold text-slate-400 uppercase">Lun</div>
-                    <div class="text-xs font-bold text-slate-400 uppercase">Mar</div>
-                    <div class="text-xs font-bold text-slate-400 uppercase">Mié</div>
-                    <div class="text-xs font-bold text-slate-400 uppercase">Jue</div>
-                    <div class="text-xs font-bold text-slate-400 uppercase">Vie</div>
-                    <div class="text-xs font-bold text-slate-400 uppercase">Sáb</div>
-                    <div class="text-xs font-bold text-slate-400 uppercase">Dom</div>
+                    <div class="text-[10px] font-black text-slate-400 uppercase">Lun</div>
+                    <div class="text-[10px] font-black text-slate-400 uppercase">Mar</div>
+                    <div class="text-[10px] font-black text-slate-400 uppercase">Mié</div>
+                    <div class="text-[10px] font-black text-slate-400 uppercase">Jue</div>
+                    <div class="text-[10px] font-black text-slate-400 uppercase">Vie</div>
+                    <div class="text-[10px] font-black text-slate-400 uppercase">Sáb</div>
+                    <div class="text-[10px] font-black text-slate-400 uppercase">Dom</div>
                 </div>
                 <div id="calendar-grid" class="cal-grid"></div>
             </section>
@@ -280,7 +286,9 @@
             inventory: [],
             orders: [],
             calendar: {},
-            dateContext: new Date()
+            movements: [],
+            dateContext: new Date(),
+            scannerBuffer: []
         };
 
         window.App = {
@@ -288,6 +296,7 @@
                 onValue(ref(db, 'inventory'), s => { State.inventory = s.val() || []; App.UI.renderInventory(); App.UI.updateDashboard(); });
                 onValue(ref(db, 'orders'), s => { State.orders = s.val() || []; App.UI.renderOrders(); App.UI.updateDashboard(); App.Logic.Calendar.render(); });
                 onValue(ref(db, 'calendar'), s => { State.calendar = s.val() || {}; App.Logic.Calendar.render(); });
+                onValue(ref(db, 'movements'), s => { State.movements = s.val() || []; App.UI.renderMovements(); });
                 onValue(ref(db, ".info/connected"), s => {
                     const txt = document.getElementById('conn-text');
                     const dot = document.getElementById('ping-dot');
@@ -303,7 +312,6 @@
                     document.getElementById('view-'+page).classList.remove('hidden');
                     document.querySelectorAll('.nav-bubble').forEach(n => n.classList.remove('active'));
                     document.getElementById('nav-'+page).classList.add('active');
-                    if(page === 'calendar') App.Logic.Calendar.render();
                 }
             },
 
@@ -317,74 +325,74 @@
 
                 renderInventory: () => {
                     const grid = document.getElementById('inventory-grid');
-                    if(State.inventory.length === 0) { grid.innerHTML = '<div class="p-8 text-center text-slate-400 font-medium">Inventario vacío.</div>'; return; }
                     grid.innerHTML = State.inventory.map((p, i) => {
                         let badges = ''; let total = 0;
                         if(p.stock) Object.entries(p.stock).forEach(([sz, qty]) => {
-                            badges += `<span class="bg-slate-100 text-slate-600 border border-slate-200 px-2 py-1 rounded text-xs font-bold mr-2 mb-1 inline-block">${sz}: ${qty}</span>`;
+                            badges += `<span class="bg-slate-100 text-slate-600 border border-slate-200 px-2 py-1 rounded text-[10px] font-black mr-2 mb-1 inline-block">${sz}: ${qty}</span>`;
                             total += qty;
                         });
                         return `
                         <div class="card-glass flex flex-col md:flex-row justify-between items-center group">
-                            <div class="mb-4 md:mb-0">
-                                <div class="flex items-center gap-3">
-                                    <div class="w-10 h-10 bg-blue-100 text-blue-600 rounded-lg flex items-center justify-center font-bold text-lg">${p.name.charAt(0)}</div>
-                                    <div>
-                                        <div class="font-bold text-lg text-slate-800">${p.name}</div>
-                                        <div class="text-[10px] text-slate-400 font-mono">SKU: ${p.sku}</div>
-                                    </div>
-                                    <button onclick="App.UI.Modals.editProduct(${i})" class="ml-2 text-slate-300 hover:text-blue-500 transition"><i class="fas fa-edit"></i></button>
-                                    <button onclick="App.Actions.deleteProduct(${i})" class="ml-4 text-slate-300 hover:text-red-500 transition">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
+                            <div class="flex items-center gap-4">
+                                <div class="w-10 h-10 bg-blue-100 text-blue-600 rounded-lg flex items-center justify-center font-bold">${p.name.charAt(0)}</div>
+                                <div>
+                                    <div class="font-bold text-slate-800">${p.name}</div>
+                                    <div class="text-[10px] text-slate-400">SKU: ${p.sku}</div>
+                                    <div class="mt-2">${badges}</div>
                                 </div>
-                                <div class="mt-3">${badges}</div>
                             </div>
-                            <div class="text-right">
-                                <div class="text-[10px] font-bold text-slate-400 uppercase">Stock Total</div>
-                                <div class="text-3xl font-black text-slate-700">${total}</div>
+                            <div class="text-right flex items-center gap-6">
+                                <div><div class="text-[10px] font-bold text-slate-400 uppercase">Stock</div><div class="text-2xl font-black text-slate-700">${total}</div></div>
+                                <div class="flex gap-2">
+                                    <button onclick="App.UI.Modals.editProduct(${i})" class="text-slate-300 hover:text-blue-500"><i class="fas fa-edit"></i></button>
+                                    <button onclick="App.Actions.deleteProduct(${i})" class="text-slate-300 hover:text-red-500"><i class="fas fa-trash"></i></button>
+                                </div>
                             </div>
                         </div>`;
                     }).join('');
                 },
 
+                renderMovements: () => {
+                    const list = document.getElementById('movements-list');
+                    const sorted = [...State.movements].reverse().slice(0, 20);
+                    list.innerHTML = sorted.map(m => `
+                        <tr class="border-b border-slate-50 hover:bg-slate-50 transition">
+                            <td class="py-3 px-2 text-[11px] font-mono">${m.date}</td>
+                            <td class="py-3 px-2">
+                                <span class="px-2 py-0.5 rounded text-[10px] font-black ${m.type==='Ingreso'?'bg-green-100 text-green-700':'bg-red-100 text-red-700'}">${m.type.toUpperCase()}</span>
+                            </td>
+                            <td class="py-3 px-2 font-bold text-slate-700">${m.product} <span class="text-slate-400">(${m.size})</span></td>
+                            <td class="py-3 px-2 font-black">${m.qty}</td>
+                            <td class="py-3 px-2 text-slate-500 italic text-xs">${m.reason}</td>
+                        </tr>
+                    `).join('');
+                },
+
                 renderOrders: () => {
                     const grid = document.getElementById('orders-grid');
-                    const list = [...State.orders].sort((a,b) => a.status === 'Pendiente' ? -1 : 1);
-                    grid.innerHTML = list.map((o) => {
-                        const idx = State.orders.indexOf(o);
-                        const itemsHtml = o.items.map((it, i) => `
-                            <div onclick="App.UI.Modals.editOrderItem(${idx}, ${i})" class="flex justify-between items-start border-b border-slate-100 py-2 last:border-0 text-sm hover:bg-blue-50 cursor-pointer px-1 rounded transition">
-                                <div>
-                                    <span class="font-bold text-blue-600">${it.qty}</span> x ${it.name} <span class="bg-slate-100 px-1 rounded text-xs font-bold text-slate-500">${it.size}</span>
-                                    ${it.msg ? `<div class="text-[10px] text-amber-600 mt-1 italic"><i class="fas fa-comment-alt mr-1"></i>${it.msg}</div>` : ''}
-                                </div>
-                                <i class="fas fa-pencil-alt text-[10px] text-slate-300 mt-1"></i>
-                            </div>`).join('');
-
+                    grid.innerHTML = State.orders.map((o, idx) => {
+                        const itemsHtml = o.items.map(it => `<div class="text-xs py-1 border-b border-slate-100 last:border-0"><span class="font-black text-blue-600">${it.qty}</span> x ${it.name} [${it.size}]</div>`).join('');
+                        const deliveryTag = o.deliveryDate ? `<span class="ml-2 text-[9px] bg-blue-50 text-blue-600 px-2 py-1 rounded border border-blue-100"><i class="fas fa-calendar-check mr-1"></i>Entrega: ${o.deliveryDate}</span>` : '';
+                        
                         return `
                         <div class="card-glass border-l-4 ${o.status==='Despachado'?'border-l-green-500 opacity-80':'border-l-blue-500'}">
-                            <div class="flex flex-col md:flex-row justify-between items-start mb-4">
+                            <div class="flex justify-between items-start mb-4">
                                 <div>
                                     <div class="flex items-center gap-2">
-                                        <h3 class="font-bold text-xl text-slate-800">${o.client}</h3>
-                                        <button onclick="App.UI.Modals.editOrderHeader(${idx})" class="text-slate-300 hover:text-blue-500 text-xs"><i class="fas fa-edit"></i></button>
+                                        <h3 class="font-bold text-lg text-slate-800">${o.client}</h3>
+                                        <button onclick="App.UI.Modals.editFullOrder(${idx})" class="text-slate-300 hover:text-blue-500 text-xs"><i class="fas fa-edit"></i></button>
                                     </div>
-                                    <div class="text-xs text-slate-500 font-medium mt-1 flex gap-3">
-                                        <span><i class="far fa-calendar mr-1"></i>${o.date}</span>
-                                        <span><i class="fas fa-hashtag mr-1"></i>${o.id}</span>
-                                        ${o.place ? `<span><i class="fas fa-map-marker-alt mr-1"></i>${o.place}</span>` : ''}
-                                    </div>
+                                    <div class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1">OC #${o.id} • ${o.date} ${deliveryTag}</div>
                                 </div>
-                                <span class="mt-2 md:mt-0 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wide ${o.status==='Despachado'?'bg-green-100 text-green-700':'bg-blue-100 text-blue-700'}">${o.status}</span>
+                                <span class="px-3 py-1 rounded-full text-[10px] font-black uppercase ${o.status==='Despachado'?'bg-green-100 text-green-700':'bg-blue-100 text-blue-700'}">${o.status}</span>
                             </div>
-                            <div class="bg-slate-50 rounded-xl p-4 mb-4 border border-slate-100 shadow-inner max-h-48 overflow-y-auto">${itemsHtml}</div>
-                            <div class="flex flex-wrap justify-end gap-3">
-                                <button onclick="App.PDF.downloadTachas(${idx})" class="btn-ios bg-slate-800 hover:bg-slate-700 text-white px-4 py-2 rounded-lg text-xs font-bold shadow flex items-center gap-2"><i class="fas fa-tags"></i> PDF TACHAS</button>
+                            <div class="bg-slate-50 rounded-xl p-4 mb-4 max-h-40 overflow-y-auto">${itemsHtml}</div>
+                            <div class="flex justify-end gap-2">
+                                <button onclick="App.PDF.downloadTachas(${idx})" class="btn-ios bg-slate-800 text-white px-4 py-2 rounded-lg text-xs font-bold"><i class="fas fa-tags mr-1"></i> TACHAS</button>
                                 ${o.status !== 'Despachado' ? 
-                                `<button onclick="App.Actions.dispatch(${idx})" class="btn-ios bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-xs font-bold shadow flex items-center gap-2"><i class="fas fa-truck-loading"></i> DESPACHAR</button>` : 
-                                `<div class="text-xs font-bold text-green-600 border border-green-200 bg-green-50 px-3 py-2 rounded flex items-center gap-1"><i class="fas fa-check-circle"></i> Fac: ${o.invoice}</div>`}
-                                <button onclick="App.Actions.deleteOrder(${idx})" class="text-red-300 hover:text-red-500 px-2 transition"><i class="fas fa-trash"></i></button>
+                                `<button onclick="App.Actions.dispatch(${idx})" class="btn-ios bg-green-600 text-white px-4 py-2 rounded-lg text-xs font-bold"><i class="fas fa-truck mr-1"></i> DESPACHAR</button>` : 
+                                `<span class="bg-green-50 text-green-600 px-3 py-2 rounded text-xs font-bold border border-green-200">Factura: ${o.invoice}</span>`}
+                                <button onclick="App.Actions.deleteOrder(${idx})" class="text-red-300 hover:text-red-500 p-2"><i class="fas fa-trash"></i></button>
                             </div>
                         </div>`;
                     }).join('');
@@ -392,160 +400,165 @@
 
                 Modals: {
                     newProduct: async () => {
-                        await Swal.fire({
-                            title: 'Nuevo Producto Multi-Talla',
-                            width: '600px',
-                            html: `
-                                <input id="np-name" class="swal2-input" placeholder="Nombre del Producto">
-                                <div class="bg-slate-50 p-3 rounded mt-3 border border-slate-200">
-                                    <label class="text-xs font-bold text-slate-400 uppercase">Configuración de Tallas</label>
-                                    <div id="size-rows-container"></div>
-                                    <button type="button" onclick="App.UI.Helpers.addSizeRow()" class="mt-2 text-xs font-bold text-blue-600 hover:underline">+ Agregar otra talla</button>
-                                </div>
-                            `,
-                            didOpen: () => { App.UI.Helpers.addSizeRow(); },
+                        const { value: res } = await Swal.fire({
+                            title: 'Nuevo Producto',
+                            html: `<input id="np-name" class="swal2-input" placeholder="Nombre (Ej: POLERA ALGODON)"><div id="size-rows-container"></div><button type="button" onclick="App.UI.Helpers.addSizeRow()" class="mt-2 text-xs font-bold text-blue-600">+ Agregar Talla</button>`,
+                            didOpen: () => App.UI.Helpers.addSizeRow(),
                             preConfirm: () => {
-                                const name = document.getElementById('np-name').value.trim();
-                                const rows = document.querySelectorAll('.size-row');
+                                const name = document.getElementById('np-name').value.toUpperCase();
                                 let stock = {};
-                                rows.forEach(r => {
-                                    let s = r.querySelector('.sz-in').value.trim().toUpperCase();
-                                    const q = parseInt(r.querySelector('.qt-in').value);
-                                    if (!isNaN(q)) {
-                                        let finalSize = (s === "") ? "ÚNICA" : s;
-                                        stock[finalSize] = q;
-                                    }
+                                document.querySelectorAll('.size-row').forEach(r => {
+                                    const sz = r.querySelector('.sz-in').value.toUpperCase() || 'ÚNICA';
+                                    const qt = parseInt(r.querySelector('.qt-in').value) || 0;
+                                    stock[sz] = qt;
                                 });
-                                if (!name) return Swal.showValidationMessage('El nombre es obligatorio');
-                                if(Object.keys(stock).length === 0) stock["ÚNICA"] = 0;
-                                return { name: name.toUpperCase(), stock };
+                                return { name, stock };
                             }
-                        }).then(res => { if(res.isConfirmed) App.Logic.Inventory.add(res.value); });
+                        });
+                        if(res) App.Logic.Inventory.add(res);
                     },
 
-                    editProduct: async (index) => {
-                        const p = State.inventory[index];
-                        const {value: newName} = await Swal.fire({title:'Editar Nombre', input:'text', inputValue: p.name});
-                        if(newName) {
-                            State.inventory[index].name = newName.toUpperCase();
-                            set(ref(db, 'inventory'), State.inventory);
+                    registerMovement: async () => {
+                        const prods = State.inventory.map(p => `<option value="${p.name}">${p.name}</option>`).join('');
+                        const { value: res } = await Swal.fire({
+                            title: 'Registrar Movimiento',
+                            html: `
+                                <select id="m-prod" class="swal2-input" onchange="App.UI.Helpers.updateSizeSelect(this.value)">
+                                    <option value="">Seleccionar Producto...</option>
+                                    ${prods}
+                                </select>
+                                <select id="m-size" class="swal2-input"><option value="">Talla...</option></select>
+                                <select id="m-type" class="swal2-input">
+                                    <option value="Ingreso">📥 INGRESO (Suma al stock)</option>
+                                    <option value="Egreso">📤 EGRESO (Resta al stock)</option>
+                                </select>
+                                <input id="m-qty" type="number" class="swal2-input" placeholder="Cantidad">
+                                <input id="m-reason" class="swal2-input" placeholder="Motivo (Ej: Compra Proveedor)">
+                            `,
+                            preConfirm: () => {
+                                const p = document.getElementById('m-prod').value;
+                                const s = document.getElementById('m-size').value;
+                                const t = document.getElementById('m-type').value;
+                                const q = parseInt(document.getElementById('m-qty').value);
+                                const r = document.getElementById('m-reason').value;
+                                if(!p || !s || !q || !r) return Swal.showValidationMessage('Todos los campos son obligatorios');
+                                return { p, s, t, q, r };
+                            }
+                        });
+                        if(res) App.Actions.registerMovement(res);
+                    },
+
+                    editFullOrder: async (idx) => {
+                        const o = State.orders[idx];
+                        let cart = [...o.items];
+                        const render = () => {
+                            document.getElementById('edit-cart').innerHTML = cart.map((it, i) => `
+                                <div class="flex justify-between items-center text-xs p-2 border-b bg-white">
+                                    <span><b>${it.qty}</b> x ${it.name} [${it.size}]</span>
+                                    <button onclick="window.tempRemove(${i})" class="text-red-500 font-bold">X</button>
+                                </div>
+                            `).join('');
+                        };
+                        window.tempRemove = (i) => { cart.splice(i,1); render(); };
+
+                        const { value: res } = await Swal.fire({
+                            title: 'Editar Orden Compra',
+                            width: '600px',
+                            html: `
+                                <div class="grid grid-cols-2 gap-2 mb-2">
+                                    <input id="eo-client" class="swal2-input m-0 h-10 text-sm" value="${o.client}" placeholder="Cliente">
+                                    <input id="eo-id" class="swal2-input m-0 h-10 text-sm" value="${o.id}" placeholder="ID OC">
+                                </div>
+                                <div class="text-left mb-4">
+                                    <label class="text-[10px] font-bold text-slate-400">FECHA DE ENTREGA (CALENDARIO)</label>
+                                    <input type="date" id="eo-date" class="swal2-input m-0 h-10 text-sm w-full" value="${o.deliveryDate || ''}">
+                                </div>
+                                <div class="bg-slate-50 p-3 rounded-lg border border-slate-200 text-left">
+                                    <div class="grid grid-cols-12 gap-2">
+                                        <div class="col-span-6"><input id="eo-prod" class="swal2-input m-0 h-9 text-xs" placeholder="Producto"></div>
+                                        <div class="col-span-3"><input id="eo-size" class="swal2-input m-0 h-9 text-xs" placeholder="Talla"></div>
+                                        <div class="col-span-3"><input id="eo-qty" type="number" class="swal2-input m-0 h-9 text-xs" placeholder="Cant"></div>
+                                    </div>
+                                    <button type="button" id="btn-add-edit" class="mt-2 w-full bg-slate-800 text-white py-2 rounded font-bold text-[10px]">AÑADIR A LA ORDEN</button>
+                                </div>
+                                <div id="edit-cart" class="mt-4 max-h-40 overflow-y-auto border rounded bg-slate-100"></div>
+                            `,
+                            didOpen: () => {
+                                render();
+                                document.getElementById('btn-add-edit').onclick = () => {
+                                    const n = document.getElementById('eo-prod').value.toUpperCase();
+                                    const s = document.getElementById('eo-size').value.toUpperCase() || 'ÚNICA';
+                                    const q = parseInt(document.getElementById('eo-qty').value);
+                                    if(n && q) { 
+                                        cart.push({name:n, size:s, qty:q}); 
+                                        render();
+                                        document.getElementById('eo-prod').value = '';
+                                        document.getElementById('eo-qty').value = '';
+                                    }
+                                };
+                            },
+                            preConfirm: () => ({ client: document.getElementById('eo-client').value, id: document.getElementById('eo-id').value, deliveryDate: document.getElementById('eo-date').value, items: cart })
+                        });
+                        if(res) {
+                            State.orders[idx] = { ...o, ...res };
+                            set(ref(db, 'orders'), State.orders);
+                            Swal.fire('Guardado', 'La orden ha sido actualizada.', 'success');
                         }
                     },
 
                     newOrder: async () => {
                         let cart = [];
-                        const renderCart = () => {
-                            document.getElementById('cart-view').innerHTML = cart.map((it, i) => `
-                                <div class="flex justify-between text-xs border-b p-1">
-                                    <span>${it.qty} x ${it.name} (${it.size}) <i class="text-gray-400">${it.msg||''}</i></span>
-                                    <span class="text-red-500 cursor-pointer font-bold" onclick="document.getElementById('btn-rm-${i}').click()" id="btn-rm-${i}">X</span>
+                        const render = () => {
+                            document.getElementById('new-cart').innerHTML = cart.map((it, i) => `
+                                <div class="flex justify-between text-xs p-1 border-b">
+                                    <span>${it.qty} x ${it.name} (${it.size})</span>
+                                    <button onclick="window.newRemove(${i})" class="text-red-500">X</button>
                                 </div>
                             `).join('');
-                            cart.forEach((_,i)=> document.getElementById(`btn-rm-${i}`).onclick = ()=> { cart.splice(i,1); renderCart(); });
                         };
+                        window.newRemove = (i) => { cart.splice(i,1); render(); };
 
                         await Swal.fire({
-                            title: 'Crear Orden de Compra',
-                            width: '700px',
+                            title: 'Nueva OC',
                             html: `
-                                <div class="grid grid-cols-2 gap-4">
-                                    <input id="oc-client" class="swal2-input" placeholder="Cliente">
-                                    <input id="oc-place" class="swal2-input" placeholder="Lugar Despacho (Opcional)">
+                                <input id="no-client" class="swal2-input" placeholder="Cliente">
+                                <label class="block text-left text-[10px] font-bold text-slate-400 mt-2">FECHA DE ENTREGA</label>
+                                <input id="no-date" type="date" class="swal2-input m-0">
+                                <div class="bg-slate-50 p-3 rounded mt-3">
+                                    <input id="no-prod" class="swal2-input m-1" placeholder="Producto">
+                                    <div class="flex gap-2"><input id="no-sz" class="swal2-input m-1" placeholder="Talla"><input id="no-qt" type="number" class="swal2-input m-1" placeholder="Cant"></div>
+                                    <button type="button" id="btn-no-add" class="bg-blue-600 text-white w-full py-2 rounded mt-2 font-bold text-xs">AGREGAR</button>
                                 </div>
-                                <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 mt-4 text-left">
-                                    <div class="grid grid-cols-12 gap-2">
-                                        <div class="col-span-4"><input id="oc-prod" class="swal2-input m-0 text-sm h-10" placeholder="Producto"></div>
-                                        <div class="col-span-2"><input id="oc-size" class="swal2-input m-0 text-sm h-10" placeholder="Talla"></div>
-                                        <div class="col-span-2"><input id="oc-qty" type="number" class="swal2-input m-0 text-sm h-10" placeholder="Cant"></div>
-                                        <div class="col-span-4"><input id="oc-msg" class="swal2-input m-0 text-sm h-10" placeholder="Nota Item"></div>
-                                    </div>
-                                    <div class="mt-2 text-right">
-                                        <button type="button" id="btn-add-item" class="bg-slate-800 text-white px-4 py-2 rounded font-bold text-xs">AGREGAR AL CARRITO</button>
-                                    </div>
-                                </div>
-                                <div class="mt-4 text-left">
-                                    <div class="text-xs font-bold text-slate-400 uppercase mb-1">Carrito de Compras</div>
-                                    <div id="cart-view" class="h-32 overflow-y-auto bg-white border rounded p-2"></div>
-                                </div>
+                                <div id="new-cart" class="mt-4 border rounded max-h-32 overflow-y-auto"></div>
                             `,
                             didOpen: () => {
-                                document.getElementById('btn-add-item').onclick = () => {
-                                    const name = document.getElementById('oc-prod').value.toUpperCase();
-                                    const size = document.getElementById('oc-size').value.toUpperCase() || 'ÚNICA';
-                                    const qty = parseInt(document.getElementById('oc-qty').value);
-                                    const msg = document.getElementById('oc-msg').value;
-                                    
-                                    if(name && qty > 0) {
-                                        const exists = State.inventory.find(p => p.name === name);
-                                        if(!exists) {
-                                            const Toast = Swal.mixin({toast: true, position: 'top-end', showConfirmButton: false, timer: 2000});
-                                            Toast.fire({icon: 'info', title: 'Producto nuevo preparado'});
-                                            State.inventory.push({ sku: 'NEW-'+Date.now().toString().slice(-4), name: name, stock: { [size]: 0 } });
-                                        } else if(!exists.stock[size]) {
-                                            exists.stock[size] = 0;
-                                        }
-                                        cart.push({name, size, qty, msg});
-                                        renderCart();
-                                        document.getElementById('oc-prod').value = '';
-                                        document.getElementById('oc-qty').value = '';
-                                        document.getElementById('oc-msg').value = '';
-                                        document.getElementById('oc-prod').focus();
-                                    }
+                                document.getElementById('btn-no-add').onclick = () => {
+                                    const n = document.getElementById('no-prod').value.toUpperCase();
+                                    const s = document.getElementById('no-sz').value.toUpperCase() || 'ÚNICA';
+                                    const q = parseInt(document.getElementById('no-qt').value);
+                                    if(n && q) { cart.push({name:n, size:s, qty:q}); render(); }
                                 };
                             },
                             preConfirm: () => {
-                                const c = document.getElementById('oc-client').value;
-                                const p = document.getElementById('oc-place').value;
-                                if(!c || cart.length===0) return Swal.showValidationMessage('Cliente y Productos requeridos');
-                                return { client: c, place: p, cart };
+                                const client = document.getElementById('no-client').value;
+                                const date = document.getElementById('no-date').value;
+                                if(!client || cart.length === 0) return Swal.showValidationMessage('Datos incompletos');
+                                return { client, date, items: cart };
                             }
-                        }).then(res => { if(res.isConfirmed) App.Logic.Orders.create(res.value); });
-                    },
-
-                    editOrderItem: async (orderIdx, itemIdx) => {
-                        const item = State.orders[orderIdx].items[itemIdx];
-                        const { value: form } = await Swal.fire({
-                            title: 'Editar Item en OC',
-                            html: `
-                                <div class="text-left">
-                                    <label class="text-[10px] font-bold text-slate-400">CANTIDAD</label>
-                                    <input id="ed-qty" type="number" class="swal2-input m-0 mb-3" value="${item.qty}">
-                                    <label class="text-[10px] font-bold text-slate-400">TALLA</label>
-                                    <input id="ed-size" class="swal2-input m-0 mb-3" value="${item.size}">
-                                    <label class="text-[10px] font-bold text-slate-400">MENSAJE / NOTA</label>
-                                    <input id="ed-msg" class="swal2-input m-0" value="${item.msg || ''}">
-                                </div>
-                            `,
-                            preConfirm: () => ({
-                                qty: parseInt(document.getElementById('ed-qty').value),
-                                size: document.getElementById('ed-size').value.toUpperCase(),
-                                msg: document.getElementById('ed-msg').value
-                            })
+                        }).then(r => {
+                            if(r.isConfirmed) {
+                                const order = { 
+                                    id: Date.now().toString().slice(-6), 
+                                    client: r.value.client.toUpperCase(), 
+                                    date: new Date().toISOString().split('T')[0], 
+                                    deliveryDate: r.value.date, // Guardamos fecha entrega
+                                    items: r.value.items, 
+                                    status: 'Pendiente' 
+                                };
+                                State.orders.push(order);
+                                set(ref(db, 'orders'), State.orders);
+                            }
                         });
-                        if(form && !isNaN(form.qty)) {
-                            State.orders[orderIdx].items[itemIdx] = { ...item, ...form };
-                            set(ref(db, 'orders'), State.orders);
-                            Swal.fire({ icon: 'success', title: 'Item Actualizado', timer: 1000, showConfirmButton: false });
-                        }
-                    },
-
-                    editOrderHeader: async (index) => {
-                        const o = State.orders[index];
-                        const { value: form } = await Swal.fire({
-                            title: 'Editar Cabecera OC',
-                            html: `
-                                <label class="block text-xs font-bold text-left text-gray-500">ID Orden</label>
-                                <input id="eo-id" class="swal2-input m-0 mb-3" value="${o.id}">
-                                <label class="block text-xs font-bold text-left text-gray-500">Lugar Despacho</label>
-                                <input id="eo-place" class="swal2-input m-0" value="${o.place || ''}">
-                            `,
-                            preConfirm: () => ({ id: document.getElementById('eo-id').value, place: document.getElementById('eo-place').value })
-                        });
-                        if(form) {
-                            o.id = form.id;
-                            o.place = form.place;
-                            set(ref(db, 'orders'), State.orders);
-                        }
                     }
                 },
 
@@ -553,8 +566,15 @@
                     addSizeRow: () => {
                         const div = document.createElement('div');
                         div.className = 'flex gap-2 mb-2 size-row';
-                        div.innerHTML = `<input class="swal2-input m-0 text-sm sz-in" placeholder="Talla (Vacio = UNICA)" style="width:50%"><input type="number" class="swal2-input m-0 text-sm qt-in" placeholder="Cant" style="width:50%">`;
+                        div.innerHTML = `<input class="swal2-input m-0 text-sm sz-in" placeholder="Talla" style="width:50%"><input type="number" class="swal2-input m-0 text-sm qt-in" placeholder="Cant" style="width:50%">`;
                         document.getElementById('size-rows-container').appendChild(div);
+                    },
+                    updateSizeSelect: (prodName) => {
+                        const p = State.inventory.find(x => x.name === prodName);
+                        const sel = document.getElementById('m-size');
+                        if(p && p.stock) {
+                            sel.innerHTML = Object.keys(p.stock).map(s => `<option value="${s}">${s}</option>`).join('');
+                        }
                     }
                 }
             },
@@ -562,89 +582,196 @@
             Logic: {
                 Inventory: {
                     add: (data) => {
-                        let p = State.inventory.find(x => x.name === data.name.toUpperCase());
-                        if(p) {
-                            Object.keys(data.stock).forEach(sz => { p.stock[sz] = (p.stock[sz]||0) + data.stock[sz]; });
-                        } else {
-                            State.inventory.push({ sku: 'SKU-'+Date.now().toString().slice(-5), name: data.name.toUpperCase(), stock: data.stock });
-                        }
+                        let p = State.inventory.find(x => x.name === data.name);
+                        if(p) { Object.keys(data.stock).forEach(s => p.stock[s] = (p.stock[s]||0) + data.stock[s]); }
+                        else { State.inventory.push({ sku: 'IT-'+Date.now().toString().slice(-4), name: data.name, stock: data.stock }); }
                         set(ref(db, 'inventory'), State.inventory);
                     }
                 },
-
-                Orders: {
-                    create: async (data) => {
-                        await set(ref(db, 'inventory'), State.inventory);
-
-                        const order = {
-                            id: Date.now().toString().slice(-6),
-                            client: data.client.toUpperCase(),
-                            place: data.place || 'Bodega Central',
-                            date: new Date().toISOString().split('T')[0],
-                            status: 'Pendiente',
-                            items: data.cart
-                        };
-                        State.orders.push(order);
-                        await set(ref(db, 'orders'), State.orders);
-                        Swal.fire('Éxito', 'Orden Creada Correctamente', 'success');
-                    }
-                },
-
                 Calendar: {
                     move: (d) => { State.dateContext.setMonth(State.dateContext.getMonth()+d); App.Logic.Calendar.render(); },
                     render: () => {
                         const y = State.dateContext.getFullYear(), m = State.dateContext.getMonth();
                         document.getElementById('cal-month-title').innerText = new Date(y,m).toLocaleString('es-ES',{month:'long',year:'numeric'});
                         const days = new Date(y,m+1,0).getDate();
-                        const start = new Date(y,m,1).getDay() || 7; 
+                        const start = new Date(y,m,1).getDay() || 7;
                         let html = '';
                         for(let i=1; i<start; i++) html+=`<div></div>`;
                         for(let i=1; i<=days; i++) {
                             const k = `${y}-${String(m+1).padStart(2,'0')}-${String(i).padStart(2,'0')}`;
                             const isToday = k === new Date().toISOString().split('T')[0] ? 'today' : '';
                             let content = '';
-                            if(State.calendar[k]) content += `<div class="cal-event evt-pending">📌 ${State.calendar[k]}</div>`;
-                            const ds = State.orders.filter(o => o.dispatchDate === k);
-                            ds.forEach(o => content += `<div class="cal-event evt-dispatch">🚚 ${o.client.substring(0,8)}...</div>`);
+                            if(State.calendar[k]) content += `<div class="cal-event evt-move">📝 ${State.calendar[k]}</div>`;
+                            
+                            // FECHA DE ENTREGA (Lógica Nueva)
+                            State.orders.filter(o => o.deliveryDate === k).forEach(o => content += `<div class="cal-event evt-delivery">📦 Entrega: ${o.client.substring(0,8)}</div>`);
+                            
+                            // Despachos
+                            State.orders.filter(o => o.dispatchDate === k).forEach(o => content += `<div class="cal-event evt-dispatch">🚚 ${o.client.substring(0,8)}</div>`);
+                            
                             html += `<div class="cal-day ${isToday}" onclick="App.Actions.addNote('${k}')">
-                                <span class="text-xs font-bold text-slate-400">${i}</span>
-                                <div class="flex-1 overflow-hidden flex flex-col justify-end">${content}</div>
+                                <span class="text-[10px] font-black text-slate-400">${i}</span>
+                                <div class="overflow-hidden">${content}</div>
                             </div>`;
                         }
                         document.getElementById('calendar-grid').innerHTML = html;
+                    }
+                },
+                Scanner: {
+                    handleFile: async (input) => {
+                        const file = input.files[0];
+                        if(!file) return;
+                        Swal.fire({ title: 'Procesando con IA...', text: 'Extrayendo productos, tallas y ordenes...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+                        
+                        if(file.name.endsWith('.xlsx') || file.name.endsWith('.csv')) {
+                            const reader = new FileReader();
+                            reader.onload = (e) => {
+                                const data = new Uint8Array(e.target.result);
+                                const workbook = XLSX.read(data, {type: 'array'});
+                                const sheet = workbook.Sheets[workbook.SheetNames[0]];
+                                const json = XLSX.utils.sheet_to_json(sheet);
+                                App.Logic.Scanner.parseData(json, 'excel');
+                            };
+                            reader.readAsArrayBuffer(file);
+                        } else {
+                            // OCR DE IMAGENES
+                            const result = await Tesseract.recognize(file, 'spa');
+                            App.Logic.Scanner.parseData(result.data.text, 'ocr');
+                        }
+                    },
+                    
+                    parseData: (input, type) => {
+                        let detectedOrders = [];
+                        
+                        // PARSEADOR EXCEL (ITEXX FORMATO)
+                        if(type === 'excel') {
+                            const groups = {};
+                            input.forEach(row => {
+                                // Mapeo inteligente de columnas según el Excel proporcionado
+                                const id = row['ID_ORDEN'] || row['ID_PEDIDO'] || 'EXT-GEN';
+                                if(!groups[id]) {
+                                    groups[id] = { 
+                                        id: id.toString(), 
+                                        client: row['CLIENTE'] || row['NOMBRE_ORDEN'] || 'CLIENTE EXCEL', 
+                                        items: [] 
+                                    };
+                                }
+                                
+                                const qty = parseInt(row['CANTIDAD_SOLICITADA'] || row['CANTIDAD'] || 0);
+                                if(qty > 0) {
+                                    groups[id].items.push({ 
+                                        name: (row['PRODUCTO'] || 'ITEM SIN NOMBRE').toUpperCase(), 
+                                        size: (row['TALLA'] || 'UNICA').toString().toUpperCase(), 
+                                        qty: qty 
+                                    });
+                                }
+                            });
+                            detectedOrders = Object.values(groups);
+                        } 
+                        // PARSEADOR OCR (IMAGENES JUNAEB/OTROS)
+                        else {
+                            const lines = input.split('\n');
+                            // Intentamos detectar ID de Orden en el texto
+                            let currentID = 'OCR-' + Date.now().toString().slice(-4);
+                            let items = [];
+                            
+                            lines.forEach(line => {
+                                const upper = line.toUpperCase();
+                                
+                                // Detectar "ID Orden" o "Pedido"
+                                const idMatch = upper.match(/(ORDEN|PEDIDO|OC|N°)\s*[:.]?\s*(\d+)/);
+                                if(idMatch) currentID = idMatch[2];
+
+                                // Lógica heurística para detectar items (Talla + Numero)
+                                // Busca patrones como "Polera ... L ... 5"
+                                const sizeMatch = upper.match(/\b(XS|S|M|L|XL|XXL|TALLA\s\d+)\b/);
+                                const qtyMatch = upper.match(/\b(\d+)\b/);
+                                
+                                if(sizeMatch && qtyMatch) {
+                                    // Asumimos que el resto del texto es el producto
+                                    let cleanName = upper.replace(sizeMatch[0], '').replace(qtyMatch[0], '').trim();
+                                    if(cleanName.length > 3) {
+                                        items.push({
+                                            name: cleanName,
+                                            size: sizeMatch[0],
+                                            qty: parseInt(qtyMatch[0])
+                                        });
+                                    }
+                                }
+                            });
+
+                            if(items.length > 0) {
+                                detectedOrders.push({
+                                    id: currentID,
+                                    client: 'DETECTADO POR OCR',
+                                    items: items
+                                });
+                            }
+                        }
+
+                        State.scannerBuffer = detectedOrders;
+                        const resDiv = document.getElementById('scanner-results');
+                        if(detectedOrders.length === 0) {
+                            resDiv.innerHTML = '<div class="text-center text-red-500 font-bold">No se detectaron datos válidos. Intente otra imagen.</div>';
+                        } else {
+                            resDiv.innerHTML = detectedOrders.map((o, i) => `
+                                <div class="p-3 bg-blue-50 border border-blue-100 rounded-lg text-left">
+                                    <div class="font-bold text-blue-800">OC: ${o.id} - ${o.client}</div>
+                                    <div class="text-[10px] text-slate-500">${o.items.length} productos detectados</div>
+                                    <div class="max-h-20 overflow-y-auto mt-2 border-t border-blue-200 pt-1">
+                                        ${o.items.map(it => `<div class="text-[9px]">${it.qty} x ${it.name} (${it.size})</div>`).join('')}
+                                    </div>
+                                </div>
+                            `).join('');
+                            document.getElementById('scanner-preview').classList.remove('hidden');
+                        }
+                        Swal.close();
+                    },
+                    
+                    confirmAll: () => {
+                        let newCount = 0;
+                        State.scannerBuffer.forEach(o => {
+                            // Crear productos fantasma si no existen
+                            o.items.forEach(it => {
+                                const exists = State.inventory.find(p => p.name === it.name);
+                                if(!exists) {
+                                    State.inventory.push({ sku: 'IA-'+Date.now().toString().slice(-3)+newCount, name: it.name, stock: { [it.size]: 0 } });
+                                    newCount++;
+                                }
+                            });
+                            // Crear Orden
+                            State.orders.push({ 
+                                ...o, 
+                                date: new Date().toISOString().split('T')[0], 
+                                status: 'Pendiente',
+                                deliveryDate: '' // Se puede editar después
+                            });
+                        });
+                        set(ref(db, 'orders'), State.orders);
+                        set(ref(db, 'inventory'), State.inventory);
+                        document.getElementById('scanner-preview').classList.add('hidden');
+                        Swal.fire('Procesado', `Se cargaron ${State.scannerBuffer.length} órdenes y ${newCount} productos nuevos.`, 'success');
                     }
                 }
             },
 
             Actions: {
-                dispatch: async (index) => {
-                    const { value: f } = await Swal.fire({
-                        title: 'Confirmar Despacho',
-                        html: `<input id="d-inv" class="swal2-input" placeholder="N° Factura"><input id="d-bul" class="swal2-input" placeholder="N° Bultos">`,
-                        focusConfirm: false,
-                        preConfirm: () => {
-                            const i = document.getElementById('d-inv').value, b = document.getElementById('d-bul').value;
-                            if(!i || !b) return Swal.showValidationMessage('Factura y Bultos requeridos');
-                            return { i, b };
-                        }
-                    });
-                    if(f) {
-                        const o = State.orders[index];
-                        o.items.forEach(it => {
-                            const p = State.inventory.find(x => x.name === it.name);
-                            if(p && p.stock && p.stock[it.size] !== undefined) {
-                                p.stock[it.size] -= it.qty;
-                                if(p.stock[it.size] < 0) p.stock[it.size] = 0;
-                            }
-                        });
-                        o.status = 'Despachado';
-                        o.invoice = f.i;
-                        o.bultos = f.b;
-                        o.dispatchDate = new Date().toISOString().split('T')[0];
-                        set(ref(db, 'inventory'), State.inventory);
-                        set(ref(db, 'orders'), State.orders);
-                        Swal.fire('Despachado', 'Inventario actualizado', 'success');
+                registerMovement: (data) => {
+                    const p = State.inventory.find(x => x.name === data.p);
+                    if(data.t === 'Ingreso') p.stock[data.s] += data.q;
+                    else {
+                        p.stock[data.s] -= data.q;
+                        if(p.stock[data.s] < 0) p.stock[data.s] = 0;
                     }
+                    const today = new Date().toISOString().split('T')[0];
+                    const moveNote = `[${data.t}] ${data.q} ${data.p} (${data.s}): ${data.r}`;
+                    State.calendar[today] = (State.calendar[today] ? State.calendar[today] + " | " : "") + moveNote;
+                    State.movements.push({ date: new Date().toLocaleString(), ...data, product: data.p, size: data.s, qty: data.q, reason: data.r });
+                    
+                    set(ref(db, 'inventory'), State.inventory);
+                    set(ref(db, 'movements'), State.movements);
+                    set(ref(db, 'calendar'), State.calendar);
+                    Swal.fire('Registrado', 'Stock y Calendario actualizados', 'success');
                 },
                 addNote: async (date) => {
                     const {value:n} = await Swal.fire({title:`Nota ${date}`, input:'text', inputValue:State.calendar[date]||''});
@@ -653,108 +780,38 @@
                         set(ref(db,'calendar'), State.calendar);
                     }
                 },
-                // FUNCIÓN BORRAR PRODUCTO (BODEGA)
-                deleteProduct: (index) => {
-                    Swal.fire({
-                        title: '¿Eliminar producto?',
-                        text: "Esta acción quitará el producto del inventario permanentemente.",
-                        icon: 'warning',
-                        showCancelButton: true,
-                        confirmButtonColor: '#ef4444',
-                        cancelButtonColor: '#64748b',
-                        confirmButtonText: 'Sí, eliminar',
-                        cancelButtonText: 'Cancelar'
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            State.inventory.splice(index, 1);
-                            set(ref(db, 'inventory'), State.inventory);
-                            Swal.fire('Eliminado', 'El producto ha sido quitado de bodega.', 'success');
-                        }
-                    });
+                dispatch: async (idx) => {
+                    const { value: f } = await Swal.fire({ title: 'Facturar', html: `<input id="f-inv" class="swal2-input" placeholder="Factura">`, preConfirm: () => document.getElementById('f-inv').value });
+                    if(f) {
+                        const o = State.orders[idx];
+                        o.items.forEach(it => {
+                            const p = State.inventory.find(x => x.name === it.name);
+                            if(p && p.stock[it.size] !== undefined) p.stock[it.size] -= it.qty;
+                        });
+                        o.status = 'Despachado'; o.invoice = f; o.dispatchDate = new Date().toISOString().split('T')[0];
+                        set(ref(db, 'orders'), State.orders); set(ref(db, 'inventory'), State.inventory);
+                    }
                 },
-                // FUNCIÓN BORRAR ORDEN (ESTÉTICA)
-                deleteOrder: (i) => {
-                    Swal.fire({
-                        title: '¿Eliminar Orden?',
-                        text: "Se borrará el registro de la orden de compra de forma permanente.",
-                        icon: 'warning',
-                        showCancelButton: true,
-                        confirmButtonColor: '#ef4444',
-                        cancelButtonColor: '#64748b',
-                        confirmButtonText: 'Sí, borrar',
-                        cancelButtonText: 'Cancelar'
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            State.orders.splice(i,1); 
-                            set(ref(db, 'orders'), State.orders);
-                            Swal.fire('Borrada', 'La orden ha sido eliminada.', 'success');
-                        }
-                    });
-                },
-                systemReset: () => {
-                    if(confirm('ALERTA: ¿Borrar toda la base de datos?')) set(ref(db), null);
-                }
+                deleteProduct: (i) => { if(confirm('¿Borrar producto?')) { State.inventory.splice(i,1); set(ref(db,'inventory'),State.inventory); } },
+                deleteOrder: (i) => { if(confirm('¿Borrar orden?')) { State.orders.splice(i,1); set(ref(db,'orders'),State.orders); } }
             },
 
             PDF: {
-                downloadTachas: async (index) => {
-                    const o = State.orders[index];
-
-                    if (!o.invoice) {
-                        const { value: fac } = await Swal.fire({
-                            title: 'N° de Factura Requerido',
-                            text: 'Para generar las etiquetas, ingresa el número de factura o guía:',
-                            input: 'text',
-                            showCancelButton: true,
-                            inputValidator: (value) => { if (!value) return 'Debes ingresar un número' }
-                        });
-                        if (!fac) return; 
-                        o.invoice = fac;
-                        await set(ref(db, 'orders'), State.orders); 
-                    }
-
+                downloadTachas: (idx) => {
+                    const o = State.orders[idx];
                     const { jsPDF } = window.jspdf;
-                    const doc = new jsPDF({ unit: 'mm', format: [216, 356] }); 
-                    const cards = o.items;
-                    const margin = 10;
-                    const w = (216 - (margin*3)) / 2;
-                    const h = (356 - (margin*3)) / 2;
-                    let x = margin, y = margin, count = 0;
-
-                    cards.forEach((it, i) => {
-                        doc.setLineWidth(0.5); doc.setDrawColor(0); doc.rect(x, y, w, h);
-                        doc.setFont("helvetica", "bold"); doc.setFontSize(14);
-                        doc.text("IDEAS TEXTILES SPA", x + w/2, y + 15, { align: "center" });
-                        doc.setFontSize(8); doc.setFont("helvetica", "normal");
-                        doc.text("Rep: Alejandro Cisterna O.", x + w/2, y + 20, { align: "center" });
-                        doc.line(x+5, y+23, x+w-5, y+23);
-                        doc.setFont("helvetica", "bold"); doc.setFontSize(10);
-                        doc.text(`CLIENTE: ${o.client}`, x + w/2, y + 35, { align: "center" });
-                        doc.setFontSize(16);
-                        doc.text(it.name, x + w/2, y + 50, { align: "center", maxWidth: w-10 });
-                        doc.setLineWidth(1); doc.rect(x + w/2 - 15, y + 60, 30, 15);
-                        doc.setFontSize(22); doc.text(it.size, x + w/2, y + 71, { align: "center" });
-                        doc.setFontSize(12); doc.text(`CANTIDAD: ${it.qty}`, x + w/2, y + 90, { align: "center" });
-                        if(it.msg) {
-                            doc.setFontSize(9); doc.setFont("helvetica", "italic");
-                            doc.text(`"${it.msg}"`, x + w/2, y + 100, { align: "center" });
-                        }
-                        const fy = y + h - 15;
-                        doc.setLineWidth(0.2); doc.line(x+5, fy, x+w-5, fy);
-                        doc.setFont("helvetica", "normal"); doc.setFontSize(8);
-                        doc.text(`OC #${o.id} | FAC: ${o.invoice}`, x+5, fy+5);
-                        doc.text("N° BULTOS:", x+w-40, fy+5);
-                        doc.rect(x+w-15, fy-2, 10, 8); 
-
-                        count++;
-                        if (count % 4 === 0 && i < cards.length - 1) {
-                            doc.addPage(); x = margin; y = margin;
-                        } else {
-                            if (count % 2 !== 0) x += w + margin;
-                            else { x = margin; y += h + margin; }
-                        }
+                    const doc = new jsPDF({ unit: 'mm', format: [216, 356] });
+                    const w = 90, h = 160; let x = 10, y = 10;
+                    o.items.forEach((it, i) => {
+                        doc.rect(x, y, w, h);
+                        doc.setFontSize(16); doc.text(it.name, x+w/2, y+20, {align:'center', maxWidth:80});
+                        doc.setFontSize(30); doc.text(it.size, x+w/2, y+60, {align:'center'});
+                        doc.setFontSize(14); doc.text(`CANT: ${it.qty}`, x+w/2, y+90, {align:'center'});
+                        doc.setFontSize(10); doc.text(`OC: ${o.id} | ${o.client}`, x+w/2, y+140, {align:'center'});
+                        if(i%2===0) x+=w+10; else { x=10; y+=h+10; }
+                        if(i>0 && (i+1)%4===0) { doc.addPage(); x=10; y=10; }
                     });
-                    doc.save(`Tachas_${o.client}_OC${o.id}.pdf`);
+                    doc.save(`Tachas_${o.id}.pdf`);
                 }
             }
         };
