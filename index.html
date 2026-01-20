@@ -334,6 +334,9 @@
                                         <div class="text-[10px] text-slate-400 font-mono">SKU: ${p.sku}</div>
                                     </div>
                                     <button onclick="App.UI.Modals.editProduct(${i})" class="ml-2 text-slate-300 hover:text-blue-500 transition"><i class="fas fa-edit"></i></button>
+                                    <button onclick="App.Actions.deleteProduct(${i})" class="ml-4 text-slate-300 hover:text-red-500 transition">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
                                 </div>
                                 <div class="mt-3">${badges}</div>
                             </div>
@@ -350,7 +353,6 @@
                     const list = [...State.orders].sort((a,b) => a.status === 'Pendiente' ? -1 : 1);
                     grid.innerHTML = list.map((o) => {
                         const idx = State.orders.indexOf(o);
-                        // FIX 3: HACER ITEMS CLICKEABLES PARA EDITAR
                         const itemsHtml = o.items.map((it, i) => `
                             <div onclick="App.UI.Modals.editOrderItem(${idx}, ${i})" class="flex justify-between items-start border-b border-slate-100 py-2 last:border-0 text-sm hover:bg-blue-50 cursor-pointer px-1 rounded transition">
                                 <div>
@@ -382,7 +384,7 @@
                                 ${o.status !== 'Despachado' ? 
                                 `<button onclick="App.Actions.dispatch(${idx})" class="btn-ios bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-xs font-bold shadow flex items-center gap-2"><i class="fas fa-truck-loading"></i> DESPACHAR</button>` : 
                                 `<div class="text-xs font-bold text-green-600 border border-green-200 bg-green-50 px-3 py-2 rounded flex items-center gap-1"><i class="fas fa-check-circle"></i> Fac: ${o.invoice}</div>`}
-                                <button onclick="App.Actions.deleteOrder(${idx})" class="text-red-300 hover:text-red-500 px-2"><i class="fas fa-trash"></i></button>
+                                <button onclick="App.Actions.deleteOrder(${idx})" class="text-red-300 hover:text-red-500 px-2 transition"><i class="fas fa-trash"></i></button>
                             </div>
                         </div>`;
                     }).join('');
@@ -410,13 +412,11 @@
                                     let s = r.querySelector('.sz-in').value.trim().toUpperCase();
                                     const q = parseInt(r.querySelector('.qt-in').value);
                                     if (!isNaN(q)) {
-                                        // FIX 1: SI LA TALLA ESTA VACIA, ES UNICA
                                         let finalSize = (s === "") ? "ÚNICA" : s;
                                         stock[finalSize] = q;
                                     }
                                 });
                                 if (!name) return Swal.showValidationMessage('El nombre es obligatorio');
-                                // Si no hay filas pero hay nombre, creamos ÚNICA con 0
                                 if(Object.keys(stock).length === 0) stock["ÚNICA"] = 0;
                                 return { name: name.toUpperCase(), stock };
                             }
@@ -480,7 +480,6 @@
                                         if(!exists) {
                                             const Toast = Swal.mixin({toast: true, position: 'top-end', showConfirmButton: false, timer: 2000});
                                             Toast.fire({icon: 'info', title: 'Producto nuevo preparado'});
-                                            // FIX 2: NO GUARDAMOS EN FIREBASE AUN. SOLO EN MEMORIA
                                             State.inventory.push({ sku: 'NEW-'+Date.now().toString().slice(-4), name: name, stock: { [size]: 0 } });
                                         } else if(!exists.stock[size]) {
                                             exists.stock[size] = 0;
@@ -503,7 +502,6 @@
                         }).then(res => { if(res.isConfirmed) App.Logic.Orders.create(res.value); });
                     },
 
-                    // NUEVA FUNCIÓN: EDITAR ITEM DE UNA OC YA CREADA
                     editOrderItem: async (orderIdx, itemIdx) => {
                         const item = State.orders[orderIdx].items[itemIdx];
                         const { value: form } = await Swal.fire({
@@ -576,7 +574,6 @@
 
                 Orders: {
                     create: async (data) => {
-                        // FIX 2: AHORA SI GUARDAMOS EL INVENTARIO CON LOS POSIBLES PRODUCTOS NUEVOS
                         await set(ref(db, 'inventory'), State.inventory);
 
                         const order = {
@@ -656,8 +653,43 @@
                         set(ref(db,'calendar'), State.calendar);
                     }
                 },
+                // FUNCIÓN BORRAR PRODUCTO (BODEGA)
+                deleteProduct: (index) => {
+                    Swal.fire({
+                        title: '¿Eliminar producto?',
+                        text: "Esta acción quitará el producto del inventario permanentemente.",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#ef4444',
+                        cancelButtonColor: '#64748b',
+                        confirmButtonText: 'Sí, eliminar',
+                        cancelButtonText: 'Cancelar'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            State.inventory.splice(index, 1);
+                            set(ref(db, 'inventory'), State.inventory);
+                            Swal.fire('Eliminado', 'El producto ha sido quitado de bodega.', 'success');
+                        }
+                    });
+                },
+                // FUNCIÓN BORRAR ORDEN (ESTÉTICA)
                 deleteOrder: (i) => {
-                    if(confirm('¿Eliminar Orden?')) { State.orders.splice(i,1); set(ref(db, 'orders'), State.orders); }
+                    Swal.fire({
+                        title: '¿Eliminar Orden?',
+                        text: "Se borrará el registro de la orden de compra de forma permanente.",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#ef4444',
+                        cancelButtonColor: '#64748b',
+                        confirmButtonText: 'Sí, borrar',
+                        cancelButtonText: 'Cancelar'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            State.orders.splice(i,1); 
+                            set(ref(db, 'orders'), State.orders);
+                            Swal.fire('Borrada', 'La orden ha sido eliminada.', 'success');
+                        }
+                    });
                 },
                 systemReset: () => {
                     if(confirm('ALERTA: ¿Borrar toda la base de datos?')) set(ref(db), null);
@@ -665,7 +697,6 @@
             },
 
             PDF: {
-                // FIX 4: EXIGIR FACTURA SOLO AL IMPRIMIR PDF TACHAS
                 downloadTachas: async (index) => {
                     const o = State.orders[index];
 
@@ -679,7 +710,7 @@
                         });
                         if (!fac) return; 
                         o.invoice = fac;
-                        await set(ref(db, 'orders'), State.orders); // Guardamos la factura en la OC
+                        await set(ref(db, 'orders'), State.orders); 
                     }
 
                     const { jsPDF } = window.jspdf;
