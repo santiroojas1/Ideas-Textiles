@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>IDEAS TEXTILES SPA | ERP SYSTEM PROFESSIONAL </title>
+    <title>IDEAS TEXTILES SPA | ERP SYSTEM</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
@@ -15,11 +15,9 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <script src="https://unpkg.com/tesseract.js@4.0.2/dist/tesseract.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
 
     <script>
-        // Configuración Worker PDF.js
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';
     </script>
 
@@ -43,7 +41,7 @@
             overflow-x: hidden;
         }
 
-        /* COMPONENTES DE NAVEGACION */
+        /* --- COMPONENTES DE UI --- */
         .nav-bubble {
             position: relative; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             overflow: hidden; border: 1px solid transparent;
@@ -59,7 +57,6 @@
         }
         .nav-bubble.active i { color: var(--brand-primary); }
 
-        /* TARJETAS Y CONTENEDORES */
         .card-glass {
             background: white; border-radius: 16px; border: 1px solid var(--border-light);
             padding: 24px; transition: all 0.3s ease; position: relative;
@@ -70,7 +67,6 @@
             border-color: #cbd5e1;
         }
 
-        /* INPUTS DE BUSQUEDA */
         .search-input {
             background: #f1f5f9; border: 1px solid #e2e8f0; border-radius: 12px;
             padding: 10px 16px; font-size: 0.85rem; font-weight: 600; color: #334155;
@@ -81,11 +77,10 @@
             box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
         }
 
-        /* BOTONES E INTERACCION */
         .btn-action { transition: all 0.2s active; cursor: pointer; user-select: none; }
         .btn-action:active { transform: scale(0.97); }
 
-        /* CALENDARIO AVANZADO */
+        /* --- CALENDARIO & PLANNER --- */
         .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; }
         .cal-day {
             min-height: 120px; background: white; border-radius: 12px;
@@ -94,33 +89,31 @@
         }
         .cal-day:hover { border-color: var(--brand-primary); background: #f8fafc; z-index: 10; }
         .cal-day.today { background: #eff6ff; border: 2px solid var(--brand-primary); }
-        
         .cal-event {
             font-size: 0.65rem; padding: 3px 6px; border-radius: 4px; margin-top: 2px;
             font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
             display: flex; align-items: center; gap: 4px; border-left-width: 3px;
         }
         
-        /* ESTADOS DE ORDENES (PIPELINE) */
+        /* --- PIPELINE VISUAL --- */
         .st-pendiente { background-color: #f1f5f9; color: #64748b; border-color: #cbd5e1; }
         .st-proceso { background-color: #fff7ed; color: #c2410c; border-color: #fdba74; }
         .st-empaquetado { background-color: #eff6ff; color: #1e40af; border-color: #93c5fd; }
         .st-despachado { background-color: #f0fdf4; color: #15803d; border-color: #86efac; }
         
-        /* TASK PLANNER */
         .task-item { transition: all 0.2s; }
         .task-item.done span { text-decoration: line-through; color: #94a3b8; }
         .task-item:hover { background-color: #f8fafc; }
 
-        /* ESTILOS NUEVOS V9: ADUANA DE VALIDACION */
+        /* --- ADUANA DE VALIDACIÓN (SPLIT VIEW) --- */
         .split-view { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; height: 70vh; }
         .evidence-panel { background: #0f172a; border-radius: 12px; overflow: hidden; position: relative; display: flex; align-items: center; justify-content: center; }
         .evidence-img { max-width: 100%; max-height: 100%; transition: transform 0.2s; cursor: grab; }
         .data-panel { background: #fff; border-radius: 12px; padding: 20px; overflow-y: auto; border: 1px solid #e2e8f0; }
         
-        /* Input Confidence Levels */
-        .confidence-high { border-color: #22c55e !important; background-color: #f0fdf4 !important; }
-        .confidence-low { border-color: #eab308 !important; background-color: #fefce8 !important; }
+        /* GEMINI STYLES */
+        .gemini-glow { animation: geminiPulse 2s infinite; }
+        @keyframes geminiPulse { 0% { box-shadow: 0 0 0 0 rgba(147, 51, 234, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(147, 51, 234, 0); } 100% { box-shadow: 0 0 0 0 rgba(147, 51, 234, 0); } }
 
         @media (max-width: 1024px) {
             .sidebar {
@@ -145,10 +138,23 @@
     <div id="loader" class="fixed inset-0 bg-slate-900 z-[100] flex flex-col justify-center items-center text-white transition-opacity duration-700">
         <div class="relative mb-6">
             <div class="w-16 h-16 border-4 border-blue-500/30 border-t-blue-500 rounded-full animate-spin"></div>
-            <i class="fas fa-scissors absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-xl text-white"></i>
+            <i class="fas fa-brain absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-xl text-white"></i>
         </div>
         <h2 class="font-black text-2xl tracking-[6px] uppercase">Ideas Textiles</h2>
-        <p class="text-[10px] font-bold text-slate-500 mt-2 uppercase tracking-widest">Iniciando Sistema...</p>
+        <p class="text-[10px] font-bold text-slate-500 mt-2 uppercase tracking-widest">Iniciando...</p>
+    </div>
+
+    <div id="config-modal" class="fixed inset-0 bg-slate-900/90 z-[95] hidden p-4 flex items-center justify-center">
+        <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl p-6 animate__animated animate__fadeInDown">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="font-bold text-slate-800 flex items-center gap-2"><i class="fas fa-key text-purple-600"></i> Configurar IA</h3>
+                <button onclick="document.getElementById('config-modal').classList.add('hidden')" class="text-slate-400 hover:text-red-500"><i class="fas fa-times"></i></button>
+            </div>
+            <p class="text-xs text-slate-500 mb-4">Ingresa tu API Key de Google Gemini para habilitar la inteligencia artificial. Se guardará de forma segura en tu navegador.</p>
+            <input type="password" id="gemini-api-key" class="w-full bg-slate-50 border border-slate-200 rounded-lg p-3 text-sm font-mono mb-4 focus:ring-2 focus:ring-purple-500 outline-none" placeholder="Pegar API Key aquí...">
+            <button onclick="App.Logic.Gemini.saveKey()" class="w-full bg-slate-900 text-white font-bold py-3 rounded-xl hover:bg-slate-800 transition">GUARDAR Y ACTIVAR</button>
+            <p class="text-[10px] text-center mt-4 text-slate-400 cursor-pointer hover:text-blue-500" onclick="window.open('https://aistudio.google.com/app/apikey')">¿No tienes una Key? Consíguela gratis aquí</p>
+        </div>
     </div>
 
     <div id="validation-modal" class="fixed inset-0 bg-slate-900/90 z-[90] hidden p-4 flex items-center justify-center">
@@ -157,33 +163,34 @@
             <div class="bg-slate-100 px-6 py-4 border-b border-slate-200 flex justify-between items-center">
                 <div>
                     <h3 class="font-black text-slate-800 text-lg flex items-center gap-2">
-                        <i class="fas fa-robot text-blue-600"></i> VERIFICACIÓN DE IA
+                        <i class="fas fa-sparkles text-purple-600 animate-pulse"></i> GEMINI ANALYSIS
                     </h3>
-                    <p class="text-xs text-slate-500">Confirme los datos antes de ingresar al sistema.</p>
+                    <p class="text-xs text-slate-500">Revisa la interpretación de la IA antes de guardar.</p>
                 </div>
                 <div class="flex gap-2">
-                    <button onclick="App.Logic.Validation.zoom(0.1)" class="w-8 h-8 rounded bg-white border shadow flex items-center justify-center"><i class="fas fa-search-plus"></i></button>
-                    <button onclick="App.Logic.Validation.zoom(-0.1)" class="w-8 h-8 rounded bg-white border shadow flex items-center justify-center"><i class="fas fa-search-minus"></i></button>
+                    <button onclick="App.Logic.Validation.zoom(0.1)" class="w-8 h-8 rounded bg-white border shadow flex items-center justify-center hover:bg-slate-50"><i class="fas fa-search-plus"></i></button>
+                    <button onclick="App.Logic.Validation.zoom(-0.1)" class="w-8 h-8 rounded bg-white border shadow flex items-center justify-center hover:bg-slate-50"><i class="fas fa-search-minus"></i></button>
                     <button onclick="App.Logic.Validation.close()" class="w-8 h-8 rounded bg-red-100 text-red-500 hover:bg-red-200 flex items-center justify-center"><i class="fas fa-times"></i></button>
                 </div>
             </div>
 
             <div class="flex-1 p-6 overflow-hidden">
                 <div class="split-view h-full">
-                    <div class="evidence-panel group">
+                    <div class="evidence-panel group border border-slate-700">
                         <img id="evidence-img" src="" class="evidence-img" alt="Evidencia">
-                        <div class="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-black/50 text-white px-3 py-1 rounded-full text-xs opacity-0 group-hover:opacity-100 transition">Rueda del mouse para zoom</div>
+                        <div id="evidence-text-overlay" class="hidden absolute inset-0 bg-white p-4 font-mono text-xs overflow-auto whitespace-pre-wrap"></div>
+                        <div class="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-black/50 text-white px-3 py-1 rounded-full text-xs opacity-0 group-hover:opacity-100 transition pointer-events-none">Scroll para Zoom</div>
                     </div>
                     
-                    <div class="data-panel flex flex-col">
+                    <div class="data-panel flex flex-col shadow-inner bg-slate-50/50">
                         <div id="validation-form-container" class="flex-1 space-y-4">
                             </div>
                         
-                        <div class="mt-6 pt-4 border-t border-slate-100 grid grid-cols-2 gap-4">
-                            <button onclick="App.Logic.Validation.reject()" class="py-3 rounded-xl border border-red-200 text-red-600 font-bold hover:bg-red-50 transition">
+                        <div class="mt-6 pt-4 border-t border-slate-200 grid grid-cols-2 gap-4">
+                            <button onclick="App.Logic.Validation.reject()" class="py-3 rounded-xl border-2 border-red-100 text-red-500 font-bold hover:bg-red-50 transition">
                                 <i class="fas fa-trash-alt mr-2"></i> RECHAZAR
                             </button>
-                            <button onclick="App.Logic.Validation.confirm()" class="py-3 rounded-xl bg-blue-600 text-white font-bold shadow-lg hover:bg-blue-700 transition">
+                            <button onclick="App.Logic.Validation.confirm()" class="py-3 rounded-xl bg-purple-600 text-white font-bold shadow-lg hover:bg-purple-700 transition gemini-glow">
                                 <i class="fas fa-check-circle mr-2"></i> CONFIRMAR E IMPORTAR
                             </button>
                         </div>
@@ -228,7 +235,7 @@
                     <i class="fas fa-file-invoice w-6 text-center"></i> <span class="nav-label">Órdenes</span>
                 </div>
                 <div onclick="App.Router.go('scanner')" id="nav-scanner" class="nav-bubble p-3 rounded-xl cursor-pointer flex items-center gap-3 text-sm font-bold text-slate-400 shrink-0">
-                    <i class="fas fa-microchip w-6 text-center text-blue-400"></i> <span class="nav-label">Scanner IA</span>
+                    <i class="fas fa-microchip w-6 text-center text-purple-400"></i> <span class="nav-label">Cerebro AI</span>
                 </div>
                 <div onclick="App.Router.go('calendar')" id="nav-calendar" class="nav-bubble p-3 rounded-xl cursor-pointer flex items-center gap-3 text-sm font-bold text-slate-400 shrink-0">
                     <i class="fas fa-calendar-alt w-6 text-center"></i> <span class="nav-label">Agenda</span>
@@ -237,8 +244,8 @@
 
             <div class="sidebar-footer z-10 mt-auto pt-4 border-t border-slate-800">
                 <div class="flex items-center gap-3">
-                    <div class="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center text-xs font-bold text-white">AC</div>
-                    <div><p class="text-xs font-bold text-white">Alejandro Cisterna</p><p class="text-[10px] text-slate-500">Administrador</p></div>
+                    <div class="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center text-xs font-bold text-white cursor-pointer hover:bg-slate-600" onclick="document.getElementById('config-modal').classList.remove('hidden')"><i class="fas fa-cog"></i></div>
+                    <div><p class="text-xs font-bold text-white">Gemini</p><p class="text-[10px] text-slate-500">Modo Online </p></div>
                 </div>
             </div>
         </aside>
@@ -252,8 +259,8 @@
                         <p class="text-slate-500 text-sm font-medium mt-1">Resumen de operaciones diarias</p>
                     </div>
                     <button onclick="App.PDF.generateManagementReport()" class="btn-action bg-slate-800 text-white px-5 py-3 rounded-xl font-bold text-xs shadow-lg flex items-center gap-2 hover:bg-slate-900 border border-slate-700">
-                        <i class="fas fa-file-contract"></i> REPORTE GERENCIAL 
-                    </button
+                        <i class="fas fa-file-contract"></i> REPORTE GERENCIAL
+                    </button>
                 </header>
                 
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
@@ -286,8 +293,7 @@
                         <input type="text" id="new-task-input" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-purple-500" placeholder="Escribe una tarea nueva y presiona Enter..." onkeypress="if(event.key==='Enter') App.Logic.Planner.add()">
                         <button onclick="App.Logic.Planner.add()" class="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition"><i class="fas fa-plus"></i></button>
                     </div>
-                    <div id="tasks-list" class="space-y-2 max-h-60 overflow-y-auto pr-2">
-                        </div>
+                    <div id="tasks-list" class="space-y-2 max-h-60 overflow-y-auto pr-2"></div>
                 </div>
             </section>
 
@@ -299,10 +305,10 @@
                             <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 text-xs"></i>
                             <input type="text" class="search-input pl-9" placeholder="Buscar por Nombre o SKU..." oninput="App.Actions.filter('inventory', this.value)">
                         </div>
-                        <button onclick="document.getElementById('file-ia-inventory').click()" class="btn-action bg-emerald-600 text-white px-4 py-3 rounded-xl font-bold shadow-lg flex items-center gap-2 text-sm hover:bg-emerald-700 whitespace-nowrap">
-                            <i class="fas fa-robot"></i> ESCANEA EL STOCK
+                        
+                        <button onclick="App.Logic.Gemini.trigger('inventory')" class="btn-action bg-emerald-600 text-white px-4 py-3 rounded-xl font-bold shadow-lg flex items-center gap-2 text-sm hover:bg-emerald-700 whitespace-nowrap">
+                            <i class="fas fa-robot"></i> SCAN STOCK
                         </button>
-                        <input type="file" id="file-ia-inventory" class="hidden" accept="image/*,.pdf,.xlsx,.csv" onchange="App.Logic.AI.processFile(this, 'inventory')">
                         
                         <button onclick="App.UI.Modals.newProduct()" class="btn-action bg-slate-900 text-white px-6 py-3 rounded-xl font-bold shadow-lg flex items-center gap-2 text-sm hover:bg-slate-800 whitespace-nowrap"><i class="fas fa-plus"></i> NUEVO</button>
                     </div>
@@ -312,7 +318,7 @@
 
             <section id="view-movements" class="hidden fade-in">
                 <header class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
-                    <div><h2 class="text-3xl font-black text-slate-800">Movimientos</h2><p class="text-slate-500 text-sm">Entradas y Salidas</p></div>
+                    <div><h2 class="text-3xl font-black text-slate-800">Movimientos</h2><p class="text-slate-500 text-sm">Kárdex de Entradas y Salidas</p></div>
                     <button onclick="App.UI.Modals.registerMovement()" class="btn-action bg-slate-800 text-white px-6 py-3 rounded-xl font-bold text-sm shadow-lg flex items-center gap-2 hover:bg-slate-700">
                         <i class="fas fa-exchange-alt"></i> REGISTRO MANUAL
                     </button>
@@ -342,10 +348,9 @@
                             <input type="text" class="search-input pl-9" placeholder="Buscar Cliente, OC, Fac o Estado..." oninput="App.Actions.filter('orders', this.value)">
                         </div>
                         
-                        <button onclick="document.getElementById('file-ia-orders').click()" class="btn-action bg-purple-600 text-white px-4 py-3 rounded-xl font-bold shadow-lg flex items-center gap-2 text-sm hover:bg-purple-700 whitespace-nowrap">
-                            <i class="fas fa-magic"></i> ESCANEA UNA OC
+                        <button onclick="App.Logic.Gemini.trigger('orders')" class="btn-action bg-purple-600 text-white px-4 py-3 rounded-xl font-bold shadow-lg flex items-center gap-2 text-sm hover:bg-purple-700 whitespace-nowrap">
+                            <i class="fas fa-magic"></i> SCAN OC
                         </button>
-                        <input type="file" id="file-ia-orders" class="hidden" accept="image/*,.pdf,.xlsx,.csv" onchange="App.Logic.AI.processFile(this, 'orders')">
 
                         <button onclick="App.UI.Modals.newOrder()" class="btn-action bg-blue-600 text-white px-6 py-3 rounded-xl font-bold shadow-lg flex items-center gap-2 text-sm hover:bg-blue-700 whitespace-nowrap"><i class="fas fa-cart-shopping"></i> CREAR OC</button>
                     </div>
@@ -354,22 +359,28 @@
             </section>
 
             <section id="view-scanner" class="hidden fade-in">
-                <header class="mb-8">
-                    <h2 class="text-3xl font-black text-slate-800">Motores de IA</h2>
-                    <p class="text-slate-500 text-sm">Seleccione el modo de operación</p>
+                <header class="mb-8 flex justify-between items-center">
+                    <div>
+                        <h2 class="text-3xl font-black text-slate-800">Motores de IA</h2>
+                        <p class="text-slate-500 text-sm">Seleccione el modo de operación</p>
+                    </div>
+                    <button onclick="document.getElementById('config-modal').classList.remove('hidden')" class="bg-slate-100 p-2 rounded-full hover:bg-slate-200 transition"><i class="fas fa-cog text-slate-500"></i></button>
                 </header>
+                
+                <div id="key-status-msg" class="mb-4 text-xs font-bold text-red-500 bg-red-50 p-3 rounded hidden">⚠️ La API Key no está configurada. Pulsa el engranaje.</div>
+
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <div class="card-glass border-l-4 border-l-emerald-500 flex flex-col items-center justify-center p-12 text-center group cursor-pointer hover:bg-emerald-50 transition" onclick="document.getElementById('file-ia-inventory').click()">
+                    <div class="card-glass border-l-4 border-l-emerald-500 flex flex-col items-center justify-center p-12 text-center group cursor-pointer hover:bg-emerald-50 transition" onclick="App.Logic.Gemini.trigger('inventory')">
                         <div class="w-20 h-20 bg-emerald-100 rounded-full flex items-center justify-center mb-4 text-emerald-600 group-hover:scale-110 transition"><i class="fas fa-box-open text-3xl"></i></div>
                         <h4 class="font-bold text-slate-700 text-xl">Ingreso de Stock</h4>
-                        <p class="text-xs text-slate-400 mt-2">Fotos de Albaranes, Listas, Excel</p>
+                        <p class="text-xs text-slate-400 mt-2">Fotos, Listas, Excel, PDF</p>
                         <p class="text-[10px] text-emerald-600 mt-2 font-bold uppercase">Suma Inventario</p>
                     </div>
 
-                    <div class="card-glass border-l-4 border-l-purple-500 flex flex-col items-center justify-center p-12 text-center group cursor-pointer hover:bg-purple-50 transition" onclick="document.getElementById('file-ia-orders').click()">
+                    <div class="card-glass border-l-4 border-l-purple-500 flex flex-col items-center justify-center p-12 text-center group cursor-pointer hover:bg-purple-50 transition" onclick="App.Logic.Gemini.trigger('orders')">
                         <div class="w-20 h-20 bg-purple-100 rounded-full flex items-center justify-center mb-4 text-purple-600 group-hover:scale-110 transition"><i class="fas fa-file-invoice-dollar text-3xl"></i></div>
                         <h4 class="font-bold text-slate-700 text-xl">Ingreso de Pedidos</h4>
-                        <p class="text-xs text-slate-400 mt-2">Fotos de OCs, Correos, Excel</p>
+                        <p class="text-xs text-slate-400 mt-2">OCs, Correos, Excel, PDF</p>
                         <p class="text-[10px] text-purple-600 mt-2 font-bold uppercase">Crea Órdenes</p>
                     </div>
                 </div>
@@ -381,19 +392,12 @@
                     <h2 class="text-xl font-black text-slate-800 uppercase tracking-widest" id="cal-month-title">MES AÑO</h2>
                     <button onclick="App.Logic.Calendar.move(1)" class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center hover:bg-white hover:shadow transition"><i class="fas fa-chevron-right"></i></button>
                 </div>
-                <div class="grid grid-cols-7 gap-8 text-center mb-4 px-2">
-                    <div class="text-[10px] font-black text-slate-400 uppercase">Lun</div>
-                    <div class="text-[10px] font-black text-slate-400 uppercase">Mar</div>
-                    <div class="text-[10px] font-black text-slate-400 uppercase">Mié</div>
-                    <div class="text-[10px] font-black text-slate-400 uppercase">Jue</div>
-                    <div class="text-[10px] font-black text-slate-400 uppercase">Vie</div>
-                    <div class="text-[10px] font-black text-slate-400 uppercase">Sáb</div>
-                    <div class="text-[10px] font-black text-slate-400 uppercase">Dom</div>
-                </div>
                 <div id="calendar-grid" class="cal-grid"></div>
             </section>
         </main>
     </div>
+
+    <input type="file" id="gemini-upload" class="hidden" accept="image/*,.pdf,.xlsx,.xls,.csv" onchange="App.Logic.Gemini.handleFile(this)">
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
@@ -403,7 +407,7 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        // ESTADO GLOBAL DE LA APLICACIÓN
+        // --- ESTADO GLOBAL ---
         const State = {
             inventory: [],
             orders: [],
@@ -412,11 +416,11 @@
             tasks: [], 
             dateContext: new Date(),
             filters: { inventory: '', orders: '' },
-            // NUEVO: Buffer de la Aduana de IA
             aiBuffer: {
                 data: null,
                 context: null,
-                imageSrc: null
+                imageSrc: null,
+                rawText: null // Para debug o Excel
             }
         };
 
@@ -439,6 +443,12 @@
 
                 const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
                 document.getElementById('current-date-display').innerText = new Date().toLocaleDateString('es-ES', options);
+
+                // Check Gemini Key on Load
+                if(!App.Logic.Gemini.getKey()) {
+                    document.getElementById('key-status-msg').classList.remove('hidden');
+                    // Auto-open modal if no key (optional, maybe annoying)
+                }
 
                 setTimeout(()=> document.getElementById('loader').classList.add('opacity-0', 'pointer-events-none'), 1200);
             },
@@ -543,7 +553,7 @@
                         const deliveryTag = o.deliveryDate ? `<span class="ml-2 text-[10px] bg-blue-50 text-blue-600 px-2 py-1 rounded border border-blue-100 font-bold"><i class="fas fa-calendar-check mr-1"></i>Entrega: ${o.deliveryDate}</span>` : '';
                         let statusClass = o.status === 'En Proceso' ? 'st-proceso' : o.status === 'Empaquetado' ? 'st-empaquetado' : o.status === 'Despachado' ? 'st-despachado' : 'st-pendiente';
 
-                        // PUNTO 5: EDICIÓN FACTURA Y REVERSA
+                        // EDICIÓN FACTURA Y REVERSA
                         let actionBtn = '';
                         if (o.status === 'Despachado') {
                             actionBtn = `
@@ -871,166 +881,215 @@
                     }
                 },
 
-                // -----------------------------------------------------
-                // PUNTO 2 y 3: IA SUPERIOR  (CEREBROS SEPARADOS + LECTURA HEURÍSTICA)
-                // -----------------------------------------------------
-                AI: {
-                    processFile: async (input, context) => {
+                // =========================================================================
+                // GEMINI AI ENGINE (CEREBRO V11)
+                // =========================================================================
+                Gemini: {
+                    getKey: () => localStorage.getItem('GEMINI_API_KEY'),
+                    saveKey: () => {
+                        const k = document.getElementById('gemini-api-key').value.trim();
+                        if(k) { localStorage.setItem('GEMINI_API_KEY', k); document.getElementById('config-modal').classList.add('hidden'); Swal.fire('Configurado', 'API Key guardada.', 'success'); document.getElementById('key-status-msg').classList.add('hidden'); }
+                    },
+                    
+                    trigger: (context) => {
+                        const key = App.Logic.Gemini.getKey();
+                        if(!key) { document.getElementById('config-modal').classList.remove('hidden'); return; }
+                        // Guardar contexto temporalmente
+                        document.getElementById('gemini-upload').setAttribute('data-context', context);
+                        document.getElementById('gemini-upload').click();
+                    },
+
+                    handleFile: async (input) => {
                         const file = input.files[0];
                         if(!file) return;
-                        
-                        Swal.fire({ title: 'Analizando...', text: 'Aplicando I.A', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+                        const context = input.getAttribute('data-context'); // 'inventory' or 'orders'
+                        input.value = ''; // Reset
 
-                        let extractedText = "";
-                        let imgSrc = "";
+                        Swal.fire({
+                            title: 'Gemini Pensando...',
+                            text: 'Analizando estructura y contenido...',
+                            allowOutsideClick: false,
+                            didOpen: () => Swal.showLoading()
+                        });
 
                         try {
-                            if(file.name.endsWith('.pdf')) {
-                                // PDF RENDERING TO CANVAS FOR OCR
-                                const arrayBuffer = await file.arrayBuffer();
-                                const pdf = await pdfjsLib.getDocument(arrayBuffer).promise;
-                                const page = await pdf.getPage(1);
-                                const viewport = page.getViewport({scale: 2.0}); // High scale for better OCR
-                                const canvas = document.createElement('canvas');
-                                const ctx = canvas.getContext('2d');
-                                canvas.height = viewport.height;
-                                canvas.width = viewport.width;
-                                await page.render({canvasContext: ctx, viewport: viewport}).promise;
-                                imgSrc = canvas.toDataURL('image/png');
-                                const res = await Tesseract.recognize(imgSrc, 'spa');
-                                extractedText = res.data.text;
-                            } else if(file.name.endsWith('.xlsx') || file.name.endsWith('.csv')) {
-                                // EXCEL PARSING (Simulado como texto para pasar por heurística)
-                                const reader = new FileReader();
-                                reader.onload = (e) => {
-                                    const data = new Uint8Array(e.target.result);
-                                    const workbook = XLSX.read(data, {type: 'array'});
-                                    const sheet = workbook.Sheets[workbook.SheetNames[0]];
-                                    const json = XLSX.utils.sheet_to_json(sheet, {header: 1});
-                                    extractedText = json.map(row => row.join(" ")).join("\n");
-                                    // Para Excel no hay imagen real, usamos un placeholder
-                                    App.Logic.Validation.open(extractedText, context, "https://cdn-icons-png.flaticon.com/512/732/732220.png");
-                                };
-                                reader.readAsArrayBuffer(file);
-                                return; // Salir, el callback abre la validación
-                            } else {
-                                // IMAGE OCR
-                                imgSrc = URL.createObjectURL(file);
-                                const res = await Tesseract.recognize(file, 'spa');
-                                extractedText = res.data.text;
+                            let payloadPart = null;
+                            let mimeType = file.type;
+                            let previewSrc = null;
+
+                            // 1. PROCESAR EXCEL
+                            if(file.name.endsWith('.xlsx') || file.name.endsWith('.xls') || file.name.endsWith('.csv')) {
+                                const textData = await App.Logic.Gemini.utils.excelToCSV(file);
+                                payloadPart = { text: "ANALIZA ESTOS DATOS CSV:\n" + textData };
+                                previewSrc = "https://cdn-icons-png.flaticon.com/512/732/732220.png"; // Icono Excel
+                            } 
+                            // 2. PROCESAR PDF
+                            else if(file.type === 'application/pdf') {
+                                const base64Img = await App.Logic.Gemini.utils.pdfToImage(file);
+                                payloadPart = { inline_data: { mime_type: "image/jpeg", data: base64Img } };
+                                previewSrc = "data:image/jpeg;base64," + base64Img;
+                            }
+                            // 3. PROCESAR IMAGEN
+                            else {
+                                const base64Img = await App.Logic.Gemini.utils.fileToBase64(file);
+                                payloadPart = { inline_data: { mime_type: file.type, data: base64Img } };
+                                previewSrc = "data:" + file.type + ";base64," + base64Img;
                             }
 
-                            App.Logic.Validation.open(extractedText, context, imgSrc);
+                            // LLAMADA A API
+                            const responseData = await App.Logic.Gemini.callAPI(payloadPart, context);
+                            
+                            // ABRIR ADUANA
+                            App.Logic.Validation.open(responseData, context, previewSrc);
+
                         } catch (e) {
                             console.error(e);
-                            Swal.fire('Error IA', 'No se pudo procesar el archivo.', 'error');
+                            Swal.fire('Error IA', 'Gemini no pudo procesar el archivo. Revisa tu API Key o el formato.', 'error');
                         }
                     },
 
-                    // EL CEREBRO DE PENSAMIENTO (HEURÍSTICA)
-                    analyzeText: (text, context) => {
-                        const lines = text.split('\n');
-                        const data = { items: [], client: '', date: '' };
+                    callAPI: async (part, context) => {
+                        const key = App.Logic.Gemini.getKey();
+                        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key=${key}`;
                         
-                        // DICCIONARIOS DE BUSQUEDA
-                        const sizes = ['XS','S','M','L','XL','XXL','2','4','6','8','10','12','14','16','36','38','40','42','44','46','48','50','52'];
+                        // SYSTEM PROMPTS (PERSONALIDADES)
+                        const PROMPTS = {
+                            inventory: `Actúa como Experto en Inventario Textil. Tu misión es extraer una lista de productos de la imagen o texto provisto.
+                            REGLAS:
+                            1. Ignora precios, códigos de barra inútiles o direcciones.
+                            2. Normaliza nombres (ej: "P0lera" -> "POLERA").
+                            3. Si ves "S, M, L" cerca de números, asocia la cantidad a la talla.
+                            4. SALIDA OBLIGATORIA: Un JSON Array estricto.
+                            FORMATO: [{"name": "NOMBRE PRODUCTO", "size": "TALLA", "qty": 0}]`,
+                            
+                            orders: `Actúa como Administrador de Pedidos. Tu misión es extraer los datos de una Orden de Compra.
+                            REGLAS:
+                            1. Busca el nombre del CLIENTE (Empresa o Persona).
+                            2. Busca la FECHA de entrega o emisión.
+                            3. Extrae la lista de items.
+                            4. SALIDA OBLIGATORIA: Un JSON Object estricto.
+                            FORMATO: {"client": "NOMBRE", "deliveryDate": "YYYY-MM-DD", "items": [{"name": "PROD", "size": "TALLA", "qty": 0}]}`
+                        };
 
-                        lines.forEach(line => {
-                            const upper = line.toUpperCase().trim();
-                            if(upper.length < 3) return;
-
-                            // CEREBRO B (VENTAS): BUSCA CLIENTE Y FECHA
-                            if(context === 'orders') {
-                                if(!data.client && !upper.includes('IDEAS TEXTILES') && !upper.includes('RUT') && upper.length > 5 && !upper.match(/\d/)) {
-                                    // Heurística: Primera línea larga que no sea mi empresa es el cliente
-                                    data.client = upper;
-                                }
-                                if(!data.date) {
-                                    const dateMatch = upper.match(/(\d{1,2})[-/](\d{1,2})[-/](\d{2,4})/);
-                                    if(dateMatch) data.date = `${dateMatch[3]}-${dateMatch[2].padStart(2,'0')}-${dateMatch[1].padStart(2,'0')}`; 
-                                }
+                        const body = {
+                            contents: [{
+                                parts: [
+                                    { text: PROMPTS[context] }, // Instrucción del Sistema
+                                    part // El archivo (Imagen o Texto)
+                                ]
+                            }],
+                            generationConfig: {
+                                temperature: 0.1, // Creatividad baja para precisión
+                                response_mime_type: "application/json" // Forzar JSON
                             }
+                        };
 
-                            // CEREBRO A & B: BUSCA PRODUCTOS Y CANTIDADES
-                            // Lógica de Proximidad: Buscar Talla + Numero
-                            let foundSize = null;
-                            let foundQty = 0;
-
-                            sizes.forEach(sz => {
-                                const regex = new RegExp(`\\b${sz}\\b`);
-                                if(regex.test(upper)) foundSize = sz;
-                            });
-
-                            const numbers = upper.match(/\b\d+\b/g);
-                            if(numbers) {
-                                // Si hay talla, el numero más cercano suele ser la cantidad
-                                // Si no hay talla, asumimos que es un item unico o cantidad total
-                                foundQty = Math.max(...numbers.map(n => parseInt(n))); 
-                            }
-
-                            if(foundSize && foundQty > 0 && foundQty < 10000) {
-                                // Limpieza de nombre: Quitar talla y numeros
-                                let name = upper.replace(foundSize, '').replace(/\d+/g, '').replace(/[.,$]/g,'').trim();
-                                if(name.length > 3) {
-                                    data.items.push({ name: name, size: foundSize, qty: foundQty, confidence: 0.9 });
-                                }
-                            }
+                        const res = await fetch(url, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(body)
                         });
 
-                        // Fallback si no encontró items pero hay texto
-                        if(data.items.length === 0) {
-                             data.items.push({ name: "PRODUCTO NO IDENTIFICADO", size: "M", qty: 0, confidence: 0.2 });
-                        }
+                        const json = await res.json();
+                        if(json.error) throw new Error(json.error.message);
+                        
+                        const textResponse = json.candidates[0].content.parts[0].text;
+                        // Limpiar posible markdown ```json ... ```
+                        const cleanJson = textResponse.replace(/```json/g, '').replace(/```/g, '').trim();
+                        return JSON.parse(cleanJson);
+                    },
 
-                        return data;
+                    utils: {
+                        fileToBase64: (file) => new Promise((resolve, reject) => {
+                            const reader = new FileReader();
+                            reader.readAsDataURL(file);
+                            reader.onload = () => resolve(reader.result.split(',')[1]);
+                            reader.onerror = error => reject(error);
+                        }),
+                        excelToCSV: (file) => new Promise((resolve) => {
+                            const reader = new FileReader();
+                            reader.onload = (e) => {
+                                const data = new Uint8Array(e.target.result);
+                                const workbook = XLSX.read(data, {type: 'array'});
+                                const sheet = workbook.Sheets[workbook.SheetNames[0]];
+                                const csv = XLSX.utils.sheet_to_csv(sheet);
+                                resolve(csv);
+                            };
+                            reader.readAsArrayBuffer(file);
+                        }),
+                        pdfToImage: async (file) => {
+                            const arrayBuffer = await file.arrayBuffer();
+                            const pdf = await pdfjsLib.getDocument(arrayBuffer).promise;
+                            const page = await pdf.getPage(1); // Solo página 1 para preview/scan rápido
+                            const viewport = page.getViewport({scale: 2.0});
+                            const canvas = document.createElement('canvas');
+                            const ctx = canvas.getContext('2d');
+                            canvas.height = viewport.height;
+                            canvas.width = viewport.width;
+                            await page.render({canvasContext: ctx, viewport: viewport}).promise;
+                            return canvas.toDataURL('image/jpeg').split(',')[1];
+                        }
                     }
                 },
 
-                // -----------------------------------------------------
-                // PUNTO 1: ADUANA DE VALIDACIÓN (INTERFAZ VISUAL)
-                // -----------------------------------------------------
+                // =========================================================================
+                // ADUANA DE VALIDACIÓN (LA INTERFAZ QUE CONECTA IA -> HUMANO -> DB)
+                // =========================================================================
                 Validation: {
-                    open: (text, context, imgSrc) => {
+                    open: (data, context, imgSrc) => {
                         Swal.close();
                         State.aiBuffer.context = context;
                         State.aiBuffer.imageSrc = imgSrc;
-                        
-                        const extractedData = App.Logic.AI.analyzeText(text, context);
-                        State.aiBuffer.data = extractedData;
+                        State.aiBuffer.data = data; // Raw data from Gemini
 
                         const modal = document.getElementById('validation-modal');
                         const img = document.getElementById('evidence-img');
+                        const overlay = document.getElementById('evidence-text-overlay');
                         const formContainer = document.getElementById('validation-form-container');
 
-                        img.src = imgSrc;
+                        // Si es Excel, mostrar texto en lugar de imagen
+                        if(imgSrc.includes('flaticon')) {
+                            img.classList.add('hidden');
+                            overlay.classList.remove('hidden');
+                            overlay.innerText = "ARCHIVO EXCEL/CSV PROCESADO.\nGemini ha analizado las filas matemáticamente.";
+                        } else {
+                            img.src = imgSrc;
+                            img.classList.remove('hidden');
+                            overlay.classList.add('hidden');
+                        }
+
                         modal.classList.remove('hidden');
 
                         // GENERAR FORMULARIO DINÁMICO
                         let html = '';
-                        
+                        let items = [];
+
                         if(context === 'orders') {
+                            items = data.items || [];
                             html += `
-                            <div class="bg-blue-50 p-4 rounded border border-blue-100 mb-4">
-                                <h4 class="font-bold text-blue-800 text-xs mb-2 uppercase">Cabecera Orden</h4>
+                            <div class="bg-blue-50 p-4 rounded border border-blue-100 mb-4 animate__animated animate__fadeIn">
+                                <h4 class="font-bold text-blue-800 text-xs mb-2 uppercase">Cabecera Detectada</h4>
                                 <div class="grid grid-cols-2 gap-2">
-                                    <div><label class="text-[10px] text-slate-500 font-bold">CLIENTE DETECTADO</label><input id="val-client" class="w-full text-sm font-bold border rounded p-1" value="${extractedData.client || 'CLIENTE GENERICO'}"></div>
-                                    <div><label class="text-[10px] text-slate-500 font-bold">FECHA ENTREGA</label><input type="date" id="val-date" class="w-full text-sm font-bold border rounded p-1" value="${extractedData.date || new Date().toISOString().split('T')[0]}"></div>
+                                    <div><label class="text-[10px] text-slate-500 font-bold">CLIENTE</label><input id="val-client" class="w-full text-sm font-bold border rounded p-1" value="${data.client || ''}"></div>
+                                    <div><label class="text-[10px] text-slate-500 font-bold">FECHA</label><input type="date" id="val-date" class="w-full text-sm font-bold border rounded p-1" value="${data.deliveryDate || new Date().toISOString().split('T')[0]}"></div>
                                 </div>
                             </div>`;
+                        } else {
+                            // Inventory: Gemini devuelve array directo
+                            items = Array.isArray(data) ? data : (data.items || []);
                         }
 
-                        html += `<div class="space-y-2 max-h-[400px] overflow-y-auto pr-2">`;
-                        extractedData.items.forEach((item, idx) => {
-                            const confidenceClass = item.confidence > 0.8 ? 'confidence-high' : 'confidence-low';
+                        html += `<div class="space-y-2 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">`;
+                        items.forEach((item, idx) => {
                             html += `
-                            <div class="flex items-center gap-2 p-2 rounded border ${confidenceClass} item-row" data-idx="${idx}">
-                                <input class="flex-1 text-xs font-bold bg-transparent border-b border-dashed border-slate-400 focus:outline-none val-name" value="${item.name}">
-                                <input class="w-16 text-xs text-center font-bold bg-white border rounded focus:outline-none val-size" value="${item.size}">
-                                <input type="number" class="w-16 text-xs text-center font-bold bg-white border rounded focus:outline-none val-qty" value="${item.qty}">
-                                <button onclick="this.parentElement.remove()" class="text-red-400 hover:text-red-600"><i class="fas fa-times"></i></button>
+                            <div class="flex items-center gap-2 p-2 rounded border bg-white border-slate-100 item-row hover:bg-slate-50 transition" data-idx="${idx}">
+                                <input class="flex-1 text-xs font-bold bg-transparent border-b border-dashed border-slate-300 focus:border-purple-500 focus:outline-none val-name uppercase" value="${item.name || ''}">
+                                <input class="w-16 text-xs text-center font-bold bg-white border rounded focus:outline-none val-size uppercase" value="${item.size || 'ÚNICA'}">
+                                <input type="number" class="w-16 text-xs text-center font-bold bg-white border rounded focus:outline-none val-qty" value="${item.qty || 0}">
+                                <button onclick="this.parentElement.remove()" class="text-slate-300 hover:text-red-500 transition"><i class="fas fa-times"></i></button>
                             </div>`;
                         });
-                        html += `</div><button onclick="App.Logic.Validation.addRow()" class="w-full py-2 text-xs font-bold text-slate-500 border border-dashed border-slate-300 rounded hover:bg-slate-50">+ Agregar Fila Manual</button>`;
+                        html += `</div><button onclick="App.Logic.Validation.addRow()" class="w-full py-2 mt-2 text-xs font-bold text-purple-500 border border-dashed border-purple-200 rounded hover:bg-purple-50 transition">+ Agregar Fila Manual</button>`;
 
                         formContainer.innerHTML = html;
                     },
@@ -1038,8 +1097,8 @@
                     addRow: () => {
                         const container = document.querySelector('#validation-form-container .space-y-2');
                         const div = document.createElement('div');
-                        div.className = "flex items-center gap-2 p-2 rounded border bg-white border-slate-200 item-row";
-                        div.innerHTML = `<input class="flex-1 text-xs font-bold bg-transparent border-b border-dashed border-slate-400 focus:outline-none val-name" placeholder="Producto"><input class="w-16 text-xs text-center font-bold bg-white border rounded focus:outline-none val-size" placeholder="Talla"><input type="number" class="w-16 text-xs text-center font-bold bg-white border rounded focus:outline-none val-qty" value="1"><button onclick="this.parentElement.remove()" class="text-red-400 hover:text-red-600"><i class="fas fa-times"></i></button>`;
+                        div.className = "flex items-center gap-2 p-2 rounded border bg-white border-slate-100 item-row animate__animated animate__fadeIn";
+                        div.innerHTML = `<input class="flex-1 text-xs font-bold bg-transparent border-b border-dashed border-slate-300 focus:border-purple-500 focus:outline-none val-name uppercase" placeholder="PRODUCTO"><input class="w-16 text-xs text-center font-bold bg-white border rounded focus:outline-none val-size uppercase" placeholder="TALLA"><input type="number" class="w-16 text-xs text-center font-bold bg-white border rounded focus:outline-none val-qty" value="1"><button onclick="this.parentElement.remove()" class="text-slate-300 hover:text-red-500 transition"><i class="fas fa-times"></i></button>`;
                         container.appendChild(div);
                     },
 
@@ -1061,26 +1120,28 @@
                         const rows = document.querySelectorAll('.item-row');
                         let items = [];
                         rows.forEach(r => {
-                            items.push({
-                                name: r.querySelector('.val-name').value.toUpperCase(),
-                                size: r.querySelector('.val-size').value.toUpperCase(),
-                                qty: parseInt(r.querySelector('.val-qty').value) || 0
-                            });
+                            const n = r.querySelector('.val-name').value.toUpperCase();
+                            const s = r.querySelector('.val-size').value.toUpperCase();
+                            const q = parseInt(r.querySelector('.val-qty').value) || 0;
+                            if(n && q > 0) items.push({name: n, size: s, qty: q});
                         });
+
+                        if(items.length === 0) return Swal.fire('Error', 'No hay items válidos para importar', 'warning');
 
                         if(context === 'inventory') {
                             items.forEach(it => {
                                 let p = State.inventory.find(x => x.name === it.name);
                                 if(p) { p.stock[it.size] = (p.stock[it.size]||0) + it.qty; }
                                 else { 
+                                    // Crear nuevo si no existe
                                     let newStock = {}; newStock[it.size] = it.qty;
-                                    State.inventory.push({ sku: 'IA-'+Date.now(), name: it.name, stock: newStock });
+                                    State.inventory.push({ sku: 'IA-'+Date.now().toString().slice(-4), name: it.name, stock: newStock });
                                 }
                             });
                             set(ref(db, 'inventory'), State.inventory);
-                            Swal.fire('Inventario Actualizado', 'Stock sumado correctamente.', 'success');
+                            Swal.fire('Inventario Actualizado', `${items.length} productos procesados.`, 'success');
                         } else {
-                            const client = document.getElementById('val-client').value.toUpperCase();
+                            const client = document.getElementById('val-client').value.toUpperCase() || "CLIENTE GENERAL";
                             const date = document.getElementById('val-date').value;
                             const newOrder = {
                                 id: Date.now().toString().slice(-6),
@@ -1092,7 +1153,7 @@
                             };
                             State.orders.push(newOrder);
                             set(ref(db, 'orders'), State.orders);
-                            Swal.fire('Orden Creada', `OC #${newOrder.id} generada.`, 'success');
+                            Swal.fire('Orden Creada', `OC #${newOrder.id} generada con éxito.`, 'success');
                         }
                         App.Logic.Validation.close();
                     }
@@ -1124,13 +1185,10 @@
                     const currentIdx = ORDER_STATUS_FLOW.indexOf(o.status);
                     const nextIdx = currentIdx + direction;
 
-                    // PUNTO 5: REVERSA Y BORRADO DE FACTURA
                     if (direction === -1 && o.status === 'Despachado') {
-                        // REGLA: Si me devuelvo de Despachado, borro la factura.
                         o.status = 'Empaquetado';
                         o.invoice = ''; 
                         o.dispatchDate = '';
-                        // Devolver Stock (Opcional, depende de política. Aquí asumimos que si se reversa despacho, el stock vuelve virtualmente a la orden pero no a bodega aun)
                         set(ref(db, 'orders'), State.orders);
                         Swal.fire('Reversado', 'Orden volvió a Empaquetado. Factura borrada.', 'info');
                         return;
@@ -1168,7 +1226,6 @@
                     }
                 },
 
-                // PUNTO 5: EDICIÓN DE FACTURA EN CALIENTE
                 editInvoice: async (idx) => {
                     const o = State.orders[idx];
                     const { value: newFac } = await Swal.fire({
@@ -1193,7 +1250,6 @@
             },
 
             PDF: {
-                // PUNTO 4: REPORTE GERENCIAL DETALLADO (HOJA DE RUTA)
                 generateManagementReport: () => {
                     const { jsPDF } = window.jspdf;
                     const doc = new jsPDF();
@@ -1203,7 +1259,6 @@
                     doc.setFontSize(10); doc.setFont("helvetica", "normal"); doc.text("REPORTE DE GESTIÓN ", 15, 26); doc.text(`Emitido: ${now.toLocaleString()}`, 15, 31);
                     doc.line(15, 35, 195, 35);
 
-                    // KPIs
                     let totalItems = 0; State.inventory.forEach(p => { if(p.stock) totalItems += Object.values(p.stock).reduce((a,b)=>a+b,0); });
                     const pendingOrders = State.orders.filter(o => o.status !== 'Despachado');
                     
@@ -1211,17 +1266,14 @@
                     doc.rect(15, startY, 40, 25); doc.setFontSize(8); doc.text("STOCK TOTAL", 35, startY+6, {align:'center'}); doc.setFontSize(14); doc.text(String(totalItems), 35, startY+16, {align:'center'});
                     doc.rect(60, startY, 40, 25); doc.setFontSize(8); doc.text("EN PROCESO", 80, startY+6, {align:'center'}); doc.setFontSize(14); doc.text(String(pendingOrders.length), 80, startY+16, {align:'center'});
                     
-                    // TABLA 1: INVENTARIO
                     doc.setFontSize(11); doc.text("ESTADO DE BODEGA", 15, startY+35);
                     const invRows = State.inventory.map(p => [p.sku, p.name, p.stock ? Object.entries(p.stock).map(([k,v])=>`${k}:${v}`).join(', ') : '0']);
                     doc.autoTable({ startY: startY+40, head: [['SKU', 'Producto', 'Detalle']], body: invRows, theme: 'plain', headStyles: { fillColor: [220, 220, 220], fontStyle: 'bold' } });
 
                     let finalY = doc.lastAutoTable.finalY + 15;
 
-                    // TABLA 2 (NUEVA): HOJA DE RUTA / ÓRDENES EN CURSO
                     doc.text("DETALLE DE ÓRDENES EN CURSO (PRIORIDAD)", 15, finalY);
                     
-                    // Ordenar por fecha de entrega
                     const sortedOrders = pendingOrders.sort((a,b) => new Date(a.deliveryDate) - new Date(b.deliveryDate));
                     const orderRows = sortedOrders.map(o => {
                         const vol = o.items.reduce((acc, it) => acc + it.qty, 0);
@@ -1239,33 +1291,25 @@
 
                     finalY = doc.lastAutoTable.finalY + 15;
 
-                    // TABLA 3: MOVIMIENTOS
                     doc.text("BITÁCORA DE MOVIMIENTOS", 15, finalY);
                     const movRows = State.movements.slice(-10).reverse().map(m => [m.date, m.type, m.product, m.qty, m.reason]);
                     doc.autoTable({ startY: finalY + 5, head: [['Fecha', 'Tipo', 'Producto', 'Cant', 'Motivo']], body: movRows, theme: 'plain', styles: { fontSize: 7 } });
 
-                    finalY = doc.lastAutoTable.finalY + 30;
-                    if(finalY > 260) { doc.addPage(); finalY = 40; }
-                    doc.line(70, finalY, 140, finalY);
-                    doc.setFontSize(9); doc.text("FIRMA RESPONSABLE", 105, finalY + 5, {align:'center'});
-
                     doc.save(`Reporte_${now.toISOString().slice(0,10)}.pdf`);
                 },
 
-                // PUNTO 3: ETIQUETAS "CAJA MASTER" AGRUPADAS
                 downloadTachas: (idx) => {
                     const o = State.orders[idx];
                     const { jsPDF } = window.jspdf;
                     const doc = new jsPDF({ unit: 'mm', format: [216, 356] }); // Oficio
-                    const cols = 1; // 1 Etiqueta grande por ancho para que quepa la tabla
-                    const rows = 2; // 2 por hoja (Más grandes para caja master)
+                    const cols = 1; 
+                    const rows = 2; 
                     const margin = 10;
                     const w = 196; 
                     const h = 160;
                     
                     let x = margin; let y = margin; let count = 0;
 
-                    // AGRUPAR ITEMS POR NOMBRE DE PRODUCTO
                     const groupedItems = {};
                     o.items.forEach(it => {
                         if(!groupedItems[it.name]) groupedItems[it.name] = { name: it.name, sizes: {}, total: 0 };
@@ -1274,39 +1318,32 @@
                     });
 
                     Object.values(groupedItems).forEach((prod, i) => {
-                        // Marco
                         doc.setDrawColor(0); doc.setLineWidth(0.5); doc.rect(x, y, w, h);
                         
-                        // Header
                         doc.setFont("helvetica", "bold"); doc.setFontSize(20); doc.text("IDEAS TEXTILES SPA", x + w/2, y + 15, { align: "center" });
                         doc.setFontSize(12); doc.text(`CLIENTE: ${o.client}`, x + 10, y + 30);
                         doc.text(`OC: ${o.id}`, x + 10, y + 38);
                         doc.text(`DESTINO/FAC: ${o.invoice || 'PENDIENTE'}`, x + 100, y + 38);
 
-                        // PRODUCTO GIGANTE
                         doc.setFontSize(24); doc.text(prod.name, x + w/2, y + 60, { align: "center" });
 
-                        // MATRIZ DE TALLAS (La Tabla)
                         let matrixY = y + 80;
                         doc.setFontSize(14);
                         doc.text("DETALLE DE CONTENIDO:", x + 10, matrixY);
                         matrixY += 10;
 
-                        // Dibujar mini tabla manual
                         let cellX = x + 10;
                         Object.entries(prod.sizes).forEach(([size, qty]) => {
                             doc.rect(cellX, matrixY, 30, 20);
                             doc.setFontSize(10); doc.text(size, cellX + 15, matrixY + 8, {align:'center'});
                             doc.setFontSize(14); doc.text(String(qty), cellX + 15, matrixY + 16, {align:'center'});
                             cellX += 35;
-                            if(cellX > x + w - 30) { cellX = x + 10; matrixY += 25; } // Salto de línea
+                            if(cellX > x + w - 30) { cellX = x + 10; matrixY += 25; }
                         });
 
-                        // TOTALIZADOR
                         doc.setFontSize(30); 
                         doc.text(`TOTAL: ${prod.total} UN.`, x + w/2, y + h - 20, { align: "center" });
 
-                        // Paginación
                         count++;
                         if (count % rows === 0 && i < Object.keys(groupedItems).length - 1) { doc.addPage(); y = margin; } 
                         else { y += h + margin; }
