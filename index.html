@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Ideas Textiles SPA</title>
+    <title>Ideas Textiles SPA </title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
@@ -53,11 +53,11 @@
         <div class="max-w-7xl mx-auto p-4 md:p-6 flex flex-col md:flex-row items-center justify-between gap-4">
             <div class="flex items-center gap-3 w-full md:w-auto">
                 <div class="p-2 bg-blue-600 rounded-xl shadow-lg shadow-blue-500/20">
-                    <i data-lucide="zap" class="w-5 h-5 md:w-6 md:h-6 text-yellow-300"></i>
+                    <i data-lucide="activity" class="w-5 h-5 md:w-6 md:h-6 text-white"></i>
                 </div>
                 <div>
                     <h1 class="text-lg md:text-xl font-black tracking-tighter leading-none">IDEAS TEXTILES SPA</h1>
-                    <p id="syncStatus" class="text-emerald-400 text-[9px] md:text-[10px] font-bold uppercase italic mt-1">Modo Rápido Activado</p>
+                    <p id="syncStatus" class="text-amber-400 text-[9px] md:text-[10px] font-bold uppercase italic mt-1">Iniciando sistema...</p>
                 </div>
             </div>
             
@@ -110,9 +110,10 @@
             </div>
 
             <div id="productGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 pb-10">
-                <div class="col-span-full text-center py-20">
+                <div id="loadingState" class="col-span-full text-center py-20">
                     <div class="animate-spin inline-block w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full mb-4"></div>
-                    <p class="text-slate-400 font-bold uppercase text-[10px] tracking-widest">Cargando...</p>
+                    <p class="text-slate-400 font-bold uppercase text-[10px] tracking-widest">Conectando con base de datos...</p>
+                    <button onclick="forceRenderEmpty()" id="btnForceLoad" class="hidden mt-4 text-blue-600 underline text-xs font-bold">¿Tarda mucho? Iniciar vacío</button>
                 </div>
             </div>
         </section>
@@ -229,7 +230,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getFirestore, collection, doc, setDoc, onSnapshot, query, deleteDoc, updateDoc, enableIndexedDbPersistence } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, collection, doc, setDoc, onSnapshot, query, deleteDoc, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
         const firebaseConfig = JSON.parse(__firebase_config);
@@ -238,24 +239,29 @@
         const auth = getAuth(app);
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'it-erp-v2';
 
-        // --- OPTIMIZACIÓN: PERSISTENCIA LOCAL (Caché Offline) ---
-        // Esto hace que la carga sea instantánea después de la primera visita
-        try {
-            enableIndexedDbPersistence(db).catch((err) => {
-                if (err.code == 'failed-precondition') {
-                    console.log('Múltiples pestañas abiertas, persistencia limitada.');
-                } else if (err.code == 'unimplemented') {
-                    console.log('Navegador no soporta persistencia.');
-                }
-            });
-        } catch(e) { console.log(e); }
-
         let products = [];
         let orders = [];
         let events = [];
         let cart = [];
         let backupDone = false;
         let currentUser = null;
+        let loadTimeout;
+
+        // TIMEOUT DE SEGURIDAD
+        // Si no carga en 5s, muestra botón para forzar entrada
+        loadTimeout = setTimeout(() => {
+            document.getElementById('btnForceLoad').classList.remove('hidden');
+            document.getElementById('syncStatus').innerText = "ESPERANDO DATOS...";
+            document.getElementById('syncStatus').classList.add('text-rose-400');
+        }, 5000);
+
+        window.forceRenderEmpty = () => {
+            clearTimeout(loadTimeout);
+            if(products.length === 0) {
+                renderProducts(); // Renderizará el estado vacío
+            }
+            document.getElementById('syncStatus').innerText = "MODO LOCAL / VACÍO";
+        };
 
         const initAuth = async () => {
             try {
@@ -265,7 +271,8 @@
                     await signInAnonymously(auth);
                 }
             } catch (error) {
-                document.getElementById('syncStatus').innerText = "SIN CONEXIÓN";
+                console.error("Auth Error:", error);
+                document.getElementById('syncStatus').innerText = "ERROR DE CONEXIÓN";
                 document.getElementById('syncStatus').className = "text-rose-500 text-[9px] font-bold uppercase italic mt-1";
             }
         };
@@ -275,19 +282,27 @@
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 currentUser = user;
-                document.getElementById('syncStatus').innerText = "CONECTADO: MODO RÁPIDO";
+                document.getElementById('syncStatus').innerText = "AUTENTICADO. BUSCANDO DATOS...";
                 startSync();
             }
         });
 
         function startSync() {
             if (!currentUser) return;
-            // Usamos snapshots: actualizan la UI instantáneamente con la caché local
+            
+            // Usar onSnapshot con manejo de errores explícito
             onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'products'), (snap) => {
+                clearTimeout(loadTimeout); // Se recibieron datos, cancelar timeout
                 products = snap.docs.map(d => d.data());
                 renderProducts();
                 renderCatalog();
                 updateOrderSummary();
+                document.getElementById('syncStatus').innerText = "CONECTADO: DATOS LISTOS";
+                document.getElementById('syncStatus').className = "text-emerald-400 text-[9px] font-bold uppercase italic mt-1";
+            }, (err) => {
+                console.error("Snapshot Error:", err);
+                // Si falla el permiso o red, forzar render vacío para no bloquear
+                forceRenderEmpty();
             });
 
             onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'orders'), (snap) => {
@@ -302,7 +317,6 @@
         }
 
         // --- OPTIMIZACIÓN: GUARDADO OPTIMISTA ---
-        // La UI se cierra ANTES de esperar al servidor
         window.saveProduct = (e) => {
             e.preventDefault();
             if (!currentUser) return;
@@ -314,19 +328,15 @@
             const sizes = document.getElementById('prodSizes').value.split(',').map(s => s.trim().toUpperCase());
             const reason = document.getElementById('prodReason').value;
 
-            // 1. Cerrar Modal INMEDIATAMENTE (Sensación de velocidad)
+            // 1. Cerrar Modal INMEDIATAMENTE
             closeModal('modalProducto');
 
             // 2. Procesar datos en segundo plano
             const processSave = async () => {
                 const existing = products.find(p => p.id === id);
-                
                 try {
-                    // Guardar evento de stock si corresponde
                     if (existing && existing.stock !== newStock) {
-                        if(!reason) { alert("Faltó el motivo, pero se guardará. Edítalo luego."); }
                         const eventId = `EV-${Date.now()}`;
-                        // No usamos await aquí para no bloquear, dejamos que Firebase gestione la cola
                         setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'events', eventId), {
                             id: eventId,
                             date: new Date().toISOString().split('T')[0],
@@ -334,17 +344,14 @@
                             desc: `Ajuste: ${existing.stock} -> ${newStock}. Ref: ${reason || 'Sin motivo'}`
                         });
                     }
-
-                    // Guardar producto
                     await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'products', id), {
                         id, name, stock: newStock, price, sizes
                     });
-                    
                 } catch (err) {
+                    console.error(err);
                     alert("Hubo un error guardando en la nube. Verifique su conexión.");
                 }
             };
-            
             processSave();
         };
 
@@ -364,8 +371,8 @@
 
             // 1. Feedback Inmediato
             printTachas(newOrder);
-            const tempCart = [...cart]; // Copia para el bucle
-            cart = []; // Limpiar UI
+            const tempCart = [...cart];
+            cart = [];
             document.getElementById('orderCustomer').value = '';
             document.getElementById('orderAddress').value = '';
             renderCart();
@@ -374,7 +381,6 @@
             const processOrder = async () => {
                 try {
                     await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'orders', orderId), newOrder);
-                    // Actualizar stocks
                     for (const item of tempCart) {
                         const p = products.find(prod => prod.id === item.id);
                         if (p) {
@@ -383,16 +389,16 @@
                             });
                         }
                     }
-                } catch(err) { console.error("Error sincronizando orden", err); }
+                } catch(err) { console.error("Error orden", err); }
             };
             processOrder();
         };
 
-        // RENDERERS (Sin cambios mayores, solo optimización visual)
+        // RENDERERS
         function renderProducts() {
             const grid = document.getElementById('productGrid');
             if (products.length === 0) {
-                grid.innerHTML = '<div class="col-span-full text-center py-20 text-slate-400 font-bold uppercase text-xs">Sin inventario</div>';
+                grid.innerHTML = '<div class="col-span-full text-center py-20 text-slate-400 font-bold uppercase text-xs">Sin inventario. Añade un producto.</div>';
                 return;
             }
             grid.innerHTML = products.sort((a,b) => a.name.localeCompare(b.name)).map(p => `
@@ -422,7 +428,7 @@
             lucide.createIcons();
         }
 
-        // Resto de funciones UI idénticas al diseño anterior...
+        // Resto de funciones UI idénticas
         function renderCatalog() {
             const grid = document.getElementById('catalogGrid');
             grid.innerHTML = products.map(p => `
