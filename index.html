@@ -2,649 +2,557 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Ideas Textiles SPA </title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ideas Textiles ERP</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-    
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap');
-        
-        :root {
-            --safe-area-inset-bottom: env(safe-area-inset-bottom);
-        }
-
-        body { 
-            font-family: 'Inter', sans-serif; 
-            background-color: #f8fafc; 
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        .tab-content { display: none; }
-        .tab-content.active { display: block; animation: fadeIn 0.3s ease-out; }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .glass-header { 
-            background: rgba(15, 23, 42, 0.95); 
-            backdrop-filter: blur(12px); 
-            -webkit-backdrop-filter: blur(12px);
-        }
-
-        ::-webkit-scrollbar { width: 4px; height: 4px; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-
-        .calendar-grid { 
-            display: grid; 
-            grid-template-columns: repeat(7, minmax(100px, 1fr)); 
-        }
-
-        .touch-target { min-height: 44px; min-width: 44px; }
-    </style>
 </head>
-<body class="min-h-screen pb-20 md:pb-0">
+<body class="min-h-screen pb-20 md:pb-0 bg-slate-50">
 
-    <!-- Header Adaptativo -->
-    <header class="glass-header text-white sticky top-0 z-50 shadow-xl">
-        <div class="max-w-7xl mx-auto p-4 md:p-6 flex flex-col md:flex-row items-center justify-between gap-4">
-            <div class="flex items-center gap-3 w-full md:w-auto">
-                <div class="p-2 bg-blue-600 rounded-xl shadow-lg shadow-blue-500/20">
-                    <i data-lucide="activity" class="w-5 h-5 md:w-6 md:h-6 text-white"></i>
+    <!-- HEADER -->
+    <header class="bg-gradient-to-r from-slate-900 to-blue-900 text-white sticky top-0 z-50 shadow-xl">
+        <div class="max-w-7xl mx-auto px-4 md:px-8 py-4 md:py-6">
+            <div class="flex items-center justify-between gap-4">
+                <div class="flex items-center gap-3">
+                    <div class="p-2 bg-blue-500 rounded-xl">
+                        <i data-lucide="package" class="w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-xl md:text-2xl font-black">IDEAS TEXTILES SPA</h1>
+                        <p id="syncStatus" class="text-amber-300 text-xs font-bold">Cargando...</p>
+                    </div>
                 </div>
-                <div>
-                    <h1 class="text-lg md:text-xl font-black tracking-tighter leading-none">IDEAS TEXTILES SPA</h1>
-                    <p id="syncStatus" class="text-amber-400 text-[9px] md:text-[10px] font-bold uppercase italic mt-1">Iniciando sistema...</p>
-                </div>
-            </div>
-            
-            <div class="flex items-center gap-2 w-full md:w-auto justify-between md:justify-end">
-                <div class="hidden lg:block text-right border-r border-slate-700 pr-4">
-                    <p class="text-[9px] font-bold text-slate-500 uppercase">Representante</p>
-                    <p class="font-bold text-xs uppercase">Alejandro Cisterna O.</p>
-                </div>
-                <div class="flex gap-2 w-full md:w-auto">
-                    <button onclick="generateFullBackup()" class="flex-1 md:flex-none bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2.5 rounded-xl text-[10px] md:text-xs font-bold flex items-center justify-center gap-2 transition-all">
-                        <i data-lucide="file-down" class="w-4 h-4"></i> <span class="hidden xs:inline">RESPALDO</span>
-                    </button>
-                    <button id="btnReset" disabled onclick="resetSystem()" class="flex-1 md:flex-none bg-rose-600/30 text-white/50 px-3 py-2.5 rounded-xl text-[10px] md:text-xs font-bold flex items-center justify-center gap-2 transition-all cursor-not-allowed">
-                        <i data-lucide="trash-2" class="w-4 h-4"></i> <span class="hidden xs:inline">RESET</span>
+                <div class="flex gap-2">
+                    <button onclick="generateBackup()" class="bg-emerald-600 hover:bg-emerald-700 px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2">
+                        <i data-lucide="download" class="w-4 h-4"></i>
+                        <span class="hidden sm:inline">Descargar</span>
                     </button>
                 </div>
             </div>
         </div>
     </header>
 
-    <!-- Navegación -->
-    <nav class="fixed bottom-0 left-0 right-0 md:relative md:bottom-auto bg-white border-t md:border-none shadow-[0_-10px_20px_rgba(0,0,0,0.05)] md:shadow-none z-40 px-2 py-2 md:py-6">
-        <div class="max-w-4xl mx-auto flex justify-around md:justify-center gap-1 md:gap-4">
-            <button onclick="switchTab('bodega')" class="tab-btn active flex-1 md:flex-none flex flex-col md:flex-row items-center justify-center gap-1 md:gap-2 px-2 md:px-6 py-2 md:py-3 rounded-xl font-bold text-slate-400 [&.active]:bg-blue-50 [&.active]:text-blue-600 transition-all" data-tab="bodega">
-                <i data-lucide="box" class="w-5 h-5 md:w-5 md:h-5"></i>
-                <span class="text-[10px] md:text-sm">Bodega</span>
+    <!-- NAVIGATION -->
+    <nav class="bg-white border-b shadow-sm sticky top-16 z-40">
+        <div class="max-w-7xl mx-auto px-4 md:px-8 flex gap-4 overflow-x-auto">
+            <button onclick="switchTab('productos')" class="tab-btn active px-6 py-4 font-bold text-slate-600 border-b-2 border-blue-600 whitespace-nowrap" data-tab="productos">
+                <i data-lucide="package" class="w-4 h-4 inline mr-2"></i>Productos
             </button>
-            <button onclick="switchTab('ordenes')" class="tab-btn flex-1 md:flex-none flex flex-col md:flex-row items-center justify-center gap-1 md:gap-2 px-2 md:px-6 py-2 md:py-3 rounded-xl font-bold text-slate-400 [&.active]:bg-blue-50 [&.active]:text-blue-600 transition-all" data-tab="ordenes">
-                <i data-lucide="shopping-bag" class="w-5 h-5 md:w-5 md:h-5"></i>
-                <span class="text-[10px] md:text-sm">Órdenes</span>
+            <button onclick="switchTab('ordenes')" class="tab-btn px-6 py-4 font-bold text-slate-600 border-b-2 border-transparent hover:border-slate-300 whitespace-nowrap" data-tab="ordenes">
+                <i data-lucide="shopping-cart" class="w-4 h-4 inline mr-2"></i>Órdenes
             </button>
-            <button onclick="switchTab('calendario')" class="tab-btn flex-1 md:flex-none flex flex-col md:flex-row items-center justify-center gap-1 md:gap-2 px-2 md:px-6 py-2 md:py-3 rounded-xl font-bold text-slate-400 [&.active]:bg-blue-50 [&.active]:text-blue-600 transition-all" data-tab="calendario">
-                <i data-lucide="calendar" class="w-5 h-5 md:w-5 md:h-5"></i>
-                <span class="text-[10px] md:text-sm">Agenda</span>
+            <button onclick="switchTab('calendario')" class="tab-btn px-6 py-4 font-bold text-slate-600 border-b-2 border-transparent hover:border-slate-300 whitespace-nowrap" data-tab="calendario">
+                <i data-lucide="calendar" class="w-4 h-4 inline mr-2"></i>Calendario
             </button>
         </div>
     </nav>
 
-    <main class="max-w-7xl mx-auto px-4 md:px-8 mt-4 md:mt-0">
-        <!-- SECCIÓN BODEGA -->
-        <section id="bodega" class="tab-content active space-y-6">
-            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-white p-5 md:p-6 rounded-2xl shadow-sm gap-4 border border-slate-100">
+    <!-- MAIN CONTENT -->
+    <main class="max-w-7xl mx-auto px-4 md:px-8 py-8">
+
+        <!-- PRODUCTOS TAB -->
+        <section id="productos" class="tab-content active space-y-6">
+            <div class="flex justify-between items-center bg-white p-6 rounded-xl shadow-sm border border-slate-200">
                 <div>
-                    <h2 class="text-xl font-black text-slate-800 uppercase tracking-tight">Inventario Global</h2>
-                    <p class="text-xs text-slate-400 font-medium">Gestión de stock instantánea</p>
+                    <h2 class="text-2xl font-black text-slate-800">Inventario de Productos</h2>
+                    <p class="text-sm text-slate-500">Gestión centralizada de stock</p>
                 </div>
-                <button onclick="openModal('modalProducto')" class="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white px-6 py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 shadow-xl shadow-blue-500/20 active:scale-95 transition-all">
-                    <i data-lucide="plus-circle" class="w-5 h-5"></i> Nuevo Producto
+                <button onclick="openProductModal()" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-bold flex items-center gap-2">
+                    <i data-lucide="plus" class="w-5 h-5"></i>Nuevo Producto
                 </button>
             </div>
 
-            <div id="productGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 pb-10">
-                <div id="loadingState" class="col-span-full text-center py-20">
-                    <div class="animate-spin inline-block w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full mb-4"></div>
-                    <p class="text-slate-400 font-bold uppercase text-[10px] tracking-widest">Conectando con base de datos...</p>
-                    <button onclick="forceRenderEmpty()" id="btnForceLoad" class="hidden mt-4 text-blue-600 underline text-xs font-bold">¿Tarda mucho? Iniciar vacío</button>
+            <div id="productGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div class="col-span-full text-center py-12 text-slate-400">
+                    <i data-lucide="package" class="w-12 h-12 mx-auto mb-4 opacity-50"></i>
+                    <p class="font-bold">Cargando productos...</p>
                 </div>
             </div>
         </section>
 
-        <!-- SECCIÓN ORDENES -->
-        <section id="ordenes" class="tab-content space-y-6">
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 pb-20">
-                <div class="lg:col-span-8 bg-white p-5 md:p-8 rounded-3xl shadow-sm border border-slate-100 space-y-6">
-                    <div class="flex justify-between items-center">
-                        <h3 class="font-black text-lg uppercase tracking-tight">Nueva Orden</h3>
-                        <button onclick="simulateIA()" class="text-indigo-600 bg-indigo-50 px-4 py-2 rounded-xl text-[10px] font-black border border-indigo-100 active:bg-indigo-100">IA: AUTO-RELLENO</button>
-                    </div>
+        <!-- ORDENES TAB -->
+        <section id="ordenes" class="tab-content hidden space-y-6">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- NUEVA ORDEN -->
+                <div class="lg:col-span-2 bg-white p-6 rounded-xl shadow-sm border border-slate-200 space-y-6">
+                    <h3 class="text-xl font-black text-slate-800">Nueva Orden de Compra</h3>
                     
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div class="space-y-1">
-                            <label class="text-[10px] font-bold text-slate-400 uppercase ml-2">Cliente</label>
-                            <input id="orderCustomer" type="text" placeholder="Ej: Tienda Santiago" class="w-full p-4 rounded-xl bg-slate-50 focus:ring-2 focus:ring-blue-500 transition-all outline-none">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-bold text-slate-600 mb-2">Cliente</label>
+                            <input id="orderCustomer" type="text" placeholder="Nombre del cliente" class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
                         </div>
-                        <div class="space-y-1">
-                            <label class="text-[10px] font-bold text-slate-400 uppercase ml-2">Despacho</label>
-                            <input id="orderAddress" type="text" placeholder="Dirección completa" class="w-full p-4 rounded-xl bg-slate-50 focus:ring-2 focus:ring-blue-500 transition-all outline-none">
+                        <div>
+                            <label class="block text-sm font-bold text-slate-600 mb-2">Dirección</label>
+                            <input id="orderAddress" type="text" placeholder="Dirección de despacho" class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
                         </div>
                     </div>
 
-                    <div id="cartItems" class="space-y-3 min-h-[50px]">
-                        <p class="text-center py-6 text-slate-300 text-xs italic">El carrito está vacío</p>
+                    <div class="border-t pt-4">
+                        <label class="block text-sm font-bold text-slate-600 mb-3">Agregar Productos</label>
+                        <div id="catalogGrid" class="grid grid-cols-2 md:grid-cols-3 gap-2 mb-4"></div>
                     </div>
 
-                    <div class="border-t pt-6">
-                        <p class="text-[10px] font-black text-slate-400 mb-4 uppercase tracking-widest">Añadir del Catálogo</p>
-                        <div id="catalogGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2"></div>
+                    <div class="bg-slate-50 p-4 rounded-lg border border-slate-200">
+                        <h4 class="font-bold text-slate-800 mb-4">Productos en Orden</h4>
+                        <div id="cartItems" class="space-y-3"></div>
                     </div>
+
+                    <button onclick="saveOrder()" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-bold flex items-center justify-center gap-2">
+                        <i data-lucide="check" class="w-5 h-5"></i>Crear Orden
+                    </button>
                 </div>
 
-                <div class="lg:col-span-4 space-y-6">
-                    <div class="bg-slate-900 text-white p-6 rounded-3xl shadow-2xl sticky top-28">
-                        <h4 class="font-bold mb-4 flex items-center gap-2"><i data-lucide="shopping-cart" class="text-blue-400"></i> Resumen de Venta</h4>
-                        <div id="orderTotal" class="text-3xl font-black mb-6">$0</div>
-                        <button onclick="saveOrder()" class="w-full bg-blue-600 hover:bg-blue-500 py-4 rounded-2xl font-black text-sm uppercase tracking-widest transition-all shadow-lg shadow-blue-500/20 active:scale-95">GENERAR ORDEN</button>
-                        <p class="text-[9px] text-center text-slate-500 mt-4 uppercase font-bold">Se generarán 4 etiquetas por hoja</p>
+                <!-- RESUMEN Y ÓRDENES -->
+                <div class="space-y-6">
+                    <div class="bg-gradient-to-br from-slate-900 to-blue-900 text-white p-6 rounded-xl shadow-lg sticky top-32">
+                        <h4 class="font-bold mb-4 flex items-center gap-2">
+                            <i data-lucide="calculator" class="w-5 h-5"></i>Total Orden
+                        </h4>
+                        <div id="orderTotal" class="text-4xl font-black mb-4">$0</div>
+                        <p class="text-sm text-slate-300">Se imprimirán 4 etiquetas por hoja</p>
                     </div>
-                    
-                    <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100">
-                        <h4 class="font-bold text-[10px] uppercase mb-4 text-slate-400 tracking-widest">Historial Reciente</h4>
-                        <div id="recentOrders" class="space-y-3"></div>
+
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                        <h4 class="font-bold text-slate-800 mb-4 flex items-center gap-2">
+                            <i data-lucide="history" class="w-5 h-5"></i>Órdenes Recientes
+                        </h4>
+                        <div id="recentOrders" class="space-y-2 max-h-96 overflow-y-auto"></div>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- SECCIÓN CALENDARIO -->
-        <section id="calendario" class="tab-content">
-            <div class="bg-white p-2 md:p-6 rounded-3xl shadow-sm border border-slate-100 mb-20 overflow-hidden">
-                <div class="flex justify-between items-center mb-6 px-4">
-                    <h3 class="font-black text-lg uppercase">Logística de Stock</h3>
-                    <div class="flex gap-2">
-                        <div class="w-3 h-3 bg-slate-900 rounded-full"></div>
-                        <span class="text-[10px] font-bold text-slate-400 uppercase">Cambios de Stock</span>
-                    </div>
-                </div>
-                <div class="overflow-x-auto pb-4">
-                    <div class="calendar-grid border border-slate-100 rounded-2xl overflow-hidden min-w-[800px]">
-                        <div class="bg-slate-50 p-4 text-center text-[10px] font-black text-slate-400 border-b border-r">LUNES</div>
-                        <div class="bg-slate-50 p-4 text-center text-[10px] font-black text-slate-400 border-b border-r">MARTES</div>
-                        <div class="bg-slate-50 p-4 text-center text-[10px] font-black text-slate-400 border-b border-r">MIÉRC.</div>
-                        <div class="bg-slate-50 p-4 text-center text-[10px] font-black text-slate-400 border-b border-r">JUEVES</div>
-                        <div class="bg-slate-50 p-4 text-center text-[10px] font-black text-slate-400 border-b border-r">VIERNES</div>
-                        <div class="bg-slate-50 p-4 text-center text-[10px] font-black text-slate-400 border-b border-r">SÁBADO</div>
-                        <div class="bg-slate-50 p-4 text-center text-[10px] font-black text-slate-400 border-b">DOMINGO</div>
-                        <div id="calendarDays" class="contents"></div>
-                    </div>
+        <!-- CALENDARIO TAB -->
+        <section id="calendario" class="tab-content hidden">
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                <h3 class="text-xl font-black text-slate-800 mb-6">Calendario de Movimientos</h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm">
+                        <thead>
+                            <tr class="bg-slate-100 border-b-2 border-slate-300">
+                                <th class="px-4 py-3 text-left font-bold text-slate-700">Fecha</th>
+                                <th class="px-4 py-3 text-left font-bold text-slate-700">Tipo</th>
+                                <th class="px-4 py-3 text-left font-bold text-slate-700">Descripción</th>
+                                <th class="px-4 py-3 text-left font-bold text-slate-700">Detalles</th>
+                            </tr>
+                        </thead>
+                        <tbody id="calendarBody" class="divide-y divide-slate-200"></tbody>
+                    </table>
                 </div>
             </div>
         </section>
     </main>
 
     <!-- MODAL PRODUCTO -->
-    <div id="modalProducto" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center p-4 z-[200]">
-        <div class="bg-white rounded-[2rem] w-full max-w-lg p-6 md:p-8 shadow-2xl animate-in zoom-in-95 duration-200 overflow-y-auto max-h-[90vh]">
-            <div class="flex justify-between items-center mb-6">
-                <h3 id="modalTitle" class="text-xl font-black uppercase tracking-tight">Ficha Producto</h3>
-                <button onclick="closeModal('modalProducto')" class="p-2 bg-slate-100 rounded-full"><i data-lucide="x" class="w-5 h-5 text-slate-400"></i></button>
+    <div id="productModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center p-4 z-50 overflow-y-auto">
+        <div class="bg-white rounded-xl w-full max-w-md p-6 my-8">
+            <div class="flex justify-between items-center mb-4">
+                <h3 id="modalTitle" class="text-xl font-black text-slate-800">Nuevo Producto</h3>
+                <button onclick="closeModal('productModal')" class="text-slate-400 hover:text-slate-600">
+                    <i data-lucide="x" class="w-6 h-6"></i>
+                </button>
             </div>
-            <form id="formProduct" class="space-y-4">
-                <input type="hidden" id="editId">
-                <div class="space-y-1">
-                    <label class="text-[10px] font-bold text-slate-400 uppercase ml-2">Nombre del Artículo</label>
-                    <input id="prodName" required placeholder="Ej: Polera Algodón Premium" class="w-full p-4 bg-slate-50 rounded-xl outline-none focus:ring-2 focus:ring-blue-500">
+
+            <form id="productForm" class="space-y-4">
+                <input type="hidden" id="productId">
+                
+                <div>
+                    <label class="block text-sm font-bold text-slate-600 mb-1">Nombre del Producto</label>
+                    <input id="productName" required type="text" placeholder="Ej: Polera Algodón" class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
                 </div>
+
                 <div class="grid grid-cols-2 gap-4">
-                    <div class="space-y-1">
-                        <label class="text-[10px] font-bold text-slate-400 uppercase ml-2">Stock Actual</label>
-                        <input id="prodStock" required type="number" placeholder="0" class="w-full p-4 bg-slate-50 rounded-xl outline-none">
+                    <div>
+                        <label class="block text-sm font-bold text-slate-600 mb-1">Stock</label>
+                        <input id="productStock" required type="number" min="0" placeholder="0" class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
                     </div>
-                    <div class="space-y-1">
-                        <label class="text-[10px] font-bold text-slate-400 uppercase ml-2">Precio $</label>
-                        <input id="prodPrice" required type="number" placeholder="0" class="w-full p-4 bg-slate-50 rounded-xl outline-none">
+                    <div>
+                        <label class="block text-sm font-bold text-slate-600 mb-1">Precio ($)</label>
+                        <input id="productPrice" required type="number" min="0" placeholder="0" class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
                     </div>
                 </div>
-                <div class="space-y-1">
-                    <label class="text-[10px] font-bold text-slate-400 uppercase ml-2">Tallas Disponibles (Separadas por coma)</label>
-                    <input id="prodSizes" required placeholder="S, M, L, XL" class="w-full p-4 bg-slate-50 rounded-xl uppercase outline-none">
+
+                <div>
+                    <label class="block text-sm font-bold text-slate-600 mb-2">Tallas Disponibles</label>
+                    <div id="sizeList" class="space-y-2 mb-3"></div>
+                    <button type="button" onclick="addSizeField()" class="text-blue-600 font-bold text-sm flex items-center gap-1">
+                        <i data-lucide="plus" class="w-4 h-4"></i>Agregar Talla
+                    </button>
                 </div>
-                <div id="reasonField" class="hidden animate-in fade-in slide-in-from-top-2">
-                    <label class="text-[10px] font-black text-blue-600 uppercase mb-2 block ml-2">Motivo del Ajuste de Stock</label>
-                    <textarea id="prodReason" placeholder="¿Por qué se modifica el inventario?" class="w-full p-4 bg-blue-50 rounded-xl text-sm border-2 border-blue-100 outline-none"></textarea>
+
+                <div id="reasonField" class="hidden">
+                    <label class="block text-sm font-bold text-slate-600 mb-1">Motivo del Cambio</label>
+                    <textarea id="productReason" placeholder="Descripción del cambio de inventario" class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" rows="3"></textarea>
                 </div>
-                <button type="submit" class="w-full bg-slate-900 text-white py-5 rounded-2xl font-black uppercase tracking-widest shadow-xl active:scale-95 transition-all mt-4">GUARDAR RÁPIDO</button>
+
+                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-bold">
+                    Guardar Producto
+                </button>
             </form>
         </div>
     </div>
 
-    <div id="backupArea" style="position: absolute; left: -9999px;"></div>
+    <!-- MODAL ORDEN DETALLE -->
+    <div id="orderDetailModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center p-4 z-50 overflow-y-auto">
+        <div class="bg-white rounded-xl w-full max-w-2xl p-6 my-8">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-black text-slate-800">Detalle de Orden</h3>
+                <button onclick="closeModal('orderDetailModal')" class="text-slate-400 hover:text-slate-600">
+                    <i data-lucide="x" class="w-6 h-6"></i>
+                </button>
+            </div>
+
+            <div id="orderDetailContent" class="space-y-6"></div>
+
+            <div class="flex gap-3 mt-6">
+                <button onclick="printOrder()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-bold flex items-center justify-center gap-2">
+                    <i data-lucide="printer" class="w-5 h-5"></i>Imprimir
+                </button>
+                <button onclick="editOrder()" class="flex-1 bg-slate-600 hover:bg-slate-700 text-white py-3 rounded-lg font-bold flex items-center justify-center gap-2">
+                    <i data-lucide="edit" class="w-5 h-5"></i>Editar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- PRINT AREA -->
+    <div id="printArea" style="display:none;"></div>
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getFirestore, collection, doc, setDoc, onSnapshot, query, deleteDoc, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-
-        const firebaseConfig = JSON.parse(__firebase_config);
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-        const auth = getAuth(app);
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'it-erp-v2';
-
-        let products = [];
-        let orders = [];
-        let events = [];
-        let cart = [];
-        let backupDone = false;
-        let currentUser = null;
-        let loadTimeout;
-
-        // TIMEOUT DE SEGURIDAD
-        // Si no carga en 5s, muestra botón para forzar entrada
-        loadTimeout = setTimeout(() => {
-            document.getElementById('btnForceLoad').classList.remove('hidden');
-            document.getElementById('syncStatus').innerText = "ESPERANDO DATOS...";
-            document.getElementById('syncStatus').classList.add('text-rose-400');
-        }, 5000);
-
-        window.forceRenderEmpty = () => {
-            clearTimeout(loadTimeout);
-            if(products.length === 0) {
-                renderProducts(); // Renderizará el estado vacío
-            }
-            document.getElementById('syncStatus').innerText = "MODO LOCAL / VACÍO";
+        // STATE MANAGEMENT
+        let state = {
+            products: [],
+            orders: [],
+            events: [],
+            cart: [],
+            currentOrder: null,
+            currentUser: null,
+            sizeFields: []
         };
 
-        const initAuth = async () => {
-            try {
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    await signInWithCustomToken(auth, __initial_auth_token);
-                } else {
-                    await signInAnonymously(auth);
-                }
-            } catch (error) {
-                console.error("Auth Error:", error);
-                document.getElementById('syncStatus').innerText = "ERROR DE CONEXIÓN";
-                document.getElementById('syncStatus').className = "text-rose-500 text-[9px] font-bold uppercase italic mt-1";
-            }
+        // FIREBASE CONFIG - USES LOCAL STORAGE AS FALLBACK
+        const useLocalStorage = true; // Set to false when Firebase is ready
+        const STORAGE_KEYS = {
+            products: 'IT_PRODUCTS',
+            orders: 'IT_ORDERS',
+            events: 'IT_EVENTS'
         };
 
-        initAuth();
-
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                currentUser = user;
-                document.getElementById('syncStatus').innerText = "AUTENTICADO. BUSCANDO DATOS...";
-                startSync();
-            }
-        });
-
-        function startSync() {
-            if (!currentUser) return;
+        // INITIALIZE
+        function initApp() {
+            document.getElementById('syncStatus').textContent = '✓ Sistema Listo';
+            document.getElementById('syncStatus').className = 'text-emerald-300 text-xs font-bold';
             
-            // Usar onSnapshot con manejo de errores explícito
-            onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'products'), (snap) => {
-                clearTimeout(loadTimeout); // Se recibieron datos, cancelar timeout
-                products = snap.docs.map(d => d.data());
-                renderProducts();
-                renderCatalog();
-                updateOrderSummary();
-                document.getElementById('syncStatus').innerText = "CONECTADO: DATOS LISTOS";
-                document.getElementById('syncStatus').className = "text-emerald-400 text-[9px] font-bold uppercase italic mt-1";
-            }, (err) => {
-                console.error("Snapshot Error:", err);
-                // Si falla el permiso o red, forzar render vacío para no bloquear
-                forceRenderEmpty();
-            });
-
-            onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'orders'), (snap) => {
-                orders = snap.docs.map(d => d.data());
-                renderRecentOrders();
-            });
-
-            onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'events'), (snap) => {
-                events = snap.docs.map(d => d.data());
-                renderCalendar();
-            });
-        }
-
-        // --- OPTIMIZACIÓN: GUARDADO OPTIMISTA ---
-        window.saveProduct = (e) => {
-            e.preventDefault();
-            if (!currentUser) return;
-
-            const id = document.getElementById('editId').value || `IT-${Date.now().toString().slice(-6)}`;
-            const name = document.getElementById('prodName').value;
-            const newStock = parseInt(document.getElementById('prodStock').value);
-            const price = parseInt(document.getElementById('prodPrice').value);
-            const sizes = document.getElementById('prodSizes').value.split(',').map(s => s.trim().toUpperCase());
-            const reason = document.getElementById('prodReason').value;
-
-            // 1. Cerrar Modal INMEDIATAMENTE
-            closeModal('modalProducto');
-
-            // 2. Procesar datos en segundo plano
-            const processSave = async () => {
-                const existing = products.find(p => p.id === id);
-                try {
-                    if (existing && existing.stock !== newStock) {
-                        const eventId = `EV-${Date.now()}`;
-                        setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'events', eventId), {
-                            id: eventId,
-                            date: new Date().toISOString().split('T')[0],
-                            title: `Stock: ${name}`,
-                            desc: `Ajuste: ${existing.stock} -> ${newStock}. Ref: ${reason || 'Sin motivo'}`
-                        });
-                    }
-                    await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'products', id), {
-                        id, name, stock: newStock, price, sizes
-                    });
-                } catch (err) {
-                    console.error(err);
-                    alert("Hubo un error guardando en la nube. Verifique su conexión.");
-                }
-            };
-            processSave();
-        };
-
-        window.saveOrder = () => {
-            if (!currentUser) return;
-            const customer = document.getElementById('orderCustomer').value;
-            const address = document.getElementById('orderAddress').value;
-            if (!customer || cart.length === 0) return alert("Faltan datos.");
-
-            const orderId = Date.now().toString();
-            const total = cart.reduce((acc, item) => acc + (item.price * item.qty), 0);
-            
-            const newOrder = {
-                id: orderId, customer, address, items: cart, total,
-                date: new Date().toISOString().split('T')[0]
-            };
-
-            // 1. Feedback Inmediato
-            printTachas(newOrder);
-            const tempCart = [...cart];
-            cart = [];
-            document.getElementById('orderCustomer').value = '';
-            document.getElementById('orderAddress').value = '';
-            renderCart();
-
-            // 2. Procesar en segundo plano
-            const processOrder = async () => {
-                try {
-                    await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'orders', orderId), newOrder);
-                    for (const item of tempCart) {
-                        const p = products.find(prod => prod.id === item.id);
-                        if (p) {
-                            updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'products', p.id), {
-                                stock: p.stock - item.qty
-                            });
-                        }
-                    }
-                } catch(err) { console.error("Error orden", err); }
-            };
-            processOrder();
-        };
-
-        // RENDERERS
-        function renderProducts() {
-            const grid = document.getElementById('productGrid');
-            if (products.length === 0) {
-                grid.innerHTML = '<div class="col-span-full text-center py-20 text-slate-400 font-bold uppercase text-xs">Sin inventario. Añade un producto.</div>';
-                return;
-            }
-            grid.innerHTML = products.sort((a,b) => a.name.localeCompare(b.name)).map(p => `
-                <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 group hover:shadow-md transition-all">
-                    <div class="flex justify-between items-start mb-4">
-                        <span class="px-2 py-1 bg-slate-100 text-slate-500 rounded text-[9px] font-black font-mono">ID: ${p.id}</span>
-                        <button onclick="editProduct('${p.id}')" class="w-8 h-8 flex items-center justify-center rounded-full bg-slate-50 text-slate-400 hover:bg-blue-50 hover:text-blue-600 transition-colors">
-                            <i data-lucide="edit-3" class="w-4 h-4"></i>
-                        </button>
-                    </div>
-                    <h4 class="font-black text-slate-800 mb-2 uppercase tracking-tight text-sm">${p.name}</h4>
-                    <div class="flex flex-wrap gap-1 mb-4">
-                        ${p.sizes.map(s => `<span class="px-2 py-0.5 bg-blue-50 rounded text-[9px] font-bold text-blue-600">${s}</span>`).join('')}
-                    </div>
-                    <div class="flex justify-between items-end border-t border-slate-50 pt-4">
-                        <div>
-                            <p class="text-[9px] font-black text-slate-400 uppercase">Stock</p>
-                            <p class="text-2xl font-black ${p.stock < 10 ? 'text-rose-500' : 'text-slate-800'}">${p.stock}</p>
-                        </div>
-                        <div class="text-right">
-                            <p class="text-[9px] font-black text-slate-400 uppercase">Precio</p>
-                            <p class="text-sm font-black text-blue-600 tracking-tighter">$${p.price.toLocaleString()}</p>
-                        </div>
-                    </div>
-                </div>
-            `).join('');
+            loadData();
+            renderProducts();
+            renderCatalog();
+            renderRecentOrders();
+            renderCalendar();
             lucide.createIcons();
         }
 
-        // Resto de funciones UI idénticas
-        function renderCatalog() {
-            const grid = document.getElementById('catalogGrid');
-            grid.innerHTML = products.map(p => `
-                <button onclick="addToCart('${p.id}')" class="p-3 bg-slate-50 border border-slate-100 rounded-2xl text-left hover:border-blue-500 hover:bg-white transition-all group active:scale-95">
-                    <p class="text-[9px] font-black uppercase truncate group-hover:text-blue-600">${p.name}</p>
-                    <p class="text-[8px] text-slate-400 font-bold uppercase mt-1">Stock: ${p.stock}</p>
-                </button>
-            `).join('');
-        }
-
-        window.addToCart = (id) => {
-            const p = products.find(prod => prod.id === id);
-            if(p.stock <= 0) return alert("Sin stock disponible.");
-            cart.push({ ...p, selectedSize: p.sizes[0], qty: 1, note: '' });
-            renderCart();
-        };
-
-        function renderCart() {
-            const container = document.getElementById('cartItems');
-            if(cart.length === 0) {
-                container.innerHTML = '<p class="text-center py-6 text-slate-300 text-xs italic">El carrito está vacío</p>';
-                updateOrderSummary();
-                return;
+        // DATA PERSISTENCE
+        function saveData(key, data) {
+            if (useLocalStorage) {
+                localStorage.setItem(key, JSON.stringify(data));
             }
-            container.innerHTML = cart.map((item, idx) => `
-                <div class="bg-slate-50 p-4 rounded-2xl relative border border-slate-200 animate-in slide-in-from-right-4">
-                    <button onclick="window.removeCart(${idx})" class="absolute top-4 right-4 text-slate-300 hover:text-rose-500"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
-                    <p class="font-bold text-xs uppercase mb-3 pr-8">${item.name}</p>
-                    <div class="grid grid-cols-2 gap-2">
-                        <div class="space-y-1">
-                            <p class="text-[8px] font-bold text-slate-400 uppercase">Talla</p>
-                            <select onchange="window.updateCart(${idx}, 'selectedSize', this.value)" class="w-full p-2 bg-white rounded-lg text-xs font-bold border border-slate-100">
-                                ${item.sizes.map(s => `<option value="${s}" ${s === item.selectedSize ? 'selected' : ''}>${s}</option>`).join('')}
-                            </select>
-                        </div>
-                        <div class="space-y-1">
-                            <p class="text-[8px] font-bold text-slate-400 uppercase">Cant.</p>
-                            <input type="number" value="${item.qty}" onchange="window.updateCart(${idx}, 'qty', this.value)" class="w-full p-2 bg-white rounded-lg text-xs font-bold border border-slate-100" min="1" max="${item.stock}">
-                        </div>
-                    </div>
-                </div>
-            `).join('');
-            updateOrderSummary();
+        }
+
+        function loadData() {
+            if (useLocalStorage) {
+                state.products = JSON.parse(localStorage.getItem(STORAGE_KEYS.products)) || [];
+                state.orders = JSON.parse(localStorage.getItem(STORAGE_KEYS.orders)) || [];
+                state.events = JSON.parse(localStorage.getItem(STORAGE_KEYS.events)) || [];
+            }
+        }
+
+        // PRODUCTOS
+        window.openProductModal = (id = null) => {
+            state.sizeFields = [];
+            document.getElementById('productId').value = id || '';
+            document.getElementById('reasonField').classList.toggle('hidden', !id);
+            
+            if (id) {
+                const p = state.products.find(x => x.id === id);
+                document.getElementById('modalTitle').textContent = 'Editar Producto';
+                document.getElementById('productName').value = p.name;
+                document.getElementById('productStock').value = p.stock;
+                document.getElementById('productPrice').value = p.price;
+                state.sizeFields = [...p.sizes];
+            } else {
+                document.getElementById('modalTitle').textContent = 'Nuevo Producto';
+                document.getElementById('productForm').reset();
+                state.sizeFields = [''];
+            }
+            
+            renderSizeFields();
+            document.getElementById('productModal').classList.remove('hidden');
             lucide.createIcons();
-        }
-
-        function updateOrderSummary() {
-            const total = cart.reduce((acc, item) => acc + (item.price * item.qty), 0);
-            document.getElementById('orderTotal').innerText = `$${total.toLocaleString()}`;
-        }
-
-        window.removeCart = (idx) => { cart.splice(idx,1); renderCart(); };
-        window.updateCart = (idx, key, val) => { 
-            cart[idx][key] = (key === 'qty') ? parseInt(val) : val;
-            updateOrderSummary();
         };
 
-        function renderRecentOrders() {
-            const container = document.getElementById('recentOrders');
-            container.innerHTML = orders.slice(0, 5).sort((a,b) => b.id - a.id).map(o => `
-                <div class="p-3 bg-slate-50 rounded-2xl flex justify-between items-center text-[10px] border border-slate-100">
-                    <div class="truncate pr-2">
-                        <p class="font-black uppercase text-slate-700">${o.customer}</p>
-                        <p class="text-slate-400 font-mono text-[8px]">ID: ${o.id.toString().slice(-6)}</p>
-                    </div>
-                    <button onclick='window.printTachas(${JSON.stringify(o)})' class="w-8 h-8 flex items-center justify-center bg-white rounded-xl shadow-sm text-blue-600 hover:bg-blue-600 hover:text-white transition-all">
-                        <i data-lucide="printer" class="w-4 h-4"></i>
+        window.addSizeField = () => {
+            state.sizeFields.push('');
+            renderSizeFields();
+        };
+
+        function renderSizeFields() {
+            const container = document.getElementById('sizeList');
+            container.innerHTML = state.sizeFields.map((size, i) => `
+                <div class="flex gap-2">
+                    <input type="text" value="${size}" placeholder="S, M, L, XL, etc" 
+                        onchange="state.sizeFields[${i}] = this.value" 
+                        class="flex-1 p-2 border border-slate-300 rounded text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+                    <button type="button" onclick="state.sizeFields.splice(${i}, 1); renderSizeFields()" class="px-2 py-2 text-red-600 hover:bg-red-50 rounded">
+                        <i data-lucide="trash-2" class="w-4 h-4"></i>
                     </button>
                 </div>
             `).join('');
             lucide.createIcons();
         }
 
-        window.printTachas = (order) => {
-            const win = window.open('', '_blank');
-            const tacha = `
-                <div style="border:2.5px solid #000; padding:15px; height:120mm; box-sizing:border-box; display:flex; flex-direction:column; font-family:sans-serif; background:white;">
-                    <div style="border-bottom:3px solid #000; padding-bottom:8px; margin-bottom:12px; display:flex; justify-content:between; align-items:center;">
-                        <div style="font-weight:900; font-size:18px; letter-spacing:-1px;">IDEAS TEXTILES SPA</div>
-                    </div>
-                    <div style="font-size:11px; line-height:1.4;">
-                        <div style="background:#000; color:white; padding:4px 8px; display:inline-block; font-weight:bold; margin-bottom:10px;">ORDEN #${order.id.toString().slice(-6)}</div>
-                        <br>
-                        <strong style="text-transform:uppercase; font-size:9px; color:#666;">Destinatario:</strong><br>
-                        <span style="font-size:16px; font-weight:900;">${order.customer.toUpperCase()}</span><br>
-                        <br>
-                        <strong style="text-transform:uppercase; font-size:9px; color:#666;">Dirección Despacho:</strong><br>
-                        <span style="font-size:13px; font-weight:bold;">${order.address.toUpperCase()}</span><br>
-                        <hr style="margin:15px 0; border:0; border-top:2px dashed #000;">
-                        <strong style="text-transform:uppercase; font-size:9px; color:#666;">Detalle Bulto:</strong><br>
-                        <div style="margin-top:5px;">
-                            ${order.items.map(i => `• ${i.name} <span style="font-weight:bold;">(T: ${i.selectedSize})</span> x${i.qty}`).join('<br>')}
-                        </div>
-                    </div>
-                    <div style="margin-top:auto; font-size:8px; text-align:right; border-top:1px solid #eee; padding-top:5px; font-weight:bold; color:#999;">
-                        VALIDADO EN SISTEMA CLOUD - ${order.date}
-                    </div>
-                </div>`;
-            
-            win.document.write(`
-                <html><head><title>Impresión de Tachas - Ideas Textiles</title></head>
-                <body style="margin:0; padding:10mm; background:#f0f0f0;">
-                    <div style="display:grid; grid-template-columns:1fr 1fr; grid-template-rows:1fr 1fr; gap:8mm; width:190mm; height:277mm; margin:auto;">
-                        ${tacha}${tacha}${tacha}${tacha}
-                    </div>
-                </body></html>`);
-            win.document.close();
-            setTimeout(() => { win.print(); }, 500);
+        document.getElementById('productForm').onsubmit = (e) => {
+            e.preventDefault();
+            const id = document.getElementById('productId').value || `PROD-${Date.now()}`;
+            const product = {
+                id,
+                name: document.getElementById('productName').value,
+                stock: parseInt(document.getElementById('productStock').value),
+                price: parseInt(document.getElementById('productPrice').value),
+                sizes: state.sizeFields.filter(s => s.trim())
+            };
+
+            const existing = state.products.findIndex(p => p.id === id);
+            if (existing >= 0) {
+                state.products[existing] = product;
+                addEvent('Producto Actualizado', `${product.name} - Stock: ${product.stock}`);
+            } else {
+                state.products.push(product);
+                addEvent('Producto Creado', product.name);
+            }
+
+            saveData(STORAGE_KEYS.products, state.products);
+            renderProducts();
+            renderCatalog();
+            closeModal('productModal');
         };
 
-        function renderCalendar() {
-            const container = document.getElementById('calendarDays');
-            container.innerHTML = '';
-            const today = new Date().getDate();
-            
-            for (let i = 1; i <= 31; i++) {
-                const dateStr = `2026-01-${i.toString().padStart(2, '0')}`;
-                const dayEvents = events.filter(e => e.date === dateStr);
-                container.innerHTML += `
-                    <div class="bg-white min-h-[140px] p-3 border-b border-r group hover:bg-slate-50 transition-all">
-                        <span class="text-[10px] font-black ${i === today ? 'bg-blue-600 text-white px-2 py-1 rounded-full' : 'text-slate-300'}">${i}</span>
-                        <div class="mt-3 space-y-2">
-                            ${dayEvents.map(ev => `
-                                <div class="text-[8px] leading-tight bg-slate-900 text-white p-2 rounded-xl font-bold shadow-sm">
-                                    <p class="uppercase text-blue-400 mb-0.5">${ev.title.split(':')[1] || ev.title}</p>
-                                    <p class="opacity-70 font-medium">${ev.desc.split('Motivo:')[1] || ev.desc}</p>
-                                </div>
-                            `).join('')}
-                        </div>
-                    </div>`;
+        window.deleteProduct = (id) => {
+            if (confirm('¿Eliminar este producto?')) {
+                state.products = state.products.filter(p => p.id !== id);
+                saveData(STORAGE_KEYS.products, state.products);
+                renderProducts();
+                renderCatalog();
             }
+        };
+
+        function renderProducts() {
+            const grid = document.getElementById('productGrid');
+            if (state.products.length === 0) {
+                grid.innerHTML = '<div class="col-span-full text-center py-12 text-slate-400"><i data-lucide="package" class="w-12 h-12 mx-auto mb-4 opacity-50"></i><p class="font-bold">No hay productos. Crea uno nuevo.</p></div>';
+                return;
+            }
+            grid.innerHTML = state.products.map(p => `
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 hover:shadow-md transition">
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <p class="text-xs font-bold text-slate-500 uppercase">ID: ${p.id}</p>
+                            <h4 class="text-lg font-black text-slate-800">${p.name}</h4>
+                        </div>
+                        <button onclick="openProductModal('${p.id}')" class="p-2 text-slate-400 hover:bg-blue-50 hover:text-blue-600 rounded">
+                            <i data-lucide="edit" class="w-5 h-5"></i>
+                        </button>
+                    </div>
+                    <div class="flex flex-wrap gap-1 mb-4">
+                        ${p.sizes.map(s => `<span class="px-2 py-1 bg-blue-100 text-blue-700 text-xs font-bold rounded">${s}</span>`).join('')}
+                    </div>
+                    <div class="grid grid-cols-2 gap-4 pt-4 border-t">
+                        <div>
+                            <p class="text-xs text-slate-500 uppercase font-bold">Stock</p>
+                            <p class="text-2xl font-black ${p.stock < 10 ? 'text-red-600' : 'text-slate-800'}">${p.stock}</p>
+                        </div>
+                        <div>
+                            <p class="text-xs text-slate-500 uppercase font-bold">Precio</p>
+                            <p class="text-xl font-black text-blue-600">$${p.price.toLocaleString()}</p>
+                        </div>
+                    </div>
+                    <button onclick="deleteProduct('${p.id}')" class="w-full mt-4 py-2 text-red-600 hover:bg-red-50 rounded font-bold text-sm flex items-center justify-center gap-2">
+                        <i data-lucide="trash-2" class="w-4 h-4"></i>Eliminar
+                    </button>
+                </div>
+            `).join('');
+            lucide.createIcons();
         }
 
-        window.switchTab = (id) => {
-            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
-            document.querySelector(`[data-tab="${id}"]`).classList.add('active');
-            window.scrollTo(0, 0);
+        // ÓRDENES
+        function renderCatalog() {
+            const grid = document.getElementById('catalogGrid');
+            grid.innerHTML = state.products.map(p => `
+                <button onclick="addToCart('${p.id}')" class="p-3 bg-slate-100 hover:bg-blue-100 border border-slate-300 rounded-lg text-left transition font-bold text-sm">
+                    ${p.name} <span class="text-xs text-slate-600">(${p.stock})</span>
+                </button>
+            `).join('');
             lucide.createIcons();
+        }
+
+        window.addToCart = (productId) => {
+            const product = state.products.find(p => p.id === productId);
+            if (!product || product.stock <= 0) {
+                alert('Producto sin stock');
+                return;
+            }
+
+            const item = {
+                ...product,
+                cartId: `CART-${Date.now()}`,
+                selectedSize: product.sizes[0] || 'Único',
+                qty: 1
+            };
+            state.cart.push(item);
+            renderCart();
         };
 
-        window.openModal = (id) => { 
-            document.getElementById(id).style.display = 'flex'; 
-            lucide.createIcons();
+        window.removeFromCart = (cartId) => {
+            state.cart = state.cart.filter(i => i.cartId !== cartId);
+            renderCart();
         };
 
-        window.closeModal = (id) => { 
-            document.getElementById(id).style.display = 'none'; 
-            document.getElementById('formProduct').reset();
-            document.getElementById('editId').value = '';
-            document.getElementById('modalTitle').innerText = "Ficha Producto";
-            document.getElementById('reasonField').classList.add('hidden');
-        };
-
-        window.editProduct = (id) => {
-            const p = products.find(prod => prod.id === id);
-            document.getElementById('editId').value = p.id;
-            document.getElementById('prodName').value = p.name;
-            document.getElementById('prodStock').value = p.stock;
-            document.getElementById('prodPrice').value = p.price;
-            document.getElementById('prodSizes').value = p.sizes.join(', ');
-            document.getElementById('modalTitle').innerText = "Editar Stock Nube";
-            document.getElementById('reasonField').classList.remove('hidden');
-            openModal('modalProducto');
-        };
-
-        window.generateFullBackup = () => {
-            const area = document.getElementById('backupArea');
-            area.innerHTML = `
-                <div style="padding:40px; font-family:sans-serif;">
-                    <h1 style="text-align:center;">RESPALDO ERP - IDEAS TEXTILES SPA</h1>
-                    <p style="text-align:center; color:#666;">Generado el ${new Date().toLocaleString()}</p>
-                    <hr>
-                    <h3>ESTADO DE INVENTARIO</h3>
-                    <table border="1" style="width:100%; border-collapse:collapse; margin-bottom:40px;">
-                        <tr style="background:#eee;"><th>ID</th><th>Producto</th><th>Stock Actual</th><th>Precio</th></tr>
-                        ${products.map(p => `<tr><td style="padding:5px;">${p.id}</td><td style="padding:5px;">${p.name}</td><td style="padding:5px;">${p.stock}</td><td style="padding:5px;">$${p.price}</td></tr>`).join('')}
-                    </table>
-                    <h3>LOG DE MOVIMIENTOS</h3>
-                    <ul>${events.map(e => `<li><strong>${e.date}:</strong> ${e.desc}</li>`).join('')}</ul>
-                </div>`;
-            html2pdf().from(area).save('Respaldo_ERP_IT.pdf').then(() => {
-                backupDone = true;
-                const btn = document.getElementById('btnReset');
-                btn.disabled = false;
-                btn.classList.replace('bg-rose-600/30', 'bg-rose-600');
-                btn.classList.replace('text-white/50', 'text-white');
-                btn.classList.remove('cursor-not-allowed');
-                alert("Respaldo descargado con éxito. Ahora puedes resetear el sistema si lo deseas.");
-            });
-        };
-
-        window.resetSystem = async () => {
-            if (!backupDone || !currentUser) return;
-            if (confirm("ATENCIÓN: Se borrarán TODOS los datos de la nube. ¿Confirmar acción?")){
-                try {
-                    for (let p of products) await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'products', p.id));
-                    for (let o of orders) await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'orders', o.id));
-                    for (let e of events) await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'events', e.id));
-                    alert("Sistema reiniciado. La página se refrescará.");
-                    location.reload();
-                } catch (err) {
-                    alert("Error al borrar datos.");
-                }
+        window.updateCartQty = (cartId, qty) => {
+            const item = state.cart.find(i => i.cartId === cartId);
+            if (item) {
+                item.qty = Math.min(parseInt(qty), item.stock);
+                renderCart();
             }
         };
 
-        window.simulateIA = () => {
-            document.getElementById('orderCustomer').value = "MULTITIENDAS CHILE SPA";
-            document.getElementById('orderAddress').value = "Calle Comercial 123, Bodega 4, Santiago";
-            alert("IA: Datos del cliente detectados automáticamente.");
+        window.updateCartSize = (cartId, size) => {
+            const item = state.cart.find(i => i.cartId === cartId);
+            if (item) item.selectedSize = size;
+            renderCart();
         };
 
-        document.getElementById('formProduct').onsubmit = window.saveProduct;
-        lucide.createIcons();
-    </script>
-</body>
-</html>
+        function renderCart() {
+            const container = document.getElementById('cartItems');
+            if (state.cart.length === 0) {
+                container.innerHTML = '<p class="text-center py-6 text-slate-400 italic">Carrito vacío</p>';
+                updateOrderTotal();
+                return;
+            }
+            container.innerHTML = state.cart.map(item => `
+                <div class="bg-white p-4 rounded-lg border border-slate-200 flex justify-between items-start gap-4">
+                    <div class="flex-1">
+                        <p class="font-bold text-slate-800">${item.name}</p>
+                        <div class="grid grid-cols-2 gap-2 mt-2">
+                            ${item.sizes.length > 0 ? `
+                                <div>
+                                    <label class="text-xs text-slate-600 font-bold block mb-1">Talla</label>
+                                    <select onchange="updateCartSize('${item.cartId}', this.value)" class="w-full p-1 border border-slate-300 rounded text-xs">
+                                        ${item.sizes.map(s => `<option value="${s}" ${s === item.selectedSize ? 'selected' : ''}>${s}</option>`).join('')}
+                                    </select>
+                                </div>
+                            ` : ''}
+                            <div>
+                                <label class="text-xs text-slate-600 font-bold block mb-1">Cantidad</label>
+                                <input type="number" min="1" max="${item.stock}" value="${item.qty}" 
+                                    onchange="updateCartQty('${item.cartId}', this.value)" 
+                                    class="w-full p-1 border border-slate-300 rounded text-xs">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <p class="font-bold text-blue-600">$${(item.price * item.qty).toLocaleString()}</p>
+                        <button onclick="removeFromCart('${item.cartId}')" class="mt-2 text-red-600 hover:bg-red-50 p-2 rounded">
+                            <i data-lucide="trash-2" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+            updateOrderTotal();
+            lucide.createIcons();
+        }
+
+        function updateOrderTotal() {
+            const total = state.cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+            document.getElementById('orderTotal').textContent = `$${total.toLocaleString()}`;
+        }
+
+        window.saveOrder = () => {
+            const customer = document.getElementById('orderCustomer').value;
+            const address = document.getElementById('orderAddress').value;
+
+            if (!customer || !address || state.cart.length === 0) {
+                alert('Completa todos los campos y agrega productos');
+                return;
+            }
+
+            const order = {
+                id: `OC-${Date.now()}`,
+                customer,
+                address,
+                items: state.cart.map(i => ({
+                    productId: i.id,
+                    name: i.name,
+                    size: i.selectedSize,
+                    qty: i.qty,
+                    price: i.price
+                })),
+                total: state.cart.reduce((sum, i) => sum + (i.price * i.qty), 0),
+                date: new Date().toLocaleDateString('es-CL'),
+                status: 'Pendiente'
+            };
+
+            state.orders.push(order);
+            saveData(STORAGE_KEYS.orders, state.orders);
+            addEvent('Orden Creada', `${order.customer} - ${order.items.length} productos`);
+
+            state.cart = [];
+            document.getElementById('orderCustomer').value = '';
+            document.getElementById('orderAddress').value = '';
+            renderCart();
+            renderRecentOrders();
+            renderCalendar();
+            
+            printOrderLabels(order);
+            alert('Orden creada exitosamente');
+        };
+
+        function renderRecentOrders() {
+            const container = document.getElementById('recentOrders');
+            if (state.orders.length === 0) {
+                container.innerHTML = '<p class="text-slate-400 text-sm italic">Sin órdenes</p>';
+                return;
+            }
+            container.innerHTML = state.orders.slice(-10).reverse().map(o => `
+                <div class="p-3 bg-slate-50 rounded-lg border border-slate-200 cursor-pointer hover:bg-blue-50 transition" onclick="viewOrderDetail('${o.id}')">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="font-bold text-slate-800 text-sm">${o.customer}</p>
+                            <p class="text-xs text-slate-500">${o.id}</p>
+                        </div>
+                        <div class="text-right">
+                            <p class="font-bold text-blue-600">$${o.total.toLocaleString()}</p>
+                            <p class="text-xs text-slate-500">${o.date}</p>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        window.viewOrderDetail = (orderId) => {
+            const order = state.orders.find(o => o.id === orderId);
+            state.currentOrder = order;
+
+            let html = `
+                <div class="space-y-4">
+                    <div class="grid grid-cols-2 gap-4 p-4 bg-slate-100 rounded-lg">
+                        <div>
+                            <p class="text-xs text-slate-600 font-bold">ORDEN</p>
+                            <p class="text-lg font-black text-slate-800">${order.id}</p>
+                        </div>
+                        <div>
+                            <p class="text-xs text-slate-600 font-bold">FECHA</p>
+                            <p class="text-lg font-black text-slate-800">${order.date}</p>
+                        </div>
+                        <div>
+                            <p class="text-xs text-slate-600 font-bold">CLIENTE</p>
