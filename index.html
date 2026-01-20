@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>IDEAS TEXTILES SPA | ERP SYSTEM</title>
+    <title>IDEAS TEXTILES SPA | ERP SISTEMA</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
@@ -140,17 +140,17 @@
             <div class="w-16 h-16 border-4 border-blue-500/30 border-t-blue-500 rounded-full animate-spin"></div>
             <i class="fas fa-brain absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-xl text-white"></i>
         </div>
-        <h2 class="font-black text-2xl tracking-[6px] uppercase">Ideas Textiles</h2>
+        <h2 class="font-black text-2xl tracking-[6px] uppercase">Ideas Textiles SPA</h2>
         <p class="text-[10px] font-bold text-slate-500 mt-2 uppercase tracking-widest">Iniciando...</p>
     </div>
 
     <div id="config-modal" class="fixed inset-0 bg-slate-900/90 z-[95] hidden p-4 flex items-center justify-center">
         <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl p-6 animate__animated animate__fadeInDown">
             <div class="flex justify-between items-center mb-4">
-                <h3 class="font-bold text-slate-800 flex items-center gap-2"><i class="fas fa-key text-purple-600"></i> Configurar IA</h3>
+                <h3 class="font-bold text-slate-800 flex items-center gap-2"><i class="fas fa-key text-purple-600"></i> Configurar IA Global</h3>
                 <button onclick="document.getElementById('config-modal').classList.add('hidden')" class="text-slate-400 hover:text-red-500"><i class="fas fa-times"></i></button>
             </div>
-            <p class="text-xs text-slate-500 mb-4">Ingresa tu API Key de Google Gemini para habilitar la inteligencia artificial. Se guardará de forma segura en tu navegador.</p>
+            <p class="text-xs text-slate-500 mb-4">Ingresa tu API Key de Google Gemini. Se sincronizará automáticamente en TODOS los dispositivos de la empresa.</p>
             <input type="password" id="gemini-api-key" class="w-full bg-slate-50 border border-slate-200 rounded-lg p-3 text-sm font-mono mb-4 focus:ring-2 focus:ring-purple-500 outline-none" placeholder="Pegar API Key aquí...">
             <button onclick="App.Logic.Gemini.saveKey()" class="w-full bg-slate-900 text-white font-bold py-3 rounded-xl hover:bg-slate-800 transition">GUARDAR Y ACTIVAR</button>
             <p class="text-[10px] text-center mt-4 text-slate-400 cursor-pointer hover:text-blue-500" onclick="window.open('https://aistudio.google.com/app/apikey')">¿No tienes una Key? Consíguela gratis aquí</p>
@@ -163,7 +163,7 @@
             <div class="bg-slate-100 px-6 py-4 border-b border-slate-200 flex justify-between items-center">
                 <div>
                     <h3 class="font-black text-slate-800 text-lg flex items-center gap-2">
-                        <i class="fas fa-sparkles text-purple-600 animate-pulse"></i> GEMINI ANALYSIS
+                        <i class="fas fa-sparkles text-purple-600 animate-pulse"></i> ANALISIS CON IA
                     </h3>
                     <p class="text-xs text-slate-500">Revisa la interpretación de la IA antes de guardar.</p>
                 </div>
@@ -245,7 +245,7 @@
             <div class="sidebar-footer z-10 mt-auto pt-4 border-t border-slate-800">
                 <div class="flex items-center gap-3">
                     <div class="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center text-xs font-bold text-white cursor-pointer hover:bg-slate-600" onclick="document.getElementById('config-modal').classList.remove('hidden')"><i class="fas fa-cog"></i></div>
-                    <div><p class="text-xs font-bold text-white">Alejandro Cisterna O.</p><p class="text-[10px] text-slate-500"> GERENTE GENERAL </p></div>
+                    <div><p class="text-xs font-bold text-white">Alejandro Cisterna</p><p class="text-[10px] text-slate-500">Global Admin</p></div>
                 </div>
             </div>
         </aside>
@@ -409,6 +409,7 @@
 
         // --- ESTADO GLOBAL ---
         const State = {
+            geminiKey: '', // <--- AJUSTE 1: VARIABLE PARA LA KEY GLOBAL
             inventory: [],
             orders: [],
             calendar: {},
@@ -434,6 +435,12 @@
                 onValue(ref(db, 'movements'), s => { State.movements = s.val() || []; App.UI.renderMovements(); });
                 onValue(ref(db, 'tasks'), s => { State.tasks = s.val() || []; App.UI.renderTasks(); App.Logic.Calendar.render(); });
                 
+                // AJUSTE 2: LISTENER GLOBAL PARA API KEY
+                onValue(ref(db, 'config/gemini_api_key'), s => {
+                    State.geminiKey = s.val() || ''; 
+                    if(State.geminiKey) document.getElementById('key-status-msg').classList.add('hidden');
+                });
+
                 onValue(ref(db, ".info/connected"), s => {
                     const txt = document.getElementById('conn-text');
                     const dot = document.getElementById('ping-dot');
@@ -443,12 +450,6 @@
 
                 const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
                 document.getElementById('current-date-display').innerText = new Date().toLocaleDateString('es-ES', options);
-
-                // Check Gemini Key on Load
-                if(!App.Logic.Gemini.getKey()) {
-                    document.getElementById('key-status-msg').classList.remove('hidden');
-                    // Auto-open modal if no key (optional, maybe annoying)
-                }
 
                 setTimeout(()=> document.getElementById('loader').classList.add('opacity-0', 'pointer-events-none'), 1200);
             },
@@ -882,19 +883,27 @@
                 },
 
                 // =========================================================================
-                // GEMINI AI ENGINE (CEREBRO V11)
+                // GEMINI AI ENGINE (CEREBRO V12 - GLOBAL SYNC)
                 // =========================================================================
                 Gemini: {
-                    getKey: () => localStorage.getItem('GEMINI_API_KEY'),
+                    // AJUSTE 3: LEER LA KEY DEL ESTADO GLOBAL, NO DEL NAVEGADOR
+                    getKey: () => State.geminiKey,
+
+                    // AJUSTE 4: GUARDAR EN LA BASE DE DATOS, NO EN LOCAL STORAGE
                     saveKey: () => {
                         const k = document.getElementById('gemini-api-key').value.trim();
-                        if(k) { localStorage.setItem('GEMINI_API_KEY', k); document.getElementById('config-modal').classList.add('hidden'); Swal.fire('Configurado', 'API Key guardada.', 'success'); document.getElementById('key-status-msg').classList.add('hidden'); }
+                        if(k) { 
+                            set(ref(db, 'config/gemini_api_key'), k); 
+                            document.getElementById('config-modal').classList.add('hidden'); 
+                            Swal.fire('Sincronizado', 'API Key activada para TODOS los dispositivos.', 'success'); 
+                        }
                     },
                     
                     trigger: (context) => {
-                        const key = App.Logic.Gemini.getKey();
+                        // USAR LA KEY GLOBAL
+                        const key = State.geminiKey;
                         if(!key) { document.getElementById('config-modal').classList.remove('hidden'); return; }
-                        // Guardar contexto temporalmente
+                        
                         document.getElementById('gemini-upload').setAttribute('data-context', context);
                         document.getElementById('gemini-upload').click();
                     },
@@ -949,7 +958,7 @@
                     },
 
                     callAPI: async (part, context) => {
-                        const key = App.Logic.Gemini.getKey();
+                        const key = App.Logic.Gemini.getKey(); // USA LA KEY GLOBAL
                         const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key=${key}`;
                         
                         // SYSTEM PROMPTS (PERSONALIDADES)
@@ -1256,7 +1265,7 @@
                     const now = new Date();
 
                     doc.setFont("helvetica", "bold"); doc.setFontSize(22); doc.text("IDEAS TEXTILES SPA", 15, 20);
-                    doc.setFontSize(10); doc.setFont("helvetica", "normal"); doc.text("REPORTE DE GESTIÓN ", 15, 26); doc.text(`Emitido: ${now.toLocaleString()}`, 15, 31);
+                    doc.setFontSize(10); doc.setFont("helvetica", "normal"); doc.text("REPORTE DE GESTIÓN V11", 15, 26); doc.text(`Emitido: ${now.toLocaleString()}`, 15, 31);
                     doc.line(15, 35, 195, 35);
 
                     let totalItems = 0; State.inventory.forEach(p => { if(p.stock) totalItems += Object.values(p.stock).reduce((a,b)=>a+b,0); });
@@ -1295,7 +1304,7 @@
                     const movRows = State.movements.slice(-10).reverse().map(m => [m.date, m.type, m.product, m.qty, m.reason]);
                     doc.autoTable({ startY: finalY + 5, head: [['Fecha', 'Tipo', 'Producto', 'Cant', 'Motivo']], body: movRows, theme: 'plain', styles: { fontSize: 7 } });
 
-                    doc.save(`Reporte_${now.toISOString().slice(0,10)}.pdf`);
+                    doc.save(`Reporte_V11_${now.toISOString().slice(0,10)}.pdf`);
                 },
 
                 downloadTachas: (idx) => {
@@ -1349,7 +1358,7 @@
                         else { y += h + margin; }
                     });
 
-                    doc.save(`TACHA_OCNRO${o.id}.pdf`);
+                    doc.save(`Etiqueta_OCNRO${o.id}.pdf`);
                 }
             }
         };
