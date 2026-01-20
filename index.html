@@ -441,21 +441,32 @@
                                 </div>
                             `,
                             didOpen: () => { App.UI.Helpers.addSizeRow(); }, // Iniciar con una fila
-                            preConfirm: () => {
-                                const name = document.getElementById('np-name').value;
-                                const rows = document.querySelectorAll('.size-row');
-                                let stock = {};
-                                rows.forEach(r => {
-                                    const s = r.querySelector('.sz-in').value.toUpperCase();
-                                    const q = parseInt(r.querySelector('.qt-in').value);
-                                    if(s && q) stock[s] = q;
-                                });
-                                if(!name || Object.keys(stock).length === 0) return Swal.showValidationMessage('Nombre y al menos una talla requeridos');
-                                return { name, stock };
-                            }
-                        }).then(res => { if(res.isConfirmed) App.Logic.Inventory.add(res.value); });
-                    },
+                           preConfirm: () => {
+    const name = document.getElementById('np-name').value;
+    const rows = document.querySelectorAll('.size-row');
+    let stock = {};
 
+    rows.forEach(r => {
+        // 1. Tomamos el valor de la talla y le quitamos los espacios
+        let s = r.querySelector('.sz-in').value.trim().toUpperCase();
+        const q = parseInt(r.querySelector('.qt-in').value);
+
+        // 2. Si el usuario puso una cantidad válida...
+        if (!isNaN(q)) {
+            // AQUI ESTÁ LA MAGIA:
+            // Si el campo de talla está VACÍO (""), lo guardamos como "ÚNICA"
+            if (s === "") {
+                s = "ÚNICA";
+            }
+            // Guardamos
+            stock[s] = q;
+        }
+    });
+
+    if (!name) return Swal.showValidationMessage('El nombre es obligatorio');
+
+    return { name, stock };
+}
                     editProduct: async (index) => {
                         const p = State.inventory[index];
                         // Pre-populate logic would go here similar to newProduct but filling values
