@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>IDEAS TEXTILES SPA | ERP SYSTEM</title>
+    <title>IDEAS TEXTILES SPA | ERP SYSTEM </title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
@@ -75,7 +75,6 @@
         .evt-pending { background: #fffbeb; color: #b45309; border-color: #fcd34d; }
         .evt-dispatch { background: #f0fdf4; color: #15803d; border-color: #4ade80; }
         .evt-move { background: #f1f5f9; color: #475569; border-color: #94a3b8; border-left-style: dashed; }
-        /* NUEVO ESTILO PARA FECHA DE ENTREGA */
         .evt-delivery { background: #e0f2fe; color: #0369a1; border-color: #0ea5e9; border-left: 3px solid #0284c7; }
 
         @media (max-width: 1024px) {
@@ -98,7 +97,7 @@
             <i class="fas fa-scissors absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-2xl text-white"></i>
         </div>
         <h2 class="font-black text-3xl tracking-[8px] uppercase">Ideas Textiles</h2>
-        <p class="text-xs font-bold text-slate-500 mt-2 uppercase tracking-widest">Cargando Inteligencia Artificial...</p>
+        <p class="text-xs font-bold text-slate-500 mt-2 uppercase tracking-widest">Cargando</p>
     </div>
 
     <div id="connection-widget" class="fixed top-4 right-4 z-50 bg-white/90 backdrop-blur px-3 py-1.5 rounded-full border border-slate-200 shadow-lg flex items-center gap-2 transition-all">
@@ -136,7 +135,7 @@
                     <i class="fas fa-file-invoice w-6 text-center"></i> <span class="nav-label">Órdenes</span>
                 </div>
                 <div onclick="App.Router.go('scanner')" id="nav-scanner" class="nav-bubble p-3 rounded-xl cursor-pointer flex items-center gap-3 text-sm font-bold text-slate-400 shrink-0">
-                    <i class="fas fa-robot w-6 text-center text-blue-400"></i> <span class="nav-label">Scanner IA</span>
+                    <i class="fas fa-robot w-6 text-center text-blue-400"></i> <span class="nav-label">Scanner </span>
                 </div>
                 <div onclick="App.Router.go('calendar')" id="nav-calendar" class="nav-bubble p-3 rounded-xl cursor-pointer flex items-center gap-3 text-sm font-bold text-slate-400 shrink-0">
                     <i class="fas fa-calendar-alt w-6 text-center"></i> <span class="nav-label">Agenda</span>
@@ -223,14 +222,14 @@
 
             <section id="view-scanner" class="hidden fade-in">
                 <header class="mb-8">
-                    <h2 class="text-3xl font-black text-slate-800">Scanner IA (Junaeb/Itexx)</h2>
+                    <h2 class="text-3xl font-black text-slate-800">Scanner IA </h2>
                     <p class="text-slate-500 text-sm">Carga masiva desde Fotos o Excel</p>
                 </header>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <div class="card-glass border-dashed border-2 border-blue-200 flex flex-col items-center justify-center p-12 text-center group cursor-pointer hover:bg-blue-50 transition" onclick="document.getElementById('file-ia').click()">
                         <i class="fas fa-cloud-upload-alt text-5xl text-blue-400 group-hover:scale-110 transition mb-4"></i>
                         <h4 class="font-bold text-slate-700">Subir Foto o Excel</h4>
-                        <p class="text-xs text-slate-400 mt-2">Compatible con Junaeb, Excel Itexx y Facturas</p>
+                        <p class="text-xs text-slate-400 mt-2">CARGA MASIVA</p>
                         <input type="file" id="file-ia" class="hidden" accept="image/*,.xlsx,.csv" onchange="App.Logic.Scanner.handleFile(this)">
                     </div>
                     <div class="card-glass bg-slate-50">
@@ -371,7 +370,11 @@
                 renderOrders: () => {
                     const grid = document.getElementById('orders-grid');
                     grid.innerHTML = State.orders.map((o, idx) => {
-                        const itemsHtml = o.items.map(it => `<div class="text-xs py-1 border-b border-slate-100 last:border-0"><span class="font-black text-blue-600">${it.qty}</span> x ${it.name} [${it.size}]</div>`).join('');
+                        const itemsHtml = o.items.map(it => `
+                            <div class="text-xs py-1 border-b border-slate-100 last:border-0 flex justify-between">
+                                <span><span class="font-black text-blue-600">${it.qty}</span> x ${it.name} [${it.size}]</span>
+                                ${it.msg ? `<span class="text-[9px] text-amber-600 bg-amber-50 px-1 rounded border border-amber-100 italic"><i class="fas fa-sticky-note mr-1"></i>${it.msg}</span>` : ''}
+                            </div>`).join('');
                         const deliveryTag = o.deliveryDate ? `<span class="ml-2 text-[9px] bg-blue-50 text-blue-600 px-2 py-1 rounded border border-blue-100"><i class="fas fa-calendar-check mr-1"></i>Entrega: ${o.deliveryDate}</span>` : '';
                         
                         return `
@@ -418,6 +421,92 @@
                         if(res) App.Logic.Inventory.add(res);
                     },
 
+                    // -----------------------------------------------------
+                    // EDITOR DE INVENTARIO (REPARADO Y POTENCIADO)
+                    // -----------------------------------------------------
+                    editProduct: async (index) => {
+                        const p = State.inventory[index];
+                        
+                        // 1. Preparamos las filas con el stock actual
+                        let rowsHtml = '';
+                        if (p.stock) {
+                            Object.entries(p.stock).forEach(([size, qty]) => {
+                                rowsHtml += `
+                                    <div class="flex gap-2 mb-2 size-row items-center">
+                                        <input class="swal2-input m-0 text-sm sz-in" value="${size}" placeholder="Talla" style="width:40%">
+                                        <input type="number" class="swal2-input m-0 text-sm qt-in" value="${qty}" placeholder="Cant" style="width:40%">
+                                        <button type="button" onclick="this.parentElement.remove()" class="text-red-500 hover:text-red-700 font-bold px-2 w-[10%]"><i class="fas fa-times"></i></button>
+                                    </div>`;
+                            });
+                        }
+
+                        // 2. Abrimos el Modal Avanzado
+                        const { value: form } = await Swal.fire({
+                            title: 'Editar Inventario',
+                            width: '600px',
+                            html: `
+                                <div class="text-left mb-4">
+                                    <label class="text-[10px] font-bold text-slate-400 uppercase">Nombre Producto</label>
+                                    <input id="ep-name" class="swal2-input m-0 w-full" value="${p.name}">
+                                </div>
+                                
+                                <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-left">
+                                    <label class="text-[10px] font-bold text-slate-400 uppercase mb-2 block">Stock por Talla</label>
+                                    <div id="ep-rows-container" class="max-h-60 overflow-y-auto mb-2">
+                                        ${rowsHtml}
+                                    </div>
+                                    <button type="button" id="btn-add-size-edit" class="w-full py-2 text-xs font-bold text-blue-600 border border-blue-200 rounded hover:bg-blue-50 transition">+ AGREGAR OTRA TALLA</button>
+                                </div>
+                            `,
+                            didOpen: () => {
+                                // Lógica del botón para agregar nuevas filas vacías
+                                document.getElementById('btn-add-size-edit').onclick = () => {
+                                    const div = document.createElement('div');
+                                    div.className = 'flex gap-2 mb-2 size-row items-center animate__animated animate__fadeIn';
+                                    div.innerHTML = `
+                                        <input class="swal2-input m-0 text-sm sz-in" placeholder="Talla" style="width:40%">
+                                        <input type="number" class="swal2-input m-0 text-sm qt-in" placeholder="0" style="width:40%">
+                                        <button type="button" onclick="this.parentElement.remove()" class="text-red-500 hover:text-red-700 font-bold px-2 w-[10%]"><i class="fas fa-times"></i></button>
+                                    `;
+                                    document.getElementById('ep-rows-container').appendChild(div);
+                                };
+                            },
+                            preConfirm: () => {
+                                const name = document.getElementById('ep-name').value.toUpperCase();
+                                let newStock = {};
+                                const rows = document.querySelectorAll('#ep-rows-container .size-row');
+                                
+                                rows.forEach(r => {
+                                    let s = r.querySelector('.sz-in').value.trim().toUpperCase();
+                                    const q = parseInt(r.querySelector('.qt-in').value);
+                                    
+                                    if (!isNaN(q)) {
+                                        if (s === "") s = "ÚNICA";
+                                        newStock[s] = q;
+                                    }
+                                });
+
+                                if (!name) return Swal.showValidationMessage('El nombre es obligatorio');
+                                if (Object.keys(newStock).length === 0) newStock["ÚNICA"] = 0;
+
+                                return { name, stock: newStock };
+                            }
+                        });
+
+                        // 3. Guardamos los cambios
+                        if (form) {
+                            State.inventory[index] = { ...p, ...form }; 
+                            set(ref(db, 'inventory'), State.inventory);
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Inventario Actualizado',
+                                text: 'Las cantidades y tallas se han guardado correctamente.',
+                                timer: 1500,
+                                showConfirmButton: false
+                            });
+                        }
+                    },
+
                     registerMovement: async () => {
                         const prods = State.inventory.map(p => `<option value="${p.name}">${p.name}</option>`).join('');
                         const { value: res } = await Swal.fire({
@@ -454,7 +543,7 @@
                         const render = () => {
                             document.getElementById('edit-cart').innerHTML = cart.map((it, i) => `
                                 <div class="flex justify-between items-center text-xs p-2 border-b bg-white">
-                                    <span><b>${it.qty}</b> x ${it.name} [${it.size}]</span>
+                                    <span><b>${it.qty}</b> x ${it.name} [${it.size}] <i class="text-gray-400">${it.msg || ''}</i></span>
                                     <button onclick="window.tempRemove(${i})" class="text-red-500 font-bold">X</button>
                                 </div>
                             `).join('');
@@ -478,6 +567,7 @@
                                         <div class="col-span-6"><input id="eo-prod" class="swal2-input m-0 h-9 text-xs" placeholder="Producto"></div>
                                         <div class="col-span-3"><input id="eo-size" class="swal2-input m-0 h-9 text-xs" placeholder="Talla"></div>
                                         <div class="col-span-3"><input id="eo-qty" type="number" class="swal2-input m-0 h-9 text-xs" placeholder="Cant"></div>
+                                        <div class="col-span-12"><input id="eo-msg" class="swal2-input m-0 h-9 text-xs w-full" placeholder="Mensaje/Nota (Opcional)"></div>
                                     </div>
                                     <button type="button" id="btn-add-edit" class="mt-2 w-full bg-slate-800 text-white py-2 rounded font-bold text-[10px]">AÑADIR A LA ORDEN</button>
                                 </div>
@@ -489,11 +579,13 @@
                                     const n = document.getElementById('eo-prod').value.toUpperCase();
                                     const s = document.getElementById('eo-size').value.toUpperCase() || 'ÚNICA';
                                     const q = parseInt(document.getElementById('eo-qty').value);
+                                    const m = document.getElementById('eo-msg').value;
                                     if(n && q) { 
-                                        cart.push({name:n, size:s, qty:q}); 
+                                        cart.push({name:n, size:s, qty:q, msg:m}); 
                                         render();
                                         document.getElementById('eo-prod').value = '';
                                         document.getElementById('eo-qty').value = '';
+                                        document.getElementById('eo-msg').value = '';
                                     }
                                 };
                             },
@@ -511,7 +603,7 @@
                         const render = () => {
                             document.getElementById('new-cart').innerHTML = cart.map((it, i) => `
                                 <div class="flex justify-between text-xs p-1 border-b">
-                                    <span>${it.qty} x ${it.name} (${it.size})</span>
+                                    <span>${it.qty} x ${it.name} (${it.size}) <i class="text-gray-400">${it.msg || ''}</i></span>
                                     <button onclick="window.newRemove(${i})" class="text-red-500">X</button>
                                 </div>
                             `).join('');
@@ -527,6 +619,7 @@
                                 <div class="bg-slate-50 p-3 rounded mt-3">
                                     <input id="no-prod" class="swal2-input m-1" placeholder="Producto">
                                     <div class="flex gap-2"><input id="no-sz" class="swal2-input m-1" placeholder="Talla"><input id="no-qt" type="number" class="swal2-input m-1" placeholder="Cant"></div>
+                                    <input id="no-msg" class="swal2-input m-1 w-full" placeholder="Mensaje/Nota (Opcional)">
                                     <button type="button" id="btn-no-add" class="bg-blue-600 text-white w-full py-2 rounded mt-2 font-bold text-xs">AGREGAR</button>
                                 </div>
                                 <div id="new-cart" class="mt-4 border rounded max-h-32 overflow-y-auto"></div>
@@ -536,7 +629,8 @@
                                     const n = document.getElementById('no-prod').value.toUpperCase();
                                     const s = document.getElementById('no-sz').value.toUpperCase() || 'ÚNICA';
                                     const q = parseInt(document.getElementById('no-qt').value);
-                                    if(n && q) { cart.push({name:n, size:s, qty:q}); render(); }
+                                    const m = document.getElementById('no-msg').value;
+                                    if(n && q) { cart.push({name:n, size:s, qty:q, msg:m}); render(); }
                                 };
                             },
                             preConfirm: () => {
@@ -551,7 +645,7 @@
                                     id: Date.now().toString().slice(-6), 
                                     client: r.value.client.toUpperCase(), 
                                     date: new Date().toISOString().split('T')[0], 
-                                    deliveryDate: r.value.date, // Guardamos fecha entrega
+                                    deliveryDate: r.value.date, 
                                     items: r.value.items, 
                                     status: 'Pendiente' 
                                 };
@@ -796,22 +890,126 @@
                 deleteOrder: (i) => { if(confirm('¿Borrar orden?')) { State.orders.splice(i,1); set(ref(db,'orders'),State.orders); } }
             },
 
+            // --------------------------------------------------------------------------------
+            // PDF DE TACHAS PROFESIONALES (2 COLUMNAS x 3 FILAS = 6 POR HOJA OFICIO)
+            // --------------------------------------------------------------------------------
             PDF: {
                 downloadTachas: (idx) => {
                     const o = State.orders[idx];
                     const { jsPDF } = window.jspdf;
+                    
+                    // OFICIO / LEGAL SIZE: 216mm x 356mm
                     const doc = new jsPDF({ unit: 'mm', format: [216, 356] });
-                    const w = 90, h = 160; let x = 10, y = 10;
+                    
+                    // CONFIGURACIÓN DE GRILLA
+                    // Margen 8mm. 
+                    // Ancho útil: 200mm. Cada celda: 100mm.
+                    // Alto útil: 340mm. Cada celda: 113mm.
+                    const cols = 2;
+                    const rows = 3;
+                    const margin = 8;
+                    
+                    const w = (216 - (margin * 2)) / cols; // ~100mm
+                    const h = (356 - (margin * 2)) / rows; // ~113mm (Más ancha que larga visualmente al girar mentalmente, pero encaja 6)
+                    
+                    let x = margin;
+                    let y = margin;
+                    let count = 0;
+
                     o.items.forEach((it, i) => {
+                        // 1. DIBUJAR CONTENEDOR PRINCIPAL
+                        doc.setDrawColor(0); 
+                        doc.setLineWidth(0.4);
                         doc.rect(x, y, w, h);
-                        doc.setFontSize(16); doc.text(it.name, x+w/2, y+20, {align:'center', maxWidth:80});
-                        doc.setFontSize(30); doc.text(it.size, x+w/2, y+60, {align:'center'});
-                        doc.setFontSize(14); doc.text(`CANT: ${it.qty}`, x+w/2, y+90, {align:'center'});
-                        doc.setFontSize(10); doc.text(`OC: ${o.id} | ${o.client}`, x+w/2, y+140, {align:'center'});
-                        if(i%2===0) x+=w+10; else { x=10; y+=h+10; }
-                        if(i>0 && (i+1)%4===0) { doc.addPage(); x=10; y=10; }
+
+                        // 2. CABECERA CORPORATIVA
+                        doc.setFont("helvetica", "bold");
+                        doc.setFontSize(14);
+                        doc.text("IDEAS TEXTILES SPA", x + w/2, y + 10, { align: "center" });
+                        
+                        doc.setFontSize(10);
+                        doc.text("RUT: 76.577.458-6", x + w/2, y + 16, { align: "center" });
+
+                        // Línea separadora
+                        doc.setLineWidth(0.2);
+                        doc.line(x + 5, y + 20, x + w - 5, y + 20);
+
+                        // 3. DATOS CLIENTE
+                        doc.setFont("helvetica", "bold");
+                        doc.setFontSize(8);
+                        doc.text(`CLIENTE:`, x + 6, y + 26);
+                        doc.setFont("helvetica", "normal");
+                        doc.text(o.client.substring(0, 35), x + 22, y + 26);
+
+                        doc.setFont("helvetica", "bold");
+                        doc.text(`DIRECCIÓN:`, x + 6, y + 31);
+                        doc.setFont("helvetica", "normal");
+                        // Usamos o.place (Lugar despacho) o un placeholder
+                        const placeText = o.place || "_______________________";
+                        doc.text(placeText.substring(0, 35), x + 25, y + 31);
+
+                        doc.setFont("helvetica", "bold");
+                        doc.text(`N° OC: ${o.id}`, x + w - 30, y + 26);
+
+                        // 4. PRODUCTO (GRANDE)
+                        const prodY = y + 15;
+                        doc.setFont("helvetica", "bold");
+                        doc.setFontSize(14);
+                        // Split text para nombres largos
+                        const splitTitle = doc.splitTextToSize(it.name, w - 10);
+                        doc.text(splitTitle, x + w/2, prodY, { align: "center" });
+
+                        // 5. TALLA (GIGANTE) EN RECUADRO
+                        const sizeY = prodY + 10;
+                        doc.setLineWidth(0.8);
+                        doc.rect(x + w/2 - 20, sizeY, 40, 18); // Caja Talla
+                        doc.setFontSize(32);
+                        doc.text(it.size, x + w/2, sizeY + 13, { align: "center" });
+
+                        // 6. CANTIDAD
+                        doc.setFontSize(12);
+                        doc.text(`CANTIDAD: ${it.qty} UN.`, x + w/2, sizeY + 25, { align: "center" });
+
+                        // 7. MENSAJE / NOTA (IMPORTANTE)
+                        if (it.msg) {
+                            doc.setFont("helvetica", "italic");
+                            doc.setFontSize(10);
+                            doc.setTextColor(50);
+                            doc.text(`NOTA: ${it.msg}`, x + w/2, sizeY + 32, { align: "center" });
+                            doc.setTextColor(0);
+                        }
+
+                        // 8. PIE DE PAGINA (BULTOS)
+                        const footerY = y + h - 12;
+                        doc.setLineWidth(0.3);
+                        doc.line(x + 5, footerY - 5, x + w - 5, footerY - 5);
+                        
+                        doc.setFont("helvetica", "bold");
+                        doc.setFontSize(9);
+                        doc.text("N° BULTOS:", x + w - 40, footerY + 5);
+                        doc.rect(x + w - 20, footerY - 2, 12, 10); // Casilla vacía
+
+                        // LOGICA DE GRILLA (SALTO DE CELDA Y PAGINA)
+                        count++;
+                        
+                        // Si es par (2 columnas), mueve X a la derecha
+                        if (count % 2 !== 0) {
+                            x += w; 
+                        } else {
+                            // Si completó la fila, vuelve X al margen y baja Y
+                            x = margin;
+                            y += h;
+                        }
+
+                        // Si completamos 6 tarjetas, nueva página y reset
+                        if (count % 6 === 0 && i < o.items.length - 1) {
+                            doc.addPage();
+                            x = margin;
+                            y = margin;
+                        }
                     });
-                    doc.save(`Tachas_${o.id}.pdf`);
+
+                    doc.save(`Tachas${o.id}.pdf`);
                 }
             }
         };
