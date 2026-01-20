@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>IDEAS TEXTILES SPA | ERP SISTEMA</title>
+    <title>IDEAS TEXTILES SPA | ERP SYSTEM </title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
@@ -140,8 +140,8 @@
             <div class="w-16 h-16 border-4 border-blue-500/30 border-t-blue-500 rounded-full animate-spin"></div>
             <i class="fas fa-brain absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-xl text-white"></i>
         </div>
-        <h2 class="font-black text-2xl tracking-[6px] uppercase">Ideas Textiles SPA</h2>
-        <p class="text-[10px] font-bold text-slate-500 mt-2 uppercase tracking-widest">Iniciando...</p>
+        <h2 class="font-black text-2xl tracking-[6px] uppercase">Ideas Textiles</h2>
+        <p class="text-[10px] font-bold text-slate-500 mt-2 uppercase tracking-widest">Iniciando IA Autónoma V14...</p>
     </div>
 
     <div id="config-modal" class="fixed inset-0 bg-slate-900/90 z-[95] hidden p-4 flex items-center justify-center">
@@ -163,7 +163,7 @@
             <div class="bg-slate-100 px-6 py-4 border-b border-slate-200 flex justify-between items-center">
                 <div>
                     <h3 class="font-black text-slate-800 text-lg flex items-center gap-2">
-                        <i class="fas fa-sparkles text-purple-600 animate-pulse"></i> ANALISIS CON IA
+                        <i class="fas fa-sparkles text-purple-600 animate-pulse"></i> GEMINI ANALYSIS
                     </h3>
                     <p class="text-xs text-slate-500">Revisa la interpretación de la IA antes de guardar.</p>
                 </div>
@@ -318,7 +318,7 @@
 
             <section id="view-movements" class="hidden fade-in">
                 <header class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
-                    <div><h2 class="text-3xl font-black text-slate-800">Movimientos</h2><p class="text-slate-500 text-sm">Entradas y Salidas</p></div>
+                    <div><h2 class="text-3xl font-black text-slate-800">Movimientos</h2><p class="text-slate-500 text-sm">Kárdex de Entradas y Salidas</p></div>
                     <button onclick="App.UI.Modals.registerMovement()" class="btn-action bg-slate-800 text-white px-6 py-3 rounded-xl font-bold text-sm shadow-lg flex items-center gap-2 hover:bg-slate-700">
                         <i class="fas fa-exchange-alt"></i> REGISTRO MANUAL
                     </button>
@@ -409,7 +409,7 @@
 
         // --- ESTADO GLOBAL ---
         const State = {
-            geminiKey: '', // <--- AJUSTE 1: VARIABLE PARA LA KEY GLOBAL
+            geminiKey: '',
             inventory: [],
             orders: [],
             calendar: {},
@@ -435,7 +435,7 @@
                 onValue(ref(db, 'movements'), s => { State.movements = s.val() || []; App.UI.renderMovements(); });
                 onValue(ref(db, 'tasks'), s => { State.tasks = s.val() || []; App.UI.renderTasks(); App.Logic.Calendar.render(); });
                 
-                // AJUSTE 2: LISTENER GLOBAL PARA API KEY
+                // LISTENER GLOBAL PARA API KEY
                 onValue(ref(db, 'config/gemini_api_key'), s => {
                     State.geminiKey = s.val() || ''; 
                     if(State.geminiKey) document.getElementById('key-status-msg').classList.add('hidden');
@@ -883,13 +883,11 @@
                 },
 
                 // =========================================================================
-                // GEMINI AI ENGINE (CEREBRO V12 - GLOBAL SYNC)
+                // GEMINI AI ENGINE (CEREBRO V14 - AUTONOMOUS HYBRID)
                 // =========================================================================
                 Gemini: {
-                    // AJUSTE 3: LEER LA KEY DEL ESTADO GLOBAL, NO DEL NAVEGADOR
                     getKey: () => State.geminiKey,
 
-                    // AJUSTE 4: GUARDAR EN LA BASE DE DATOS, NO EN LOCAL STORAGE
                     saveKey: () => {
                         const k = document.getElementById('gemini-api-key').value.trim();
                         if(k) { 
@@ -900,7 +898,6 @@
                     },
                     
                     trigger: (context) => {
-                        // USAR LA KEY GLOBAL
                         const key = State.geminiKey;
                         if(!key) { document.getElementById('config-modal').classList.remove('hidden'); return; }
                         
@@ -915,15 +912,14 @@
                         input.value = ''; // Reset
 
                         Swal.fire({
-                            title: 'Gemini Pensando...',
-                            text: 'Analizando estructura y contenido...',
+                            title: 'IA Autónoma...',
+                            text: 'Detectando formato y extrayendo datos...',
                             allowOutsideClick: false,
                             didOpen: () => Swal.showLoading()
                         });
 
                         try {
                             let payloadPart = null;
-                            let mimeType = file.type;
                             let previewSrc = null;
 
                             // 1. PROCESAR EXCEL
@@ -945,7 +941,7 @@
                                 previewSrc = "data:" + file.type + ";base64," + base64Img;
                             }
 
-                            // LLAMADA A API
+                            // LLAMADA A API CON CEREBRO ACTUALIZADO V14
                             const responseData = await App.Logic.Gemini.callAPI(payloadPart, context);
                             
                             // ABRIR ADUANA
@@ -953,7 +949,7 @@
 
                         } catch (e) {
                             console.error(e);
-                            Swal.fire('Error IA', 'Gemini no pudo procesar el archivo. Revisa tu API Key o el formato.', 'error');
+                            Swal.fire('Error IA', 'No se pudo leer el archivo. Verifique que la API Key sea válida.', 'error');
                         }
                     },
 
@@ -961,34 +957,51 @@
                         const key = App.Logic.Gemini.getKey(); // USA LA KEY GLOBAL
                         const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key=${key}`;
                         
-                        // SYSTEM PROMPTS (PERSONALIDADES)
+                        // SYSTEM PROMPTS (PERSONALIDADES ACTUALIZADAS V14 - AUTONOMOUS)
                         const PROMPTS = {
-                            inventory: `Actúa como Experto en Inventario Textil. Tu misión es extraer una lista de productos de la imagen o texto provisto.
-                            REGLAS:
-                            1. Ignora precios, códigos de barra inútiles o direcciones.
-                            2. Normaliza nombres (ej: "P0lera" -> "POLERA").
-                            3. Si ves "S, M, L" cerca de números, asocia la cantidad a la talla.
-                            4. SALIDA OBLIGATORIA: Un JSON Array estricto.
-                            FORMATO: [{"name": "NOMBRE PRODUCTO", "size": "TALLA", "qty": 0}]`,
+                            inventory: `Actúa como Analista de Datos de Inventario.
+                            Tu misión es extraer productos y cantidades.
                             
-                            orders: `Actúa como Administrador de Pedidos. Tu misión es extraer los datos de una Orden de Compra.
-                            REGLAS:
-                            1. Busca el nombre del CLIENTE (Empresa o Persona).
-                            2. Busca la FECHA de entrega o emisión.
-                            3. Extrae la lista de items.
-                            4. SALIDA OBLIGATORIA: Un JSON Object estricto.
-                            FORMATO: {"client": "NOMBRE", "deliveryDate": "YYYY-MM-DD", "items": [{"name": "PROD", "size": "TALLA", "qty": 0}]}`
+                            ESTRATEGIA DUAL:
+                            1. REVISIÓN DE COLUMNAS: Si ves columnas explícitas de tallas (S, M, L, XL), usa el valor de la celda.
+                            2. REVISIÓN DE TOTALES: Si las columnas de talla están VACÍAS, busca la columna "TOTAL" o el último valor numérico de la fila y asígnalo a "TALLA ÚNICA".
+                            
+                            SALIDA: JSON Array estricto: [{"name": "PRODUCTO", "size": "TALLA", "qty": 0}]`,
+                            
+                            orders: `Actúa como un Experto en Procesamiento de Órdenes de Compra (OC).
+                            Tu misión es extraer: CLIENTE, FECHA DE ENTREGA e ITEMS.
+
+                            FASE 1: LIMPIEZA DE RUIDO
+                            - El documento puede tener logotipos, direcciones y teléfonos en las primeras 20 líneas. IGNÓRALOS.
+                            - Busca palabras clave como "SEÑOR", "RAZÓN SOCIAL", "RUT" para encontrar al CLIENTE en el encabezado.
+                            - Busca la tabla de productos detectando encabezados como "DESCRIPCION", "UNIDADES", "DETALLE".
+
+                            FASE 2: MINERÍA DE ITEMS
+                            - Lee fila por fila la tabla detectada.
+                            - DETECCIÓN DE TALLA "ESCONDIDA":
+                              - Si no hay columna "TALLA", lee la columna "DESCRIPCIÓN".
+                              - Si el texto dice "DELANTAL BLANCO TALLA XS", extrae: {name: "DELANTAL BLANCO", size: "XS"}.
+                              - Palabras clave a buscar: XS, S, M, L, XL, XXL, 3XL.
+                            
+                            SALIDA JSON OBLIGATORIA:
+                            {
+                                "client": "NOMBRE CLIENTE DETECTADO",
+                                "deliveryDate": "YYYY-MM-DD",
+                                "items": [
+                                    {"name": "NOMBRE LIMPIO", "size": "TALLA DETECTADA", "qty": 0}
+                                ]
+                            }`
                         };
 
                         const body = {
                             contents: [{
                                 parts: [
-                                    { text: PROMPTS[context] }, // Instrucción del Sistema
-                                    part // El archivo (Imagen o Texto)
+                                    { text: PROMPTS[context] }, // Instrucción del Sistema V14
+                                    part // El archivo
                                 ]
                             }],
                             generationConfig: {
-                                temperature: 0.1, // Creatividad baja para precisión
+                                temperature: 0.1, // Precisión máxima
                                 response_mime_type: "application/json" // Forzar JSON
                             }
                         };
@@ -1003,7 +1016,6 @@
                         if(json.error) throw new Error(json.error.message);
                         
                         const textResponse = json.candidates[0].content.parts[0].text;
-                        // Limpiar posible markdown ```json ... ```
                         const cleanJson = textResponse.replace(/```json/g, '').replace(/```/g, '').trim();
                         return JSON.parse(cleanJson);
                     },
@@ -1029,7 +1041,7 @@
                         pdfToImage: async (file) => {
                             const arrayBuffer = await file.arrayBuffer();
                             const pdf = await pdfjsLib.getDocument(arrayBuffer).promise;
-                            const page = await pdf.getPage(1); // Solo página 1 para preview/scan rápido
+                            const page = await pdf.getPage(1);
                             const viewport = page.getViewport({scale: 2.0});
                             const canvas = document.createElement('canvas');
                             const ctx = canvas.getContext('2d');
@@ -1265,7 +1277,7 @@
                     const now = new Date();
 
                     doc.setFont("helvetica", "bold"); doc.setFontSize(22); doc.text("IDEAS TEXTILES SPA", 15, 20);
-                    doc.setFontSize(10); doc.setFont("helvetica", "normal"); doc.text("REPORTE DE GESTIÓN V11", 15, 26); doc.text(`Emitido: ${now.toLocaleString()}`, 15, 31);
+                    doc.setFontSize(10); doc.setFont("helvetica", "normal"); doc.text("REPORTE DE GESTIÓN V14", 15, 26); doc.text(`Emitido: ${now.toLocaleString()}`, 15, 31);
                     doc.line(15, 35, 195, 35);
 
                     let totalItems = 0; State.inventory.forEach(p => { if(p.stock) totalItems += Object.values(p.stock).reduce((a,b)=>a+b,0); });
@@ -1304,7 +1316,7 @@
                     const movRows = State.movements.slice(-10).reverse().map(m => [m.date, m.type, m.product, m.qty, m.reason]);
                     doc.autoTable({ startY: finalY + 5, head: [['Fecha', 'Tipo', 'Producto', 'Cant', 'Motivo']], body: movRows, theme: 'plain', styles: { fontSize: 7 } });
 
-                    doc.save(`Reporte_V11_${now.toISOString().slice(0,10)}.pdf`);
+                    doc.save(`Reporte_V14_${now.toISOString().slice(0,10)}.pdf`);
                 },
 
                 downloadTachas: (idx) => {
@@ -1358,7 +1370,7 @@
                         else { y += h + margin; }
                     });
 
-                    doc.save(`Etiqueta_OCNRO${o.id}.pdf`);
+                    doc.save(`TACHA_ORDENCOMPRANRO${o.id}.pdf`);
                 }
             }
         };
