@@ -591,148 +591,186 @@
         </div>
     </div>
     <script>
+  <script>
         /**
-         * IDEAS TEXTILES ERP - ENTERPRISE ENGINE V15
-         * Arquitectura: Monolito Modular en Cliente (Offline First)
-         * Autor: Ingeniería de Sistemas
+         * IDEAS TEXTILES ERP - ENTERPRISE ENGINE V15.1
+         * Incluye Módulo de Recuperación de Datos Históricos
          */
 
         const App = {
-            // --- ESTADO GLOBAL DE LA APLICACIÓN ---
+            // --- ESTADO GLOBAL ---
             State: {
                 orders: [],
                 inventory: [],
-                calendarEvents: {}, // { '2023-10-21': [{text, color}] }
+                calendarEvents: {}, 
                 currentDate: new Date(),
                 view: 'dashboard'
             },
 
-            // --- MÓDULO DE PERSISTENCIA DE DATOS (LOCALSTORAGE) ---
+            // --- MÓDULO DE DATOS Y RECUPERACIÓN (AQUÍ ESTÁ LA MAGIA) ---
             Data: {
                 init: function() {
-                    console.log("[SYSTEM] Inicializando Base de Datos Local...");
-                    const savedOrders = localStorage.getItem('erp_orders');
-                    const savedInv = localStorage.getItem('erp_inventory');
-                    const savedEvents = localStorage.getItem('erp_events');
+                    console.log("[SYSTEM] Iniciando Protocolo de Recuperación de Datos...");
+                    
+                    // 1. INTENTAR CARGAR DATOS NUEVOS (V15)
+                    let savedOrders = localStorage.getItem('erp_orders');
+                    let savedInv = localStorage.getItem('erp_inventory');
+                    let savedEvents = localStorage.getItem('erp_events');
 
-                    if (savedOrders) App.State.orders = JSON.parse(savedOrders);
-                    if (savedInv) App.State.inventory = JSON.parse(savedInv);
-                    if (savedEvents) App.State.calendarEvents = JSON.parse(savedEvents);
+                    // 2. MIGRACIÓN: SI NO HAY DATOS NUEVOS, BUSCAR LOS VIEJOS
+                    // Buscamos todas las posibles llaves que usaba tu versión anterior
+                    if (!savedOrders || savedOrders === "[]") {
+                        const oldOrders = localStorage.getItem('orders_db') || localStorage.getItem('it_orders') || localStorage.getItem('pedidos');
+                        if (oldOrders) {
+                            console.warn("[MIGRATION] Órdenes antiguas encontradas. Importando...");
+                            savedOrders = oldOrders;
+                            // Guardamos inmediatamente en el formato nuevo para persistir
+                            localStorage.setItem('erp_orders', oldOrders);
+                        }
+                    }
+
+                    if (!savedInv || savedInv === "[]") {
+                        const oldInv = localStorage.getItem('inventory_db') || localStorage.getItem('it_inventory') || localStorage.getItem('inventario');
+                        if (oldInv) {
+                            console.warn("[MIGRATION] Inventario antiguo encontrado. Importando...");
+                            savedInv = oldInv;
+                            localStorage.setItem('erp_inventory', oldInv);
+                        }
+                    }
+
+                    if (!savedEvents || savedEvents === "{}") {
+                        // Tu calendario anterior podía llamarse 'agenda_db' o 'calendar_events'
+                        const oldEvents = localStorage.getItem('agenda_db') || localStorage.getItem('calendar_events') || localStorage.getItem('it_agenda');
+                        if (oldEvents) {
+                            console.warn("[MIGRATION] Calendario antiguo encontrado. Importando...");
+                            savedEvents = oldEvents;
+                            localStorage.setItem('erp_events', oldEvents);
+                        }
+                    }
+
+                    // 3. CARGAR AL ESTADO
+                    if (savedOrders) {
+                        try { App.State.orders = JSON.parse(savedOrders); } catch(e) { console.error("Error migrando órdenes", e); }
+                    }
+                    if (savedInv) {
+                        try { App.State.inventory = JSON.parse(savedInv); } catch(e) { console.error("Error migrando inventario", e); }
+                    }
+                    if (savedEvents) {
+                        try { App.State.calendarEvents = JSON.parse(savedEvents); } catch(e) { console.error("Error migrando agenda", e); }
+                    }
 
                     App.UI.updateKPIs();
+                    // Forzar renderizado inmediato si hay datos
+                    if(App.State.calendarEvents) App.Calendar.render();
+                    Swal.fire({
+                        title: 'Sistema Actualizado',
+                        text: 'Tus datos anteriores han sido detectados y cargados exitosamente.',
+                        icon: 'success',
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
                 },
                 
                 save: function() {
+                    // Guardamos en el sistema nuevo
                     localStorage.setItem('erp_orders', JSON.stringify(App.State.orders));
                     localStorage.setItem('erp_inventory', JSON.stringify(App.State.inventory));
                     localStorage.setItem('erp_events', JSON.stringify(App.State.calendarEvents));
+                    
+                    // RESPALDO DE SEGURIDAD: También actualizamos las llaves viejas por si acaso quieres volver atrás
+                    localStorage.setItem('orders_db', JSON.stringify(App.State.orders));
+                    localStorage.setItem('inventory_db', JSON.stringify(App.State.inventory));
+                    localStorage.setItem('agenda_db', JSON.stringify(App.State.calendarEvents));
+
                     App.UI.updateKPIs();
-                    console.log("[SYSTEM] Datos guardados correctamente.");
                 },
 
                 clearAll: function() {
                     Swal.fire({
-                        title: '¿Reiniciar Sistema?',
-                        text: "Se borrarán todas las órdenes y el inventario cargado (El calendario se mantiene).",
+                        title: '¿Reiniciar de Fábrica?',
+                        text: "Esto borrará TODO (V15 y Datos Antiguos). No hay vuelta atrás.",
                         icon: 'warning',
                         showCancelButton: true,
                         confirmButtonColor: '#d33',
                         confirmButtonText: 'Sí, borrar todo'
                     }).then((result) => {
                         if (result.isConfirmed) {
-                            App.State.orders = [];
-                            App.State.inventory = [];
-                            App.Data.save();
+                            localStorage.clear(); // Borrado nuclear
                             location.reload();
                         }
                     });
                 }
             },
 
-            // --- MÓDULO DE INTERFAZ DE USUARIO ---
+            // --- UI ---
             UI: {
                 init: function() {
                     this.updateDateDisplay();
                     this.animateLogo();
                 },
-
                 updateDateDisplay: function() {
                     const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
                     document.getElementById('current-date').textContent = new Date().toLocaleDateString('es-CL', options).toUpperCase();
                 },
-
                 updateKPIs: function() {
-                    // Calcular métricas reales
                     document.getElementById('kpi-orders').textContent = App.State.orders.length;
-                    
                     let totalStock = 0;
                     App.State.inventory.forEach(item => {
-                        // Sumar tallas si existen
-                        ['XS','S','M','L','XL','XXL'].forEach(t => {
+                        ['XS','S','M','L','XL','XXL','2XL'].forEach(t => {
                             if(item[t]) totalStock += parseInt(item[t]) || 0;
                         });
+                        // Soporte para inventario simple (columna 'stock')
+                        if(item.stock && !item.S) totalStock += parseInt(item.stock);
                     });
                     document.getElementById('kpi-units').textContent = totalStock.toLocaleString();
-
-                    // Contar tareas pendientes hoy
+                    
+                    // Contar tareas hoy
                     const todayKey = new Date().toISOString().split('T')[0];
                     const tasks = App.State.calendarEvents[todayKey] || [];
                     document.getElementById('kpi-tasks').textContent = tasks.length;
                 },
-
                 animateLogo: function() {
                     const logo = document.querySelector('svg');
-                    logo.classList.add('animate__animated', 'animate__rubberBand');
-                    setTimeout(() => logo.classList.remove('animate__animated', 'animate__rubberBand'), 1000);
+                    if(logo) {
+                        logo.classList.add('animate__animated', 'animate__rubberBand');
+                        setTimeout(() => logo.classList.remove('animate__animated', 'animate__rubberBand'), 1000);
+                    }
                 }
             },
 
-            // --- MÓDULO DE ENRUTAMIENTO (SPA) ---
+            // --- ROUTER ---
             Router: {
                 go: function(viewName) {
-                    console.log(`[ROUTER] Navegando a: ${viewName}`);
-                    
-                    // Ocultar todas las secciones
                     document.querySelectorAll('main section').forEach(el => {
                         el.classList.add('hidden');
                         el.classList.remove('animate-enter');
                     });
-
-                    // Activar botones del menú
                     document.querySelectorAll('nav button').forEach(btn => {
                         btn.classList.remove('bg-teal-50', 'text-teal-700');
                         btn.classList.add('text-slate-600');
                     });
 
-                    // Mostrar vista seleccionada
                     const target = document.getElementById(`view-${viewName}`);
                     if (target) {
                         target.classList.remove('hidden');
                         target.classList.add('animate-enter');
-                        
-                        // Actualizar título
-                        const titles = {
-                            'dashboard': 'PANEL DE CONTROL',
-                            'orders': 'GESTIÓN DE ÓRDENES',
-                            'inventory': 'BODEGA JUNAEB',
-                            'calendar': 'CALENDARIO CORPORATIVO',
-                            'agenda': 'AGENDA SEMANAL'
-                        };
+                        const titles = { 'dashboard': 'PANEL DE CONTROL', 'orders': 'GESTIÓN DE ÓRDENES', 'inventory': 'BODEGA JUNAEB', 'calendar': 'CALENDARIO CORPORATIVO', 'agenda': 'AGENDA SEMANAL' };
                         document.getElementById('page-title').textContent = titles[viewName] || 'SISTEMA ERP';
 
-                        // Resaltar menú activo
-                        const navBtn = document.getElementById(`nav-${viewName === 'orders' ? 'orders' : viewName === 'inventory' ? 'inv' : viewName === 'calendar' ? 'cal' : viewName === 'agenda' ? 'agenda' : 'dash'}`);
+                        // Mapeo de botones de navegación
+                        const navMap = { 'dashboard': 'dash', 'orders': 'orders', 'inventory': 'inv', 'calendar': 'cal', 'agenda': 'agenda' };
+                        const navBtn = document.getElementById(`nav-${navMap[viewName]}`);
                         if(navBtn) navBtn.classList.add('bg-teal-50', 'text-teal-700');
 
-                        // Acciones específicas por vista
                         if (viewName === 'calendar') App.Calendar.render();
                         if (viewName === 'orders') App.Sabueso.renderTable();
                         if (viewName === 'agenda') App.Calendar.renderAgenda();
+                        if (viewName === 'inventory') App.Inventory.renderTable();
                     }
                 }
             },
 
-            // --- MÓDULO CALENDARIO (LÓGICA CORE ORIGINAL) ---
+            // --- CALENDARIO (LÓGICA MATEMÁTICA COMPLETA) ---
             Calendar: {
                 monthNames: ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"],
                 selectedDate: null,
@@ -742,69 +780,57 @@
                     const year = date.getFullYear();
                     const month = date.getMonth();
 
-                    document.getElementById('calendar-month-year').textContent = `${this.monthNames[month]} ${year}`;
+                    const monthTitle = document.getElementById('calendar-month-year');
+                    if(monthTitle) monthTitle.textContent = `${this.monthNames[month]} ${year}`;
 
-                    const firstDay = new Date(year, month, 1).getDay(); // 0 = Domingo
+                    const firstDay = new Date(year, month, 1).getDay(); 
                     const daysInMonth = new Date(year, month + 1, 0).getDate();
-                    
-                    // Ajustar para que Lunes sea 0 (Sistema Chileno)
-                    // getDay(): Dom=0, Lun=1... -> Queremos Lun=0... Dom=6
                     let startingDay = firstDay === 0 ? 6 : firstDay - 1;
 
                     const grid = document.getElementById('calendar-days');
+                    if(!grid) return;
                     grid.innerHTML = '';
 
-                    // Celdas vacías previas
                     for (let i = 0; i < startingDay; i++) {
                         const cell = document.createElement('div');
-                        cell.className = 'bg-slate-50';
+                        cell.className = 'bg-slate-50 border-r border-b border-slate-100';
                         grid.appendChild(cell);
                     }
 
-                    // Días del mes
                     for (let day = 1; day <= daysInMonth; day++) {
                         const cell = document.createElement('div');
-                        cell.className = 'calendar-day group';
+                        cell.className = 'calendar-day group min-h-[100px] border-r border-b border-slate-200 p-2 relative hover:bg-teal-50 transition-colors cursor-pointer';
                         
-                        // Generar Key YYYY-MM-DD
-                        const dateKey = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-                        const isToday = new Date().toDateString() === new Date(year, month, day).toDateString();
+                        // Fix zona horaria local
+                        const localDate = new Date(year, month, day);
+                        const offset = localDate.getTimezoneOffset();
+                        const dateKey = new Date(localDate.getTime() - (offset*60*1000)).toISOString().split('T')[0];
 
-                        if (isToday) cell.classList.add('bg-teal-50/50', 'border-teal-200');
+                        const isToday = new Date().toISOString().split('T')[0] === dateKey;
+                        if (isToday) cell.classList.add('bg-blue-50/50');
 
-                        // Header del día
                         const header = document.createElement('div');
-                        header.className = 'calendar-day-header';
-                        header.innerHTML = `<span class="${isToday ? 'bg-teal-600 text-white w-6 h-6 rounded-full flex items-center justify-center' : ''}">${day}</span>`;
+                        header.className = 'flex justify-between items-center mb-1';
+                        header.innerHTML = `<span class="text-sm font-bold ${isToday ? 'bg-teal-600 text-white w-6 h-6 rounded-full flex items-center justify-center' : 'text-slate-700'}">${day}</span>`;
                         
-                        // Botón flotante para agregar tarea (aparece en hover)
                         const addBtn = document.createElement('button');
+                        addBtn.innerHTML = '<i class="fas fa-plus text-xs"></i>';
                         addBtn.className = 'opacity-0 group-hover:opacity-100 text-teal-600 hover:text-teal-800 transition-opacity';
-                        addBtn.innerHTML = '<i class="fas fa-plus-circle"></i>';
-                        addBtn.onclick = (e) => {
-                            e.stopPropagation();
-                            App.Calendar.selectDate(dateKey);
-                            App.Modals.Task.open();
-                        };
+                        addBtn.onclick = (e) => { e.stopPropagation(); App.Calendar.selectDate(dateKey); App.Modals.Task.open(); };
                         header.appendChild(addBtn);
                         cell.appendChild(header);
 
-                        // Renderizar Tareas
                         const events = App.State.calendarEvents[dateKey] || [];
                         events.forEach((evt, index) => {
                             const chip = document.createElement('div');
-                            chip.className = `task-chip truncate text-xs p-1 mb-1 rounded border-l-4 ${this.getColorClass(evt.color)}`;
+                            chip.className = `text-[10px] p-1 mb-1 rounded border-l-2 truncate ${this.getColorClass(evt.color)}`;
                             chip.textContent = evt.text;
-                            chip.onclick = (e) => {
-                                e.stopPropagation();
-                                App.Calendar.deleteTask(dateKey, index);
-                            };
+                            chip.title = evt.text; // Tooltip nativo
+                            chip.onclick = (e) => { e.stopPropagation(); App.Calendar.deleteTask(dateKey, index); };
                             cell.appendChild(chip);
                         });
 
-                        // Click en la celda
                         cell.onclick = () => App.Calendar.selectDate(dateKey);
-
                         grid.appendChild(cell);
                     }
                 },
@@ -821,27 +847,29 @@
 
                 selectDate: function(dateKey) {
                     this.selectedDate = dateKey;
-                    document.getElementById('selected-date-title').textContent = `Tareas: ${dateKey}`;
+                    const title = document.getElementById('selected-date-title');
+                    if(title) title.textContent = `Notas del: ${dateKey}`;
                     
                     const list = document.getElementById('day-task-list');
+                    if(!list) return;
                     list.innerHTML = '';
                     
                     const events = App.State.calendarEvents[dateKey] || [];
                     if (events.length === 0) {
-                        list.innerHTML = '<li class="text-slate-400 text-sm italic">No hay notas para este día.</li>';
+                        list.innerHTML = '<li class="text-slate-400 text-sm italic text-center py-4">Sin notas.</li>';
                         return;
                     }
 
                     events.forEach((evt, idx) => {
                         const li = document.createElement('li');
-                        li.className = 'flex items-center justify-between p-3 bg-slate-50 rounded border border-slate-100';
+                        li.className = 'flex items-center justify-between p-3 bg-white rounded border border-slate-100 shadow-sm';
                         li.innerHTML = `
-                            <span class="flex items-center gap-2">
-                                <span class="w-3 h-3 rounded-full bg-${evt.color}-500"></span>
-                                <span class="text-sm font-medium text-slate-700">${evt.text}</span>
+                            <span class="flex items-center gap-2 overflow-hidden">
+                                <span class="w-2 h-2 rounded-full bg-${evt.color}-500 flex-shrink-0"></span>
+                                <span class="text-sm text-slate-700 truncate">${evt.text}</span>
                             </span>
-                            <button onclick="App.Calendar.deleteTask('${dateKey}', ${idx})" class="text-red-400 hover:text-red-600">
-                                <i class="fas fa-trash"></i>
+                            <button onclick="App.Calendar.deleteTask('${dateKey}', ${idx})" class="text-slate-300 hover:text-red-500">
+                                <i class="fas fa-trash-alt"></i>
                             </button>
                         `;
                         list.appendChild(li);
@@ -855,515 +883,278 @@
                     }
                     App.State.calendarEvents[this.selectedDate].push({ text, color });
                     App.Data.save();
-                    this.render(); // Refrescar calendario visual
-                    this.selectDate(this.selectedDate); // Refrescar lista lateral
+                    this.render();
+                    this.selectDate(this.selectedDate);
                 },
 
                 deleteTask: function(dateKey, index) {
-                    Swal.fire({
-                        title: '¿Borrar nota?',
-                        text: "No podrás recuperarla.",
-                        icon: 'warning',
-                        showCancelButton: true,
-                        confirmButtonColor: '#d33',
-                        confirmButtonText: 'Sí, borrar'
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            App.State.calendarEvents[dateKey].splice(index, 1);
-                            if(App.State.calendarEvents[dateKey].length === 0) delete App.State.calendarEvents[dateKey];
-                            App.Data.save();
-                            App.Calendar.render();
-                            App.Calendar.selectDate(dateKey);
-                        }
-                    })
+                    if(confirm("¿Borrar nota?")) {
+                        App.State.calendarEvents[dateKey].splice(index, 1);
+                        if(App.State.calendarEvents[dateKey].length === 0) delete App.State.calendarEvents[dateKey];
+                        App.Data.save();
+                        this.render();
+                        this.selectDate(dateKey);
+                    }
                 },
 
-                prevMonth: function() {
-                    App.State.currentDate.setMonth(App.State.currentDate.getMonth() - 1);
-                    this.render();
-                },
-                nextMonth: function() {
-                    App.State.currentDate.setMonth(App.State.currentDate.getMonth() + 1);
-                    this.render();
-                },
+                prevMonth: function() { App.State.currentDate.setMonth(App.State.currentDate.getMonth() - 1); this.render(); },
+                nextMonth: function() { App.State.currentDate.setMonth(App.State.currentDate.getMonth() + 1); this.render(); },
 
                 renderAgenda: function() {
                     const list = document.getElementById('agenda-full-list');
+                    if(!list) return;
                     list.innerHTML = '';
-                    
-                    // Ordenar fechas
                     const keys = Object.keys(App.State.calendarEvents).sort();
-                    
-                    if(keys.length === 0) {
-                        list.innerHTML = '<div class="text-center py-10 text-slate-400">Agenda vacía. Agrega notas en el Calendario.</div>';
-                        return;
-                    }
+                    if(keys.length === 0) { list.innerHTML = '<div class="text-center text-slate-400">Agenda vacía.</div>'; return; }
 
                     keys.forEach(date => {
                         const events = App.State.calendarEvents[date];
-                        const dateObj = new Date(date + 'T00:00:00'); // Fix timezone issue
-                        
+                        const dateObj = new Date(date + 'T12:00:00'); // Fix visual
                         const group = document.createElement('div');
-                        group.className = 'border-l-4 border-teal-500 pl-4 py-2';
-                        
-                        const dateHeader = document.createElement('h4');
-                        dateHeader.className = 'font-bold text-lg text-slate-800 uppercase';
-                        dateHeader.textContent = dateObj.toLocaleDateString('es-CL', { weekday: 'long', day: 'numeric', month: 'long' });
-                        group.appendChild(dateHeader);
-
+                        group.className = 'mb-4';
+                        group.innerHTML = `<h4 class="font-bold text-teal-700 border-b border-teal-100 mb-2">${dateObj.toLocaleDateString()}</h4>`;
                         events.forEach(evt => {
-                            const item = document.createElement('div');
-                            item.className = 'mt-2 p-3 bg-white rounded shadow-sm border border-slate-100 text-slate-600 flex items-center gap-3';
-                            item.innerHTML = `<span class="w-2 h-2 rounded-full bg-${evt.color}-500"></span> ${evt.text}`;
-                            group.appendChild(item);
+                            group.innerHTML += `<div class="p-2 bg-white border border-slate-100 rounded mb-1 text-sm flex gap-2 items-center"><span class="w-2 h-2 rounded-full bg-${evt.color}-500"></span>${evt.text}</div>`;
                         });
-
                         list.appendChild(group);
                     });
                 }
             },
 
-            // --- MÓDULO SABUESO (LECTOR DE ARCHIVOS AVANZADO) ---
+            // --- SABUESO (LECTOR DE ARCHIVOS) ---
             Sabueso: {
-                handleDrop: function(e) {
-                    e.preventDefault();
-                    e.target.classList.remove('border-teal-500', 'bg-teal-50');
-                    this.handleFiles(e.dataTransfer.files);
-                },
-
+                handleDrop: function(e) { e.preventDefault(); e.target.classList.remove('border-teal-500', 'bg-teal-50'); this.handleFiles(e.dataTransfer.files); },
                 handleFiles: async function(files) {
                     if (files.length === 0) return;
-                    
-                    Swal.fire({
-                        title: 'Procesando Archivos...',
-                        html: 'El motor Sabueso está analizando la data.',
-                        timerProgressBar: true,
-                        didOpen: () => { Swal.showLoading() }
-                    });
+                    Swal.fire({ title: 'Analizando...', didOpen: () => Swal.showLoading() });
 
                     for (let file of files) {
                         try {
-                            if (file.type === "application/pdf") {
-                                await this.parsePDF(file);
-                            } else if (file.name.includes(".xls") || file.name.includes(".csv")) {
-                                await this.parseExcel(file);
-                            }
-                        } catch (err) {
-                            console.error("Error leyendo archivo:", err);
-                            Swal.fire('Error', `No se pudo leer ${file.name}`, 'error');
-                        }
+                            if (file.type === "application/pdf") await this.parsePDF(file);
+                            else if (file.name.match(/\.(xls|xlsx|csv)$/i)) await this.parseExcel(file);
+                        } catch (err) { console.error(err); }
                     }
-
                     App.Data.save();
                     this.renderTable();
-                    App.Inventory.renderTable(); // Por si se cargó inventario
+                    App.Inventory.renderTable();
                     Swal.close();
-                    Swal.fire('¡Listo!', 'Archivos procesados correctamente.', 'success');
                 },
 
                 parseExcel: function(file) {
-                    return new Promise((resolve, reject) => {
+                    return new Promise((resolve) => {
                         const reader = new FileReader();
                         reader.onload = (e) => {
-                            const data = new Uint8Array(e.target.result);
-                            const workbook = XLSX.read(data, { type: 'array' });
+                            const wb = XLSX.read(new Uint8Array(e.target.result), { type: 'array' });
+                            const json = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);
                             
-                            // Asumimos que la primera hoja es la relevante
-                            const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-                            const jsonData = XLSX.utils.sheet_to_json(firstSheet);
-                            
-                            console.log("[SABUESO] Excel Data Raw:", jsonData);
-
-                            // Detectar si es Inventario Junaeb (Tiene columna XS, S, M...)
-                            if (jsonData.length > 0 && ('XS' in jsonData[0] || 'Talla' in jsonData[0])) {
-                                App.State.inventory = jsonData;
-                                console.log("[SABUESO] Inventario detectado y cargado.");
+                            // Detección: Inventario vs Orden
+                            if (json.length > 0 && ('XS' in json[0] || 'S' in json[0] || 'Talla' in json[0])) {
+                                App.State.inventory = json; // Es inventario
                             } else {
-                                // Tratar como listado de órdenes simple
-                                jsonData.forEach(row => {
+                                // Es orden simple
+                                json.forEach(row => {
                                     App.State.orders.push({
-                                        id: row['OC'] || row['Orden'] || `XLS-${Date.now()}`,
-                                        client: row['Cliente'] || 'Carga Masiva',
+                                        id: row['OC'] || `XLS-${Date.now()}`,
+                                        client: row['Cliente'] || 'Importado Excel',
                                         date: new Date().toISOString().split('T')[0],
                                         content: JSON.stringify(row),
-                                        status: 'Pendiente'
+                                        status: 'Pendiente', source: 'Excel'
                                     });
                                 });
                             }
                             resolve();
                         };
-                        reader.onerror = reject;
                         reader.readAsArrayBuffer(file);
                     });
                 },
 
                 parsePDF: async function(file) {
-                    // Lógica para leer PDF con pdf.js
-                    const arrayBuffer = await file.arrayBuffer();
-                    const pdf = await pdfjsLib.getDocument(arrayBuffer).promise;
-                    
-                    let fullText = "";
-                    for (let i = 1; i <= pdf.numPages; i++) {
-                        const page = await pdf.getPage(i);
-                        const textContent = await page.getTextContent();
-                        fullText += textContent.items.map(item => item.str).join(" ") + "\n";
+                    const buf = await file.arrayBuffer();
+                    const pdf = await pdfjsLib.getDocument(buf).promise;
+                    let text = "";
+                    for(let i=1; i<=pdf.numPages; i++) {
+                        const p = await pdf.getPage(i);
+                        const c = await p.getTextContent();
+                        text += c.items.map(s=>s.str).join(" ") + "\n";
                     }
-
-                    console.log("[SABUESO] PDF Content Extracted:", fullText.substring(0, 200) + "...");
-
-                    // EXTRACCIÓN INTELIGENTE (REGEX)
-                    // Buscar patrones comunes en OCs chilenas
-                    const ocMatch = fullText.match(/Orden\s*N[°º]\s*(\d+)/i) || fullText.match(/OC\s*[:\.]?\s*(\d+)/i);
-                    const dateMatch = fullText.match(/(\d{2})[\/-](\d{2})[\/-](\d{4})/);
                     
-                    const newOrder = {
-                        id: ocMatch ? ocMatch[1] : `PDF-${Date.now()}`,
-                        client: "Extraído de PDF", // Podríamos buscar "Cliente:"
-                        date: dateMatch ? `${dateMatch[3]}-${dateMatch[2]}-${dateMatch[1]}` : new Date().toISOString().split('T')[0],
-                        content: fullText.substring(0, 1500), // Guardamos los primeros 1500 caracteres como referencia
+                    // Regex Heurística para OCs Chilenas
+                    const oc = text.match(/Orden\s*N[°º]\s*(\d+)/i) || {1: `PDF-${Date.now()}`};
+                    const client = text.match(/Señor\(es\):\s*(.+?)\n/i) || {1: "Cliente PDF"};
+                    
+                    App.State.orders.push({
+                        id: oc[1],
+                        client: client[1].trim(),
+                        date: new Date().toISOString().split('T')[0],
+                        content: text.substring(0, 800), // Preview
                         status: 'Pendiente',
                         source: 'PDF'
-                    };
-
-                    App.State.orders.push(newOrder);
+                    });
                 },
 
                 renderTable: function() {
                     const tbody = document.getElementById('orders-table-body');
+                    if(!tbody) return;
                     tbody.innerHTML = '';
+                    if(App.State.orders.length === 0) { tbody.innerHTML = '<tr><td colspan="5" class="p-8 text-center text-slate-400">Sin órdenes.</td></tr>'; return; }
 
-                    if (App.State.orders.length === 0) {
-                        tbody.innerHTML = `
-                            <tr>
-                                <td colspan="5" class="px-6 py-12 text-center text-slate-400">
-                                    <i class="fas fa-inbox text-4xl mb-3 block opacity-20"></i>
-                                    No hay órdenes cargadas. Sube un archivo.
-                                </td>
-                            </tr>`;
-                        return;
-                    }
-
-                    App.State.orders.forEach((order, index) => {
+                    App.State.orders.forEach((o, i) => {
                         const tr = document.createElement('tr');
-                        tr.className = 'hover:bg-slate-50 transition-colors group';
+                        tr.className = "hover:bg-slate-50 transition-colors border-b border-slate-50";
                         tr.innerHTML = `
-                            <td class="px-6 py-4 font-bold text-slate-700">
-                                <i class="fas ${order.source === 'PDF' ? 'fa-file-pdf text-red-500' : 'fa-file-excel text-green-500'} mr-2"></i>
-                                ${order.id}
-                                <div class="text-xs text-slate-400 font-normal">${order.date}</div>
-                            </td>
-                            <td class="px-6 py-4">
-                                <div class="font-bold">${order.client}</div>
-                                <div class="text-xs text-slate-400">${order.invoice || 'Sin Factura'}</div>
-                            </td>
-                            <td class="px-6 py-4 text-xs font-mono text-slate-500 max-w-xs truncate">
-                                ${typeof order.content === 'string' ? order.content.substring(0, 50) : 'Datos estructurados'}...
-                            </td>
-                            <td class="px-6 py-4">
-                                <span class="px-2 py-1 bg-yellow-100 text-yellow-700 rounded-full text-xs font-bold border border-yellow-200">
-                                    ${order.status}
-                                </span>
-                            </td>
+                            <td class="px-6 py-4"><i class="fas ${o.source==='PDF'?'fa-file-pdf text-red-500':'fa-file-alt text-blue-500'} mr-2"></i><b>${o.id}</b></td>
+                            <td class="px-6 py-4 font-medium text-slate-700">${o.client}</td>
+                            <td class="px-6 py-4 text-xs font-mono text-slate-400 max-w-xs truncate">${o.content.substring(0,60)}...</td>
+                            <td class="px-6 py-4"><span class="px-2 py-1 bg-yellow-100 text-yellow-800 rounded text-xs font-bold">${o.status}</span></td>
                             <td class="px-6 py-4 text-right">
-                                <button onclick="App.Modals.EditOrder.open(${index})" class="text-teal-600 hover:text-teal-800 font-bold text-xs bg-teal-50 px-3 py-1 rounded border border-teal-100">
-                                    EDITAR
-                                </button>
-                                <button onclick="App.Sabueso.deleteOrder(${index})" class="ml-2 text-slate-400 hover:text-red-500">
-                                    <i class="fas fa-trash"></i>
-                                </button>
+                                <button onclick="App.Modals.EditOrder.open(${i})" class="text-teal-600 font-bold text-xs mr-3">EDITAR</button>
+                                <button onclick="App.Sabueso.delete(${i})" class="text-slate-400 hover:text-red-500"><i class="fas fa-trash"></i></button>
                             </td>
                         `;
                         tbody.appendChild(tr);
                     });
                 },
-
-                deleteOrder: function(index) {
-                    App.State.orders.splice(index, 1);
-                    App.Data.save();
-                    this.renderTable();
-                }
+                delete: function(i) { App.State.orders.splice(i,1); App.Data.save(); this.renderTable(); }
             },
 
-            // --- MÓDULO DE INVENTARIO ---
+            // --- INVENTARIO ---
             Inventory: {
                 renderTable: function() {
                     const tbody = document.getElementById('inventory-body');
+                    if(!tbody) return;
                     tbody.innerHTML = '';
-                    
-                    if (App.State.inventory.length === 0) {
-                        tbody.innerHTML = '<tr><td colspan="8" class="p-4 text-center text-slate-400">Sin datos de inventario. Sube el Excel Junaeb.</td></tr>';
-                        return;
-                    }
+                    if(App.State.inventory.length === 0) { tbody.innerHTML = '<tr><td colspan="8" class="p-4 text-center">Carga el Excel Junaeb.</td></tr>'; return; }
 
                     App.State.inventory.forEach(item => {
-                        // Intentar mapear columnas flexibles
-                        const name = item['PRODUCTO'] || item['Producto'] || item['Nombre'] || 'Item S/N';
-                        const xs = item['XS'] || 0;
-                        const s = item['S'] || 0;
-                        const m = item['M'] || 0;
-                        const l = item['L'] || 0;
-                        const xl = item['XL'] || 0;
-                        const xxl = item['XXL'] || item['2XL'] || 0;
-                        const total = (parseInt(xs)||0)+(parseInt(s)||0)+(parseInt(m)||0)+(parseInt(l)||0)+(parseInt(xl)||0)+(parseInt(xxl)||0);
+                        const name = item['PRODUCTO'] || item['Producto'] || item['Nombre'] || 'Item';
+                        // Sumar tallas o usar stock total
+                        let total = 0;
+                        if(item.stock) total = item.stock;
+                        else {
+                            ['XS','S','M','L','XL','XXL'].forEach(t => total += (parseInt(item[t])||0));
+                        }
 
                         const tr = document.createElement('tr');
                         tr.innerHTML = `
                             <td class="p-3 font-bold text-slate-700">${name}</td>
-                            <td class="p-3 text-center text-slate-500">${xs || '-'}</td>
-                            <td class="p-3 text-center text-slate-500">${s || '-'}</td>
-                            <td class="p-3 text-center text-slate-500">${m || '-'}</td>
-                            <td class="p-3 text-center text-slate-500">${l || '-'}</td>
-                            <td class="p-3 text-center text-slate-500">${xl || '-'}</td>
-                            <td class="p-3 text-center text-slate-500">${xxl || '-'}</td>
+                            <td class="p-3 text-center text-slate-500">${item.XS||'-'}</td>
+                            <td class="p-3 text-center text-slate-500">${item.S||'-'}</td>
+                            <td class="p-3 text-center text-slate-500">${item.M||'-'}</td>
+                            <td class="p-3 text-center text-slate-500">${item.L||'-'}</td>
+                            <td class="p-3 text-center text-slate-500">${item.XL||'-'}</td>
+                            <td class="p-3 text-center text-slate-500">${item.XXL||'-'}</td>
                             <td class="p-3 text-right font-bold text-teal-600">${total}</td>
                         `;
                         tbody.appendChild(tr);
                     });
                 },
-
                 filter: function() {
                     const term = document.getElementById('inv-search').value.toLowerCase();
-                    const rows = document.querySelectorAll('#inventory-body tr');
-                    rows.forEach(row => {
-                        const text = row.textContent.toLowerCase();
-                        row.style.display = text.includes(term) ? '' : 'none';
+                    document.querySelectorAll('#inventory-body tr').forEach(row => {
+                        row.style.display = row.innerText.toLowerCase().includes(term) ? '' : 'none';
                     });
                 }
             },
 
-            // --- MÓDULO DE IMPRESIÓN (PDF GENERATION) ---
+            // --- IMPRESORAS PDF (TACHA PRO + ACTA) ---
             Printers: {
-                // Función auxiliar para dibujar el logo vectorial
-                drawVectorLogo: function(doc, x, y, size) {
-                    doc.setDrawColor(0, 128, 128); // Teal
-                    doc.setLineWidth(1);
-                    doc.circle(x + size/2, y + size/2, size/2 - 2); // Círculo exterior
-                    
-                    // Simulación simplificada de tijeras con líneas
-                    doc.setLineWidth(2);
-                    doc.line(x + size*0.3, y + size*0.3, x + size*0.7, y + size*0.8); // Hoja 1
-                    doc.line(x + size*0.7, y + size*0.3, x + size*0.3, y + size*0.8); // Hoja 2
-                    
-                    // Orificios
-                    doc.setFillColor(255, 255, 255);
-                    doc.circle(x + size*0.3, y + size*0.3, size*0.08, 'F');
-                    doc.circle(x + size*0.7, y + size*0.3, size*0.08, 'F');
+                drawLogo: function(doc, x, y, s) {
+                    doc.setDrawColor(0, 128, 128); doc.setLineWidth(0.8);
+                    doc.circle(x+s/2, y+s/2, s/2-1);
+                    doc.line(x+s*0.3, y+s*0.3, x+s*0.7, y+s*0.8);
+                    doc.line(x+s*0.7, y+s*0.3, x+s*0.3, y+s*0.8);
                 },
 
                 printTacha3Cols: function() {
-                    if(App.State.orders.length === 0) { Swal.fire('Error', 'No hay órdenes para imprimir', 'error'); return; }
-
+                    if(App.State.orders.length === 0) return Swal.fire('Error', 'Sin órdenes', 'warning');
                     const { jsPDF } = window.jspdf;
-                    const doc = new jsPDF('p', 'mm', 'legal'); // Oficio
-                    
-                    const cols = 3;
-                    const colWidth = 65; // Ajustado para Oficio
-                    const margin = 10;
-                    let x = margin;
-                    let y = margin;
-                    let colCount = 0;
+                    const doc = new jsPDF('l', 'mm', 'legal');
+                    const cols = 3, w = 355.6, colW = 110, margin = 10;
+                    let x = margin, y = margin, c = 0;
 
-                    App.State.orders.forEach((order, index) => {
-                        // Dibujar Contenedor de la Orden
-                        doc.setDrawColor(200, 200, 200);
-                        doc.rect(x, y, colWidth - 5, 80); // Caja de 80mm alto
-
-                        // Cabecera
-                        this.drawVectorLogo(doc, x + 2, y + 2, 10);
+                    App.State.orders.forEach((o, i) => {
+                        // Marco
+                        doc.setDrawColor(220); doc.rect(x, y, colW-5, 90);
+                        // Logo y Header
+                        this.drawLogo(doc, x+2, y+2, 12);
+                        doc.setFontSize(14); doc.setTextColor(0,128,128); doc.text(o.id.toString(), x+100, y+10, {align:'right'});
+                        doc.setFontSize(9); doc.setTextColor(0); doc.text(o.client.substring(0,35), x+16, y+8);
                         
-                        doc.setFontSize(8);
-                        doc.setFont("helvetica", "bold");
-                        doc.text("IDEAS TEXTILES", x + 14, y + 6);
-                        
-                        doc.setFontSize(14);
-                        doc.text(`OC: ${order.id}`, x + 5, y + 18);
-                        
-                        doc.setFontSize(8);
-                        doc.setFont("helvetica", "normal");
-                        doc.text(String(order.client).substring(0, 25), x + 5, y + 24);
-                        doc.text(`Fecha: ${order.date}`, x + 5, y + 28);
-
-                        // Contenido (Miniatura)
+                        // Contenido
                         doc.setFontSize(7);
-                        const cleanContent = (order.content || "").replace(/[^a-zA-Z0-9\s:-]/g, '').substring(0, 150);
-                        const splitText = doc.splitTextToSize(cleanContent, colWidth - 15);
-                        doc.text(splitText, x + 5, y + 35);
+                        const lines = doc.splitTextToSize(o.content.replace(/[\{\}\"]/g,' ').substring(0,300), colW-15);
+                        doc.text(lines, x+5, y+25);
 
-                        // CAJAS DE CHECK (La funcionalidad clave solicitada)
-                        doc.setDrawColor(0, 0, 0);
-                        // Caja 1: Picking
-                        doc.rect(x + colWidth - 15, y + 5, 8, 8);
-                        doc.setFontSize(5); doc.text("PICK", x + colWidth - 14, y + 15);
-                        
-                        // Caja 2: Revisión
-                        doc.rect(x + colWidth - 15, y + 25, 8, 8);
-                        doc.text("REV", x + colWidth - 14, y + 35);
+                        // Checkboxes
+                        doc.setDrawColor(0);
+                        doc.rect(x+colW-12, y+5, 6, 6); doc.text("OK", x+colW-12, y+14);
 
-                        // Caja 3: Despacho
-                        doc.rect(x + colWidth - 15, y + 45, 8, 8);
-                        doc.text("DESP", x + colWidth - 14, y + 55);
-
-                        // Mover cursor
-                        colCount++;
-                        if (colCount < cols) {
-                            x += colWidth;
-                        } else {
-                            x = margin;
-                            colCount = 0;
-                            y += 85; // Salto de fila
-                        }
-
-                        // Salto de página si se acaba el legal
-                        if (y > 300) {
-                            doc.addPage();
-                            y = margin;
-                            x = margin;
-                            colCount = 0;
-                        }
+                        c++; x += colW;
+                        if(c >= cols) { c=0; x=margin; y+=95; }
+                        if(y > 180) { doc.addPage(); y=margin; x=margin; c=0; }
                     });
-
-                    doc.save(`Tacha_3Col_Oficio_${new Date().getTime()}.pdf`);
+                    doc.save("Tacha_Despacho_3Col.pdf");
                 },
 
                 printActa: function() {
                     const title = document.getElementById('acta-title').value;
-                    const receiver = document.getElementById('acta-receiver').value;
                     const items = document.getElementById('acta-items').value;
-
                     const { jsPDF } = window.jspdf;
                     const doc = new jsPDF();
 
-                    // Header
-                    doc.setFillColor(0, 128, 128);
-                    doc.rect(0, 0, 210, 40, 'F');
-                    doc.setTextColor(255, 255, 255);
-                    doc.setFontSize(22);
-                    doc.text("IDEAS TEXTILES SPA", 105, 20, { align: "center" });
-                    doc.setFontSize(12);
-                    doc.text("Acta de Entrega Oficial", 105, 30, { align: "center" });
-
-                    // Info
-                    doc.setTextColor(0, 0, 0);
-                    doc.setFontSize(12);
-                    doc.text(`TÍTULO: ${title}`, 20, 60);
-                    doc.text(`FECHA: ${new Date().toLocaleDateString()}`, 20, 70);
-                    doc.text(`RECIBE: ${receiver}`, 20, 80);
-
-                    // Línea
-                    doc.setLineWidth(0.5);
-                    doc.line(20, 90, 190, 90);
-
-                    // Items
-                    doc.setFontSize(10);
-                    const splitItems = doc.splitTextToSize(items, 170);
-                    doc.text(splitItems, 20, 100);
-
-                    // Firmas
-                    doc.line(30, 250, 90, 250);
-                    doc.text("FIRMA ENTREGUE", 60, 260, { align: "center" });
-
-                    doc.line(120, 250, 180, 250);
-                    doc.text("FIRMA RECIBE", 150, 260, { align: "center" });
-
-                    doc.save("Acta_Entrega.pdf");
+                    this.drawLogo(doc, 15, 15, 20);
+                    doc.setFontSize(18); doc.text("IDEAS TEXTILES", 40, 25);
+                    doc.setFontSize(14); doc.text(title, 105, 50, {align:'center'});
+                    doc.setFontSize(10); doc.text(items, 20, 70);
+                    
+                    doc.line(30, 250, 90, 250); doc.text("ENTREGA", 60, 255, {align:'center'});
+                    doc.line(120, 250, 180, 250); doc.text("RECIBE", 150, 255, {align:'center'});
+                    
+                    doc.save("Acta.pdf");
                     App.Modals.Acta.close();
                 }
             },
 
-            // --- MÓDULO DE VENTANAS (MODALS) ---
+            // --- MODALES ---
             Modals: {
                 EditOrder: {
-                    currentIdx: null,
-                    open: function(index) {
-                        const order = App.State.orders[index];
-                        this.currentIdx = index;
-                        document.getElementById('edit-order-id').value = order.id;
-                        document.getElementById('edit-order-client').value = order.client;
-                        document.getElementById('edit-order-date').value = order.date;
-                        document.getElementById('edit-order-invoice').value = order.invoice || '';
-                        document.getElementById('edit-order-content').value = order.content;
-                        
-                        document.getElementById('modal-edit-order').classList.remove('hidden');
-                        document.getElementById('modal-edit-order').classList.add('flex');
-                    },
-                    create: function() {
-                        this.currentIdx = -1; // Nuevo
-                        document.getElementById('edit-order-id').value = Date.now();
-                        document.getElementById('edit-order-client').value = "";
-                        document.getElementById('edit-order-content').value = "";
-                        document.getElementById('modal-edit-order').classList.remove('hidden');
-                        document.getElementById('modal-edit-order').classList.add('flex');
-                    },
-                    close: function() {
-                        document.getElementById('modal-edit-order').classList.add('hidden');
-                        document.getElementById('modal-edit-order').classList.remove('flex');
-                    },
+                    idx: null,
+                    open: function(i) { this.idx=i; const o = App.State.orders[i]; document.getElementById('edit-order-client').value=o.client; document.getElementById('edit-order-content').value=o.content; document.getElementById('modal-edit-order').classList.remove('hidden'); },
+                    create: function() { this.idx=-1; document.getElementById('edit-order-client').value=""; document.getElementById('edit-order-content').value=""; document.getElementById('modal-edit-order').classList.remove('hidden'); },
+                    close: function() { document.getElementById('modal-edit-order').classList.add('hidden'); },
                     save: function() {
-                        const newOrder = {
-                            id: document.getElementById('edit-order-id').value,
-                            client: document.getElementById('edit-order-client').value,
-                            date: document.getElementById('edit-order-date').value,
-                            invoice: document.getElementById('edit-order-invoice').value,
-                            content: document.getElementById('edit-order-content').value,
-                            status: 'Editado',
-                            source: 'Manual'
-                        };
-
-                        if (this.currentIdx === -1) {
-                            App.State.orders.unshift(newOrder); // Agregar al inicio
-                        } else {
-                            App.State.orders[this.currentIdx] = newOrder;
-                        }
-                        
-                        App.Data.save();
-                        App.Sabueso.renderTable();
-                        this.close();
-                        Swal.fire('Guardado', 'La orden ha sido actualizada', 'success');
+                        const c = document.getElementById('edit-order-client').value;
+                        const t = document.getElementById('edit-order-content').value;
+                        if(this.idx===-1) App.State.orders.unshift({id:`MAN-${Date.now()}`, client:c, content:t, date:new Date().toISOString().split('T')[0], status:'Nuevo', source:'Manual'});
+                        else { App.State.orders[this.idx].client=c; App.State.orders[this.idx].content=t; }
+                        App.Data.save(); App.Sabueso.renderTable(); this.close();
                     }
                 },
                 Task: {
-                    open: function() {
-                        document.getElementById('modal-task').classList.remove('hidden');
-                        document.getElementById('modal-task').classList.add('flex');
-                        document.getElementById('task-input').focus();
-                    },
-                    close: function() {
-                        document.getElementById('modal-task').classList.add('hidden');
-                        document.getElementById('modal-task').classList.remove('flex');
-                    },
+                    open: function() { document.getElementById('modal-task').classList.remove('hidden'); },
+                    close: function() { document.getElementById('modal-task').classList.add('hidden'); },
                     save: function() {
-                        const text = document.getElementById('task-input').value;
-                        const color = document.getElementById('task-color').value;
-                        if(text) {
-                            App.Calendar.addTask(text, color);
-                            document.getElementById('task-input').value = ''; // Limpiar
-                            this.close();
-                        }
+                        const t = document.getElementById('task-input').value;
+                        const c = document.getElementById('task-color').value;
+                        if(t) { App.Calendar.addTask(t, c); document.getElementById('task-input').value=''; this.close(); }
                     }
                 },
                 Acta: {
-                    open: function() {
-                        document.getElementById('modal-acta').classList.remove('hidden');
-                        document.getElementById('modal-acta').classList.add('flex');
-                    },
-                    close: function() {
-                        document.getElementById('modal-acta').classList.add('hidden');
-                        document.getElementById('modal-acta').classList.remove('flex');
-                    }
+                    open: function() { document.getElementById('modal-acta').classList.remove('hidden'); },
+                    close: function() { document.getElementById('modal-acta').classList.add('hidden'); }
                 }
-            }
+            },
+            
+            System: { backup: function() { 
+                const data = JSON.stringify(App.State);
+                const blob = new Blob([data], {type:'application/json'});
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a'); a.href=url; a.download=`BACKUP_IDEAS_${Date.now()}.json`; a.click();
+            }}
         };
 
-        // --- INICIALIZACIÓN DEL SISTEMA ---
-        document.addEventListener('DOMContentLoaded', () => {
-            console.log("-----------------------------------------");
-            console.log("   IDEAS TEXTILES ERP V15 - STARTUP      ");
-            console.log("-----------------------------------------");
-            
-            App.Data.init();
-            App.UI.init();
-            App.Router.go('dashboard'); // Vista inicial
-        });
+        // INICIO
+        window.onload = App.Data.init;
 
     </script>
 </body>
