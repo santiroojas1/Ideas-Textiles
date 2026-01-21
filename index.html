@@ -1,14 +1,41 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" class="antialiased">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="description" content="Sistema ERP Corporativo - Ideas Textiles SpA">
-    <meta name="author" content="Ideas Textiles Dev Team">
-    <title>IDEAS TEXTILES | SISTEMA ERP </title>
+    <meta name="author" content="Ideas Textiles Engineering">
+    <meta name="theme-color" content="#008080">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>IDEAS TEXTILES | ERP V15 ENTERPRISE</title>
 
     <script src="https://cdn.tailwindcss.com"></script>
-    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        teal: { 
+                            50: '#f0fdfa', 100: '#ccfbf1', 200: '#99f6e4', 
+                            300: '#5eead4', 400: '#2dd4bf', 500: '#14b8a6', 
+                            600: '#0d9488', 700: '#0f766e', 800: '#115e59', 900: '#134e4a' 
+                        },
+                        slate: { 850: '#1e293b' } // Color oscuro corporativo
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'Menlo', 'Monaco', 'Courier New', 'monospace'],
+                    },
+                    boxShadow: {
+                        'glass': '0 8px 32px 0 rgba( 31, 38, 135, 0.37 )',
+                        'neumorph': '20px 20px 60px #d1d5db, -20px -20px 60px #ffffff',
+                    }
+                }
+            }
+        }
+    </script>
+
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -20,1257 +47,1322 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
     
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-    <script>pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';</script>
+    <script>
+        // Configuración del Worker para PDF.js
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <style>
-        /* --- VARIABLES GLOBALES DEL TEMA (TEAL CORPORATIVO) --- */
+        /* --- VARIABLES GLOBALES --- */
         :root {
-            --color-primary: #008080;        /* Teal Principal */
-            --color-primary-dark: #004d4d;   /* Teal Oscuro para textos */
-            --color-primary-light: #e0f2f1;  /* Teal Claro para fondos */
-            --color-secondary: #2dd4bf;      /* Turquesa vibrante para acentos */
-            --color-surface: #ffffff;        /* Blanco puro */
-            --color-background: #f3f4f6;     /* Gris suave de fondo */
-            --color-text-main: #111827;      /* Negro suave */
-            --color-text-muted: #6b7280;     /* Gris texto secundario */
-            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
-            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
-            --radius-std: 0.75rem;           /* 12px border radius */
+            --primary-color: #008080; /* Teal Ideas Textiles */
+            --secondary-color: #0f766e;
+            --accent-color: #2dd4bf;
+            --bg-color: #f8fafc;
+            --surface-color: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border-radius: 12px;
         }
 
-        /* --- RESET & BASE --- */
         body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--color-background);
-            color: var(--color-text-main);
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            /* Font smoothing para legibilidad estilo Apple */
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
-            overflow: hidden; /* Evita scroll doble */
         }
 
-        /* --- UTILIDADES DE UI ESTILO "GLASSMORPHISM" --- */
+        /* --- UTILIDADES DE CRISTAL (GLASSMORPHISM) --- */
         .glass-panel {
             background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(0, 128, 128, 0.1);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
         }
 
-        /* --- BOTONES & INTERACTIVIDAD --- */
-        .btn-corporate {
-            background-color: var(--color-primary);
-            color: white;
-            font-weight: 600;
-            padding: 0.75rem 1.5rem;
-            border-radius: var(--radius-std);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 4px 6px -1px rgba(0, 128, 128, 0.3);
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
+        /* --- BOTONES ESTILO iOS --- */
+        .btn-action {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        .btn-action:active {
+            transform: scale(0.97);
+        }
+        .btn-action::after {
+            content: "";
+            position: absolute;
+            top: 50%; left: 50%;
+            width: 0; height: 0;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.3s, height 0.3s;
+        }
+        .btn-action:hover::after {
+            width: 300px; height: 300px;
         }
 
-        .btn-corporate:hover {
-            background-color: var(--color-primary-dark);
-            transform: translateY(-2px);
-            box-shadow: 0 10px 15px -3px rgba(0, 128, 128, 0.4);
-        }
-
-        .btn-corporate:active {
-            transform: translateY(0);
-        }
-
-        .btn-ghost {
-            background-color: transparent;
-            color: var(--color-text-muted);
-            padding: 0.5rem;
-            border-radius: 0.5rem;
-            transition: all 0.2s;
-        }
-        .btn-ghost:hover {
-            background-color: var(--color-primary-light);
-            color: var(--color-primary);
-        }
-
-        /* --- CAMPOS DE FORMULARIO (INPUTS) --- */
-        .input-field {
+        /* --- INPUTS & FORMULARIOS --- */
+        .form-input-pro {
             width: 100%;
             padding: 0.75rem 1rem;
-            border: 1px solid #d1d5db;
+            border: 1px solid #e2e8f0;
             border-radius: 0.5rem;
-            font-size: 0.95rem;
-            transition: border-color 0.2s, box-shadow 0.2s;
             background-color: #fff;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            font-size: 0.95rem;
         }
-
-        .input-field:focus {
+        .form-input-pro:focus {
             outline: none;
-            border-color: var(--color-primary);
+            border-color: var(--primary-color);
             box-shadow: 0 0 0 3px rgba(0, 128, 128, 0.15);
         }
 
-        /* --- SCROLLBAR PERSONALIZADO --- */
-        ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
+        /* --- ANIMACIONES --- */
+        @keyframes slideInUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
         }
-        ::-webkit-scrollbar-track {
-            background: #f1f1f1;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
-            border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: var(--color-primary);
+        .animate-enter {
+            animation: slideInUp 0.4s ease-out forwards;
         }
 
-        /* --- EFECTOS DE CARGA (LOADERS) --- */
-        .loader-spinner {
-            width: 48px;
-            height: 48px;
-            border: 5px solid #FFF;
-            border-bottom-color: var(--color-primary);
-            border-radius: 50%;
-            display: inline-block;
-            box-sizing: border-box;
-            animation: rotation 1s linear infinite;
-        }
-
-        @keyframes rotation {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        /* --- ESTILOS DE TABLAS AVANZADAS --- */
-        .table-container {
-            border-radius: var(--radius-std);
-            overflow: hidden;
-            box-shadow: var(--shadow-sm);
-            border: 1px solid #e5e7eb;
-        }
-
-        .data-table {
-            width: 100%;
-            border-collapse: collapse;
-            background-color: white;
-        }
-
-        .data-table thead {
-            background-color: var(--color-primary-light);
-            color: var(--color-primary-dark);
-            text-transform: uppercase;
-            font-size: 0.75rem;
-            font-weight: 700;
-            letter-spacing: 0.05em;
-        }
-
-        .data-table th, .data-table td {
-            padding: 1rem;
-            text-align: left;
-            border-bottom: 1px solid #f3f4f6;
-        }
-
-        .data-table tr:hover {
-            background-color: #f9fafb;
-        }
-
-        /* --- SUGERENCIAS FLOTANTES (CHIPS) --- */
-        .suggestions-wrapper {
-            position: absolute;
-            background: white;
+        /* --- ESTILOS ESPECÍFICOS DEL CALENDARIO (PRESERVADOS) --- */
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 1px;
+            background-color: #e5e7eb;
             border: 1px solid #e5e7eb;
             border-radius: 0.5rem;
-            box-shadow: var(--shadow-lg);
-            width: 100%;
-            z-index: 50;
-            max-height: 200px;
-            overflow-y: auto;
-            margin-top: 4px;
+            overflow: hidden;
         }
-
-        .suggestion-item {
-            padding: 0.75rem;
-            cursor: pointer;
-            border-bottom: 1px solid #f3f4f6;
-            font-size: 0.9rem;
-        }
-        .suggestion-item:hover {
-            background-color: var(--color-primary-light);
-            color: var(--color-primary-dark);
-        }
-
-        /* --- ESTILOS PARA LA AGENDA (MÓDULO ESPECÍFICO) --- */
-        .agenda-card {
-            background: white;
-            border-radius: 1rem;
-            border: 1px solid #e2e8f0;
-            display: flex;
-            flex-direction: column;
-            height: 100%;
-            transition: transform 0.2s;
-        }
-        .agenda-card:hover {
-            border-color: var(--color-primary);
-            box-shadow: var(--shadow-md);
-        }
-        .agenda-header {
-            background: var(--color-primary-light);
-            color: var(--color-primary-dark);
-            padding: 1rem;
-            text-align: center;
-            font-weight: 800;
-            letter-spacing: 1px;
-            border-bottom: 1px solid #ccfbf1;
-            border-top-left-radius: 1rem;
-            border-top-right-radius: 1rem;
-        }
-        .task-item {
-            background: #fffbeb; /* Yellow 50 */
-            border-left: 4px solid #f59e0b; /* Amber 500 */
+        .calendar-day {
+            background-color: white;
+            min-height: 120px;
             padding: 0.5rem;
+            transition: background-color 0.2s;
+            position: relative;
+        }
+        .calendar-day:hover {
+            background-color: #f0fdfa; /* Teal 50 */
+        }
+        .calendar-day-header {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--text-muted);
             margin-bottom: 0.5rem;
-            border-radius: 0.25rem;
-            font-size: 0.85rem;
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            animation: fadeIn 0.3s ease-in;
+        }
+        .task-chip {
+            background-color: #ccfbf1; /* Teal 100 */
+            color: #0f766e; /* Teal 700 */
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            margin-bottom: 2px;
+            cursor: pointer;
+            border-left: 3px solid #0d9488;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
         }
 
+        /* --- ESTILOS DE IMPRESIÓN (PDF PREVIEW) --- */
+        @media print {
+            .no-print { display: none !important; }
+            .print-only { display: block !important; }
+            body { background: white; }
+        }
+
+        /* --- SCROLLBARS ELEGANTES --- */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--primary-color); }
+        
+        /* --- CHIPS DE SUGERENCIAS FLOTANTES --- */
+        .suggestions-box {
+            position: absolute;
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.5rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            z-index: 50;
+            width: 100%;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .suggestion-item {
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            font-size: 0.875rem;
+        }
+        .suggestion-item:hover {
+            background-color: #f0fdfa;
+            color: var(--primary-color);
+        }
     </style>
 </head>
-<body class="h-screen flex overflow-hidden text-gray-800">
+<body class="h-screen flex flex-col md:flex-row overflow-hidden bg-slate-50 text-slate-800">
 
-    <aside class="w-72 bg-white border-r border-gray-200 flex flex-col z-30 shadow-xl hidden md:flex transition-all duration-300">
+    <aside class="w-72 bg-white border-r border-slate-200 hidden md:flex flex-col z-30 shadow-xl transition-all duration-300">
         
-        <div class="h-32 flex flex-col items-center justify-center border-b border-gray-100 bg-gradient-to-b from-white to-teal-50">
-            <div class="relative group cursor-pointer" onclick="App.UI.animateLogo()">
-                <svg width="60" height="60" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" class="transition-transform duration-500 group-hover:rotate-12">
-                    <circle cx="50" cy="50" r="48" stroke="#008080" stroke-width="2.5" fill="white"/>
-                    <circle cx="40" cy="30" r="6" stroke="#008080" stroke-width="2"/>
-                    <circle cx="60" cy="30" r="6" stroke="#008080" stroke-width="2"/>
-                    <path d="M42 35 L65 80" stroke="#008080" stroke-width="2.5" stroke-linecap="round"/>
-                    <path d="M58 35 L35 80" stroke="#008080" stroke-width="2.5" stroke-linecap="round"/>
-                    <circle cx="50" cy="55" r="3" fill="#008080"/>
+        <div class="h-40 flex flex-col items-center justify-center border-b border-slate-100 bg-gradient-to-b from-teal-50 to-white relative overflow-hidden group">
+            <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
+            
+            <div class="z-10 transform transition-transform duration-500 group-hover:scale-110 cursor-pointer" onclick="App.UI.animateLogo()">
+                <svg width="80" height="80" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="50" cy="50" r="48" stroke="#008080" stroke-width="3" fill="white" class="shadow-sm"/>
+                    <path d="M35 30 C28 18 42 8 48 22 L50 45 L52 22 C58 8 72 18 65 30 L55 55 L75 85 L70 90 L50 65 L30 90 L25 85 L45 55 Z" fill="#008080"/>
+                    <circle cx="40" cy="22" r="4" fill="white"/>
+                    <circle cx="60" cy="22" r="4" fill="white"/>
+                    <circle cx="50" cy="50" r="3" fill="white"/>
                 </svg>
             </div>
-            <div class="mt-2 text-center">
-                <h1 class="text-xl font-black text-gray-800 tracking-tight">IDEAS TEXTILES</h1>
-                <p class="text-[10px] uppercase font-bold text-teal-600 tracking-widest">Ropa de Trabajo & Corporativa</p>
+            
+            <div class="z-10 mt-3 text-center">
+                <h1 class="text-xl font-black text-slate-800 tracking-tight leading-none">IDEAS TEXTILES</h1>
+                <p class="text-[10px] font-bold text-teal-600 tracking-[0.2em] uppercase mt-1">Enterprise V15</p>
             </div>
         </div>
 
-        <nav class="flex-1 overflow-y-auto py-6 px-4 space-y-2">
+        <nav class="flex-1 overflow-y-auto py-6 px-3 space-y-1">
+            <p class="px-4 text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Operaciones</p>
             
-            <p class="text-xs font-bold text-gray-400 uppercase ml-2 mb-2">Principal</p>
+            <button onclick="App.Router.go('dashboard')" id="nav-dash" class="btn-action w-full flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 hover:bg-teal-50 hover:text-teal-700 font-medium group">
+                <i class="fas fa-chart-pie w-5 text-slate-400 group-hover:text-teal-600 transition-colors"></i> 
+                <span>Dashboard</span>
+            </button>
             
-            <button onclick="App.Router.navigate('dashboard')" id="nav-dashboard" class="nav-item w-full flex items-center p-3 rounded-lg text-gray-600 hover:bg-teal-50 hover:text-teal-700 transition-all group">
-                <div class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center mr-3 group-hover:bg-white group-hover:shadow-sm text-teal-600">
-                    <i class="fas fa-chart-pie"></i>
-                </div>
-                <span class="font-semibold">Dashboard</span>
+            <button onclick="App.Router.go('orders')" id="nav-orders" class="btn-action w-full flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 hover:bg-teal-50 hover:text-teal-700 font-medium group">
+                <i class="fas fa-file-invoice w-5 text-slate-400 group-hover:text-teal-600 transition-colors"></i> 
+                <span>Órdenes de Compra</span>
+            </button>
+            
+            <button onclick="App.Router.go('inventory')" id="nav-inv" class="btn-action w-full flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 hover:bg-teal-50 hover:text-teal-700 font-medium group">
+                <i class="fas fa-boxes-stacked w-5 text-slate-400 group-hover:text-teal-600 transition-colors"></i> 
+                <span>Inventario Bodega</span>
             </button>
 
-            <button onclick="App.Router.navigate('orders')" id="nav-orders" class="nav-item w-full flex items-center p-3 rounded-lg text-gray-600 hover:bg-teal-50 hover:text-teal-700 transition-all group">
-                <div class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center mr-3 group-hover:bg-white group-hover:shadow-sm text-teal-600">
-                    <i class="fas fa-file-invoice"></i>
-                </div>
-                <span class="font-semibold">Órdenes de Compra</span>
-                <span id="badge-orders" class="ml-auto bg-teal-100 text-teal-800 text-xs font-bold px-2 py-0.5 rounded-full hidden">0</span>
+            <div class="my-4 border-t border-slate-100"></div>
+            
+            <p class="px-4 text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Planificación</p>
+
+            <button onclick="App.Router.go('calendar')" id="nav-cal" class="btn-action w-full flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 hover:bg-teal-50 hover:text-teal-700 font-medium group">
+                <i class="fas fa-calendar-alt w-5 text-orange-400 group-hover:text-orange-600 transition-colors"></i> 
+                <span>Calendario & Planner</span>
             </button>
 
-            <button onclick="App.Router.navigate('inventory')" id="nav-inventory" class="nav-item w-full flex items-center p-3 rounded-lg text-gray-600 hover:bg-teal-50 hover:text-teal-700 transition-all group">
-                <div class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center mr-3 group-hover:bg-white group-hover:shadow-sm text-teal-600">
-                    <i class="fas fa-boxes-stacked"></i>
-                </div>
-                <span class="font-semibold">Inventario Bodega</span>
+            <button onclick="App.Router.go('agenda')" id="nav-agenda" class="btn-action w-full flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 hover:bg-teal-50 hover:text-teal-700 font-medium group">
+                <i class="fas fa-list-check w-5 text-blue-400 group-hover:text-blue-600 transition-colors"></i> 
+                <span>Agenda Semanal</span>
+            </button>
+            
+            <div class="my-4 border-t border-slate-100"></div>
+
+            <button onclick="App.Modals.Acta.open()" class="btn-action w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-teal-50 text-teal-800 border border-teal-100 hover:bg-teal-100 font-bold shadow-sm mb-2">
+                <i class="fas fa-print w-5"></i> 
+                <span>Acta Rápida</span>
             </button>
 
-            <div class="my-4 border-t border-gray-100"></div>
-
-            <p class="text-xs font-bold text-gray-400 uppercase ml-2 mb-2">Herramientas</p>
-
-            <button onclick="App.Router.navigate('agenda')" id="nav-agenda" class="nav-item w-full flex items-center p-3 rounded-lg text-gray-600 hover:bg-teal-50 hover:text-teal-700 transition-all group">
-                <div class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center mr-3 group-hover:bg-white group-hover:shadow-sm text-orange-500">
-                    <i class="fas fa-calendar-alt"></i>
-                </div>
-                <span class="font-semibold">Agenda & Planner</span>
-            </button>
-
-            <button onclick="App.Modals.openActaGeneral()" class="w-full flex items-center p-3 rounded-lg text-gray-600 hover:bg-teal-50 hover:text-teal-700 transition-all group border border-dashed border-gray-300 hover:border-teal-300 mt-2">
-                <div class="w-8 h-8 rounded-full bg-teal-50 flex items-center justify-center mr-3 text-teal-600">
-                    <i class="fas fa-print"></i>
-                </div>
-                <span class="font-semibold">Acta Rápida</span>
+            <button onclick="App.System.backup()" class="btn-action w-full flex items-center gap-3 px-4 py-3 rounded-xl text-slate-500 hover:text-slate-800 font-medium">
+                <i class="fas fa-download w-5"></i> 
+                <span>Respaldo Manual</span>
             </button>
         </nav>
 
-        <div class="p-4 bg-gray-50 border-t border-gray-200">
+        <div class="p-4 bg-slate-50 border-t border-slate-200">
             <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-full bg-teal-700 text-white flex items-center justify-center font-bold shadow-md">
+                <div class="w-10 h-10 rounded-full bg-teal-700 text-white flex items-center justify-center font-bold shadow-lg border-2 border-white">
                     AC
                 </div>
-                <div class="flex-1 overflow-hidden">
-                    <p class="text-sm font-bold text-gray-900 truncate">Alejandro Cisterna</p>
-                    <p class="text-xs text-gray-500 truncate">Gerente General</p>
+                <div class="flex-1 min-w-0">
+                    <p class="text-sm font-bold text-slate-900 truncate">Alejandro Cisterna</p>
+                    <p class="text-xs text-slate-500 truncate">Gerente General</p>
                 </div>
-                <button class="text-gray-400 hover:text-teal-600"><i class="fas fa-cog"></i></button>
+                <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
             </div>
         </div>
     </aside>
 
-    <main class="flex-1 flex flex-col h-full relative overflow-hidden bg-slate-50">
-        
-        <header class="md:hidden bg-white h-16 border-b flex items-center justify-between px-4 z-40 shadow-sm">
-            <div class="flex items-center gap-2">
-                <i class="fas fa-cut text-teal-700"></i>
-                <span class="font-bold text-teal-800">IDEAS TEXTILES</span>
+    <header class="md:hidden bg-white/90 backdrop-blur-md h-16 border-b border-slate-200 flex items-center justify-between px-4 sticky top-0 z-50">
+        <div class="flex items-center gap-2">
+            <i class="fas fa-cut text-teal-600 text-xl"></i>
+            <span class="font-black text-slate-800 tracking-tight">IDEAS TEXTILES</span>
+        </div>
+        <button onclick="document.querySelector('aside').classList.toggle('hidden'); document.querySelector('aside').classList.toggle('fixed'); document.querySelector('aside').classList.toggle('inset-0');" class="p-2 text-slate-600 rounded-lg active:bg-slate-100">
+            <i class="fas fa-bars text-xl"></i>
+        </button>
+    </header>
+    <main class="flex-1 flex flex-col relative overflow-hidden h-full">
+
+        <header class="h-16 bg-white/80 backdrop-blur-md border-b border-slate-200 flex items-center justify-between px-6 z-20">
+            <div class="flex items-center gap-4">
+                <h2 id="page-title" class="text-xl font-black text-slate-800 tracking-tight">PANEL DE CONTROL</h2>
+                <span id="current-date" class="hidden md:inline-block px-3 py-1 bg-slate-100 text-slate-500 rounded-full text-xs font-mono font-bold">CARGANDO FECHA...</span>
             </div>
-            <button class="text-gray-600 p-2"><i class="fas fa-bars text-xl"></i></button>
+            
+            <div class="flex items-center gap-4">
+                <div class="relative hidden md:block">
+                    <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                    <input type="text" placeholder="Buscar OC, Cliente..." class="pl-10 pr-4 py-2 bg-slate-100 border-none rounded-full text-sm focus:ring-2 focus:ring-teal-500 w-64 transition-all">
+                </div>
+
+                <button onclick="App.Data.clearAll()" class="w-10 h-10 rounded-full bg-rose-50 text-rose-600 hover:bg-rose-500 hover:text-white flex items-center justify-center transition-all" title="Borrar Datos Locales">
+                    <i class="fas fa-trash-alt"></i>
+                </button>
+            </div>
         </header>
 
-        <div id="app-content" class="flex-1 overflow-y-auto p-4 md:p-8 scroll-smooth pb-20">
-            </div>
+        <div id="content-area" class="flex-1 overflow-y-auto p-4 md:p-8 scroll-smooth relative">
 
-    </main>
-
-    <div id="modal-order" class="fixed inset-0 bg-slate-900/60 hidden items-center justify-center z-50 backdrop-blur-sm transition-opacity opacity-0">
-        <div class="bg-white w-full max-w-6xl h-[95vh] rounded-2xl shadow-2xl flex flex-col overflow-hidden transform scale-95 transition-transform duration-300" id="modal-order-panel">
-            
-            <div class="px-6 py-4 bg-white border-b border-gray-100 flex justify-between items-center">
-                <div class="flex items-center gap-4">
-                    <div class="bg-teal-100 p-2 rounded-lg text-teal-700">
-                        <i class="fas fa-file-signature text-xl"></i>
-                    </div>
-                    <div>
-                        <h2 class="text-xl font-bold text-gray-800" id="modal-order-title">Nueva Orden de Compra</h2>
-                        <p class="text-xs text-gray-500 flex items-center gap-2">
-                            <span class="w-2 h-2 bg-green-500 rounded-full"></span> Sistema de Edición en Tiempo Real
-                        </p>
-                    </div>
-                </div>
-                <div class="flex gap-2">
-                    <button onclick="App.Modals.close('modal-order')" class="p-2 text-gray-400 hover:text-red-500 transition-colors rounded-full hover:bg-red-50">
-                        <i class="fas fa-times text-xl"></i>
-                    </button>
-                </div>
-            </div>
-
-            <div class="flex-1 overflow-y-auto bg-gray-50 p-6">
-                
-                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200 mb-6">
-                    <h3 class="text-xs font-bold text-gray-400 uppercase mb-4 tracking-wider">Información General</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <div class="relative group">
-                            <label class="block text-xs font-bold text-teal-700 mb-1">CLIENTE / RAZÓN SOCIAL</label>
-                            <div class="relative">
-                                <i class="fas fa-building absolute left-3 top-3 text-gray-400"></i>
-                                <input type="text" id="input-client" class="input-field pl-10 font-bold text-gray-800" placeholder="Ej: Frusan Planta...">
-                            </div>
-                        </div>
-                        
-                        <div>
-                            <label class="block text-xs font-bold text-teal-700 mb-1">NÚMERO DE O.C.</label>
-                            <div class="relative">
-                                <i class="fas fa-hashtag absolute left-3 top-3 text-gray-400"></i>
-                                <input type="text" id="input-oc" class="input-field pl-10 font-mono text-teal-800" placeholder="Generación Automática">
-                            </div>
-                        </div>
-
-                        <div>
-                            <label class="block text-xs font-bold text-teal-700 mb-1">LUGAR DE DESPACHO (TACHA)</label>
-                            <div class="relative">
-                                <i class="fas fa-truck-loading absolute left-3 top-3 text-gray-400"></i>
-                                <input type="text" id="input-dispatch" class="input-field pl-10" placeholder="Ej: Bodega 4, Sector Norte">
-                            </div>
+            <section id="view-dashboard" class="animate-enter space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 relative overflow-hidden">
+                        <div class="absolute right-0 top-0 w-24 h-24 bg-teal-50 rounded-bl-full -mr-4 -mt-4 z-0"></div>
+                        <div class="relative z-10">
+                            <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Órdenes Activas</p>
+                            <h3 class="text-3xl font-black text-slate-800 mt-2" id="kpi-orders">0</h3>
+                            <p class="text-xs text-teal-600 font-bold mt-1"><i class="fas fa-arrow-up"></i> En proceso</p>
                         </div>
                     </div>
-                </div>
-
-                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                    
-                    <div class="lg:col-span-4 bg-white p-5 rounded-xl shadow-sm border border-gray-200 h-fit sticky top-0">
-                        <div class="flex justify-between items-center mb-4">
-                            <h3 class="text-sm font-bold text-gray-800">Agregar Ítem</h3>
-                            <span class="text-xs bg-teal-50 text-teal-700 px-2 py-1 rounded">Manual</span>
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 relative overflow-hidden">
+                        <div class="absolute right-0 top-0 w-24 h-24 bg-blue-50 rounded-bl-full -mr-4 -mt-4 z-0"></div>
+                        <div class="relative z-10">
+                            <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Unidades Totales</p>
+                            <h3 class="text-3xl font-black text-slate-800 mt-2" id="kpi-units">0</h3>
+                            <p class="text-xs text-blue-600 font-bold mt-1">Inventario Junaeb</p>
                         </div>
-                        
-                        <div class="space-y-4">
-                            <div class="relative">
-                                <label class="text-xs text-gray-500 font-bold">PRODUCTO</label>
-                                <input type="text" id="add-prod-name" class="input-field" placeholder="Buscar..." oninput="App.Logic.suggestProducts(this)">
-                                <div id="suggestions-container" class="suggestions-wrapper hidden"></div>
-                            </div>
-                            
-                            <div class="grid grid-cols-2 gap-3">
-                                <div>
-                                    <label class="text-xs text-gray-500 font-bold">TALLA</label>
-                                    <input type="text" id="add-prod-size" class="input-field text-center uppercase" placeholder="L">
-                                </div>
-                                <div>
-                                    <label class="text-xs text-gray-500 font-bold">CANTIDAD</label>
-                                    <input type="number" id="add-prod-qty" class="input-field text-center font-bold text-teal-600" placeholder="0">
-                                </div>
-                            </div>
-
+                    </div>
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 relative overflow-hidden">
+                        <div class="absolute right-0 top-0 w-24 h-24 bg-orange-50 rounded-bl-full -mr-4 -mt-4 z-0"></div>
+                        <div class="relative z-10">
+                            <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Pendientes Agenda</p>
+                            <h3 class="text-3xl font-black text-slate-800 mt-2" id="kpi-tasks">0</h3>
+                            <p class="text-xs text-orange-600 font-bold mt-1">Tareas urgentes</p>
+                        </div>
+                    </div>
+                     <div class="bg-gradient-to-br from-teal-600 to-teal-800 p-6 rounded-2xl shadow-lg text-white relative overflow-hidden cursor-pointer hover:scale-[1.02] transition-transform" onclick="document.getElementById('file-input').click()">
+                        <div class="relative z-10 flex flex-col h-full justify-between">
                             <div>
-                                <label class="text-xs text-gray-500 font-bold">DETALLE / BORDADO (OPCIONAL)</label>
-                                <textarea id="add-prod-msg" rows="2" class="input-field text-sm" placeholder="Ej: Logo pecho izquierdo..."></textarea>
+                                <i class="fas fa-cloud-upload-alt text-3xl opacity-80"></i>
+                                <h3 class="text-lg font-bold mt-2">Carga Rápida</h3>
                             </div>
-
-                            <button onclick="App.Controllers.addItemToOrder()" class="w-full btn-corporate justify-center">
-                                <i class="fas fa-plus-circle"></i> AGREGAR A LA LISTA
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="lg:col-span-8 bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden flex flex-col min-h-[400px]">
-                        <div class="p-4 bg-gray-50 border-b border-gray-200 flex justify-between items-center">
-                            <h3 class="font-bold text-gray-700">Detalle de la Orden</h3>
-                            <span id="items-counter" class="text-xs font-bold bg-gray-200 text-gray-600 px-2 py-1 rounded-full">0 Ítems</span>
-                        </div>
-                        
-                        <div class="flex-1 overflow-y-auto">
-                            <table class="w-full text-sm text-left">
-                                <thead class="bg-white text-gray-500 border-b border-gray-100 sticky top-0 z-10">
-                                    <tr>
-                                        <th class="p-3 font-semibold">Descripción</th>
-                                        <th class="p-3 font-semibold text-center w-20">Talla</th>
-                                        <th class="p-3 font-semibold text-center w-20">Cant.</th>
-                                        <th class="p-3 font-semibold text-right w-20"></th>
-                                    </tr>
-                                </thead>
-                                <tbody id="order-items-body" class="divide-y divide-gray-50 text-gray-700">
-                                    </tbody>
-                            </table>
-                            
-                            <div id="empty-state-order" class="flex flex-col items-center justify-center h-64 text-gray-300">
-                                <i class="fas fa-basket-shopping text-4xl mb-3"></i>
-                                <p>La lista está vacía</p>
-                            </div>
+                            <p class="text-xs opacity-70">Sube PDF o Excel aquí</p>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="p-4 bg-white border-t border-gray-200 flex justify-between items-center">
-                <button onclick="App.Modals.close('modal-order')" class="px-6 py-2 rounded-lg text-gray-500 font-medium hover:bg-gray-100 transition-colors">
-                    Cancelar Operación
-                </button>
-                <div class="flex gap-3">
-                    <button class="px-4 py-2 rounded-lg bg-teal-50 text-teal-700 font-bold border border-teal-200 hover:bg-teal-100" onclick="alert('Función de borrador...')">
-                        <i class="fas fa-save mr-2"></i> Guardar Borrador
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 min-h-[300px] flex items-center justify-center flex-col text-slate-300">
+                    <i class="fas fa-chart-area text-6xl mb-4 opacity-20"></i>
+                    <p class="text-sm font-medium">Visualización de métricas en desarrollo...</p>
+                </div>
+            </section>
+
+            <section id="view-orders" class="hidden animate-enter space-y-6">
+                
+                <div class="bg-white p-8 rounded-3xl border-2 border-dashed border-slate-300 hover:border-teal-500 hover:bg-teal-50 transition-all cursor-pointer group text-center"
+                     ondragover="event.preventDefault(); this.classList.add('border-teal-500', 'bg-teal-50');"
+                     ondragleave="this.classList.remove('border-teal-500', 'bg-teal-50');"
+                     ondrop="App.Sabueso.handleDrop(event)"
+                     onclick="document.getElementById('file-input').click()">
+                    
+                    <input type="file" id="file-input" class="hidden" accept=".pdf,.xlsx,.xls,.csv" multiple onchange="App.Sabueso.handleFiles(this.files)">
+                    
+                    <div class="w-20 h-20 bg-teal-100 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
+                        <i class="fas fa-file-import text-3xl text-teal-600"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-800">Arrastra tus archivos aquí</h3>
+                    <p class="text-slate-500 mt-2">Soporta: Excel Junaeb, PDF Tiojano, CSV Inventario</p>
+                    <button class="mt-4 px-6 py-2 bg-teal-600 text-white rounded-full text-sm font-bold shadow-lg hover:bg-teal-700 transition-colors">
+                        Seleccionar Archivos
                     </button>
-                    <button onclick="App.Controllers.saveOrderFinal()" class="btn-corporate shadow-lg px-8">
-                        <i class="fas fa-check-circle"></i> FINALIZAR Y GUARDAR
+                </div>
+
+                <div class="flex flex-wrap gap-3 items-center justify-between bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                    <div class="flex items-center gap-2">
+                        <span class="text-sm font-bold text-slate-500">Acciones Masivas:</span>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="App.Printers.printTacha3Cols()" class="px-4 py-2 bg-slate-800 text-white rounded-lg text-sm font-bold hover:bg-slate-900 flex items-center gap-2">
+                            <i class="fas fa-print"></i> Tacha 3 Columnas (Oficio)
+                        </button>
+                        <button onclick="App.Modals.EditOrder.create()" class="px-4 py-2 bg-teal-600 text-white rounded-lg text-sm font-bold hover:bg-teal-700 flex items-center gap-2">
+                            <i class="fas fa-plus"></i> Nueva Manual
+                        </button>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-sm">
+                            <thead class="bg-slate-50 border-b border-slate-200 text-slate-500 uppercase text-xs">
+                                <tr>
+                                    <th class="px-6 py-4 font-bold">Fecha / ID</th>
+                                    <th class="px-6 py-4 font-bold">Cliente / Origen</th>
+                                    <th class="px-6 py-4 font-bold">Detalle Rápido</th>
+                                    <th class="px-6 py-4 font-bold">Estado</th>
+                                    <th class="px-6 py-4 font-bold text-right">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="orders-table-body" class="divide-y divide-slate-100">
+                                <tr>
+                                    <td colspan="5" class="px-6 py-12 text-center text-slate-400">
+                                        <i class="fas fa-inbox text-4xl mb-3 block opacity-20"></i>
+                                        No hay órdenes cargadas hoy. Sube un PDF o Excel.
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <section id="view-inventory" class="hidden animate-enter space-y-6">
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-lg font-bold text-slate-800">Inventario Bodega Junaeb</h3>
+                        <input type="text" id="inv-search" onkeyup="App.Inventory.filter()" placeholder="Filtrar producto..." class="form-input-pro w-64">
+                    </div>
+                    
+                    <div class="overflow-x-auto rounded-lg border border-slate-200">
+                        <table class="w-full text-sm" id="inventory-table">
+                            <thead class="bg-slate-100 text-slate-600 font-bold uppercase text-xs">
+                                <tr>
+                                    <th class="p-3 text-left">Producto</th>
+                                    <th class="p-3 text-center w-12 bg-slate-200">XS</th>
+                                    <th class="p-3 text-center w-12 bg-slate-200">S</th>
+                                    <th class="p-3 text-center w-12 bg-slate-200">M</th>
+                                    <th class="p-3 text-center w-12 bg-slate-200">L</th>
+                                    <th class="p-3 text-center w-12 bg-slate-200">XL</th>
+                                    <th class="p-3 text-center w-12 bg-slate-200">XXL</th>
+                                    <th class="p-3 text-right">Total</th>
+                                </tr>
+                            </thead>
+                            <tbody id="inventory-body" class="divide-y divide-slate-100 bg-white">
+                                </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <section id="view-calendar" class="hidden animate-enter space-y-6">
+                
+                <div class="flex items-center justify-between bg-white p-4 rounded-xl shadow-sm border border-slate-200">
+                    <button onclick="App.Calendar.prevMonth()" class="w-10 h-10 rounded-lg hover:bg-slate-100 flex items-center justify-center text-slate-600">
+                        <i class="fas fa-chevron-left"></i>
                     </button>
+                    
+                    <h2 id="calendar-month-year" class="text-2xl font-black text-slate-800 uppercase tracking-tight">ENERO 2026</h2>
+                    
+                    <button onclick="App.Calendar.nextMonth()" class="w-10 h-10 rounded-lg hover:bg-slate-100 flex items-center justify-center text-slate-600">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
+                    <div class="grid grid-cols-7 mb-2 text-center">
+                        <div class="text-xs font-bold text-teal-600 uppercase py-2">Lun</div>
+                        <div class="text-xs font-bold text-teal-600 uppercase py-2">Mar</div>
+                        <div class="text-xs font-bold text-teal-600 uppercase py-2">Mié</div>
+                        <div class="text-xs font-bold text-teal-600 uppercase py-2">Jue</div>
+                        <div class="text-xs font-bold text-teal-600 uppercase py-2">Vie</div>
+                        <div class="text-xs font-bold text-red-500 uppercase py-2">Sáb</div>
+                        <div class="text-xs font-bold text-red-500 uppercase py-2">Dom</div>
+                    </div>
+                    
+                    <div id="calendar-days" class="calendar-grid">
+                        </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 mt-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-lg font-bold text-slate-800" id="selected-date-title">Tareas del Día</h3>
+                        <button onclick="App.Modals.Task.open()" class="px-4 py-2 bg-teal-600 text-white rounded-lg text-sm font-bold hover:bg-teal-700">
+                            <i class="fas fa-plus mr-2"></i> Agregar Nota
+                        </button>
+                    </div>
+                    <ul id="day-task-list" class="space-y-2">
+                        <li class="text-slate-400 text-sm italic text-center py-4">Selecciona un día para ver sus notas.</li>
+                    </ul>
+                </div>
+            </section>
+
+            <section id="view-agenda" class="hidden animate-enter space-y-4">
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 min-h-[500px]">
+                    <h2 class="text-2xl font-black text-slate-800 mb-6 border-b border-slate-100 pb-4">Agenda Completa</h2>
+                    <div id="agenda-full-list" class="space-y-3">
+                        </div>
+                </div>
+            </section>
+
+        </div> </main>
+
+    <div id="modal-edit-order" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden animate__animated animate__zoomIn">
+            <div class="bg-slate-50 px-6 py-4 border-b border-slate-200 flex justify-between items-center">
+                <h3 class="font-bold text-lg text-slate-800">Editar / Crear Orden</h3>
+                <button onclick="App.Modals.EditOrder.close()" class="text-slate-400 hover:text-slate-600"><i class="fas fa-times text-xl"></i></button>
+            </div>
+            <div class="p-6 space-y-4">
+                <input type="hidden" id="edit-order-id">
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 mb-1">Número OC / Cliente</label>
+                    <input type="text" id="edit-order-client" class="form-input-pro font-bold text-lg" placeholder="EJ: OC-5050 TIENDAS PARIS">
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 mb-1">Fecha</label>
+                        <input type="date" id="edit-order-date" class="form-input-pro">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 mb-1">Factura (Opcional)</label>
+                        <input type="text" id="edit-order-invoice" class="form-input-pro" placeholder="N° Factura">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 mb-1">Contenido (Texto libre o JSON)</label>
+                    <textarea id="edit-order-content" rows="6" class="form-input-pro font-mono text-xs" placeholder="Pega aquí el detalle o escribe las notas..."></textarea>
+                </div>
+            </div>
+            <div class="bg-slate-50 px-6 py-4 border-t border-slate-200 flex justify-end gap-3">
+                <button onclick="App.Modals.EditOrder.close()" class="px-4 py-2 text-slate-600 font-bold hover:bg-slate-200 rounded-lg">Cancelar</button>
+                <button onclick="App.Modals.EditOrder.save()" class="px-6 py-2 bg-teal-600 text-white font-bold rounded-lg shadow-lg hover:bg-teal-700">Guardar Cambios</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-task" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md animate__animated animate__fadeInUp">
+            <div class="p-6">
+                <h3 class="font-black text-xl text-slate-800 mb-4">Nueva Nota</h3>
+                <input type="text" id="task-input" class="form-input-pro mb-4" placeholder="Escribe tu recordatorio aquí..." autofocus>
+                
+                <div class="flex gap-2 mb-4">
+                    <button onclick="document.getElementById('task-color').value='teal'" class="w-8 h-8 rounded-full bg-teal-500 border-2 border-white shadow-sm ring-2 ring-transparent focus:ring-teal-300"></button>
+                    <button onclick="document.getElementById('task-color').value='orange'" class="w-8 h-8 rounded-full bg-orange-500 border-2 border-white shadow-sm ring-2 ring-transparent focus:ring-orange-300"></button>
+                    <button onclick="document.getElementById('task-color').value='blue'" class="w-8 h-8 rounded-full bg-blue-500 border-2 border-white shadow-sm ring-2 ring-transparent focus:ring-blue-300"></button>
+                    <button onclick="document.getElementById('task-color').value='red'" class="w-8 h-8 rounded-full bg-red-500 border-2 border-white shadow-sm ring-2 ring-transparent focus:ring-red-300"></button>
+                    <input type="hidden" id="task-color" value="teal">
+                </div>
+
+                <div class="flex justify-end gap-2">
+                    <button onclick="App.Modals.Task.close()" class="btn-action px-4 py-2 text-slate-500 font-bold">Cancelar</button>
+                    <button onclick="App.Modals.Task.save()" class="btn-action px-6 py-2 bg-teal-600 text-white rounded-lg font-bold shadow-md">Guardar</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <div id="modal-acta" class="fixed inset-0 bg-slate-900/60 hidden items-center justify-center z-50 backdrop-blur-sm">
-        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl p-8 animate__animated animate__fadeInUp">
-            <h2 class="text-2xl font-bold text-teal-800 mb-2">Generar Documento PDF</h2>
-            <p class="text-sm text-gray-500 mb-6">Herramienta para actas de entrega, muestras, regalos o devoluciones.</p>
-            
-            <div class="space-y-4">
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Título del Documento</label>
-                        <input type="text" id="act-title" class="input-field font-bold" value="ACTA DE ENTREGA">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Destinatario</label>
-                        <input type="text" id="act-client" class="input-field" placeholder="Cliente o Persona">
-                    </div>
+    <div id="modal-acta" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl animate__animated animate__fadeInDown">
+            <div class="bg-teal-600 px-6 py-4 rounded-t-2xl flex justify-between items-center text-white">
+                <h3 class="font-bold text-lg"><i class="fas fa-file-signature mr-2"></i> Generar Acta de Recepción</h3>
+                <button onclick="App.Modals.Acta.close()" class="text-white/80 hover:text-white"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="col-span-2">
+                    <label class="label-pro">Título del Documento</label>
+                    <input type="text" id="acta-title" class="form-input-pro" value="ACTA DE ENTREGA DE MATERIALES">
                 </div>
-
-                <div class="border border-gray-200 rounded-lg p-4 bg-gray-50">
-                    <div class="flex gap-2 mb-2">
-                        <input id="act-input-desc" class="input-field" placeholder="Descripción del ítem">
-                        <input id="act-input-qty" type="number" class="input-field w-24" placeholder="Cant.">
-                        <button onclick="App.Controllers.addActItem()" class="bg-teal-600 text-white px-4 rounded-lg hover:bg-teal-700"><i class="fas fa-plus"></i></button>
-                    </div>
-                    <ul id="act-list" class="max-h-32 overflow-y-auto space-y-1 text-sm text-gray-700 pl-1"></ul>
+                <div>
+                    <label class="label-pro">Fecha</label>
+                    <input type="date" id="acta-date" class="form-input-pro">
                 </div>
-
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Firma Entregador</label>
-                        <input type="text" id="act-signer1" class="input-field" value="Alejandro Cisterna">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Firma Receptor</label>
-                        <input type="text" id="act-signer2" class="input-field" placeholder="Nombre de quien recibe">
-                    </div>
+                <div>
+                    <label class="label-pro">Destinatario / Receptor</label>
+                    <input type="text" id="acta-receiver" class="form-input-pro" placeholder="Nombre de quien recibe">
+                </div>
+                <div class="col-span-2">
+                    <label class="label-pro">Detalle de Items (Separar con Enter)</label>
+                    <textarea id="acta-items" rows="5" class="form-input-pro" placeholder="- 50 Pecheras Junaeb&#10;- 20 Pantalones Talla M"></textarea>
                 </div>
             </div>
-
-            <div class="mt-8 flex justify-end gap-3">
-                <button onclick="App.Modals.close('modal-acta')" class="text-gray-500 font-medium px-4">Cerrar</button>
-                <button onclick="App.PDF.generateGeneralAct()" class="btn-corporate">
-                    <i class="fas fa-file-pdf"></i> DESCARGAR PDF
+            <div class="p-6 border-t border-slate-100 flex justify-end gap-3">
+                <button onclick="App.Printers.printActa()" class="px-6 py-3 bg-slate-800 text-white font-bold rounded-xl shadow-lg hover:bg-slate-900 flex items-center gap-2">
+                    <i class="fas fa-print"></i> Generar PDF
                 </button>
             </div>
         </div>
     </div>
-
     <script>
-        
         /**
-         * CLASE MAESTRA APP
-         * Contiene todos los módulos encapsulados para evitar conflictos globales.
+         * IDEAS TEXTILES ERP - ENTERPRISE ENGINE V15
+         * Arquitectura: Monolito Modular en Cliente (Offline First)
+         * Autor: Ingeniería de Sistemas
          */
+
         const App = {
-            
-            // --- CONSTANTES DE CONFIGURACIÓN ---
-            Config: {
-                company: "IDEAS TEXTILES SPA",
-                rut: "76.577.458-6",
-                colors: { primary: "#008080", dark: "#004d4d" }
-            },
-
-            // --- ESTADO GLOBAL (STORE) ---
-            Store: {
-                inventory: [],
+            // --- ESTADO GLOBAL DE LA APLICACIÓN ---
+            State: {
                 orders: [],
-                agenda: {},
-                currentOrderEditing: null, // ID de la orden en edición o null
-                
-                // Carga inicial desde LocalStorage
+                inventory: [],
+                calendarEvents: {}, // { '2023-10-21': [{text, color}] }
+                currentDate: new Date(),
+                view: 'dashboard'
+            },
+
+            // --- MÓDULO DE PERSISTENCIA DE DATOS (LOCALSTORAGE) ---
+            Data: {
                 init: function() {
-                    try {
-                        this.inventory = JSON.parse(localStorage.getItem('it_inventory')) || [];
-                        this.orders = JSON.parse(localStorage.getItem('it_orders')) || [];
-                        this.agenda = JSON.parse(localStorage.getItem('it_agenda')) || {};
-                        console.log("Sistema Iniciado. Datos cargados.");
-                    } catch (e) {
-                        console.error("Error cargando datos:", e);
-                        Swal.fire("Error Crítico", "No se pudieron cargar los datos locales.", "error");
-                    }
-                },
+                    console.log("[SYSTEM] Inicializando Base de Datos Local...");
+                    const savedOrders = localStorage.getItem('erp_orders');
+                    const savedInv = localStorage.getItem('erp_inventory');
+                    const savedEvents = localStorage.getItem('erp_events');
 
-                save: function() {
-                    localStorage.setItem('it_inventory', JSON.stringify(this.inventory));
-                    localStorage.setItem('it_orders', JSON.stringify(this.orders));
-                    localStorage.setItem('it_agenda', JSON.stringify(this.agenda));
-                }
-            },
+                    if (savedOrders) App.State.orders = JSON.parse(savedOrders);
+                    if (savedInv) App.State.inventory = JSON.parse(savedInv);
+                    if (savedEvents) App.State.calendarEvents = JSON.parse(savedEvents);
 
-            // --- MOTOR DE PARSEO "SABUESO" (ANALIZADOR DE ARCHIVOS) ---
-            Sabueso: {
-                // Función para limpiar OCs sucias copiadas de Excel o CSV
-                parseDirtyText: (text) => {
-                    const lines = text.split('\n');
-                    let detectedItems = [];
-                    
-                    // Expresiones regulares para encontrar patrones comunes
-                    const regexSize = /\b(XS|S|M|L|XL|XXL|2XL|3XL|4XL)\b/i;
-                    const regexQty = /^[\d\.,]+/; // Número al principio de la línea
-
-                    lines.forEach(line => {
-                        const cleanLine = line.trim().toUpperCase();
-                        // Ignorar cabeceras y basura
-                        if(cleanLine.length < 5 || cleanLine.includes("PRECIO") || cleanLine.includes("TOTAL")) return;
-
-                        // Intentar extraer cantidad
-                        let qtyMatch = cleanLine.match(regexQty);
-                        let qty = qtyMatch ? parseInt(qtyMatch[0].replace(/[.,]/g, '')) : 0;
-
-                        // Intentar extraer talla
-                        let sizeMatch = cleanLine.match(regexSize);
-                        let size = sizeMatch ? sizeMatch[0] : "ÚNICA";
-
-                        // El resto es descripción
-                        let desc = cleanLine
-                            .replace(regexQty, '')
-                            .replace(regexSize, '')
-                            .replace(/,/g, ' ')
-                            .replace(/UNID/g, '')
-                            .trim();
-
-                        if(qty > 0 && desc.length > 3) {
-                            detectedItems.push({ name: desc, size: size, qty: qty, msg: "Importado" });
-                        }
-                    });
-                    return detectedItems;
-                },
-
-                // Función específica para PDF tipo "Tiojano" (Paréntesis)
-                parseTiojanoPDF: (rawText) => {
-                    const lines = rawText.split('\n');
-                    let items = [];
-                    let lastProduct = null;
-
-                    lines.forEach(line => {
-                        line = line.trim();
-                        if(!line) return;
-
-                        // Detectar si la línea tiene patrón de paréntesis numéricos ej: (1), (2)
-                        const hasQtyParens = /\(\d+\)/.test(line);
-
-                        if (!hasQtyParens && line.length > 5 && !line.includes("PAGE") && !line.includes("IDEAS")) {
-                            // Es probablemente un nombre de producto
-                            lastProduct = line;
-                        } else if (hasQtyParens && lastProduct) {
-                            // Es una línea de variantes
-                            // Ejemplo: "Negra (1), Azul (2)"
-                            const parts = line.split(',');
-                            parts.forEach(part => {
-                                const match = part.match(/(.*)\((\d+)\)/);
-                                if(match) {
-                                    items.push({
-                                        name: lastProduct,
-                                        size: match[1].trim(), // Esto actúa como variante/color
-                                        qty: parseInt(match[2]),
-                                        msg: "Vía PDF Tiojano"
-                                    });
-                                }
-                            });
-                        }
-                    });
-                    return items;
-                }
-            },
-
-            // --- MOTOR DE GENERACIÓN PDF (PRINT ENGINE) ---
-            PDF: {
-                // Dibuja el logo vectorial directamente en el canvas del PDF
-                drawLogo: (doc, x, y, scale = 1) => {
-                    doc.setDrawColor(0, 128, 128); // Teal
-                    doc.setLineWidth(0.5 * scale);
-                    doc.circle(x, y, 10 * scale, 'S');
-                    // Tijeras simples
-                    doc.line(x - 2*scale, y + 2*scale, x + 2*scale, y - 4*scale);
-                    doc.line(x - 2*scale, y - 4*scale, x + 2*scale, y + 2*scale);
-                    
-                    doc.setFontSize(14 * scale);
-                    doc.setTextColor(0, 128, 128);
-                    doc.setFont("helvetica", "bold");
-                    doc.text("IDEAS TEXTILES", x + 15*scale, y + 2*scale);
-                },
-
-                // EL GENERADOR DE LA TACHA DE DESPACHO (3 COLUMNAS)
-                generateTacha: (order) => {
-                    const { jsPDF } = window.jspdf;
-                    // Formato Legal (Oficio), Paisaje (Landscape)
-                    const doc = new jsPDF('l', 'mm', 'legal'); 
-                    
-                    const pageWidth = 355.6; // Ancho Oficio apaisado aprox en mm
-                    const pageHeight = 215.9;
-                    const margin = 10;
-                    
-                    // Configuración de la cuadrícula
-                    const cols = 3;
-                    const gap = 5;
-                    const colWidth = (pageWidth - (margin * 2) - (gap * (cols - 1))) / cols;
-                    
-                    const items = order.items;
-                    const itemsPerPage = 30; // 10 filas x 3 columnas
-                    const totalPages = Math.ceil(items.length / itemsPerPage);
-
-                    for(let p = 0; p < totalPages; p++) {
-                        if(p > 0) doc.addPage('legal', 'l');
-
-                        // --- CABECERA REPETITIVA ---
-                        // Fondo suave
-                        doc.setFillColor(240, 253, 250); 
-                        doc.rect(0, 0, pageWidth, 40, 'F');
-                        
-                        App.PDF.drawLogo(doc, 20, 20, 1.2);
-
-                        doc.setFontSize(24);
-                        doc.setTextColor(0, 128, 128);
-                        doc.text("TACHA DE DESPACHO", pageWidth - margin, 20, {align: 'right'});
-                        
-                        doc.setFontSize(10);
-                        doc.setTextColor(0);
-                        doc.setFont("helvetica", "bold");
-                        doc.text(`CLIENTE: ${order.client.toUpperCase()}`, margin, 35);
-                        doc.text(`LUGAR: ${order.dispatchPlace || 'NO DEFINIDO'}`, margin + 100, 35);
-                        doc.text(`OC: #${order.number}`, pageWidth - margin, 30, {align: 'right'});
-                        doc.text(`FECHA: ${new Date(order.date).toLocaleDateString()}`, pageWidth - margin, 35, {align: 'right'});
-
-                        // --- CUERPO (GRID DE 3 COLUMNAS) ---
-                        let startY = 45;
-                        let rowHeight = 14; 
-                        
-                        // Obtener items de esta página
-                        const pageItems = items.slice(p * itemsPerPage, (p + 1) * itemsPerPage);
-
-                        pageItems.forEach((item, idx) => {
-                            // Cálculo matemático de coordenadas
-                            // Columna actual (0, 1, 2)
-                            const colIndex = Math.floor(idx / 10); 
-                            // Fila actual (0 a 9)
-                            const rowIndex = idx % 10;
-
-                            const x = margin + (colIndex * (colWidth + gap));
-                            const y = startY + (rowIndex * rowHeight);
-
-                            // Caja contenedora
-                            doc.setDrawColor(200);
-                            doc.setFillColor(255);
-                            doc.rect(x, y, colWidth, rowHeight, 'FD');
-
-                            // Contenido
-                            doc.setFontSize(10);
-                            doc.setFont("helvetica", "bold");
-                            doc.text(`${item.name.substring(0, 35)}`, x + 2, y + 5);
-                            
-                            doc.setFont("helvetica", "normal");
-                            doc.text(`Talla: ${item.size}`, x + 2, y + 10);
-                            
-                            // Cantidad Gigante
-                            doc.setFontSize(12);
-                            doc.setFont("helvetica", "bold");
-                            doc.text(`${item.qty}`, x + colWidth - 25, y + 9, {align: 'right'});
-
-                            // Mensaje (pequeño)
-                            if(item.msg) {
-                                doc.setFontSize(7);
-                                doc.setTextColor(100);
-                                doc.text(item.msg.substring(0,30), x + 35, y + 10);
-                                doc.setTextColor(0);
-                            }
-
-                            // --- EL TICKET (CHECKBOX) A LA DERECHA ---
-                            doc.setDrawColor(0);
-                            doc.setLineWidth(0.7);
-                            // Cuadrado de 8x8mm alineado a la derecha
-                            doc.rect(x + colWidth - 10, y + 3, 8, 8);
-                        });
-
-                        // Pie de página
-                        doc.setFontSize(8);
-                        doc.text(`Página ${p+1} de ${totalPages}`, pageWidth - margin, pageHeight - 5, {align: 'right'});
-                        doc.setFontSize(12);
-                        doc.text("BULTO ______ DE ______", pageWidth/2, pageHeight - 10, {align: 'center'});
-                    }
-
-                    doc.save(`TACHA_${order.client}_${order.number}.pdf`);
-                },
-
-                generateGeneralAct: () => {
-                    const title = document.getElementById('act-title').value;
-                    const items = document.querySelectorAll('#act-list li');
-                    
-                    if(items.length === 0) return Swal.fire("Error", "La lista está vacía", "warning");
-
-                    const { jsPDF } = window.jspdf;
-                    const doc = new jsPDF();
-                    
-                    App.PDF.drawLogo(doc, 20, 20);
-                    
-                    doc.setFontSize(18);
-                    doc.text(title.toUpperCase(), 105, 40, {align:'center'});
-                    
-                    doc.setFontSize(11);
-                    doc.text(`FECHA: ${new Date().toLocaleDateString()}`, 20, 55);
-                    doc.text(`PARA: ${document.getElementById('act-client').value}`, 20, 62);
-
-                    const tableData = Array.from(items).map(li => [li.dataset.desc, li.dataset.qty]);
-
-                    doc.autoTable({
-                        startY: 70,
-                        head: [['DESCRIPCIÓN', 'CANTIDAD']],
-                        body: tableData,
-                        theme: 'grid',
-                        headStyles: { fillColor: [0, 128, 128] }
-                    });
-
-                    // Firmas
-                    const y = doc.lastAutoTable.finalY + 40;
-                    doc.line(30, y, 90, y);
-                    doc.text(document.getElementById('act-signer1').value, 60, y+5, {align:'center'});
-                    
-                    doc.line(120, y, 180, y);
-                    doc.text(document.getElementById('act-signer2').value || "RECIBIDO", 150, y+5, {align:'center'});
-
-                    doc.save("ACTA_ENTREGA.pdf");
-                }
-            },
-
-            // --- CONTROLADORES DE INTERFAZ (UI LOGIC) ---
-            Controllers: {
-                // Maneja la subida de archivos (Excel/PDF)
-                handleFileUpload: async (input) => {
-                    const file = input.files[0];
-                    if(!file) return;
-
-                    Swal.fire({
-                        title: 'Analizando...',
-                        text: 'El Sabueso está procesando el archivo',
-                        allowOutsideClick: false,
-                        didOpen: () => Swal.showLoading()
-                    });
-
-                    try {
-                        let extractedItems = [];
-
-                        if(file.type === "application/pdf") {
-                            const arrayBuffer = await file.arrayBuffer();
-                            const pdf = await pdfjsLib.getDocument(arrayBuffer).promise;
-                            let fullText = "";
-                            for(let i=1; i<=pdf.numPages; i++){
-                                const page = await pdf.getPage(i);
-                                const content = await page.getTextContent();
-                                fullText += content.items.map(item => item.str).join('\n');
-                            }
-                            extractedItems = App.Sabueso.parseTiojanoPDF(fullText);
-                        } else {
-                            const data = await file.arrayBuffer();
-                            const workbook = XLSX.read(data);
-                            const sheet = workbook.Sheets[workbook.SheetNames[0]];
-                            const csv = XLSX.utils.sheet_to_csv(sheet);
-                            extractedItems = App.Sabueso.parseDirtyText(csv);
-                        }
-
-                        if(extractedItems.length > 0) {
-                            Swal.close();
-                            App.Modals.openOrderEditor('new');
-                            extractedItems.forEach(item => App.UI.addItemToOrderTable(item));
-                            Swal.fire("Éxito", `Se importaron ${extractedItems.length} productos.`, "success");
-                        } else {
-                            Swal.fire("Error", "No se detectaron productos válidos.", "error");
-                        }
-                    } catch (e) {
-                        console.error(e);
-                        Swal.fire("Error Técnico", e.message, "error");
-                    }
-                },
-
-                // Agrega un item desde el formulario manual
-                addItemToOrder: () => {
-                    const name = document.getElementById('add-prod-name').value;
-                    const size = document.getElementById('add-prod-size').value || "ÚNICA";
-                    const qty = document.getElementById('add-prod-qty').value;
-                    const msg = document.getElementById('add-prod-msg').value;
-
-                    if(!name || !qty) return Swal.fire("Atención", "Nombre y Cantidad requeridos", "warning");
-
-                    App.UI.addItemToOrderTable({
-                        name, size: size.toUpperCase(), qty: parseInt(qty), msg
-                    });
-
-                    // Limpiar campos para entrada rápida
-                    document.getElementById('add-prod-size').value = '';
-                    document.getElementById('add-prod-qty').value = '';
-                    document.getElementById('add-prod-msg').value = '';
-                    document.getElementById('add-prod-name').focus();
+                    App.UI.updateKPIs();
                 },
                 
-                addActItem: () => {
-                    const desc = document.getElementById('act-input-desc').value;
-                    const qty = document.getElementById('act-input-qty').value;
-                    if(!desc) return;
-                    const ul = document.getElementById('act-list');
-                    const li = document.createElement('li');
-                    li.className = "flex justify-between border-b py-1";
-                    li.dataset.desc = desc;
-                    li.dataset.qty = qty;
-                    li.innerHTML = `<span>${desc}</span> <b>${qty}</b>`;
-                    ul.appendChild(li);
-                    document.getElementById('act-input-desc').value = '';
-                    document.getElementById('act-input-qty').value = '';
+                save: function() {
+                    localStorage.setItem('erp_orders', JSON.stringify(App.State.orders));
+                    localStorage.setItem('erp_inventory', JSON.stringify(App.State.inventory));
+                    localStorage.setItem('erp_events', JSON.stringify(App.State.calendarEvents));
+                    App.UI.updateKPIs();
+                    console.log("[SYSTEM] Datos guardados correctamente.");
                 },
 
-                saveOrderFinal: () => {
-                    const client = document.getElementById('input-client').value;
-                    const number = document.getElementById('input-oc').value || Date.now().toString().slice(-6);
-                    const dispatch = document.getElementById('input-dispatch').value;
-
-                    // Recopilar items de la tabla DOM
-                    const items = [];
-                    document.querySelectorAll('#order-items-body tr').forEach(tr => {
-                        items.push(JSON.parse(tr.dataset.json));
-                    });
-
-                    if(!client || items.length === 0) return Swal.fire("Incompleto", "Falta cliente o productos", "warning");
-
-                    const newOrder = {
-                        id: App.Store.currentOrderEditing || Date.now(),
-                        client,
-                        number,
-                        dispatchPlace: dispatch,
-                        date: new Date().toISOString(),
-                        items,
-                        status: 'Pendiente'
-                    };
-
-                    // Enlace Inteligente: Crear items en inventario si no existen
-                    items.forEach(item => {
-                        const exists = App.Store.inventory.find(i => i.name === item.name && i.size === item.size);
-                        if(!exists) {
-                            App.Store.inventory.push({
-                                id: Date.now() + Math.random(),
-                                name: item.name,
-                                size: item.size,
-                                stock: 0 // Se crea en 0 para no bloquear
-                            });
-                        }
-                    });
-
-                    if(App.Store.currentOrderEditing) {
-                        const idx = App.Store.orders.findIndex(o => o.id === App.Store.currentOrderEditing);
-                        App.Store.orders[idx] = newOrder;
-                    } else {
-                        App.Store.orders.unshift(newOrder);
-                    }
-
-                    App.Store.save();
-                    App.Modals.close('modal-order');
-                    App.Router.navigate('orders'); // Refrescar vista
-                    Swal.fire("Guardado", "La orden se ha registrado correctamente", "success");
-                },
-
-                deleteOrder: (id) => {
+                clearAll: function() {
                     Swal.fire({
-                        title: '¿Eliminar?',
-                        text: "No podrás revertir esto",
+                        title: '¿Reiniciar Sistema?',
+                        text: "Se borrarán todas las órdenes y el inventario cargado (El calendario se mantiene).",
                         icon: 'warning',
                         showCancelButton: true,
+                        confirmButtonColor: '#d33',
+                        confirmButtonText: 'Sí, borrar todo'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            App.State.orders = [];
+                            App.State.inventory = [];
+                            App.Data.save();
+                            location.reload();
+                        }
+                    });
+                }
+            },
+
+            // --- MÓDULO DE INTERFAZ DE USUARIO ---
+            UI: {
+                init: function() {
+                    this.updateDateDisplay();
+                    this.animateLogo();
+                },
+
+                updateDateDisplay: function() {
+                    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+                    document.getElementById('current-date').textContent = new Date().toLocaleDateString('es-CL', options).toUpperCase();
+                },
+
+                updateKPIs: function() {
+                    // Calcular métricas reales
+                    document.getElementById('kpi-orders').textContent = App.State.orders.length;
+                    
+                    let totalStock = 0;
+                    App.State.inventory.forEach(item => {
+                        // Sumar tallas si existen
+                        ['XS','S','M','L','XL','XXL'].forEach(t => {
+                            if(item[t]) totalStock += parseInt(item[t]) || 0;
+                        });
+                    });
+                    document.getElementById('kpi-units').textContent = totalStock.toLocaleString();
+
+                    // Contar tareas pendientes hoy
+                    const todayKey = new Date().toISOString().split('T')[0];
+                    const tasks = App.State.calendarEvents[todayKey] || [];
+                    document.getElementById('kpi-tasks').textContent = tasks.length;
+                },
+
+                animateLogo: function() {
+                    const logo = document.querySelector('svg');
+                    logo.classList.add('animate__animated', 'animate__rubberBand');
+                    setTimeout(() => logo.classList.remove('animate__animated', 'animate__rubberBand'), 1000);
+                }
+            },
+
+            // --- MÓDULO DE ENRUTAMIENTO (SPA) ---
+            Router: {
+                go: function(viewName) {
+                    console.log(`[ROUTER] Navegando a: ${viewName}`);
+                    
+                    // Ocultar todas las secciones
+                    document.querySelectorAll('main section').forEach(el => {
+                        el.classList.add('hidden');
+                        el.classList.remove('animate-enter');
+                    });
+
+                    // Activar botones del menú
+                    document.querySelectorAll('nav button').forEach(btn => {
+                        btn.classList.remove('bg-teal-50', 'text-teal-700');
+                        btn.classList.add('text-slate-600');
+                    });
+
+                    // Mostrar vista seleccionada
+                    const target = document.getElementById(`view-${viewName}`);
+                    if (target) {
+                        target.classList.remove('hidden');
+                        target.classList.add('animate-enter');
+                        
+                        // Actualizar título
+                        const titles = {
+                            'dashboard': 'PANEL DE CONTROL',
+                            'orders': 'GESTIÓN DE ÓRDENES',
+                            'inventory': 'BODEGA JUNAEB',
+                            'calendar': 'CALENDARIO CORPORATIVO',
+                            'agenda': 'AGENDA SEMANAL'
+                        };
+                        document.getElementById('page-title').textContent = titles[viewName] || 'SISTEMA ERP';
+
+                        // Resaltar menú activo
+                        const navBtn = document.getElementById(`nav-${viewName === 'orders' ? 'orders' : viewName === 'inventory' ? 'inv' : viewName === 'calendar' ? 'cal' : viewName === 'agenda' ? 'agenda' : 'dash'}`);
+                        if(navBtn) navBtn.classList.add('bg-teal-50', 'text-teal-700');
+
+                        // Acciones específicas por vista
+                        if (viewName === 'calendar') App.Calendar.render();
+                        if (viewName === 'orders') App.Sabueso.renderTable();
+                        if (viewName === 'agenda') App.Calendar.renderAgenda();
+                    }
+                }
+            },
+
+            // --- MÓDULO CALENDARIO (LÓGICA CORE ORIGINAL) ---
+            Calendar: {
+                monthNames: ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"],
+                selectedDate: null,
+
+                render: function() {
+                    const date = App.State.currentDate;
+                    const year = date.getFullYear();
+                    const month = date.getMonth();
+
+                    document.getElementById('calendar-month-year').textContent = `${this.monthNames[month]} ${year}`;
+
+                    const firstDay = new Date(year, month, 1).getDay(); // 0 = Domingo
+                    const daysInMonth = new Date(year, month + 1, 0).getDate();
+                    
+                    // Ajustar para que Lunes sea 0 (Sistema Chileno)
+                    // getDay(): Dom=0, Lun=1... -> Queremos Lun=0... Dom=6
+                    let startingDay = firstDay === 0 ? 6 : firstDay - 1;
+
+                    const grid = document.getElementById('calendar-days');
+                    grid.innerHTML = '';
+
+                    // Celdas vacías previas
+                    for (let i = 0; i < startingDay; i++) {
+                        const cell = document.createElement('div');
+                        cell.className = 'bg-slate-50';
+                        grid.appendChild(cell);
+                    }
+
+                    // Días del mes
+                    for (let day = 1; day <= daysInMonth; day++) {
+                        const cell = document.createElement('div');
+                        cell.className = 'calendar-day group';
+                        
+                        // Generar Key YYYY-MM-DD
+                        const dateKey = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                        const isToday = new Date().toDateString() === new Date(year, month, day).toDateString();
+
+                        if (isToday) cell.classList.add('bg-teal-50/50', 'border-teal-200');
+
+                        // Header del día
+                        const header = document.createElement('div');
+                        header.className = 'calendar-day-header';
+                        header.innerHTML = `<span class="${isToday ? 'bg-teal-600 text-white w-6 h-6 rounded-full flex items-center justify-center' : ''}">${day}</span>`;
+                        
+                        // Botón flotante para agregar tarea (aparece en hover)
+                        const addBtn = document.createElement('button');
+                        addBtn.className = 'opacity-0 group-hover:opacity-100 text-teal-600 hover:text-teal-800 transition-opacity';
+                        addBtn.innerHTML = '<i class="fas fa-plus-circle"></i>';
+                        addBtn.onclick = (e) => {
+                            e.stopPropagation();
+                            App.Calendar.selectDate(dateKey);
+                            App.Modals.Task.open();
+                        };
+                        header.appendChild(addBtn);
+                        cell.appendChild(header);
+
+                        // Renderizar Tareas
+                        const events = App.State.calendarEvents[dateKey] || [];
+                        events.forEach((evt, index) => {
+                            const chip = document.createElement('div');
+                            chip.className = `task-chip truncate text-xs p-1 mb-1 rounded border-l-4 ${this.getColorClass(evt.color)}`;
+                            chip.textContent = evt.text;
+                            chip.onclick = (e) => {
+                                e.stopPropagation();
+                                App.Calendar.deleteTask(dateKey, index);
+                            };
+                            cell.appendChild(chip);
+                        });
+
+                        // Click en la celda
+                        cell.onclick = () => App.Calendar.selectDate(dateKey);
+
+                        grid.appendChild(cell);
+                    }
+                },
+
+                getColorClass: function(color) {
+                    const map = {
+                        'teal': 'border-teal-500 bg-teal-100 text-teal-800',
+                        'orange': 'border-orange-500 bg-orange-100 text-orange-800',
+                        'blue': 'border-blue-500 bg-blue-100 text-blue-800',
+                        'red': 'border-red-500 bg-red-100 text-red-800'
+                    };
+                    return map[color] || map['teal'];
+                },
+
+                selectDate: function(dateKey) {
+                    this.selectedDate = dateKey;
+                    document.getElementById('selected-date-title').textContent = `Tareas: ${dateKey}`;
+                    
+                    const list = document.getElementById('day-task-list');
+                    list.innerHTML = '';
+                    
+                    const events = App.State.calendarEvents[dateKey] || [];
+                    if (events.length === 0) {
+                        list.innerHTML = '<li class="text-slate-400 text-sm italic">No hay notas para este día.</li>';
+                        return;
+                    }
+
+                    events.forEach((evt, idx) => {
+                        const li = document.createElement('li');
+                        li.className = 'flex items-center justify-between p-3 bg-slate-50 rounded border border-slate-100';
+                        li.innerHTML = `
+                            <span class="flex items-center gap-2">
+                                <span class="w-3 h-3 rounded-full bg-${evt.color}-500"></span>
+                                <span class="text-sm font-medium text-slate-700">${evt.text}</span>
+                            </span>
+                            <button onclick="App.Calendar.deleteTask('${dateKey}', ${idx})" class="text-red-400 hover:text-red-600">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        `;
+                        list.appendChild(li);
+                    });
+                },
+
+                addTask: function(text, color) {
+                    if (!this.selectedDate) return;
+                    if (!App.State.calendarEvents[this.selectedDate]) {
+                        App.State.calendarEvents[this.selectedDate] = [];
+                    }
+                    App.State.calendarEvents[this.selectedDate].push({ text, color });
+                    App.Data.save();
+                    this.render(); // Refrescar calendario visual
+                    this.selectDate(this.selectedDate); // Refrescar lista lateral
+                },
+
+                deleteTask: function(dateKey, index) {
+                    Swal.fire({
+                        title: '¿Borrar nota?',
+                        text: "No podrás recuperarla.",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#d33',
                         confirmButtonText: 'Sí, borrar'
                     }).then((result) => {
                         if (result.isConfirmed) {
-                            App.Store.orders = App.Store.orders.filter(o => o.id !== id);
-                            App.Store.save();
-                            App.Router.navigate('orders');
+                            App.State.calendarEvents[dateKey].splice(index, 1);
+                            if(App.State.calendarEvents[dateKey].length === 0) delete App.State.calendarEvents[dateKey];
+                            App.Data.save();
+                            App.Calendar.render();
+                            App.Calendar.selectDate(dateKey);
                         }
                     })
-                }
-            },
+                },
 
-            // --- GESTOR DE UI Y DOM ---
-            UI: {
-                addItemToOrderTable: (item) => {
-                    const tbody = document.getElementById('order-items-body');
-                    const emptyState = document.getElementById('empty-state-order');
-                    if(emptyState) emptyState.style.display = 'none';
+                prevMonth: function() {
+                    App.State.currentDate.setMonth(App.State.currentDate.getMonth() - 1);
+                    this.render();
+                },
+                nextMonth: function() {
+                    App.State.currentDate.setMonth(App.State.currentDate.getMonth() + 1);
+                    this.render();
+                },
 
-                    const tr = document.createElement('tr');
-                    tr.className = "hover:bg-teal-50 transition-colors border-b border-gray-100 animate__animated animate__fadeIn";
-                    tr.dataset.json = JSON.stringify(item);
+                renderAgenda: function() {
+                    const list = document.getElementById('agenda-full-list');
+                    list.innerHTML = '';
                     
-                    tr.innerHTML = `
-                        <td class="p-3">
-                            <div class="font-bold text-gray-800">${item.name}</div>
-                            ${item.msg ? `<div class="text-xs text-orange-600 italic"><i class="fas fa-comment-alt mr-1"></i>${item.msg}</div>` : ''}
-                        </td>
-                        <td class="p-3 text-center"><span class="bg-gray-200 px-2 py-1 rounded text-xs font-bold">${item.size}</span></td>
-                        <td class="p-3 text-center font-bold text-teal-700 text-lg">${item.qty}</td>
-                        <td class="p-3 text-right">
-                            <button onclick="this.closest('tr').remove(); App.UI.updateCounter()" class="text-red-300 hover:text-red-500 transition-colors">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </td>
-                    `;
-                    tbody.appendChild(tr);
-                    App.UI.updateCounter();
-                },
-
-                updateCounter: () => {
-                    const count = document.getElementById('order-items-body').children.length;
-                    document.getElementById('items-counter').innerText = `${count} Ítems`;
-                },
-                
-                animateLogo: () => {
-                    // Pequeña animación JS de click
-                    const logo = document.querySelector('svg');
-                    logo.classList.add('scale-110');
-                    setTimeout(() => logo.classList.remove('scale-110'), 200);
-                }
-            },
-
-            // --- LÓGICA DE AGENDA (PRESERVADA) ---
-            Agenda: {
-                days: ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes'],
-                
-                render: () => {
-                    const container = document.getElementById('app-content');
-                    let html = `
-                        <div class="flex justify-between items-center mb-6">
-                            <h2 class="text-2xl font-bold text-gray-800">Planner Semanal Corporativo</h2>
-                            <div class="text-sm text-gray-500">Semana del ${new Date().toLocaleDateString()}</div>
-                        </div>
-                        <div class="grid grid-cols-1 md:grid-cols-5 gap-4 h-[calc(100vh-180px)]">`;
+                    // Ordenar fechas
+                    const keys = Object.keys(App.State.calendarEvents).sort();
                     
-                    App.Agenda.days.forEach(day => {
-                        const tasks = App.Store.agenda[day] || [];
-                        html += `
-                            <div class="agenda-card">
-                                <div class="agenda-header">${day}</div>
-                                <div class="flex-1 p-3 overflow-y-auto space-y-2 bg-gray-50" id="agenda-${day}">
-                                    ${tasks.map((t, i) => `
-                                        <div class="task-item group">
-                                            <span>${t}</span>
-                                            <button onclick="App.Agenda.remove('${day}', ${i})" class="text-red-300 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                <i class="fas fa-times-circle"></i>
-                                            </button>
-                                        </div>
-                                    `).join('')}
-                                </div>
-                                <div class="p-3 bg-white border-t">
-                                    <input type="text" placeholder="+ Tarea" 
-                                        class="w-full text-sm border rounded p-2 focus:ring-2 focus:ring-teal-500 outline-none"
-                                        onkeypress="if(event.key === 'Enter') App.Agenda.add('${day}', this)">
-                                </div>
-                            </div>
-                        `;
-                    });
-                    
-                    html += `</div>`;
-                    container.innerHTML = html;
-                },
-
-                add: (day, input) => {
-                    const val = input.value.trim();
-                    if(!val) return;
-                    if(!App.Store.agenda[day]) App.Store.agenda[day] = [];
-                    App.Store.agenda[day].push(val);
-                    App.Store.save();
-                    App.Agenda.render();
-                },
-
-                remove: (day, index) => {
-                    App.Store.agenda[day].splice(index, 1);
-                    App.Store.save();
-                    App.Agenda.render();
-                }
-            },
-
-            // --- LÓGICA DE RUTEO (SPA) ---
-            Router: {
-                navigate: (route) => {
-                    // Update Active States
-                    document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('bg-teal-50', 'text-teal-700'));
-                    const activeBtn = document.getElementById(`nav-${route}`);
-                    if(activeBtn) activeBtn.classList.add('bg-teal-50', 'text-teal-700');
-
-                    const container = document.getElementById('app-content');
-                    container.innerHTML = ''; // Clean
-
-                    switch(route) {
-                        case 'dashboard':
-                            App.Router.renderDashboard(container);
-                            break;
-                        case 'orders':
-                            App.Router.renderOrders(container);
-                            break;
-                        case 'inventory':
-                            App.Router.renderInventory(container);
-                            break;
-                        case 'agenda':
-                            App.Agenda.render();
-                            break;
+                    if(keys.length === 0) {
+                        list.innerHTML = '<div class="text-center py-10 text-slate-400">Agenda vacía. Agrega notas en el Calendario.</div>';
+                        return;
                     }
-                },
 
-                renderDashboard: (container) => {
-                    const pending = App.Store.orders.filter(o => o.status === 'Pendiente').length;
-                    container.innerHTML = `
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8 animate__animated animate__fadeIn">
-                            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4 relative overflow-hidden">
-                                <div class="absolute right-0 top-0 w-24 h-24 bg-teal-50 rounded-full -mr-8 -mt-8"></div>
-                                <div class="w-12 h-12 bg-teal-100 text-teal-700 rounded-xl flex items-center justify-center text-xl z-10">
-                                    <i class="fas fa-shopping-bag"></i>
-                                </div>
-                                <div class="z-10">
-                                    <h3 class="text-2xl font-black text-gray-800">${App.Store.orders.length}</h3>
-                                    <p class="text-sm text-gray-500 font-medium">Órdenes Totales</p>
-                                </div>
-                            </div>
-                            
-                            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4 relative overflow-hidden">
-                                <div class="absolute right-0 top-0 w-24 h-24 bg-orange-50 rounded-full -mr-8 -mt-8"></div>
-                                <div class="w-12 h-12 bg-orange-100 text-orange-600 rounded-xl flex items-center justify-center text-xl z-10">
-                                    <i class="fas fa-clock"></i>
-                                </div>
-                                <div class="z-10">
-                                    <h3 class="text-2xl font-black text-gray-800">${pending}</h3>
-                                    <p class="text-sm text-gray-500 font-medium">Pendientes de Despacho</p>
-                                </div>
-                            </div>
-
-                            <div class="bg-gradient-to-r from-teal-600 to-teal-800 p-6 rounded-2xl shadow-lg text-white flex flex-col justify-center cursor-pointer hover:shadow-xl transition-shadow" onclick="App.Modals.openOrderEditor('new')">
-                                <div class="flex items-center gap-3 mb-2">
-                                    <i class="fas fa-plus-circle text-2xl text-teal-200"></i>
-                                    <span class="font-bold text-lg">Nueva Orden Rápida</span>
-                                </div>
-                                <p class="text-teal-100 text-xs">Crear manual o importar Excel</p>
-                            </div>
-                        </div>
+                    keys.forEach(date => {
+                        const events = App.State.calendarEvents[date];
+                        const dateObj = new Date(date + 'T00:00:00'); // Fix timezone issue
                         
-                        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-                            <h3 class="font-bold text-gray-800 mb-4">Actividad Reciente</h3>
-                            <div class="space-y-4">
-                                ${App.Store.orders.slice(0, 5).map(o => `
-                                    <div class="flex items-center justify-between p-3 hover:bg-gray-50 rounded-lg transition-colors border-b border-gray-50">
-                                        <div class="flex items-center gap-3">
-                                            <div class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 font-bold text-xs">
-                                                ${o.client.substring(0,2).toUpperCase()}
-                                            </div>
-                                            <div>
-                                                <p class="font-bold text-sm text-gray-800">${o.client}</p>
-                                                <p class="text-xs text-gray-500">OC: ${o.number}</p>
-                                            </div>
-                                        </div>
-                                        <span class="text-xs font-bold px-2 py-1 rounded bg-teal-50 text-teal-700">${new Date(o.date).toLocaleDateString()}</span>
-                                    </div>
-                                `).join('')}
-                            </div>
-                        </div>
-                    `;
-                },
+                        const group = document.createElement('div');
+                        group.className = 'border-l-4 border-teal-500 pl-4 py-2';
+                        
+                        const dateHeader = document.createElement('h4');
+                        dateHeader.className = 'font-bold text-lg text-slate-800 uppercase';
+                        dateHeader.textContent = dateObj.toLocaleDateString('es-CL', { weekday: 'long', day: 'numeric', month: 'long' });
+                        group.appendChild(dateHeader);
 
-                renderOrders: (container) => {
-                    container.innerHTML = `
-                        <div class="flex justify-between items-center mb-6">
-                            <h2 class="text-2xl font-bold text-gray-800">Gestión de Órdenes</h2>
-                            <div class="flex gap-2">
-                                <label class="btn-corporate bg-white text-gray-600 border border-gray-200 hover:bg-gray-50 cursor-pointer">
-                                    <i class="fas fa-file-import"></i> Importar Archivo
-                                    <input type="file" hidden onchange="App.Controllers.handleFileUpload(this)">
-                                </label>
-                                <button onclick="App.Modals.openOrderEditor('new')" class="btn-corporate">
-                                    <i class="fas fa-plus"></i> Crear Manual
-                                </button>
-                            </div>
-                        </div>
-                        <div class="grid gap-4">
-                            ${App.Store.orders.map(o => `
-                                <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-200 hover:shadow-md transition-all flex flex-col md:flex-row justify-between items-center gap-4">
-                                    <div class="flex-1">
-                                        <div class="flex items-center gap-2 mb-1">
-                                            <h3 class="font-bold text-lg text-teal-900">${o.client}</h3>
-                                            <span class="text-xs bg-gray-100 px-2 py-0.5 rounded font-mono border">OC.NRO: ${o.number}</span>
-                                        </div>
-                                        <p class="text-sm text-gray-500 flex items-center gap-4">
-                                            <span><i class="fas fa-box mr-1"></i> ${o.items.length} Productos</span>
-                                            <span><i class="fas fa-map-marker-alt mr-1"></i> ${o.dispatchPlace || 'Sin lugar'}</span>
-                                        </p>
-                                    </div>
-                                    <div class="flex gap-2">
-                                        <button onclick="App.PDF.generateTacha(App.Store.orders.find(x => x.id === ${o.id}))" class="px-4 py-2 bg-teal-50 text-teal-700 rounded-lg font-bold text-sm hover:bg-teal-100 transition-colors border border-teal-200">
-                                            <i class="fas fa-print mr-2"></i> IMPRIMIR TACHA
-                                        </button>
-                                        <button onclick="App.Modals.openOrderEditor('edit', ${o.id})" class="p-2 text-gray-400 hover:text-blue-500 hover:bg-blue-50 rounded"><i class="fas fa-pen"></i></button>
-                                        <button onclick="App.Controllers.deleteOrder(${o.id})" class="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded"><i class="fas fa-trash"></i></button>
-                                    </div>
-                                </div>
-                            `).join('')}
-                        </div>
-                    `;
-                },
+                        events.forEach(evt => {
+                            const item = document.createElement('div');
+                            item.className = 'mt-2 p-3 bg-white rounded shadow-sm border border-slate-100 text-slate-600 flex items-center gap-3';
+                            item.innerHTML = `<span class="w-2 h-2 rounded-full bg-${evt.color}-500"></span> ${evt.text}`;
+                            group.appendChild(item);
+                        });
 
-                renderInventory: (container) => {
-                    container.innerHTML = `
-                        <div class="flex justify-between items-center mb-6">
-                            <h2 class="text-2xl font-bold text-gray-800">Inventario</h2>
-                            <button class="btn-corporate"><i class="fas fa-sync"></i> Actualizar</button>
-                        </div>
-                        <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                            <table class="data-table">
-                                <thead>
-                                    <tr>
-                                        <th>Producto</th>
-                                        <th>Talla</th>
-                                        <th>Stock Actual</th>
-                                        <th>Estado</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    ${App.Store.inventory.map(i => `
-                                        <tr>
-                                            <td class="font-medium">${i.name}</td>
-                                            <td><span class="bg-gray-100 px-2 py-1 rounded text-xs font-bold">${i.size}</span></td>
-                                            <td class="font-mono font-bold">${i.stock}</td>
-                                            <td>
-                                                ${i.stock < 5 
-                                                    ? '<span class="text-red-600 text-xs font-bold"><i class="fas fa-exclamation-circle"></i> Crítico</span>' 
-                                                    : '<span class="text-green-600 text-xs font-bold">OK</span>'}
-                                            </td>
-                                        </tr>
-                                    `).join('')}
-                                </tbody>
-                            </table>
-                        </div>
-                    `;
+                        list.appendChild(group);
+                    });
                 }
             },
 
-            // --- GESTOR DE MODALES ---
-            Modals: {
-                openOrderEditor: (mode, id = null) => {
-                    const modal = document.getElementById('modal-order');
-                    const panel = document.getElementById('modal-order-panel');
-                    const title = document.getElementById('modal-order-title');
+            // --- MÓDULO SABUESO (LECTOR DE ARCHIVOS AVANZADO) ---
+            Sabueso: {
+                handleDrop: function(e) {
+                    e.preventDefault();
+                    e.target.classList.remove('border-teal-500', 'bg-teal-50');
+                    this.handleFiles(e.dataTransfer.files);
+                },
+
+                handleFiles: async function(files) {
+                    if (files.length === 0) return;
                     
-                    // Limpiar formulario
-                    document.getElementById('input-client').value = "";
-                    document.getElementById('input-oc').value = "";
-                    document.getElementById('input-dispatch').value = "";
-                    document.getElementById('order-items-body').innerHTML = "";
-                    document.getElementById('empty-state-order').style.display = 'flex';
+                    Swal.fire({
+                        title: 'Procesando Archivos...',
+                        html: 'El motor Sabueso está analizando la data.',
+                        timerProgressBar: true,
+                        didOpen: () => { Swal.showLoading() }
+                    });
 
-                    App.Store.currentOrderEditing = null;
-
-                    if(mode === 'edit' && id) {
-                        const order = App.Store.orders.find(o => o.id === id);
-                        if(order) {
-                            App.Store.currentOrderEditing = id;
-                            title.innerText = `Editando OC #${order.number}`;
-                            document.getElementById('input-client').value = order.client;
-                            document.getElementById('input-oc').value = order.number;
-                            document.getElementById('input-dispatch').value = order.dispatchPlace || "";
-                            
-                            order.items.forEach(item => App.UI.addItemToOrderTable(item));
+                    for (let file of files) {
+                        try {
+                            if (file.type === "application/pdf") {
+                                await this.parsePDF(file);
+                            } else if (file.name.includes(".xls") || file.name.includes(".csv")) {
+                                await this.parseExcel(file);
+                            }
+                        } catch (err) {
+                            console.error("Error leyendo archivo:", err);
+                            Swal.fire('Error', `No se pudo leer ${file.name}`, 'error');
                         }
-                    } else {
-                        title.innerText = "Nueva Orden de Compra";
                     }
 
-                    modal.classList.remove('hidden');
-                    modal.classList.add('flex');
-                    setTimeout(() => {
-                        modal.classList.remove('opacity-0');
-                        panel.classList.remove('scale-95');
-                        panel.classList.add('scale-100');
-                    }, 10);
+                    App.Data.save();
+                    this.renderTable();
+                    App.Inventory.renderTable(); // Por si se cargó inventario
+                    Swal.close();
+                    Swal.fire('¡Listo!', 'Archivos procesados correctamente.', 'success');
                 },
 
-                openActaGeneral: () => {
-                    const modal = document.getElementById('modal-acta');
-                    document.getElementById('act-list').innerHTML = '';
-                    modal.classList.remove('hidden');
-                    modal.classList.add('flex');
+                parseExcel: function(file) {
+                    return new Promise((resolve, reject) => {
+                        const reader = new FileReader();
+                        reader.onload = (e) => {
+                            const data = new Uint8Array(e.target.result);
+                            const workbook = XLSX.read(data, { type: 'array' });
+                            
+                            // Asumimos que la primera hoja es la relevante
+                            const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                            const jsonData = XLSX.utils.sheet_to_json(firstSheet);
+                            
+                            console.log("[SABUESO] Excel Data Raw:", jsonData);
+
+                            // Detectar si es Inventario Junaeb (Tiene columna XS, S, M...)
+                            if (jsonData.length > 0 && ('XS' in jsonData[0] || 'Talla' in jsonData[0])) {
+                                App.State.inventory = jsonData;
+                                console.log("[SABUESO] Inventario detectado y cargado.");
+                            } else {
+                                // Tratar como listado de órdenes simple
+                                jsonData.forEach(row => {
+                                    App.State.orders.push({
+                                        id: row['OC'] || row['Orden'] || `XLS-${Date.now()}`,
+                                        client: row['Cliente'] || 'Carga Masiva',
+                                        date: new Date().toISOString().split('T')[0],
+                                        content: JSON.stringify(row),
+                                        status: 'Pendiente'
+                                    });
+                                });
+                            }
+                            resolve();
+                        };
+                        reader.onerror = reject;
+                        reader.readAsArrayBuffer(file);
+                    });
                 },
 
-                close: (modalId) => {
-                    const modal = document.getElementById(modalId);
-                    modal.classList.add('hidden');
-                    modal.classList.remove('flex');
+                parsePDF: async function(file) {
+                    // Lógica para leer PDF con pdf.js
+                    const arrayBuffer = await file.arrayBuffer();
+                    const pdf = await pdfjsLib.getDocument(arrayBuffer).promise;
+                    
+                    let fullText = "";
+                    for (let i = 1; i <= pdf.numPages; i++) {
+                        const page = await pdf.getPage(i);
+                        const textContent = await page.getTextContent();
+                        fullText += textContent.items.map(item => item.str).join(" ") + "\n";
+                    }
+
+                    console.log("[SABUESO] PDF Content Extracted:", fullText.substring(0, 200) + "...");
+
+                    // EXTRACCIÓN INTELIGENTE (REGEX)
+                    // Buscar patrones comunes en OCs chilenas
+                    const ocMatch = fullText.match(/Orden\s*N[°º]\s*(\d+)/i) || fullText.match(/OC\s*[:\.]?\s*(\d+)/i);
+                    const dateMatch = fullText.match(/(\d{2})[\/-](\d{2})[\/-](\d{4})/);
+                    
+                    const newOrder = {
+                        id: ocMatch ? ocMatch[1] : `PDF-${Date.now()}`,
+                        client: "Extraído de PDF", // Podríamos buscar "Cliente:"
+                        date: dateMatch ? `${dateMatch[3]}-${dateMatch[2]}-${dateMatch[1]}` : new Date().toISOString().split('T')[0],
+                        content: fullText.substring(0, 1500), // Guardamos los primeros 1500 caracteres como referencia
+                        status: 'Pendiente',
+                        source: 'PDF'
+                    };
+
+                    App.State.orders.push(newOrder);
+                },
+
+                renderTable: function() {
+                    const tbody = document.getElementById('orders-table-body');
+                    tbody.innerHTML = '';
+
+                    if (App.State.orders.length === 0) {
+                        tbody.innerHTML = `
+                            <tr>
+                                <td colspan="5" class="px-6 py-12 text-center text-slate-400">
+                                    <i class="fas fa-inbox text-4xl mb-3 block opacity-20"></i>
+                                    No hay órdenes cargadas. Sube un archivo.
+                                </td>
+                            </tr>`;
+                        return;
+                    }
+
+                    App.State.orders.forEach((order, index) => {
+                        const tr = document.createElement('tr');
+                        tr.className = 'hover:bg-slate-50 transition-colors group';
+                        tr.innerHTML = `
+                            <td class="px-6 py-4 font-bold text-slate-700">
+                                <i class="fas ${order.source === 'PDF' ? 'fa-file-pdf text-red-500' : 'fa-file-excel text-green-500'} mr-2"></i>
+                                ${order.id}
+                                <div class="text-xs text-slate-400 font-normal">${order.date}</div>
+                            </td>
+                            <td class="px-6 py-4">
+                                <div class="font-bold">${order.client}</div>
+                                <div class="text-xs text-slate-400">${order.invoice || 'Sin Factura'}</div>
+                            </td>
+                            <td class="px-6 py-4 text-xs font-mono text-slate-500 max-w-xs truncate">
+                                ${typeof order.content === 'string' ? order.content.substring(0, 50) : 'Datos estructurados'}...
+                            </td>
+                            <td class="px-6 py-4">
+                                <span class="px-2 py-1 bg-yellow-100 text-yellow-700 rounded-full text-xs font-bold border border-yellow-200">
+                                    ${order.status}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 text-right">
+                                <button onclick="App.Modals.EditOrder.open(${index})" class="text-teal-600 hover:text-teal-800 font-bold text-xs bg-teal-50 px-3 py-1 rounded border border-teal-100">
+                                    EDITAR
+                                </button>
+                                <button onclick="App.Sabueso.deleteOrder(${index})" class="ml-2 text-slate-400 hover:text-red-500">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                },
+
+                deleteOrder: function(index) {
+                    App.State.orders.splice(index, 1);
+                    App.Data.save();
+                    this.renderTable();
                 }
             },
 
-            Logic: {
-                suggestProducts: (input) => {
-                    // Implementación de autocompletado aquí
-                    // Simulado para brevedad del bloque, pero la estructura está lista
+            // --- MÓDULO DE INVENTARIO ---
+            Inventory: {
+                renderTable: function() {
+                    const tbody = document.getElementById('inventory-body');
+                    tbody.innerHTML = '';
+                    
+                    if (App.State.inventory.length === 0) {
+                        tbody.innerHTML = '<tr><td colspan="8" class="p-4 text-center text-slate-400">Sin datos de inventario. Sube el Excel Junaeb.</td></tr>';
+                        return;
+                    }
+
+                    App.State.inventory.forEach(item => {
+                        // Intentar mapear columnas flexibles
+                        const name = item['PRODUCTO'] || item['Producto'] || item['Nombre'] || 'Item S/N';
+                        const xs = item['XS'] || 0;
+                        const s = item['S'] || 0;
+                        const m = item['M'] || 0;
+                        const l = item['L'] || 0;
+                        const xl = item['XL'] || 0;
+                        const xxl = item['XXL'] || item['2XL'] || 0;
+                        const total = (parseInt(xs)||0)+(parseInt(s)||0)+(parseInt(m)||0)+(parseInt(l)||0)+(parseInt(xl)||0)+(parseInt(xxl)||0);
+
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td class="p-3 font-bold text-slate-700">${name}</td>
+                            <td class="p-3 text-center text-slate-500">${xs || '-'}</td>
+                            <td class="p-3 text-center text-slate-500">${s || '-'}</td>
+                            <td class="p-3 text-center text-slate-500">${m || '-'}</td>
+                            <td class="p-3 text-center text-slate-500">${l || '-'}</td>
+                            <td class="p-3 text-center text-slate-500">${xl || '-'}</td>
+                            <td class="p-3 text-center text-slate-500">${xxl || '-'}</td>
+                            <td class="p-3 text-right font-bold text-teal-600">${total}</td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                },
+
+                filter: function() {
+                    const term = document.getElementById('inv-search').value.toLowerCase();
+                    const rows = document.querySelectorAll('#inventory-body tr');
+                    rows.forEach(row => {
+                        const text = row.textContent.toLowerCase();
+                        row.style.display = text.includes(term) ? '' : 'none';
+                    });
+                }
+            },
+
+            // --- MÓDULO DE IMPRESIÓN (PDF GENERATION) ---
+            Printers: {
+                // Función auxiliar para dibujar el logo vectorial
+                drawVectorLogo: function(doc, x, y, size) {
+                    doc.setDrawColor(0, 128, 128); // Teal
+                    doc.setLineWidth(1);
+                    doc.circle(x + size/2, y + size/2, size/2 - 2); // Círculo exterior
+                    
+                    // Simulación simplificada de tijeras con líneas
+                    doc.setLineWidth(2);
+                    doc.line(x + size*0.3, y + size*0.3, x + size*0.7, y + size*0.8); // Hoja 1
+                    doc.line(x + size*0.7, y + size*0.3, x + size*0.3, y + size*0.8); // Hoja 2
+                    
+                    // Orificios
+                    doc.setFillColor(255, 255, 255);
+                    doc.circle(x + size*0.3, y + size*0.3, size*0.08, 'F');
+                    doc.circle(x + size*0.7, y + size*0.3, size*0.08, 'F');
+                },
+
+                printTacha3Cols: function() {
+                    if(App.State.orders.length === 0) { Swal.fire('Error', 'No hay órdenes para imprimir', 'error'); return; }
+
+                    const { jsPDF } = window.jspdf;
+                    const doc = new jsPDF('p', 'mm', 'legal'); // Oficio
+                    
+                    const cols = 3;
+                    const colWidth = 65; // Ajustado para Oficio
+                    const margin = 10;
+                    let x = margin;
+                    let y = margin;
+                    let colCount = 0;
+
+                    App.State.orders.forEach((order, index) => {
+                        // Dibujar Contenedor de la Orden
+                        doc.setDrawColor(200, 200, 200);
+                        doc.rect(x, y, colWidth - 5, 80); // Caja de 80mm alto
+
+                        // Cabecera
+                        this.drawVectorLogo(doc, x + 2, y + 2, 10);
+                        
+                        doc.setFontSize(8);
+                        doc.setFont("helvetica", "bold");
+                        doc.text("IDEAS TEXTILES", x + 14, y + 6);
+                        
+                        doc.setFontSize(14);
+                        doc.text(`OC: ${order.id}`, x + 5, y + 18);
+                        
+                        doc.setFontSize(8);
+                        doc.setFont("helvetica", "normal");
+                        doc.text(String(order.client).substring(0, 25), x + 5, y + 24);
+                        doc.text(`Fecha: ${order.date}`, x + 5, y + 28);
+
+                        // Contenido (Miniatura)
+                        doc.setFontSize(7);
+                        const cleanContent = (order.content || "").replace(/[^a-zA-Z0-9\s:-]/g, '').substring(0, 150);
+                        const splitText = doc.splitTextToSize(cleanContent, colWidth - 15);
+                        doc.text(splitText, x + 5, y + 35);
+
+                        // CAJAS DE CHECK (La funcionalidad clave solicitada)
+                        doc.setDrawColor(0, 0, 0);
+                        // Caja 1: Picking
+                        doc.rect(x + colWidth - 15, y + 5, 8, 8);
+                        doc.setFontSize(5); doc.text("PICK", x + colWidth - 14, y + 15);
+                        
+                        // Caja 2: Revisión
+                        doc.rect(x + colWidth - 15, y + 25, 8, 8);
+                        doc.text("REV", x + colWidth - 14, y + 35);
+
+                        // Caja 3: Despacho
+                        doc.rect(x + colWidth - 15, y + 45, 8, 8);
+                        doc.text("DESP", x + colWidth - 14, y + 55);
+
+                        // Mover cursor
+                        colCount++;
+                        if (colCount < cols) {
+                            x += colWidth;
+                        } else {
+                            x = margin;
+                            colCount = 0;
+                            y += 85; // Salto de fila
+                        }
+
+                        // Salto de página si se acaba el legal
+                        if (y > 300) {
+                            doc.addPage();
+                            y = margin;
+                            x = margin;
+                            colCount = 0;
+                        }
+                    });
+
+                    doc.save(`Tacha_3Col_Oficio_${new Date().getTime()}.pdf`);
+                },
+
+                printActa: function() {
+                    const title = document.getElementById('acta-title').value;
+                    const receiver = document.getElementById('acta-receiver').value;
+                    const items = document.getElementById('acta-items').value;
+
+                    const { jsPDF } = window.jspdf;
+                    const doc = new jsPDF();
+
+                    // Header
+                    doc.setFillColor(0, 128, 128);
+                    doc.rect(0, 0, 210, 40, 'F');
+                    doc.setTextColor(255, 255, 255);
+                    doc.setFontSize(22);
+                    doc.text("IDEAS TEXTILES SPA", 105, 20, { align: "center" });
+                    doc.setFontSize(12);
+                    doc.text("Acta de Entrega Oficial", 105, 30, { align: "center" });
+
+                    // Info
+                    doc.setTextColor(0, 0, 0);
+                    doc.setFontSize(12);
+                    doc.text(`TÍTULO: ${title}`, 20, 60);
+                    doc.text(`FECHA: ${new Date().toLocaleDateString()}`, 20, 70);
+                    doc.text(`RECIBE: ${receiver}`, 20, 80);
+
+                    // Línea
+                    doc.setLineWidth(0.5);
+                    doc.line(20, 90, 190, 90);
+
+                    // Items
+                    doc.setFontSize(10);
+                    const splitItems = doc.splitTextToSize(items, 170);
+                    doc.text(splitItems, 20, 100);
+
+                    // Firmas
+                    doc.line(30, 250, 90, 250);
+                    doc.text("FIRMA ENTREGUE", 60, 260, { align: "center" });
+
+                    doc.line(120, 250, 180, 250);
+                    doc.text("FIRMA RECIBE", 150, 260, { align: "center" });
+
+                    doc.save("Acta_Entrega.pdf");
+                    App.Modals.Acta.close();
+                }
+            },
+
+            // --- MÓDULO DE VENTANAS (MODALS) ---
+            Modals: {
+                EditOrder: {
+                    currentIdx: null,
+                    open: function(index) {
+                        const order = App.State.orders[index];
+                        this.currentIdx = index;
+                        document.getElementById('edit-order-id').value = order.id;
+                        document.getElementById('edit-order-client').value = order.client;
+                        document.getElementById('edit-order-date').value = order.date;
+                        document.getElementById('edit-order-invoice').value = order.invoice || '';
+                        document.getElementById('edit-order-content').value = order.content;
+                        
+                        document.getElementById('modal-edit-order').classList.remove('hidden');
+                        document.getElementById('modal-edit-order').classList.add('flex');
+                    },
+                    create: function() {
+                        this.currentIdx = -1; // Nuevo
+                        document.getElementById('edit-order-id').value = Date.now();
+                        document.getElementById('edit-order-client').value = "";
+                        document.getElementById('edit-order-content').value = "";
+                        document.getElementById('modal-edit-order').classList.remove('hidden');
+                        document.getElementById('modal-edit-order').classList.add('flex');
+                    },
+                    close: function() {
+                        document.getElementById('modal-edit-order').classList.add('hidden');
+                        document.getElementById('modal-edit-order').classList.remove('flex');
+                    },
+                    save: function() {
+                        const newOrder = {
+                            id: document.getElementById('edit-order-id').value,
+                            client: document.getElementById('edit-order-client').value,
+                            date: document.getElementById('edit-order-date').value,
+                            invoice: document.getElementById('edit-order-invoice').value,
+                            content: document.getElementById('edit-order-content').value,
+                            status: 'Editado',
+                            source: 'Manual'
+                        };
+
+                        if (this.currentIdx === -1) {
+                            App.State.orders.unshift(newOrder); // Agregar al inicio
+                        } else {
+                            App.State.orders[this.currentIdx] = newOrder;
+                        }
+                        
+                        App.Data.save();
+                        App.Sabueso.renderTable();
+                        this.close();
+                        Swal.fire('Guardado', 'La orden ha sido actualizada', 'success');
+                    }
+                },
+                Task: {
+                    open: function() {
+                        document.getElementById('modal-task').classList.remove('hidden');
+                        document.getElementById('modal-task').classList.add('flex');
+                        document.getElementById('task-input').focus();
+                    },
+                    close: function() {
+                        document.getElementById('modal-task').classList.add('hidden');
+                        document.getElementById('modal-task').classList.remove('flex');
+                    },
+                    save: function() {
+                        const text = document.getElementById('task-input').value;
+                        const color = document.getElementById('task-color').value;
+                        if(text) {
+                            App.Calendar.addTask(text, color);
+                            document.getElementById('task-input').value = ''; // Limpiar
+                            this.close();
+                        }
+                    }
+                },
+                Acta: {
+                    open: function() {
+                        document.getElementById('modal-acta').classList.remove('hidden');
+                        document.getElementById('modal-acta').classList.add('flex');
+                    },
+                    close: function() {
+                        document.getElementById('modal-acta').classList.add('hidden');
+                        document.getElementById('modal-acta').classList.remove('flex');
+                    }
                 }
             }
         };
 
-        // --- INICIALIZACIÓN ---
-        window.addEventListener('DOMContentLoaded', () => {
-            App.Store.init();
-            App.Router.navigate('dashboard');
+        // --- INICIALIZACIÓN DEL SISTEMA ---
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log("-----------------------------------------");
+            console.log("   IDEAS TEXTILES ERP V15 - STARTUP      ");
+            console.log("-----------------------------------------");
+            
+            App.Data.init();
+            App.UI.init();
+            App.Router.go('dashboard'); // Vista inicial
         });
 
     </script>
