@@ -1,1160 +1,761 @@
 <!DOCTYPE html>
-<html lang="es" class="antialiased">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <meta name="description" content="Sistema ERP Corporativo - Ideas Textiles SpA">
-    <meta name="author" content="Ideas Textiles Engineering">
-    <meta name="theme-color" content="#008080">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>IDEAS TEXTILES | ERP V15 ENTERPRISE</title>
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>IDEAS TEXTILES SPA | ERP SYSTEM v15.0 - UNLIMITED</title>
+    
     <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        teal: { 
-                            50: '#f0fdfa', 100: '#ccfbf1', 200: '#99f6e4', 
-                            300: '#5eead4', 400: '#2dd4bf', 500: '#14b8a6', 
-                            600: '#0d9488', 700: '#0f766e', 800: '#115e59', 900: '#134e4a' 
-                        },
-                        slate: { 850: '#1e293b' } // Color oscuro corporativo
-                    },
-                    fontFamily: {
-                        sans: ['Inter', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
-                        mono: ['JetBrains Mono', 'Menlo', 'Monaco', 'Courier New', 'monospace'],
-                    },
-                    boxShadow: {
-                        'glass': '0 8px 32px 0 rgba( 31, 38, 135, 0.37 )',
-                        'neumorph': '20px 20px 60px #d1d5db, -20px -20px 60px #ffffff',
-                    }
-                }
-            }
-        }
-    </script>
-
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
-    
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
-    
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
+
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+
     <script>
-        // Configuración del Worker para PDF.js
-        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';
     </script>
 
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
     <style>
-        /* --- VARIABLES GLOBALES --- */
         :root {
-            --primary-color: #008080; /* Teal Ideas Textiles */
-            --secondary-color: #0f766e;
-            --accent-color: #2dd4bf;
-            --bg-color: #f8fafc;
-            --surface-color: #ffffff;
-            --text-main: #0f172a;
-            --text-muted: #64748b;
-            --border-radius: 12px;
+            --brand-dark: #0f172a;
+            --brand-primary: #2563eb;
+            --brand-accent: #3b82f6;
+            --bg-app: #f8fafc;
+            --glass-bg: rgba(255, 255, 255, 0.95);
+            --border-light: #e2e8f0;
+            --shadow-soft: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            --shadow-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
         }
 
         body {
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            /* Font smoothing para legibilidad estilo Apple */
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-app);
+            color: #334155;
             -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
+            overflow-x: hidden;
         }
 
-        /* --- UTILIDADES DE CRISTAL (GLASSMORPHISM) --- */
-        .glass-panel {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.5);
+        /* --- COMPONENTES DE UI MEJORADOS --- */
+        .nav-bubble {
+            position: relative; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow: hidden; border: 1px solid transparent;
+        }
+        .nav-bubble:hover {
+            transform: translateY(-2px); background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+        .nav-bubble.active {
+            background: white; color: var(--brand-dark);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            font-weight: 800;
+        }
+        .nav-bubble.active i { color: var(--brand-primary); }
+
+        .card-glass {
+            background: white; border-radius: 20px; border: 1px solid var(--border-light);
+            padding: 24px; transition: all 0.3s ease; position: relative;
+            box-shadow: var(--shadow-soft);
+        }
+        .card-glass:hover {
+            transform: translateY(-4px); box-shadow: var(--shadow-hover);
+            border-color: #3b82f6;
         }
 
-        /* --- BOTONES ESTILO iOS --- */
-        .btn-action {
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-            overflow: hidden;
+        .search-input {
+            background: #f1f5f9; border: 1px solid #e2e8f0; border-radius: 12px;
+            padding: 12px 16px; font-size: 0.9rem; font-weight: 600; color: #334155;
+            transition: all 0.3s; width: 100%;
         }
-        .btn-action:active {
-            transform: scale(0.97);
-        }
-        .btn-action::after {
-            content: "";
-            position: absolute;
-            top: 50%; left: 50%;
-            width: 0; height: 0;
-            background: rgba(255,255,255,0.2);
-            border-radius: 50%;
-            transform: translate(-50%, -50%);
-            transition: width 0.3s, height 0.3s;
-        }
-        .btn-action:hover::after {
-            width: 300px; height: 300px;
+        .search-input:focus {
+            background: white; border-color: var(--brand-primary); outline: none;
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
         }
 
-        /* --- INPUTS & FORMULARIOS --- */
-        .form-input-pro {
-            width: 100%;
-            padding: 0.75rem 1rem;
-            border: 1px solid #e2e8f0;
-            border-radius: 0.5rem;
-            background-color: #fff;
-            transition: border-color 0.2s, box-shadow 0.2s;
-            font-size: 0.95rem;
-        }
-        .form-input-pro:focus {
-            outline: none;
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(0, 128, 128, 0.15);
-        }
+        .btn-action { transition: all 0.2s active; cursor: pointer; user-select: none; }
+        .btn-action:active { transform: scale(0.95); }
 
-        /* --- ANIMACIONES --- */
-        @keyframes slideInUp {
-            from { transform: translateY(20px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-        .animate-enter {
-            animation: slideInUp 0.4s ease-out forwards;
-        }
-
-        /* --- ESTILOS ESPECÍFICOS DEL CALENDARIO (PRESERVADOS) --- */
-        .calendar-grid {
+        /* --- TACHAS 3 COLUMNAS --- */
+        .label-grid {
             display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            gap: 1px;
-            background-color: #e5e7eb;
-            border: 1px solid #e5e7eb;
-            border-radius: 0.5rem;
-            overflow: hidden;
-        }
-        .calendar-day {
-            background-color: white;
-            min-height: 120px;
-            padding: 0.5rem;
-            transition: background-color 0.2s;
-            position: relative;
-        }
-        .calendar-day:hover {
-            background-color: #f0fdfa; /* Teal 50 */
-        }
-        .calendar-day-header {
-            font-size: 0.75rem;
-            font-weight: 700;
-            color: var(--text-muted);
-            margin-bottom: 0.5rem;
-            display: flex;
-            justify-content: space-between;
-        }
-        .task-chip {
-            background-color: #ccfbf1; /* Teal 100 */
-            color: #0f766e; /* Teal 700 */
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-size: 0.7rem;
-            margin-bottom: 2px;
-            cursor: pointer;
-            border-left: 3px solid #0d9488;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
         }
 
-        /* --- ESTILOS DE IMPRESIÓN (PDF PREVIEW) --- */
-        @media print {
-            .no-print { display: none !important; }
-            .print-only { display: block !important; }
-            body { background: white; }
+        /* --- CALENDARIO & PLANNER --- */
+        .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; }
+        .cal-day {
+            min-height: 130px; background: white; border-radius: 14px;
+            border: 1px solid #f1f5f9; padding: 10px; display: flex; flex-direction: column;
+            cursor: pointer; transition: 0.2s; position: relative;
         }
-
-        /* --- SCROLLBARS ELEGANTES --- */
-        ::-webkit-scrollbar { width: 8px; height: 8px; }
-        ::-webkit-scrollbar-track { background: #f1f5f9; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: var(--primary-color); }
+        .cal-day:hover { border-color: var(--brand-primary); background: #f8fafc; z-index: 10; transform: scale(1.02); }
+        .cal-day.today { background: #eff6ff; border: 2px solid var(--brand-primary); }
+        .cal-event {
+            font-size: 0.7rem; padding: 4px 8px; border-radius: 6px; margin-top: 4px;
+            font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+            display: flex; align-items: center; gap: 4px; border-left: 4px solid;
+        }
         
-        /* --- CHIPS DE SUGERENCIAS FLOTANTES --- */
-        .suggestions-box {
-            position: absolute;
-            background: white;
-            border: 1px solid #e2e8f0;
-            border-radius: 0.5rem;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-            z-index: 50;
-            width: 100%;
+        /* --- ESTADOS PIPELINE --- */
+        .st-pendiente { background-color: #f1f5f9; color: #64748b; border-color: #cbd5e1; }
+        .st-proceso { background-color: #fff7ed; color: #c2410c; border-color: #fdba74; }
+        .st-empaquetado { background-color: #eff6ff; color: #1e40af; border-color: #93c5fd; }
+        .st-despachado { background-color: #f0fdf4; color: #15803d; border-color: #86efac; }
+        
+        /* --- MODO SABUESO (LOGS) --- */
+        .sabueso-log {
+            font-family: 'JetBrains Mono', monospace;
+            background: #0f172a;
+            color: #10b981;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 11px;
             max-height: 200px;
             overflow-y: auto;
         }
-        .suggestion-item {
-            padding: 0.5rem 1rem;
-            cursor: pointer;
-            font-size: 0.875rem;
+
+        /* GEMINI STYLES */
+        .gemini-glow { animation: geminiPulse 2s infinite; }
+        @keyframes geminiPulse { 0% { box-shadow: 0 0 0 0 rgba(147, 51, 234, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(147, 51, 234, 0); } 100% { box-shadow: 0 0 0 0 rgba(147, 51, 234, 0); } }
+
+        @media (max-width: 1024px) {
+            .sidebar {
+                position: fixed; bottom: 0; left: 0; width: 100%; height: auto;
+                flex-direction: row; justify-content: space-evenly;
+                border-radius: 24px 24px 0 0; padding: 12px; z-index: 50;
+                background: #0f172a; box-shadow: 0 -4px 20px rgba(0,0,0,0.5);
+            }
+            .sidebar-logo, .nav-label, .sidebar-footer { display: none; }
+            .nav-bubble { padding: 12px; width: 55px; height: 55px; display: flex; align-items: center; justify-content: center; border-radius: 50%; }
+            main { padding-bottom: 120px; }
         }
-        .suggestion-item:hover {
-            background-color: #f0fdfa;
-            color: var(--primary-color);
-        }
+
+        .hidden { display: none !important; }
+        .fade-in { animation: fadeIn 0.4s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* CUSTOM SCROLLBAR */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
     </style>
 </head>
-<body class="h-screen flex flex-col md:flex-row overflow-hidden bg-slate-50 text-slate-800">
+<body class="selection:bg-blue-100">
 
-    <aside class="w-72 bg-white border-r border-slate-200 hidden md:flex flex-col z-30 shadow-xl transition-all duration-300">
+    <div id="loader" class="fixed inset-0 bg-slate-950 z-[100] flex flex-col justify-center items-center text-white transition-opacity duration-700">
+        <div class="relative mb-8">
+            <div class="w-24 h-24 border-8 border-blue-500/20 border-t-blue-500 rounded-full animate-spin"></div>
+            <i class="fas fa-microchip absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-3xl text-blue-400 animate-pulse"></i>
+        </div>
+        <h2 class="font-black text-3xl tracking-[10px] uppercase italic">IDEAS TEXTILES</h2>
+        <p class="text-xs font-bold text-slate-400 mt-4 uppercase tracking-[4px]">Sincronizando con Red Neuronal Firebase...</p>
+        <div class="mt-8 w-48 bg-slate-800 h-1 rounded-full overflow-hidden">
+            <div id="loader-bar" class="bg-blue-500 h-full w-0 transition-all duration-300"></div>
+        </div>
+    </div>
+
+    <div id="config-modal" class="fixed inset-0 bg-slate-900/90 z-[95] hidden p-4 flex items-center justify-center backdrop-blur-sm">
+        <div class="bg-white w-full max-w-lg rounded-3xl shadow-2xl p-8 animate__animated animate__fadeInUp">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="font-black text-2xl text-slate-800 flex items-center gap-3">
+                    <i class="fas fa-satellite-dish text-blue-600"></i> CONFIGURACIÓN CORE
+                </h3>
+                <button onclick="document.getElementById('config-modal').classList.add('hidden')" class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 hover:text-red-500 transition">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="space-y-6">
+                <div>
+                    <label class="block text-xs font-black text-slate-500 uppercase tracking-widest mb-2">Google Gemini API Key</label>
+                    <div class="relative">
+                        <i class="fas fa-brain absolute left-4 top-1/2 transform -translate-y-1/2 text-purple-400"></i>
+                        <input type="password" id="gemini-api-key" class="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl pl-12 pr-4 py-4 text-sm font-mono focus:border-purple-500 outline-none transition" placeholder="AI-Key-...">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-black text-slate-500 uppercase tracking-widest mb-2">Firebase Config (JSON)</label>
+                    <textarea id="firebase-config-input" rows="4" class="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl p-4 text-[10px] font-mono focus:border-blue-500 outline-none transition" placeholder='{"apiKey": "...", "databaseURL": "..."}'></textarea>
+                </div>
+
+                <button onclick="App.Core.saveConfig()" class="w-full bg-slate-900 text-white font-black py-5 rounded-2xl hover:bg-blue-600 transition shadow-xl shadow-blue-500/20 uppercase tracking-widest">
+                    REINICIAR SISTEMA CON NUEVA CONFIG
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="sabueso-modal" class="fixed inset-0 bg-slate-950/80 z-[95] hidden p-4 flex items-center justify-center backdrop-blur-md">
+        <div class="bg-white w-full max-w-4xl h-[80vh] rounded-3xl shadow-2xl flex flex-col overflow-hidden animate__animated animate__zoomIn">
+            <div class="bg-slate-900 p-6 flex justify-between items-center text-white">
+                <div>
+                    <h3 class="font-black text-xl flex items-center gap-3">
+                        <i class="fas fa-dog text-orange-400"></i> MOTOR SABUESO v2.1
+                    </h3>
+                    <p class="text-xs text-slate-400">Rastreador de datos en Excel/PDF para importación masiva</p>
+                </div>
+                <button onclick="document.getElementById('sabueso-modal').classList.add('hidden')" class="text-slate-400 hover:text-white"><i class="fas fa-times text-2xl"></i></button>
+            </div>
+            
+            <div class="flex-1 p-8 overflow-y-auto">
+                <div id="sabueso-drop-zone" class="border-4 border-dashed border-slate-200 rounded-3xl p-12 flex flex-col items-center justify-center text-slate-400 hover:border-blue-500 hover:bg-blue-50 transition cursor-pointer mb-8">
+                    <i class="fas fa-cloud-upload-alt text-6xl mb-4"></i>
+                    <p class="font-bold">Arrastra el archivo de despacho o Excel de producción</p>
+                    <p class="text-xs mt-2 italic">Soportamos .xlsx, .xls y .pdf</p>
+                    <input type="file" id="sabueso-file-input" class="hidden" accept=".xlsx,.xls,.pdf">
+                </div>
+
+                <div id="sabueso-results" class="hidden">
+                    <h4 class="font-black text-slate-800 mb-4 flex items-center gap-2">
+                        <i class="fas fa-microscope text-blue-600"></i> DATOS ENCONTRADOS
+                    </h4>
+                    <div id="sabueso-log-container" class="sabueso-log mb-6"></div>
+                    <div id="sabueso-table-preview" class="overflow-x-auto rounded-xl border border-slate-100"></div>
+                </div>
+            </div>
+
+            <div class="p-6 border-t border-slate-100 flex justify-end gap-4">
+                <button onclick="App.Logic.Sabueso.reset()" class="px-6 py-3 font-bold text-slate-500 hover:text-slate-800">LIMPIAR</button>
+                <button id="sabueso-import-btn" class="hidden px-8 py-3 bg-blue-600 text-white font-black rounded-xl shadow-lg hover:bg-blue-700 transition">IMPORTAR A BODEGA</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="flex flex-col lg:flex-row min-h-screen">
         
-        <div class="h-40 flex flex-col items-center justify-center border-b border-slate-100 bg-gradient-to-b from-teal-50 to-white relative overflow-hidden group">
-            <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
-            
-            <div class="z-10 transform transition-transform duration-500 group-hover:scale-110 cursor-pointer" onclick="App.UI.animateLogo()">
-                <svg width="80" height="80" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <circle cx="50" cy="50" r="48" stroke="#008080" stroke-width="3" fill="white" class="shadow-sm"/>
-                    <path d="M35 30 C28 18 42 8 48 22 L50 45 L52 22 C58 8 72 18 65 30 L55 55 L75 85 L70 90 L50 65 L30 90 L25 85 L45 55 Z" fill="#008080"/>
-                    <circle cx="40" cy="22" r="4" fill="white"/>
-                    <circle cx="60" cy="22" r="4" fill="white"/>
-                    <circle cx="50" cy="50" r="3" fill="white"/>
-                </svg>
-            </div>
-            
-            <div class="z-10 mt-3 text-center">
-                <h1 class="text-xl font-black text-slate-800 tracking-tight leading-none">IDEAS TEXTILES</h1>
-                <p class="text-[10px] font-bold text-teal-600 tracking-[0.2em] uppercase mt-1">Enterprise V15</p>
-            </div>
-        </div>
-
-        <nav class="flex-1 overflow-y-auto py-6 px-3 space-y-1">
-            <p class="px-4 text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Operaciones</p>
-            
-            <button onclick="App.Router.go('dashboard')" id="nav-dash" class="btn-action w-full flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 hover:bg-teal-50 hover:text-teal-700 font-medium group">
-                <i class="fas fa-chart-pie w-5 text-slate-400 group-hover:text-teal-600 transition-colors"></i> 
-                <span>Dashboard</span>
-            </button>
-            
-            <button onclick="App.Router.go('orders')" id="nav-orders" class="btn-action w-full flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 hover:bg-teal-50 hover:text-teal-700 font-medium group">
-                <i class="fas fa-file-invoice w-5 text-slate-400 group-hover:text-teal-600 transition-colors"></i> 
-                <span>Órdenes de Compra</span>
-            </button>
-            
-            <button onclick="App.Router.go('inventory')" id="nav-inv" class="btn-action w-full flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 hover:bg-teal-50 hover:text-teal-700 font-medium group">
-                <i class="fas fa-boxes-stacked w-5 text-slate-400 group-hover:text-teal-600 transition-colors"></i> 
-                <span>Inventario Bodega</span>
-            </button>
-
-            <div class="my-4 border-t border-slate-100"></div>
-            
-            <p class="px-4 text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Planificación</p>
-
-            <button onclick="App.Router.go('calendar')" id="nav-cal" class="btn-action w-full flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 hover:bg-teal-50 hover:text-teal-700 font-medium group">
-                <i class="fas fa-calendar-alt w-5 text-orange-400 group-hover:text-orange-600 transition-colors"></i> 
-                <span>Calendario & Planner</span>
-            </button>
-
-            <button onclick="App.Router.go('agenda')" id="nav-agenda" class="btn-action w-full flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 hover:bg-teal-50 hover:text-teal-700 font-medium group">
-                <i class="fas fa-list-check w-5 text-blue-400 group-hover:text-blue-600 transition-colors"></i> 
-                <span>Agenda Semanal</span>
-            </button>
-            
-            <div class="my-4 border-t border-slate-100"></div>
-
-            <button onclick="App.Modals.Acta.open()" class="btn-action w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-teal-50 text-teal-800 border border-teal-100 hover:bg-teal-100 font-bold shadow-sm mb-2">
-                <i class="fas fa-print w-5"></i> 
-                <span>Acta Rápida</span>
-            </button>
-
-            <button onclick="App.System.backup()" class="btn-action w-full flex items-center gap-3 px-4 py-3 rounded-xl text-slate-500 hover:text-slate-800 font-medium">
-                <i class="fas fa-download w-5"></i> 
-                <span>Respaldo Manual</span>
-            </button>
-        </nav>
-
-        <div class="p-4 bg-slate-50 border-t border-slate-200">
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-full bg-teal-700 text-white flex items-center justify-center font-bold shadow-lg border-2 border-white">
-                    AC
+        <aside class="sidebar bg-[#0b1120] text-slate-400 w-full lg:w-80 lg:p-8 flex lg:flex-col justify-between relative shadow-2xl z-40 border-r border-slate-800">
+            <div class="sidebar-logo z-10 mb-12">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 bg-blue-600 rounded-2xl flex items-center justify-center shadow-2xl shadow-blue-500/50 rotate-3">
+                        <i class="fas fa-vector-square text-white text-2xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="font-black italic text-xl leading-none tracking-tighter text-white">IDEAS<br><span class="text-blue-500">TEXTILES</span></h1>
+                    </div>
                 </div>
-                <div class="flex-1 min-w-0">
-                    <p class="text-sm font-bold text-slate-900 truncate">Alejandro Cisterna</p>
-                    <p class="text-xs text-slate-500 truncate">Gerente General</p>
-                </div>
-                <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
             </div>
-        </div>
-    </aside>
 
-    <header class="md:hidden bg-white/90 backdrop-blur-md h-16 border-b border-slate-200 flex items-center justify-between px-4 sticky top-0 z-50">
-        <div class="flex items-center gap-2">
-            <i class="fas fa-cut text-teal-600 text-xl"></i>
-            <span class="font-black text-slate-800 tracking-tight">IDEAS TEXTILES</span>
-        </div>
-        <button onclick="document.querySelector('aside').classList.toggle('hidden'); document.querySelector('aside').classList.toggle('fixed'); document.querySelector('aside').classList.toggle('inset-0');" class="p-2 text-slate-600 rounded-lg active:bg-slate-100">
-            <i class="fas fa-bars text-xl"></i>
-        </button>
-    </header>
-    <main class="flex-1 flex flex-col relative overflow-hidden h-full">
-
-        <header class="h-16 bg-white/80 backdrop-blur-md border-b border-slate-200 flex items-center justify-between px-6 z-20">
-            <div class="flex items-center gap-4">
-                <h2 id="page-title" class="text-xl font-black text-slate-800 tracking-tight">PANEL DE CONTROL</h2>
-                <span id="current-date" class="hidden md:inline-block px-3 py-1 bg-slate-100 text-slate-500 rounded-full text-xs font-mono font-bold">CARGANDO FECHA...</span>
-            </div>
-            
-            <div class="flex items-center gap-4">
-                <div class="relative hidden md:block">
-                    <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
-                    <input type="text" placeholder="Buscar OC, Cliente..." class="pl-10 pr-4 py-2 bg-slate-100 border-none rounded-full text-sm focus:ring-2 focus:ring-teal-500 w-64 transition-all">
+            <nav class="flex lg:flex-col gap-3 w-full lg:flex-1 z-10 overflow-x-auto lg:overflow-visible pb-4 lg:pb-0">
+                <div onclick="App.Router.go('dashboard')" id="nav-dashboard" class="nav-bubble active p-4 rounded-2xl cursor-pointer flex items-center gap-4 text-sm font-bold shrink-0">
+                    <i class="fas fa-th-large w-6 text-center text-lg"></i> <span class="nav-label uppercase tracking-widest">Dashboard</span>
                 </div>
+                <div onclick="App.Router.go('inventory')" id="nav-inventory" class="nav-bubble p-4 rounded-2xl cursor-pointer flex items-center gap-4 text-sm font-bold shrink-0">
+                    <i class="fas fa-boxes-stacked w-6 text-center text-lg"></i> <span class="nav-label uppercase tracking-widest">Bodega Central</span>
+                </div>
+                <div onclick="App.Router.go('orders')" id="nav-orders" class="nav-bubble p-4 rounded-2xl cursor-pointer flex items-center gap-4 text-sm font-bold shrink-0">
+                    <i class="fas fa-file-invoice-dollar w-6 text-center text-lg"></i> <span class="nav-label uppercase tracking-widest">Órdenes</span>
+                </div>
+                <div onclick="App.Router.go('sabueso')" id="nav-sabueso" class="nav-bubble p-4 rounded-2xl cursor-pointer flex items-center gap-4 text-sm font-bold shrink-0 bg-blue-500/5 border-blue-500/20">
+                    <i class="fas fa-dog w-6 text-center text-lg text-orange-400"></i> <span class="nav-label uppercase tracking-widest">Sabueso AI</span>
+                </div>
+                <div onclick="App.Router.go('calendar')" id="nav-calendar" class="nav-bubble p-4 rounded-2xl cursor-pointer flex items-center gap-4 text-sm font-bold shrink-0">
+                    <i class="fas fa-calendar-day w-6 text-center text-lg"></i> <span class="nav-label uppercase tracking-widest">Planificación</span>
+                </div>
+            </nav>
 
-                <button onclick="App.Data.clearAll()" class="w-10 h-10 rounded-full bg-rose-50 text-rose-600 hover:bg-rose-500 hover:text-white flex items-center justify-center transition-all" title="Borrar Datos Locales">
-                    <i class="fas fa-trash-alt"></i>
+            <div class="sidebar-footer z-10 mt-auto pt-6 border-t border-slate-800 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center border border-slate-700">
+                        <i class="fas fa-user-shield text-blue-400"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs font-black text-white uppercase">SISTEMA ERP</p>
+                        <p id="user-status" class="text-[9px] text-green-500 font-bold uppercase tracking-tighter">ONLINE SYNC</p>
+                    </div>
+                </div>
+                <button onclick="document.getElementById('config-modal').classList.remove('hidden')" class="w-10 h-10 rounded-xl bg-slate-800 text-slate-400 hover:bg-blue-600 hover:text-white transition">
+                    <i class="fas fa-cog"></i>
                 </button>
             </div>
-        </header>
+        </aside>
 
-        <div id="content-area" class="flex-1 overflow-y-auto p-4 md:p-8 scroll-smooth relative">
+        <main class="flex-1 p-6 lg:p-12 overflow-y-auto relative bg-[#f8fafc]">
+            
+            <div id="connection-status" class="fixed top-6 right-6 z-50 px-4 py-2 rounded-full bg-white shadow-xl border border-slate-100 flex items-center gap-3 animate__animated animate__fadeInRight">
+                <div class="relative flex h-3 w-3">
+                    <span id="ping-indicator" class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
+                </div>
+                <span id="conn-text" class="text-[10px] font-black text-slate-700 uppercase tracking-widest">Firebase Live</span>
+            </div>
 
-            <section id="view-dashboard" class="animate-enter space-y-6">
+            <section id="view-dashboard" class="fade-in space-y-8">
+                <header class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+                    <div>
+                        <h2 class="text-4xl font-black text-slate-900 tracking-tighter italic">PANEL OPERATIVO</h2>
+                        <p class="text-slate-500 font-bold uppercase text-xs tracking-[3px] mt-1">Control de Flujo Global • Ideas Textiles SPA</p>
+                    </div>
+                    <div class="flex gap-4">
+                        <button onclick="App.Logic.Reports.fullSync()" class="bg-white p-4 rounded-2xl shadow-lg border border-slate-100 hover:border-blue-500 transition text-slate-600">
+                            <i class="fas fa-sync-alt"></i>
+                        </button>
+                        <button onclick="App.PDF.Management.generate()" class="bg-slate-900 text-white px-8 py-4 rounded-2xl font-black text-xs uppercase tracking-widest shadow-2xl shadow-slate-900/30 flex items-center gap-3">
+                            <i class="fas fa-file-invoice"></i> Generar Balance
+                        </button>
+                    </div>
+                </header>
+
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 relative overflow-hidden">
-                        <div class="absolute right-0 top-0 w-24 h-24 bg-teal-50 rounded-bl-full -mr-4 -mt-4 z-0"></div>
-                        <div class="relative z-10">
-                            <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Órdenes Activas</p>
-                            <h3 class="text-3xl font-black text-slate-800 mt-2" id="kpi-orders">0</h3>
-                            <p class="text-xs text-teal-600 font-bold mt-1"><i class="fas fa-arrow-up"></i> En proceso</p>
+                    <div class="card-glass bg-gradient-to-br from-blue-600 to-blue-800 text-white border-none">
+                        <p class="text-[10px] font-black uppercase tracking-widest opacity-80">Stock en Bodega</p>
+                        <div class="flex justify-between items-end mt-4">
+                            <h3 id="stat-total-stock" class="text-5xl font-black">0</h3>
+                            <i class="fas fa-box-open text-3xl opacity-30 mb-2"></i>
                         </div>
                     </div>
-                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 relative overflow-hidden">
-                        <div class="absolute right-0 top-0 w-24 h-24 bg-blue-50 rounded-bl-full -mr-4 -mt-4 z-0"></div>
-                        <div class="relative z-10">
-                            <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Unidades Totales</p>
-                            <h3 class="text-3xl font-black text-slate-800 mt-2" id="kpi-units">0</h3>
-                            <p class="text-xs text-blue-600 font-bold mt-1">Inventario Junaeb</p>
+                    <div class="card-glass">
+                        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Órdenes Activas</p>
+                        <div class="flex justify-between items-end mt-4">
+                            <h3 id="stat-active-orders" class="text-5xl font-black text-slate-800">0</h3>
+                            <i class="fas fa-clock text-3xl text-orange-500 opacity-20 mb-2"></i>
                         </div>
                     </div>
-                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 relative overflow-hidden">
-                        <div class="absolute right-0 top-0 w-24 h-24 bg-orange-50 rounded-bl-full -mr-4 -mt-4 z-0"></div>
-                        <div class="relative z-10">
-                            <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Pendientes Agenda</p>
-                            <h3 class="text-3xl font-black text-slate-800 mt-2" id="kpi-tasks">0</h3>
-                            <p class="text-xs text-orange-600 font-bold mt-1">Tareas urgentes</p>
+                    <div class="card-glass">
+                        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Producción Mes</p>
+                        <div class="flex justify-between items-end mt-4">
+                            <h3 id="stat-month-prod" class="text-5xl font-black text-slate-800">0</h3>
+                            <i class="fas fa-industry text-3xl text-blue-500 opacity-20 mb-2"></i>
                         </div>
                     </div>
-                     <div class="bg-gradient-to-br from-teal-600 to-teal-800 p-6 rounded-2xl shadow-lg text-white relative overflow-hidden cursor-pointer hover:scale-[1.02] transition-transform" onclick="document.getElementById('file-input').click()">
-                        <div class="relative z-10 flex flex-col h-full justify-between">
-                            <div>
-                                <i class="fas fa-cloud-upload-alt text-3xl opacity-80"></i>
-                                <h3 class="text-lg font-bold mt-2">Carga Rápida</h3>
+                    <div class="card-glass">
+                        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Eficiencia</p>
+                        <div class="flex justify-between items-end mt-4">
+                            <h3 id="stat-efficiency" class="text-5xl font-black text-slate-800">98%</h3>
+                            <i class="fas fa-bolt text-3xl text-yellow-500 opacity-20 mb-2"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <div class="card-glass border-l-8 border-l-blue-600">
+                        <div class="flex justify-between items-center mb-6">
+                            <h4 class="font-black text-xl text-slate-800 italic uppercase">Logística en Tiempo Real</h4>
+                            <span class="text-[10px] bg-blue-100 text-blue-700 px-3 py-1 rounded-full font-black">LIVE STREAM</span>
+                        </div>
+                        <div id="dashboard-recent-activity" class="space-y-4">
                             </div>
-                            <p class="text-xs opacity-70">Sube PDF o Excel aquí</p>
+                    </div>
+                    <div class="card-glass border-l-8 border-l-orange-500">
+                        <div class="flex justify-between items-center mb-6">
+                            <h4 class="font-black text-xl text-slate-800 italic uppercase">Alertas de Stock</h4>
+                            <i class="fas fa-exclamation-triangle text-orange-500"></i>
                         </div>
-                    </div>
-                </div>
-
-                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 min-h-[300px] flex items-center justify-center flex-col text-slate-300">
-                    <i class="fas fa-chart-area text-6xl mb-4 opacity-20"></i>
-                    <p class="text-sm font-medium">Visualización de métricas en desarrollo...</p>
-                </div>
-            </section>
-
-            <section id="view-orders" class="hidden animate-enter space-y-6">
-                
-                <div class="bg-white p-8 rounded-3xl border-2 border-dashed border-slate-300 hover:border-teal-500 hover:bg-teal-50 transition-all cursor-pointer group text-center"
-                     ondragover="event.preventDefault(); this.classList.add('border-teal-500', 'bg-teal-50');"
-                     ondragleave="this.classList.remove('border-teal-500', 'bg-teal-50');"
-                     ondrop="App.Sabueso.handleDrop(event)"
-                     onclick="document.getElementById('file-input').click()">
-                    
-                    <input type="file" id="file-input" class="hidden" accept=".pdf,.xlsx,.xls,.csv" multiple onchange="App.Sabueso.handleFiles(this.files)">
-                    
-                    <div class="w-20 h-20 bg-teal-100 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
-                        <i class="fas fa-file-import text-3xl text-teal-600"></i>
-                    </div>
-                    <h3 class="text-xl font-bold text-slate-800">Arrastra tus archivos aquí</h3>
-                    <p class="text-slate-500 mt-2">Soporta: Excel Junaeb, PDF Tiojano, CSV Inventario</p>
-                    <button class="mt-4 px-6 py-2 bg-teal-600 text-white rounded-full text-sm font-bold shadow-lg hover:bg-teal-700 transition-colors">
-                        Seleccionar Archivos
-                    </button>
-                </div>
-
-                <div class="flex flex-wrap gap-3 items-center justify-between bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-                    <div class="flex items-center gap-2">
-                        <span class="text-sm font-bold text-slate-500">Acciones Masivas:</span>
-                    </div>
-                    <div class="flex gap-2">
-                        <button onclick="App.Printers.printTacha3Cols()" class="px-4 py-2 bg-slate-800 text-white rounded-lg text-sm font-bold hover:bg-slate-900 flex items-center gap-2">
-                            <i class="fas fa-print"></i> Tacha 3 Columnas (Oficio)
-                        </button>
-                        <button onclick="App.Modals.EditOrder.create()" class="px-4 py-2 bg-teal-600 text-white rounded-lg text-sm font-bold hover:bg-teal-700 flex items-center gap-2">
-                            <i class="fas fa-plus"></i> Nueva Manual
-                        </button>
-                    </div>
-                </div>
-
-                <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left text-sm">
-                            <thead class="bg-slate-50 border-b border-slate-200 text-slate-500 uppercase text-xs">
-                                <tr>
-                                    <th class="px-6 py-4 font-bold">Fecha / ID</th>
-                                    <th class="px-6 py-4 font-bold">Cliente / Origen</th>
-                                    <th class="px-6 py-4 font-bold">Detalle Rápido</th>
-                                    <th class="px-6 py-4 font-bold">Estado</th>
-                                    <th class="px-6 py-4 font-bold text-right">Acciones</th>
-                                </tr>
-                            </thead>
-                            <tbody id="orders-table-body" class="divide-y divide-slate-100">
-                                <tr>
-                                    <td colspan="5" class="px-6 py-12 text-center text-slate-400">
-                                        <i class="fas fa-inbox text-4xl mb-3 block opacity-20"></i>
-                                        No hay órdenes cargadas hoy. Sube un PDF o Excel.
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
+                        <div id="dashboard-stock-alerts" class="space-y-3">
+                            </div>
                     </div>
                 </div>
             </section>
 
-            <section id="view-inventory" class="hidden animate-enter space-y-6">
-                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-                    <div class="flex justify-between items-center mb-6">
-                        <h3 class="text-lg font-bold text-slate-800">Inventario Bodega Junaeb</h3>
-                        <input type="text" id="inv-search" onkeyup="App.Inventory.filter()" placeholder="Filtrar producto..." class="form-input-pro w-64">
-                    </div>
-                    
-                    <div class="overflow-x-auto rounded-lg border border-slate-200">
-                        <table class="w-full text-sm" id="inventory-table">
-                            <thead class="bg-slate-100 text-slate-600 font-bold uppercase text-xs">
-                                <tr>
-                                    <th class="p-3 text-left">Producto</th>
-                                    <th class="p-3 text-center w-12 bg-slate-200">XS</th>
-                                    <th class="p-3 text-center w-12 bg-slate-200">S</th>
-                                    <th class="p-3 text-center w-12 bg-slate-200">M</th>
-                                    <th class="p-3 text-center w-12 bg-slate-200">L</th>
-                                    <th class="p-3 text-center w-12 bg-slate-200">XL</th>
-                                    <th class="p-3 text-center w-12 bg-slate-200">XXL</th>
-                                    <th class="p-3 text-right">Total</th>
-                                </tr>
-                            </thead>
-                            <tbody id="inventory-body" class="divide-y divide-slate-100 bg-white">
-                                </tbody>
-                        </table>
-                    </div>
-                </div>
-            </section>
-
-            <section id="view-calendar" class="hidden animate-enter space-y-6">
-                
-                <div class="flex items-center justify-between bg-white p-4 rounded-xl shadow-sm border border-slate-200">
-                    <button onclick="App.Calendar.prevMonth()" class="w-10 h-10 rounded-lg hover:bg-slate-100 flex items-center justify-center text-slate-600">
-                        <i class="fas fa-chevron-left"></i>
-                    </button>
-                    
-                    <h2 id="calendar-month-year" class="text-2xl font-black text-slate-800 uppercase tracking-tight">ENERO 2026</h2>
-                    
-                    <button onclick="App.Calendar.nextMonth()" class="w-10 h-10 rounded-lg hover:bg-slate-100 flex items-center justify-center text-slate-600">
-                        <i class="fas fa-chevron-right"></i>
-                    </button>
-                </div>
-
-                <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
-                    <div class="grid grid-cols-7 mb-2 text-center">
-                        <div class="text-xs font-bold text-teal-600 uppercase py-2">Lun</div>
-                        <div class="text-xs font-bold text-teal-600 uppercase py-2">Mar</div>
-                        <div class="text-xs font-bold text-teal-600 uppercase py-2">Mié</div>
-                        <div class="text-xs font-bold text-teal-600 uppercase py-2">Jue</div>
-                        <div class="text-xs font-bold text-teal-600 uppercase py-2">Vie</div>
-                        <div class="text-xs font-bold text-red-500 uppercase py-2">Sáb</div>
-                        <div class="text-xs font-bold text-red-500 uppercase py-2">Dom</div>
-                    </div>
-                    
-                    <div id="calendar-days" class="calendar-grid">
-                        </div>
-                </div>
-
-                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 mt-6">
-                    <div class="flex justify-between items-center mb-4">
-                        <h3 class="text-lg font-bold text-slate-800" id="selected-date-title">Tareas del Día</h3>
-                        <button onclick="App.Modals.Task.open()" class="px-4 py-2 bg-teal-600 text-white rounded-lg text-sm font-bold hover:bg-teal-700">
-                            <i class="fas fa-plus mr-2"></i> Agregar Nota
-                        </button>
-                    </div>
-                    <ul id="day-task-list" class="space-y-2">
-                        <li class="text-slate-400 text-sm italic text-center py-4">Selecciona un día para ver sus notas.</li>
-                    </ul>
-                </div>
-            </section>
-
-            <section id="view-agenda" class="hidden animate-enter space-y-4">
-                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 min-h-[500px]">
-                    <h2 class="text-2xl font-black text-slate-800 mb-6 border-b border-slate-100 pb-4">Agenda Completa</h2>
-                    <div id="agenda-full-list" class="space-y-3">
-                        </div>
-                </div>
-            </section>
-
-        </div> </main>
-
-    <div id="modal-edit-order" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden animate__animated animate__zoomIn">
-            <div class="bg-slate-50 px-6 py-4 border-b border-slate-200 flex justify-between items-center">
-                <h3 class="font-bold text-lg text-slate-800">Editar / Crear Orden</h3>
-                <button onclick="App.Modals.EditOrder.close()" class="text-slate-400 hover:text-slate-600"><i class="fas fa-times text-xl"></i></button>
-            </div>
-            <div class="p-6 space-y-4">
-                <input type="hidden" id="edit-order-id">
-                <div>
-                    <label class="block text-xs font-bold text-slate-500 mb-1">Número OC / Cliente</label>
-                    <input type="text" id="edit-order-client" class="form-input-pro font-bold text-lg" placeholder="EJ: OC-5050 TIENDAS PARIS">
-                </div>
-                <div class="grid grid-cols-2 gap-4">
+            <section id="view-inventory" class="hidden fade-in space-y-8">
+                <header class="flex flex-col md:flex-row justify-between items-center gap-6">
                     <div>
-                        <label class="block text-xs font-bold text-slate-500 mb-1">Fecha</label>
-                        <input type="date" id="edit-order-date" class="form-input-pro">
+                        <h2 class="text-4xl font-black text-slate-900 tracking-tighter">BODEGA CENTRAL</h2>
+                        <p class="text-slate-500 font-bold uppercase text-xs tracking-widest">Maestro de Telas y Prendas</p>
                     </div>
-                    <div>
-                        <label class="block text-xs font-bold text-slate-500 mb-1">Factura (Opcional)</label>
-                        <input type="text" id="edit-order-invoice" class="form-input-pro" placeholder="N° Factura">
+                    <div class="flex gap-3 w-full md:w-auto">
+                        <div class="relative flex-1">
+                            <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                            <input type="text" oninput="App.Logic.Inventory.filter(this.value)" class="search-input pl-12" placeholder="Buscar por SKU, Nombre o Categoría...">
+                        </div>
+                        <button onclick="App.UI.Modals.openProduct()" class="bg-slate-900 text-white px-8 py-4 rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl flex items-center gap-3">
+                            <i class="fas fa-plus"></i> NUEVO SKU
+                        </button>
                     </div>
-                </div>
-                <div>
-                    <label class="block text-xs font-bold text-slate-500 mb-1">Contenido (Texto libre o JSON)</label>
-                    <textarea id="edit-order-content" rows="6" class="form-input-pro font-mono text-xs" placeholder="Pega aquí el detalle o escribe las notas..."></textarea>
-                </div>
-            </div>
-            <div class="bg-slate-50 px-6 py-4 border-t border-slate-200 flex justify-end gap-3">
-                <button onclick="App.Modals.EditOrder.close()" class="px-4 py-2 text-slate-600 font-bold hover:bg-slate-200 rounded-lg">Cancelar</button>
-                <button onclick="App.Modals.EditOrder.save()" class="px-6 py-2 bg-teal-600 text-white font-bold rounded-lg shadow-lg hover:bg-teal-700">Guardar Cambios</button>
-            </div>
-        </div>
-    </div>
+                </header>
 
-    <div id="modal-task" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md animate__animated animate__fadeInUp">
-            <div class="p-6">
-                <h3 class="font-black text-xl text-slate-800 mb-4">Nueva Nota</h3>
-                <input type="text" id="task-input" class="form-input-pro mb-4" placeholder="Escribe tu recordatorio aquí..." autofocus>
+                <div id="inventory-container" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                    </div>
+            </section>
+
+            <section id="view-orders" class="hidden fade-in space-y-8">
+                <header class="flex justify-between items-center">
+                    <h2 class="text-4xl font-black text-slate-900 tracking-tighter italic">ÓRDENES DE TRABAJO</h2>
+                    <div class="flex gap-4">
+                        <button onclick="App.PDF.Labels.generate3Columns()" class="bg-orange-600 text-white px-6 py-3 rounded-xl font-bold text-xs uppercase flex items-center gap-2">
+                            <i class="fas fa-print"></i> TACHAS 3 COL
+                        </button>
+                        <button onclick="App.UI.Modals.openOrder()" class="bg-blue-600 text-white px-6 py-3 rounded-xl font-bold text-xs uppercase flex items-center gap-2">
+                            <i class="fas fa-file-medical"></i> CREAR ORDEN
+                        </button>
+                    </div>
+                </header>
                 
-                <div class="flex gap-2 mb-4">
-                    <button onclick="document.getElementById('task-color').value='teal'" class="w-8 h-8 rounded-full bg-teal-500 border-2 border-white shadow-sm ring-2 ring-transparent focus:ring-teal-300"></button>
-                    <button onclick="document.getElementById('task-color').value='orange'" class="w-8 h-8 rounded-full bg-orange-500 border-2 border-white shadow-sm ring-2 ring-transparent focus:ring-orange-300"></button>
-                    <button onclick="document.getElementById('task-color').value='blue'" class="w-8 h-8 rounded-full bg-blue-500 border-2 border-white shadow-sm ring-2 ring-transparent focus:ring-blue-300"></button>
-                    <button onclick="document.getElementById('task-color').value='red'" class="w-8 h-8 rounded-full bg-red-500 border-2 border-white shadow-sm ring-2 ring-transparent focus:ring-red-300"></button>
-                    <input type="hidden" id="task-color" value="teal">
+                <div class="flex bg-white rounded-2xl p-2 shadow-sm border border-slate-100 w-fit mb-6">
+                    <button class="px-6 py-2 rounded-xl text-xs font-black uppercase bg-slate-100 text-slate-800">Todas</button>
+                    <button class="px-6 py-2 rounded-xl text-xs font-black uppercase text-slate-400 hover:text-slate-800">Pendientes</button>
+                    <button class="px-6 py-2 rounded-xl text-xs font-black uppercase text-slate-400 hover:text-slate-800">Finalizadas</button>
                 </div>
 
-                <div class="flex justify-end gap-2">
-                    <button onclick="App.Modals.Task.close()" class="btn-action px-4 py-2 text-slate-500 font-bold">Cancelar</button>
-                    <button onclick="App.Modals.Task.save()" class="btn-action px-6 py-2 bg-teal-600 text-white rounded-lg font-bold shadow-md">Guardar</button>
-                </div>
-            </div>
-        </div>
+                <div id="orders-list" class="space-y-4">
+                    </div>
+            </section>
+
+        </main>
     </div>
 
-    <div id="modal-acta" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl animate__animated animate__fadeInDown">
-            <div class="bg-teal-600 px-6 py-4 rounded-t-2xl flex justify-between items-center text-white">
-                <h3 class="font-bold text-lg"><i class="fas fa-file-signature mr-2"></i> Generar Acta de Recepción</h3>
-                <button onclick="App.Modals.Acta.close()" class="text-white/80 hover:text-white"><i class="fas fa-times"></i></button>
-            </div>
-            <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div class="col-span-2">
-                    <label class="label-pro">Título del Documento</label>
-                    <input type="text" id="acta-title" class="form-input-pro" value="ACTA DE ENTREGA DE MATERIALES">
-                </div>
-                <div>
-                    <label class="label-pro">Fecha</label>
-                    <input type="date" id="acta-date" class="form-input-pro">
-                </div>
-                <div>
-                    <label class="label-pro">Destinatario / Receptor</label>
-                    <input type="text" id="acta-receiver" class="form-input-pro" placeholder="Nombre de quien recibe">
-                </div>
-                <div class="col-span-2">
-                    <label class="label-pro">Detalle de Items (Separar con Enter)</label>
-                    <textarea id="acta-items" rows="5" class="form-input-pro" placeholder="- 50 Pecheras Junaeb&#10;- 20 Pantalones Talla M"></textarea>
-                </div>
-            </div>
-            <div class="p-6 border-t border-slate-100 flex justify-end gap-3">
-                <button onclick="App.Printers.printActa()" class="px-6 py-3 bg-slate-800 text-white font-bold rounded-xl shadow-lg hover:bg-slate-900 flex items-center gap-2">
-                    <i class="fas fa-print"></i> Generar PDF
-                </button>
-            </div>
-        </div>
-    </div>
     <script>
-  <script>
-        /**
-         * IDEAS TEXTILES ERP - ENTERPRISE ENGINE V15.1
-         * Incluye Módulo de Recuperación de Datos Históricos
-         */
-
+        // --- MOTOR DE DATOS Y ESTADO ---
         const App = {
-            // --- ESTADO GLOBAL ---
-            State: {
-                orders: [],
+            DB: {
                 inventory: [],
-                calendarEvents: {}, 
-                currentDate: new Date(),
-                view: 'dashboard'
+                orders: [],
+                movements: [],
+                tasks: [],
+                config: {
+                    geminiKey: localStorage.getItem('gemini_key') || '',
+                    firebase: JSON.parse(localStorage.getItem('firebase_config') || '{}')
+                }
             },
 
-            // --- MÓDULO DE DATOS Y RECUPERACIÓN (AQUÍ ESTÁ LA MAGIA) ---
-            Data: {
-                init: function() {
-                    console.log("[SYSTEM] Iniciando Protocolo de Recuperación de Datos...");
+            // LÓGICA DE RUTEO
+            Router: {
+                go(viewId) {
+                    document.querySelectorAll('main section').forEach(s => s.classList.add('hidden'));
+                    document.getElementById(`view-${viewId}`).classList.remove('hidden');
                     
-                    // 1. INTENTAR CARGAR DATOS NUEVOS (V15)
-                    let savedOrders = localStorage.getItem('erp_orders');
-                    let savedInv = localStorage.getItem('erp_inventory');
-                    let savedEvents = localStorage.getItem('erp_events');
+                    document.querySelectorAll('.nav-bubble').forEach(b => b.classList.remove('active'));
+                    document.getElementById(`nav-${viewId}`).classList.add('active');
+                }
+            },
 
-                    // 2. MIGRACIÓN: SI NO HAY DATOS NUEVOS, BUSCAR LOS VIEJOS
-                    // Buscamos todas las posibles llaves que usaba tu versión anterior
-                    if (!savedOrders || savedOrders === "[]") {
-                        const oldOrders = localStorage.getItem('orders_db') || localStorage.getItem('it_orders') || localStorage.getItem('pedidos');
-                        if (oldOrders) {
-                            console.warn("[MIGRATION] Órdenes antiguas encontradas. Importando...");
-                            savedOrders = oldOrders;
-                            // Guardamos inmediatamente en el formato nuevo para persistir
-                            localStorage.setItem('erp_orders', oldOrders);
+            // LÓGICA DE FIREBASE (SINCRONIZACIÓN)
+            Core: {
+                init() {
+                    const config = App.DB.config.firebase;
+                    if (config.apiKey) {
+                        try {
+                            firebase.initializeApp(config);
+                            this.db = firebase.database();
+                            this.bindRealtime();
+                            console.log("🔥 Firebase Online");
+                        } catch (e) {
+                            console.error("Firebase Config Error:", e);
                         }
+                    } else {
+                        // Fallback Local
+                        App.Core.loadLocal();
                     }
+                    
+                    App.UI.Loader.hide();
+                    App.Router.go('dashboard');
+                },
 
-                    if (!savedInv || savedInv === "[]") {
-                        const oldInv = localStorage.getItem('inventory_db') || localStorage.getItem('it_inventory') || localStorage.getItem('inventario');
-                        if (oldInv) {
-                            console.warn("[MIGRATION] Inventario antiguo encontrado. Importando...");
-                            savedInv = oldInv;
-                            localStorage.setItem('erp_inventory', oldInv);
-                        }
-                    }
-
-                    if (!savedEvents || savedEvents === "{}") {
-                        // Tu calendario anterior podía llamarse 'agenda_db' o 'calendar_events'
-                        const oldEvents = localStorage.getItem('agenda_db') || localStorage.getItem('calendar_events') || localStorage.getItem('it_agenda');
-                        if (oldEvents) {
-                            console.warn("[MIGRATION] Calendario antiguo encontrado. Importando...");
-                            savedEvents = oldEvents;
-                            localStorage.setItem('erp_events', oldEvents);
-                        }
-                    }
-
-                    // 3. CARGAR AL ESTADO
-                    if (savedOrders) {
-                        try { App.State.orders = JSON.parse(savedOrders); } catch(e) { console.error("Error migrando órdenes", e); }
-                    }
-                    if (savedInv) {
-                        try { App.State.inventory = JSON.parse(savedInv); } catch(e) { console.error("Error migrando inventario", e); }
-                    }
-                    if (savedEvents) {
-                        try { App.State.calendarEvents = JSON.parse(savedEvents); } catch(e) { console.error("Error migrando agenda", e); }
-                    }
-
-                    App.UI.updateKPIs();
-                    // Forzar renderizado inmediato si hay datos
-                    if(App.State.calendarEvents) App.Calendar.render();
-                    Swal.fire({
-                        title: 'Sistema Actualizado',
-                        text: 'Tus datos anteriores han sido detectados y cargados exitosamente.',
-                        icon: 'success',
-                        timer: 2000,
-                        showConfirmButton: false
+                bindRealtime() {
+                    const refs = ['inventory', 'orders', 'movements', 'tasks'];
+                    refs.forEach(ref => {
+                        this.db.ref(ref).on('value', snapshot => {
+                            const data = snapshot.val();
+                            App.DB[ref] = data ? Object.values(data) : [];
+                            App.UI.Refresh.all();
+                        });
                     });
+                },
+
+                saveConfig() {
+                    const geminiKey = document.getElementById('gemini-api-key').value;
+                    const firebaseJson = document.getElementById('firebase-config-input').value;
+                    
+                    localStorage.setItem('gemini_key', geminiKey);
+                    localStorage.setItem('firebase_config', firebaseJson);
+                    
+                    Swal.fire('Reiniciando...', 'Se ha actualizado la configuración global', 'success')
+                        .then(() => location.reload());
+                }
+            },
+
+            // MOTOR SABUESO (LECTURA DE ARCHIVOS)
+            Logic: {
+                Sabueso: {
+                    async process(file) {
+                        const reader = new FileReader();
+                        App.UI.Loader.show("SABUESO RASTREANDO...");
+                        
+                        if (file.name.endsWith('.pdf')) {
+                            // Lectura de PDF vía PDF.js y Gemini
+                            const text = await this.extractPdfText(file);
+                            this.analyzeWithGemini(text);
+                        } else {
+                            // Lectura de Excel
+                            reader.onload = (e) => {
+                                const data = new Uint8Array(e.target.result);
+                                const workbook = XLSX.read(data, {type: 'array'});
+                                const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                                const jsonData = XLSX.utils.sheet_to_json(firstSheet);
+                                this.showPreview(jsonData);
+                            };
+                            reader.readAsArrayBuffer(file);
+                        }
+                    },
+
+                    async analyzeWithGemini(text) {
+                        const key = App.DB.config.geminiKey;
+                        if(!key) return Swal.fire('Error', 'Falta API Key de Gemini', 'error');
+
+                        const prompt = `Extrae de este texto de despacho textil los productos, cantidades y tallas. Devuelve solo un JSON puro. Texto: ${text}`;
+                        
+                        try {
+                            const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${key}`, {
+                                method: 'POST',
+                                headers: {'Content-Type': 'application/json'},
+                                body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+                            });
+                            const json = await res.json();
+                            const cleanJson = JSON.parse(json.candidates[0].content.parts[0].text.replace(/```json|```/g, ''));
+                            this.showPreview(cleanJson);
+                        } catch (e) {
+                            Swal.fire('Error IA', 'No se pudo interpretar el archivo', 'error');
+                        }
+                    },
+
+                    showPreview(data) {
+                        const container = document.getElementById('sabueso-results');
+                        container.classList.remove('hidden');
+                        document.getElementById('sabueso-log-container').innerHTML = `> ANALISIS FINALIZADO\n> ${data.length} ÍTEMS ENCONTRADOS\n> SINCRONIZANDO SKUS...`;
+                        
+                        let html = `<table class="w-full text-xs font-bold">
+                                    <thead class="bg-slate-50 text-slate-500 uppercase">
+                                        <tr><th class="p-3 text-left">SKU/PRENDA</th><th class="p-3">CANTIDAD</th><th class="p-3">TALLAS</th></tr>
+                                    </thead><tbody>`;
+                        
+                        data.forEach(row => {
+                            html += `<tr class="border-t border-slate-100">
+                                        <td class="p-3">${row.producto || row.SKU || 'N/A'}</td>
+                                        <td class="p-3 text-center">${row.cantidad || 0}</td>
+                                        <td class="p-3 text-center font-mono">${row.tallas || '-'}</td>
+                                     </tr>`;
+                        });
+                        html += `</tbody></table>`;
+                        document.getElementById('sabueso-table-preview').innerHTML = html;
+                        document.getElementById('sabueso-import-btn').classList.remove('hidden');
+                        App.UI.Loader.hide();
+                    }
+                }
+            },
+
+            // MOTOR PDF Y TACHAS 3 COLUMNAS
+            PDF: {
+                Labels: {
+                    generate3Columns() {
+                        const { jsPDF } = window.jspdf;
+                        const doc = new jsPDF({ orientation: 'p', unit: 'mm', format: 'a4' });
+                        
+                        const items = App.DB.orders.filter(o => o.status === 'proceso');
+                        if(items.length === 0) return Swal.fire('Sin datos', 'No hay órdenes en proceso para imprimir', 'warning');
+
+                        let x = 10;
+                        let y = 10;
+                        const w = 60; // Ancho de columna
+                        const h = 80; // Alto de etiqueta
+                        const margin = 5;
+
+                        items.forEach((order, index) => {
+                            // Dibujar Rectángulo de Etiqueta
+                            doc.setDrawColor(200);
+                            doc.rect(x, y, w, h);
+                            
+                            // Cabecera
+                            doc.setFontSize(8);
+                            doc.setFont("helvetica", "bold");
+                            doc.text("IDEAS TEXTILES SPA", x + w/2, y + 5, {align: 'center'});
+                            
+                            // Datos de Orden
+                            doc.setFontSize(14);
+                            doc.text(`#${order.id || 'N/A'}`, x + 5, y + 15);
+                            doc.setFontSize(8);
+                            doc.text(`CLIENTE: ${order.client || 'GENERICO'}`, x + 5, y + 22);
+                            
+                            // Tallas (Tacha)
+                            doc.setFontSize(10);
+                            doc.text("TACHA DE PRODUCCIÓN", x + w/2, y + 32, {align: 'center'});
+                            
+                            let startTachaY = y + 38;
+                            let cellX = x + 5;
+                            Object.entries(order.sizes || { S:0, M:0, L:0 }).forEach(([size, qty]) => {
+                                doc.rect(cellX, startTachaY, 15, 12);
+                                doc.setFontSize(7); doc.text(size, cellX + 7.5, startTachaY + 4, {align: 'center'});
+                                doc.setFontSize(10); doc.text(qty.toString(), cellX + 7.5, startTachaY + 10, {align: 'center'});
+                                cellX += 17;
+                                if(cellX > x + w - 10) { cellX = x + 5; startTachaY += 15; }
+                            });
+
+                            // Total
+                            doc.setFontSize(12);
+                            doc.text(`TOTAL: ${order.total || 0} UN`, x + w/2, y + h - 10, {align: 'center'});
+
+                            // Lógica de 3 columnas
+                            x += w + margin;
+                            if ((index + 1) % 3 === 0) {
+                                x = 10;
+                                y += h + margin;
+                            }
+                            
+                            if (y + h > 280) {
+                                doc.addPage();
+                                x = 10; y = 10;
+                            }
+                        });
+
+                        doc.save(`TACHAS_3COL_${Date.now()}.pdf`);
+                    }
+                },
+
+                Management: {
+                    generate() {
+                        const { jsPDF } = window.jspdf;
+                        const doc = new jsPDF();
+                        doc.setFontSize(22);
+                        doc.text("REPORTE GERENCIAL - IDEAS TEXTILES", 20, 20);
+                        
+                        doc.autoTable({
+                            startY: 30,
+                            head: [['Categoría', 'Métrica', 'Estado']],
+                            body: [
+                                ['Bodega', `${App.DB.inventory.length} SKUs activos`, 'Óptimo'],
+                                ['Producción', `${App.DB.orders.length} Órdenes totales`, 'En curso'],
+                                ['Sincronización', 'Realtime Firebase', 'Activo']
+                            ]
+                        });
+                        doc.save("Balance_General.pdf");
+                    }
+                }
+            },
+
+            // CONTROLADORES DE INTERFAZ
+            UI: {
+                Loader: {
+                    show(text) { 
+                        document.getElementById('loader').classList.remove('hidden', 'opacity-0');
+                        if(text) document.querySelector('#loader p').innerText = text;
+                    },
+                    hide() {
+                        document.getElementById('loader').classList.add('opacity-0');
+                        setTimeout(() => document.getElementById('loader').classList.add('hidden'), 700);
+                    }
                 },
                 
-                save: function() {
-                    // Guardamos en el sistema nuevo
-                    localStorage.setItem('erp_orders', JSON.stringify(App.State.orders));
-                    localStorage.setItem('erp_inventory', JSON.stringify(App.State.inventory));
-                    localStorage.setItem('erp_events', JSON.stringify(App.State.calendarEvents));
-                    
-                    // RESPALDO DE SEGURIDAD: También actualizamos las llaves viejas por si acaso quieres volver atrás
-                    localStorage.setItem('orders_db', JSON.stringify(App.State.orders));
-                    localStorage.setItem('inventory_db', JSON.stringify(App.State.inventory));
-                    localStorage.setItem('agenda_db', JSON.stringify(App.State.calendarEvents));
+                Refresh: {
+                    all() {
+                        this.dashboard();
+                        this.inventory();
+                        this.orders();
+                    },
 
-                    App.UI.updateKPIs();
-                },
-
-                clearAll: function() {
-                    Swal.fire({
-                        title: '¿Reiniciar de Fábrica?',
-                        text: "Esto borrará TODO (V15 y Datos Antiguos). No hay vuelta atrás.",
-                        icon: 'warning',
-                        showCancelButton: true,
-                        confirmButtonColor: '#d33',
-                        confirmButtonText: 'Sí, borrar todo'
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            localStorage.clear(); // Borrado nuclear
-                            location.reload();
-                        }
-                    });
-                }
-            },
-
-            // --- UI ---
-            UI: {
-                init: function() {
-                    this.updateDateDisplay();
-                    this.animateLogo();
-                },
-                updateDateDisplay: function() {
-                    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-                    document.getElementById('current-date').textContent = new Date().toLocaleDateString('es-CL', options).toUpperCase();
-                },
-                updateKPIs: function() {
-                    document.getElementById('kpi-orders').textContent = App.State.orders.length;
-                    let totalStock = 0;
-                    App.State.inventory.forEach(item => {
-                        ['XS','S','M','L','XL','XXL','2XL'].forEach(t => {
-                            if(item[t]) totalStock += parseInt(item[t]) || 0;
-                        });
-                        // Soporte para inventario simple (columna 'stock')
-                        if(item.stock && !item.S) totalStock += parseInt(item.stock);
-                    });
-                    document.getElementById('kpi-units').textContent = totalStock.toLocaleString();
-                    
-                    // Contar tareas hoy
-                    const todayKey = new Date().toISOString().split('T')[0];
-                    const tasks = App.State.calendarEvents[todayKey] || [];
-                    document.getElementById('kpi-tasks').textContent = tasks.length;
-                },
-                animateLogo: function() {
-                    const logo = document.querySelector('svg');
-                    if(logo) {
-                        logo.classList.add('animate__animated', 'animate__rubberBand');
-                        setTimeout(() => logo.classList.remove('animate__animated', 'animate__rubberBand'), 1000);
-                    }
-                }
-            },
-
-            // --- ROUTER ---
-            Router: {
-                go: function(viewName) {
-                    document.querySelectorAll('main section').forEach(el => {
-                        el.classList.add('hidden');
-                        el.classList.remove('animate-enter');
-                    });
-                    document.querySelectorAll('nav button').forEach(btn => {
-                        btn.classList.remove('bg-teal-50', 'text-teal-700');
-                        btn.classList.add('text-slate-600');
-                    });
-
-                    const target = document.getElementById(`view-${viewName}`);
-                    if (target) {
-                        target.classList.remove('hidden');
-                        target.classList.add('animate-enter');
-                        const titles = { 'dashboard': 'PANEL DE CONTROL', 'orders': 'GESTIÓN DE ÓRDENES', 'inventory': 'BODEGA JUNAEB', 'calendar': 'CALENDARIO CORPORATIVO', 'agenda': 'AGENDA SEMANAL' };
-                        document.getElementById('page-title').textContent = titles[viewName] || 'SISTEMA ERP';
-
-                        // Mapeo de botones de navegación
-                        const navMap = { 'dashboard': 'dash', 'orders': 'orders', 'inventory': 'inv', 'calendar': 'cal', 'agenda': 'agenda' };
-                        const navBtn = document.getElementById(`nav-${navMap[viewName]}`);
-                        if(navBtn) navBtn.classList.add('bg-teal-50', 'text-teal-700');
-
-                        if (viewName === 'calendar') App.Calendar.render();
-                        if (viewName === 'orders') App.Sabueso.renderTable();
-                        if (viewName === 'agenda') App.Calendar.renderAgenda();
-                        if (viewName === 'inventory') App.Inventory.renderTable();
-                    }
-                }
-            },
-
-            // --- CALENDARIO (LÓGICA MATEMÁTICA COMPLETA) ---
-            Calendar: {
-                monthNames: ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"],
-                selectedDate: null,
-
-                render: function() {
-                    const date = App.State.currentDate;
-                    const year = date.getFullYear();
-                    const month = date.getMonth();
-
-                    const monthTitle = document.getElementById('calendar-month-year');
-                    if(monthTitle) monthTitle.textContent = `${this.monthNames[month]} ${year}`;
-
-                    const firstDay = new Date(year, month, 1).getDay(); 
-                    const daysInMonth = new Date(year, month + 1, 0).getDate();
-                    let startingDay = firstDay === 0 ? 6 : firstDay - 1;
-
-                    const grid = document.getElementById('calendar-days');
-                    if(!grid) return;
-                    grid.innerHTML = '';
-
-                    for (let i = 0; i < startingDay; i++) {
-                        const cell = document.createElement('div');
-                        cell.className = 'bg-slate-50 border-r border-b border-slate-100';
-                        grid.appendChild(cell);
-                    }
-
-                    for (let day = 1; day <= daysInMonth; day++) {
-                        const cell = document.createElement('div');
-                        cell.className = 'calendar-day group min-h-[100px] border-r border-b border-slate-200 p-2 relative hover:bg-teal-50 transition-colors cursor-pointer';
+                    dashboard() {
+                        document.getElementById('stat-total-stock').innerText = App.DB.inventory.reduce((a, b) => a + (parseInt(b.stock) || 0), 0);
+                        document.getElementById('stat-active-orders').innerText = App.DB.orders.filter(o => o.status !== 'despachado').length;
                         
-                        // Fix zona horaria local
-                        const localDate = new Date(year, month, day);
-                        const offset = localDate.getTimezoneOffset();
-                        const dateKey = new Date(localDate.getTime() - (offset*60*1000)).toISOString().split('T')[0];
+                        // Feed de actividad
+                        const feed = document.getElementById('dashboard-recent-activity');
+                        feed.innerHTML = App.DB.movements.slice(-5).reverse().map(m => `
+                            <div class="flex items-center gap-4 p-3 bg-slate-50 rounded-xl">
+                                <div class="w-10 h-10 rounded-full flex items-center justify-center ${m.type === 'in' ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'}">
+                                    <i class="fas fa-exchange-alt"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="text-xs font-black uppercase tracking-tighter">${m.product}</p>
+                                    <p class="text-[9px] text-slate-400 font-bold">${m.date}</p>
+                                </div>
+                                <div class="font-black text-sm">${m.type === 'in' ? '+' : '-'}${m.qty}</div>
+                            </div>
+                        `).join('');
+                    },
 
-                        const isToday = new Date().toISOString().split('T')[0] === dateKey;
-                        if (isToday) cell.classList.add('bg-blue-50/50');
+                    inventory() {
+                        const container = document.getElementById('inventory-container');
+                        container.innerHTML = App.DB.inventory.map(prod => `
+                            <div class="card-glass group overflow-hidden">
+                                <div class="absolute top-0 right-0 p-4">
+                                    <span class="px-3 py-1 bg-slate-100 rounded-full text-[9px] font-black uppercase text-slate-500">${prod.category}</span>
+                                </div>
+                                <h4 class="font-black text-xl text-slate-800 mb-1">${prod.name}</h4>
+                                <p class="text-xs font-mono text-blue-600 font-bold mb-4">${prod.sku}</p>
+                                
+                                <div class="flex justify-between items-center bg-slate-50 p-4 rounded-2xl mb-4">
+                                    <div><p class="text-[9px] font-black text-slate-400 uppercase">Stock Actual</p><p class="text-2xl font-black">${prod.stock}</p></div>
+                                    <div class="text-right"><p class="text-[9px] font-black text-slate-400 uppercase">Comprometido</p><p class="text-lg font-bold text-orange-500">${prod.reserved || 0}</p></div>
+                                </div>
 
-                        const header = document.createElement('div');
-                        header.className = 'flex justify-between items-center mb-1';
-                        header.innerHTML = `<span class="text-sm font-bold ${isToday ? 'bg-teal-600 text-white w-6 h-6 rounded-full flex items-center justify-center' : 'text-slate-700'}">${day}</span>`;
-                        
-                        const addBtn = document.createElement('button');
-                        addBtn.innerHTML = '<i class="fas fa-plus text-xs"></i>';
-                        addBtn.className = 'opacity-0 group-hover:opacity-100 text-teal-600 hover:text-teal-800 transition-opacity';
-                        addBtn.onclick = (e) => { e.stopPropagation(); App.Calendar.selectDate(dateKey); App.Modals.Task.open(); };
-                        header.appendChild(addBtn);
-                        cell.appendChild(header);
+                                <div class="flex gap-2">
+                                    <button onclick="App.Actions.edit('${prod.sku}')" class="flex-1 py-3 bg-slate-900 text-white rounded-xl text-[10px] font-black uppercase hover:bg-blue-600 transition">Gestionar</button>
+                                    <button onclick="App.Actions.quickAdd('${prod.sku}')" class="w-12 h-12 bg-slate-100 rounded-xl flex items-center justify-center hover:bg-green-100 hover:text-green-600 transition"><i class="fas fa-plus"></i></button>
+                                </div>
+                            </div>
+                        `).join('');
+                    },
 
-                        const events = App.State.calendarEvents[dateKey] || [];
-                        events.forEach((evt, index) => {
-                            const chip = document.createElement('div');
-                            chip.className = `text-[10px] p-1 mb-1 rounded border-l-2 truncate ${this.getColorClass(evt.color)}`;
-                            chip.textContent = evt.text;
-                            chip.title = evt.text; // Tooltip nativo
-                            chip.onclick = (e) => { e.stopPropagation(); App.Calendar.deleteTask(dateKey, index); };
-                            cell.appendChild(chip);
-                        });
+                    orders() {
+                        const list = document.getElementById('orders-list');
+                        list.innerHTML = App.DB.orders.map(order => `
+                            <div class="bg-white border border-slate-100 p-6 rounded-3xl shadow-sm flex flex-col md:flex-row justify-between items-center gap-6">
+                                <div class="flex items-center gap-6">
+                                    <div class="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600">
+                                        <i class="fas fa-file-invoice text-2xl"></i>
+                                    </div>
+                                    <div>
+                                        <h5 class="font-black text-lg text-slate-800 uppercase tracking-tighter">ORD-${order.id} | ${order.client}</h5>
+                                        <div class="flex gap-2 mt-1">
+                                            <span class="text-[10px] font-black px-3 py-1 rounded-full uppercase ${this.getStatusClass(order.status)}">${order.status}</span>
+                                            <span class="text-[10px] font-black text-slate-400 uppercase italic">Fecha: ${order.date}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-8">
+                                    <div class="text-center">
+                                        <p class="text-[9px] font-black text-slate-400 uppercase">Total Prendas</p>
+                                        <p class="text-xl font-black text-slate-800">${order.total}</p>
+                                    </div>
+                                    <div class="flex gap-2">
+                                        <button onclick="App.PDF.Labels.printOne('${order.id}')" class="w-12 h-12 rounded-2xl bg-slate-100 text-slate-600 hover:bg-orange-600 hover:text-white transition"><i class="fas fa-print"></i></button>
+                                        <button onclick="App.Actions.advanceOrder('${order.id}')" class="h-12 px-6 rounded-2xl bg-slate-900 text-white font-black text-[10px] uppercase hover:bg-blue-600 transition">Siguiente Paso</button>
+                                    </div>
+                                </div>
+                            </div>
+                        `).join('');
+                    },
 
-                        cell.onclick = () => App.Calendar.selectDate(dateKey);
-                        grid.appendChild(cell);
-                    }
-                },
-
-                getColorClass: function(color) {
-                    const map = {
-                        'teal': 'border-teal-500 bg-teal-100 text-teal-800',
-                        'orange': 'border-orange-500 bg-orange-100 text-orange-800',
-                        'blue': 'border-blue-500 bg-blue-100 text-blue-800',
-                        'red': 'border-red-500 bg-red-100 text-red-800'
-                    };
-                    return map[color] || map['teal'];
-                },
-
-                selectDate: function(dateKey) {
-                    this.selectedDate = dateKey;
-                    const title = document.getElementById('selected-date-title');
-                    if(title) title.textContent = `Notas del: ${dateKey}`;
-                    
-                    const list = document.getElementById('day-task-list');
-                    if(!list) return;
-                    list.innerHTML = '';
-                    
-                    const events = App.State.calendarEvents[dateKey] || [];
-                    if (events.length === 0) {
-                        list.innerHTML = '<li class="text-slate-400 text-sm italic text-center py-4">Sin notas.</li>';
-                        return;
-                    }
-
-                    events.forEach((evt, idx) => {
-                        const li = document.createElement('li');
-                        li.className = 'flex items-center justify-between p-3 bg-white rounded border border-slate-100 shadow-sm';
-                        li.innerHTML = `
-                            <span class="flex items-center gap-2 overflow-hidden">
-                                <span class="w-2 h-2 rounded-full bg-${evt.color}-500 flex-shrink-0"></span>
-                                <span class="text-sm text-slate-700 truncate">${evt.text}</span>
-                            </span>
-                            <button onclick="App.Calendar.deleteTask('${dateKey}', ${idx})" class="text-slate-300 hover:text-red-500">
-                                <i class="fas fa-trash-alt"></i>
-                            </button>
-                        `;
-                        list.appendChild(li);
-                    });
-                },
-
-                addTask: function(text, color) {
-                    if (!this.selectedDate) return;
-                    if (!App.State.calendarEvents[this.selectedDate]) {
-                        App.State.calendarEvents[this.selectedDate] = [];
-                    }
-                    App.State.calendarEvents[this.selectedDate].push({ text, color });
-                    App.Data.save();
-                    this.render();
-                    this.selectDate(this.selectedDate);
-                },
-
-                deleteTask: function(dateKey, index) {
-                    if(confirm("¿Borrar nota?")) {
-                        App.State.calendarEvents[dateKey].splice(index, 1);
-                        if(App.State.calendarEvents[dateKey].length === 0) delete App.State.calendarEvents[dateKey];
-                        App.Data.save();
-                        this.render();
-                        this.selectDate(dateKey);
-                    }
-                },
-
-                prevMonth: function() { App.State.currentDate.setMonth(App.State.currentDate.getMonth() - 1); this.render(); },
-                nextMonth: function() { App.State.currentDate.setMonth(App.State.currentDate.getMonth() + 1); this.render(); },
-
-                renderAgenda: function() {
-                    const list = document.getElementById('agenda-full-list');
-                    if(!list) return;
-                    list.innerHTML = '';
-                    const keys = Object.keys(App.State.calendarEvents).sort();
-                    if(keys.length === 0) { list.innerHTML = '<div class="text-center text-slate-400">Agenda vacía.</div>'; return; }
-
-                    keys.forEach(date => {
-                        const events = App.State.calendarEvents[date];
-                        const dateObj = new Date(date + 'T12:00:00'); // Fix visual
-                        const group = document.createElement('div');
-                        group.className = 'mb-4';
-                        group.innerHTML = `<h4 class="font-bold text-teal-700 border-b border-teal-100 mb-2">${dateObj.toLocaleDateString()}</h4>`;
-                        events.forEach(evt => {
-                            group.innerHTML += `<div class="p-2 bg-white border border-slate-100 rounded mb-1 text-sm flex gap-2 items-center"><span class="w-2 h-2 rounded-full bg-${evt.color}-500"></span>${evt.text}</div>`;
-                        });
-                        list.appendChild(group);
-                    });
-                }
-            },
-
-            // --- SABUESO (LECTOR DE ARCHIVOS) ---
-            Sabueso: {
-                handleDrop: function(e) { e.preventDefault(); e.target.classList.remove('border-teal-500', 'bg-teal-50'); this.handleFiles(e.dataTransfer.files); },
-                handleFiles: async function(files) {
-                    if (files.length === 0) return;
-                    Swal.fire({ title: 'Analizando...', didOpen: () => Swal.showLoading() });
-
-                    for (let file of files) {
-                        try {
-                            if (file.type === "application/pdf") await this.parsePDF(file);
-                            else if (file.name.match(/\.(xls|xlsx|csv)$/i)) await this.parseExcel(file);
-                        } catch (err) { console.error(err); }
-                    }
-                    App.Data.save();
-                    this.renderTable();
-                    App.Inventory.renderTable();
-                    Swal.close();
-                },
-
-                parseExcel: function(file) {
-                    return new Promise((resolve) => {
-                        const reader = new FileReader();
-                        reader.onload = (e) => {
-                            const wb = XLSX.read(new Uint8Array(e.target.result), { type: 'array' });
-                            const json = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);
-                            
-                            // Detección: Inventario vs Orden
-                            if (json.length > 0 && ('XS' in json[0] || 'S' in json[0] || 'Talla' in json[0])) {
-                                App.State.inventory = json; // Es inventario
-                            } else {
-                                // Es orden simple
-                                json.forEach(row => {
-                                    App.State.orders.push({
-                                        id: row['OC'] || `XLS-${Date.now()}`,
-                                        client: row['Cliente'] || 'Importado Excel',
-                                        date: new Date().toISOString().split('T')[0],
-                                        content: JSON.stringify(row),
-                                        status: 'Pendiente', source: 'Excel'
-                                    });
-                                });
-                            }
-                            resolve();
+                    getStatusClass(status) {
+                        const states = {
+                            'pendiente': 'bg-slate-100 text-slate-600',
+                            'proceso': 'bg-orange-100 text-orange-600',
+                            'empaquetado': 'bg-blue-100 text-blue-600',
+                            'despachado': 'bg-green-100 text-green-600'
                         };
-                        reader.readAsArrayBuffer(file);
-                    });
-                },
-
-                parsePDF: async function(file) {
-                    const buf = await file.arrayBuffer();
-                    const pdf = await pdfjsLib.getDocument(buf).promise;
-                    let text = "";
-                    for(let i=1; i<=pdf.numPages; i++) {
-                        const p = await pdf.getPage(i);
-                        const c = await p.getTextContent();
-                        text += c.items.map(s=>s.str).join(" ") + "\n";
+                        return states[status] || states.pendiente;
                     }
-                    
-                    // Regex Heurística para OCs Chilenas
-                    const oc = text.match(/Orden\s*N[°º]\s*(\d+)/i) || {1: `PDF-${Date.now()}`};
-                    const client = text.match(/Señor\(es\):\s*(.+?)\n/i) || {1: "Cliente PDF"};
-                    
-                    App.State.orders.push({
-                        id: oc[1],
-                        client: client[1].trim(),
-                        date: new Date().toISOString().split('T')[0],
-                        content: text.substring(0, 800), // Preview
-                        status: 'Pendiente',
-                        source: 'PDF'
-                    });
-                },
-
-                renderTable: function() {
-                    const tbody = document.getElementById('orders-table-body');
-                    if(!tbody) return;
-                    tbody.innerHTML = '';
-                    if(App.State.orders.length === 0) { tbody.innerHTML = '<tr><td colspan="5" class="p-8 text-center text-slate-400">Sin órdenes.</td></tr>'; return; }
-
-                    App.State.orders.forEach((o, i) => {
-                        const tr = document.createElement('tr');
-                        tr.className = "hover:bg-slate-50 transition-colors border-b border-slate-50";
-                        tr.innerHTML = `
-                            <td class="px-6 py-4"><i class="fas ${o.source==='PDF'?'fa-file-pdf text-red-500':'fa-file-alt text-blue-500'} mr-2"></i><b>${o.id}</b></td>
-                            <td class="px-6 py-4 font-medium text-slate-700">${o.client}</td>
-                            <td class="px-6 py-4 text-xs font-mono text-slate-400 max-w-xs truncate">${o.content.substring(0,60)}...</td>
-                            <td class="px-6 py-4"><span class="px-2 py-1 bg-yellow-100 text-yellow-800 rounded text-xs font-bold">${o.status}</span></td>
-                            <td class="px-6 py-4 text-right">
-                                <button onclick="App.Modals.EditOrder.open(${i})" class="text-teal-600 font-bold text-xs mr-3">EDITAR</button>
-                                <button onclick="App.Sabueso.delete(${i})" class="text-slate-400 hover:text-red-500"><i class="fas fa-trash"></i></button>
-                            </td>
-                        `;
-                        tbody.appendChild(tr);
-                    });
-                },
-                delete: function(i) { App.State.orders.splice(i,1); App.Data.save(); this.renderTable(); }
-            },
-
-            // --- INVENTARIO ---
-            Inventory: {
-                renderTable: function() {
-                    const tbody = document.getElementById('inventory-body');
-                    if(!tbody) return;
-                    tbody.innerHTML = '';
-                    if(App.State.inventory.length === 0) { tbody.innerHTML = '<tr><td colspan="8" class="p-4 text-center">Carga el Excel Junaeb.</td></tr>'; return; }
-
-                    App.State.inventory.forEach(item => {
-                        const name = item['PRODUCTO'] || item['Producto'] || item['Nombre'] || 'Item';
-                        // Sumar tallas o usar stock total
-                        let total = 0;
-                        if(item.stock) total = item.stock;
-                        else {
-                            ['XS','S','M','L','XL','XXL'].forEach(t => total += (parseInt(item[t])||0));
-                        }
-
-                        const tr = document.createElement('tr');
-                        tr.innerHTML = `
-                            <td class="p-3 font-bold text-slate-700">${name}</td>
-                            <td class="p-3 text-center text-slate-500">${item.XS||'-'}</td>
-                            <td class="p-3 text-center text-slate-500">${item.S||'-'}</td>
-                            <td class="p-3 text-center text-slate-500">${item.M||'-'}</td>
-                            <td class="p-3 text-center text-slate-500">${item.L||'-'}</td>
-                            <td class="p-3 text-center text-slate-500">${item.XL||'-'}</td>
-                            <td class="p-3 text-center text-slate-500">${item.XXL||'-'}</td>
-                            <td class="p-3 text-right font-bold text-teal-600">${total}</td>
-                        `;
-                        tbody.appendChild(tr);
-                    });
-                },
-                filter: function() {
-                    const term = document.getElementById('inv-search').value.toLowerCase();
-                    document.querySelectorAll('#inventory-body tr').forEach(row => {
-                        row.style.display = row.innerText.toLowerCase().includes(term) ? '' : 'none';
-                    });
                 }
-            },
-
-            // --- IMPRESORAS PDF (TACHA PRO + ACTA) ---
-            Printers: {
-                drawLogo: function(doc, x, y, s) {
-                    doc.setDrawColor(0, 128, 128); doc.setLineWidth(0.8);
-                    doc.circle(x+s/2, y+s/2, s/2-1);
-                    doc.line(x+s*0.3, y+s*0.3, x+s*0.7, y+s*0.8);
-                    doc.line(x+s*0.7, y+s*0.3, x+s*0.3, y+s*0.8);
-                },
-
-                printTacha3Cols: function() {
-                    if(App.State.orders.length === 0) return Swal.fire('Error', 'Sin órdenes', 'warning');
-                    const { jsPDF } = window.jspdf;
-                    const doc = new jsPDF('l', 'mm', 'legal');
-                    const cols = 3, w = 355.6, colW = 110, margin = 10;
-                    let x = margin, y = margin, c = 0;
-
-                    App.State.orders.forEach((o, i) => {
-                        // Marco
-                        doc.setDrawColor(220); doc.rect(x, y, colW-5, 90);
-                        // Logo y Header
-                        this.drawLogo(doc, x+2, y+2, 12);
-                        doc.setFontSize(14); doc.setTextColor(0,128,128); doc.text(o.id.toString(), x+100, y+10, {align:'right'});
-                        doc.setFontSize(9); doc.setTextColor(0); doc.text(o.client.substring(0,35), x+16, y+8);
-                        
-                        // Contenido
-                        doc.setFontSize(7);
-                        const lines = doc.splitTextToSize(o.content.replace(/[\{\}\"]/g,' ').substring(0,300), colW-15);
-                        doc.text(lines, x+5, y+25);
-
-                        // Checkboxes
-                        doc.setDrawColor(0);
-                        doc.rect(x+colW-12, y+5, 6, 6); doc.text("OK", x+colW-12, y+14);
-
-                        c++; x += colW;
-                        if(c >= cols) { c=0; x=margin; y+=95; }
-                        if(y > 180) { doc.addPage(); y=margin; x=margin; c=0; }
-                    });
-                    doc.save("Tacha_Despacho_3Col.pdf");
-                },
-
-                printActa: function() {
-                    const title = document.getElementById('acta-title').value;
-                    const items = document.getElementById('acta-items').value;
-                    const { jsPDF } = window.jspdf;
-                    const doc = new jsPDF();
-
-                    this.drawLogo(doc, 15, 15, 20);
-                    doc.setFontSize(18); doc.text("IDEAS TEXTILES", 40, 25);
-                    doc.setFontSize(14); doc.text(title, 105, 50, {align:'center'});
-                    doc.setFontSize(10); doc.text(items, 20, 70);
-                    
-                    doc.line(30, 250, 90, 250); doc.text("ENTREGA", 60, 255, {align:'center'});
-                    doc.line(120, 250, 180, 250); doc.text("RECIBE", 150, 255, {align:'center'});
-                    
-                    doc.save("Acta.pdf");
-                    App.Modals.Acta.close();
-                }
-            },
-
-            // --- MODALES ---
-            Modals: {
-                EditOrder: {
-                    idx: null,
-                    open: function(i) { this.idx=i; const o = App.State.orders[i]; document.getElementById('edit-order-client').value=o.client; document.getElementById('edit-order-content').value=o.content; document.getElementById('modal-edit-order').classList.remove('hidden'); },
-                    create: function() { this.idx=-1; document.getElementById('edit-order-client').value=""; document.getElementById('edit-order-content').value=""; document.getElementById('modal-edit-order').classList.remove('hidden'); },
-                    close: function() { document.getElementById('modal-edit-order').classList.add('hidden'); },
-                    save: function() {
-                        const c = document.getElementById('edit-order-client').value;
-                        const t = document.getElementById('edit-order-content').value;
-                        if(this.idx===-1) App.State.orders.unshift({id:`MAN-${Date.now()}`, client:c, content:t, date:new Date().toISOString().split('T')[0], status:'Nuevo', source:'Manual'});
-                        else { App.State.orders[this.idx].client=c; App.State.orders[this.idx].content=t; }
-                        App.Data.save(); App.Sabueso.renderTable(); this.close();
-                    }
-                },
-                Task: {
-                    open: function() { document.getElementById('modal-task').classList.remove('hidden'); },
-                    close: function() { document.getElementById('modal-task').classList.add('hidden'); },
-                    save: function() {
-                        const t = document.getElementById('task-input').value;
-                        const c = document.getElementById('task-color').value;
-                        if(t) { App.Calendar.addTask(t, c); document.getElementById('task-input').value=''; this.close(); }
-                    }
-                },
-                Acta: {
-                    open: function() { document.getElementById('modal-acta').classList.remove('hidden'); },
-                    close: function() { document.getElementById('modal-acta').classList.add('hidden'); }
-                }
-            },
-            
-            System: { backup: function() { 
-                const data = JSON.stringify(App.State);
-                const blob = new Blob([data], {type:'application/json'});
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a'); a.href=url; a.download=`BACKUP_IDEAS_${Date.now()}.json`; a.click();
-            }}
+            }
         };
 
-        // INICIO
-        window.onload = App.Data.init;
+        // --- INICIALIZACIÓN DE SABUESO DROPZONE ---
+        document.addEventListener('DOMContentLoaded', () => {
+            const dropZone = document.getElementById('sabueso-drop-zone');
+            const fileInput = document.getElementById('sabueso-file-input');
+
+            dropZone.onclick = () => fileInput.click();
+            fileInput.onchange = (e) => App.Logic.Sabueso.process(e.target.files[0]);
+
+            dropZone.ondragover = (e) => { e.preventDefault(); dropZone.classList.add('bg-blue-50', 'border-blue-500'); };
+            dropZone.ondragleave = () => dropZone.classList.remove('bg-blue-50', 'border-blue-500');
+            dropZone.ondrop = (e) => {
+                e.preventDefault();
+                dropZone.classList.remove('bg-blue-50', 'border-blue-500');
+                App.Logic.Sabueso.process(e.dataTransfer.files[0]);
+            };
+
+            // Iniciar Sistema
+            App.Core.init();
+        });
 
     </script>
 </body>
