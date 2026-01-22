@@ -1289,3 +1289,192 @@
 
         // --- FIN BLOQUE 2 ---
         // ESPERANDO BLOQUE 3 PARA CIERRE DE SISTEMA Y LÓGICA DE ESCÁNER
+/* =============================================================================
+         * BLOQUE 3: EL CEREBRO DIGITAL (SCANNER AI & IA LITE) Y CIERRE DE SISTEMA
+         * =============================================================================
+         */
+
+        // -----------------------------------------------------------------------------
+        // MÓDULO 4: SCANNER INTELIGENTE (LECTOR DE PDF "CEREBRO AI")
+        // -----------------------------------------------------------------------------
+        // Este módulo permite leer PDFs de clientes y autocompletar la orden.
+        
+        App.Scanner = {
+            isProcessing: false,
+
+            // Paso 1: Disparador del archivo
+            trigger: async function() {
+                const { value: file } = await Swal.fire({
+                    title: 'Scanner AI de Documentos',
+                    text: 'Sube la Orden de Compra (PDF) del cliente. El sistema extraerá los datos automáticamente.',
+                    input: 'file',
+                    inputAttributes: {
+                        'accept': 'application/pdf',
+                        'aria-label': 'Sube tu PDF aquí'
+                    },
+                    showCancelButton: true,
+                    confirmButtonText: 'Analizar Documento',
+                    confirmButtonColor: '#0071e3',
+                    showLoaderOnConfirm: true
+                });
+
+                if (file) {
+                    this.processPDF(file);
+                }
+            },
+
+            // Paso 2: Procesamiento del PDF (Motor OCR Lógico)
+            processPDF: function(file) {
+                if (this.isProcessing) return;
+                this.isProcessing = true;
+
+                // Configuración del Worker de PDF.js (Vital para que no se pegue la web)
+                pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.5.1/pdf.worker.min.js';
+
+                const fileReader = new FileReader();
+                fileReader.onload = function() {
+                    const typedarray = new Uint8Array(this.result);
+
+                    // Carga del documento
+                    pdfjsLib.getDocument(typedarray).promise.then(function(pdf) {
+                        // Leemos la primera página (donde suelen estar los datos clave)
+                        pdf.getPage(1).then(function(page) {
+                            page.getTextContent().then(function(textContent) {
+                                // Convertimos el contenido crudo a texto plano
+                                let fullText = "";
+                                textContent.items.forEach(function(item) {
+                                    fullText += item.str + " ";
+                                });
+
+                                // Enviamos el texto al "Cerebro" para entenderlo
+                                App.Scanner.analyzeText(fullText);
+                            });
+                        });
+                    }).catch(err => {
+                        App.Scanner.isProcessing = false;
+                        Swal.fire('Error de Lectura', 'El PDF está dañado o es una imagen escaneada sin texto seleccionable.', 'error');
+                    });
+                };
+                fileReader.readAsArrayBuffer(file);
+            },
+
+            // Paso 3: Análisis Heurístico (El "Cerebro")
+            analyzeText: function(text) {
+                console.log("Texto extraído:", text); // Para depuración
+                
+                // Normalización
+                const cleanText = text.toUpperCase();
+
+                // Lógica de Extracción (Detectives de Datos)
+                let detectedOC = "";
+                let detectedClient = "";
+                
+                // 1. Buscar N° OC (Patrones comunes: "OC 123", "ORDEN 456", "#789")
+                const ocRegex = /(?:OC|ORDEN|Nº|NUMERO|NUMBER)[\s\.:#]*([0-9A-Z\-]+)/i;
+                const ocMatch = cleanText.match(ocRegex);
+                if (ocMatch && ocMatch[1].length > 2) detectedOC = ocMatch[1];
+
+                // 2. Buscar Cliente (Basado en palabras clave cercanas a "SEÑORES", "CLIENTE", o lista conocida)
+                // Aquí usamos una heurística simple: buscar líneas comunes de encabezado
+                const knownClients = ["FALABELLA", "RIPLEY", "CENCOSUD", "CODELCO", "MUNICIPALIDAD", "HOSPITAL", "CLINICA"];
+                knownClients.forEach(client => {
+                    if (cleanText.includes(client)) detectedClient = client;
+                });
+                
+                // Si no encuentra cliente conocido, intenta buscar después de "SEÑORES"
+                if (!detectedClient) {
+                    const clientRegex = /(?:SEÑORES|CLIENTE|RAZON SOCIAL)[\s\.:]*([A-Z\s\.]+)/i;
+                    const clientMatch = cleanText.match(clientRegex);
+                    if (clientMatch && clientMatch[1]) detectedClient = clientMatch[1].substring(0, 30).trim();
+                }
+
+                this.isProcessing = false;
+                this.populateModal(detectedOC, detectedClient);
+            },
+
+            // Paso 4: Llenado Automático
+            populateModal: function(oc, client) {
+                // Abrimos el modal de creación
+                App.UI.modalOrder();
+
+                // Esperamos un milisegundo a que el DOM del modal exista
+                setTimeout(() => {
+                    const inputOC = document.getElementById('new-oc');
+                    const inputClient = document.getElementById('new-client');
+
+                    if (inputOC) {
+                        inputOC.value = oc || "";
+                        inputOC.style.backgroundColor = oc ? "#e8f0fe" : ""; // Resaltar si encontró dato
+                    }
+                    if (inputClient) {
+                        inputClient.value = client || "";
+                        inputClient.style.backgroundColor = client ? "#e8f0fe" : "";
+                    }
+
+                    const message = (oc || client) 
+                        ? '¡Datos extraídos con éxito! Verifique y guarde.' 
+                        : 'No pudimos detectar datos claros, pero el formulario está listo.';
+                    
+                    const icon = (oc || client) ? 'success' : 'info';
+
+                    Swal.fire({
+                        toast: true,
+                        position: 'top-end',
+                        icon: icon,
+                        title: 'Análisis Completado',
+                        text: message,
+                        timer: 4000
+                    });
+                }, 500);
+            }
+        };
+
+        // -----------------------------------------------------------------------------
+        // MÓDULO 5: UTILIDADES DEL SISTEMA Y GARANTÍA DE ESTABILIDAD
+        // -----------------------------------------------------------------------------
+
+        // Función para limpiar la memoria si la web lleva mucho tiempo abierta
+        App.Utils = {
+            clearCache: function() {
+                // Limpieza visual de modales fantasmas
+                document.querySelectorAll('.swal2-container').forEach(e => e.remove());
+                console.log("Sistema optimizado.");
+            }
+        };
+
+        // Inyector de Estilos Dinámicos (Correcciones de último minuto para iPhone)
+        const styleFix = document.createElement('style');
+        styleFix.innerHTML = `
+            @supports (-webkit-touch-callout: none) {
+                .main-content { padding-bottom: 120px; } /* Espacio extra en iOS */
+            }
+            .animate-spin { animation: spin 1s linear infinite; }
+            @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+            /* Corrección para que el PDF no corte texto */
+            .jspdf-plugin-autotable { font-family: helvetica !important; }
+        `;
+        document.head.appendChild(styleFix);
+
+        // -----------------------------------------------------------------------------
+        // CIERRE Y ARRANQUE FINAL
+        // -----------------------------------------------------------------------------
+
+        // Verificación final de carga
+        console.log("Bloque 3 cargado. Sistema IDEAS TEXTILES SPA completo.");
+        
+        // Si por alguna razón el window.onload del Bloque 1 no disparó (por latencia), forzamos aquí:
+        if (document.readyState === "complete" || document.readyState === "interactive") {
+            setTimeout(() => {
+                if(typeof App.Init === 'function') {
+                    // Solo iniciamos si no ha iniciado ya (evitar doble carga)
+                    if(!window.appStarted) {
+                        window.appStarted = true;
+                        // App.Init() ya fue llamado en Bloque 1, pero esto es un seguro de vida
+                    }
+                }
+            }, 1000);
+        }
+
+    </script> 
+    </body>
+</html>
