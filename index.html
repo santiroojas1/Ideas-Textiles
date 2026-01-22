@@ -735,3 +735,557 @@
 
         // --- FIN BLOQUE 1 ---
         // AHORA PEGA EL BLOQUE 2 A CONTINUACIÓN PARA ACTIVAR PDF Y CÁMARA
+/* =============================================================================
+         * BLOQUE 2: MOTORES DE POTENCIA (LÓGICA DE NEGOCIO, PDF CORPORATIVO Y CÁMARA)
+         * =============================================================================
+         */
+
+        // -----------------------------------------------------------------------------
+        // MÓDULO 1: LÓGICA DE NEGOCIO (GUARDADO Y GESTIÓN DE DATOS)
+        // -----------------------------------------------------------------------------
+
+        // Función extendida para guardar productos con validación estricta
+        App.Logic.saveProduct = function() {
+            // Captura de datos del formulario modal
+            const skuInput = document.getElementById('new-sku');
+            const nameInput = document.getElementById('new-name');
+            
+            // Validación de integridad
+            if(!skuInput || !nameInput) return; // Seguridad si el modal no está renderizado
+            
+            const sku = skuInput.value.trim().toUpperCase();
+            const name = nameInput.value.trim().toUpperCase(); // Estandarización a mayúsculas
+            
+            const sizes = {
+                S: parseInt(document.getElementById('s-s').value) || 0,
+                M: parseInt(document.getElementById('s-m').value) || 0,
+                L: parseInt(document.getElementById('s-l').value) || 0,
+                XL: parseInt(document.getElementById('s-xl').value) || 0
+            };
+
+            // Validación de campos obligatorios
+            if(!sku || !name) {
+                Swal.fire({
+                    title: 'Datos Incompletos',
+                    text: 'El SKU y el Nombre del producto son obligatorios para mantener el orden.',
+                    icon: 'warning',
+                    confirmButtonColor: '#0071e3'
+                });
+                return;
+            }
+
+            // Guardado en Firebase
+            const productData = {
+                sku: sku,
+                name: name,
+                sizes: sizes,
+                category: 'General', // Se puede expandir luego
+                lastUpdate: new Date().toLocaleString(),
+                active: true
+            };
+
+            firebase.database().ref('inventory').push(productData)
+                .then(() => {
+                    App.UI.closeModal();
+                    App.UI.notify('Producto ingresado a bodega correctamente', 'success');
+                })
+                .catch((error) => {
+                    console.error("Error Firebase:", error);
+                    App.UI.notify('Error de conexión al guardar', 'error');
+                });
+        };
+
+        // Función extendida para crear Órdenes de Compra
+        App.Logic.saveOrder = function() {
+            const ocInput = document.getElementById('new-oc');
+            const clientInput = document.getElementById('new-client');
+            const facInput = document.getElementById('new-fac');
+
+            const oc = ocInput.value.trim();
+            const client = clientInput.value.trim().toUpperCase();
+            const invoice = facInput.value.trim() || 'PENDIENTE'; // Valor por defecto inteligente
+
+            if(!oc || !client) {
+                Swal.fire({
+                    title: 'Faltan Datos',
+                    text: 'Debe ingresar el N° de Orden y el Cliente.',
+                    icon: 'warning',
+                    confirmButtonColor: '#0071e3'
+                });
+                return;
+            }
+
+            // Estructura de Orden Robusta
+            const newOrder = {
+                ocNumber: oc,
+                client: client,
+                invoice: invoice,
+                status: 'pendiente', // Estado inicial forzado
+                date: new Date().toLocaleDateString('es-CL'),
+                timestamp: Date.now(), // Para ordenamiento cronológico exacto
+                priority: 'normal',
+                notes: '',
+                items: {} // Se inicia vacía, se edita luego
+            };
+
+            firebase.database().ref('orders').push(newOrder)
+                .then(() => {
+                    App.UI.closeModal();
+                    // Feedback visual profesional
+                    Swal.fire({
+                        title: 'Orden Creada',
+                        text: `La OC #${oc} ha sido ingresada al sistema.`,
+                        icon: 'success',
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                });
+        };
+
+        // Sistema de eliminación segura con doble confirmación
+        App.Logic.deleteItem = function(node, id) {
+            Swal.fire({
+                title: '¿Está seguro?',
+                text: "Esta acción eliminará el registro permanentemente de la base de datos.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Sí, eliminar',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    firebase.database().ref(`${node}/${id}`).remove()
+                        .then(() => {
+                            App.UI.notify('Registro eliminado', 'success');
+                        })
+                        .catch(err => Swal.fire('Error', 'No se pudo borrar: ' + err.message, 'error'));
+                }
+            });
+        };
+
+        // -----------------------------------------------------------------------------
+        // MÓDULO 2: MOTOR DE PDF CORPORATIVO (DISEÑO "TIJERAS" + CHECKLIST BODEGA)
+        // -----------------------------------------------------------------------------
+        App.PDF = {
+            // Generador del Reporte General (Resumen Gerencial)
+            generateGeneralReport: function() {
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF();
+                
+                // --- CONFIGURACIÓN DE ESTILO ---
+                const azulBrand = "#0071e3"; // Azul Apple/IdeasTextiles
+                const grisFondo = "#f5f5f7";
+                const fechaHoy = new Date().toLocaleDateString('es-CL', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+
+                // 1. Cabecera Corporativa
+                doc.setFillColor(azulBrand);
+                doc.rect(0, 0, 210, 40, 'F'); // Barra superior sólida
+                
+                // Logo Simbólico (Tijeras Vectorizadas en Canvas PDF)
+                doc.setDrawColor(255, 255, 255);
+                doc.setLineWidth(1.5);
+                // Dibujo simple de tijeras abiertas (Círculos y aspas)
+                doc.circle(20, 20, 4, 'S'); // Ojo izquierdo
+                doc.circle(20, 28, 4, 'S'); // Ojo derecho
+                doc.line(23, 19, 35, 12); // Aspa superior
+                doc.line(23, 29, 35, 36); // Aspa inferior
+                
+                // Texto Cabecera
+                doc.setTextColor(255, 255, 255);
+                doc.setFont("helvetica", "bold");
+                doc.setFontSize(22);
+                doc.text("IDEAS TEXTILES", 40, 20);
+                
+                doc.setFont("helvetica", "normal");
+                doc.setFontSize(10);
+                doc.text("ROPA DE TRABAJO Y CORPORATIVA", 40, 28);
+                
+                // Datos del Reporte (Derecha)
+                doc.setFontSize(11);
+                doc.text("REPORTE OPERATIVO GLOBAL", 140, 18);
+                doc.setFontSize(9);
+                doc.text(`GENERADO: ${fechaHoy.toUpperCase()}`, 140, 25);
+                doc.text(`ID REPORTE: ${Date.now().toString().slice(-6)}`, 140, 30);
+
+                // 2. Resumen de Órdenes Activas
+                doc.setTextColor(0, 0, 0);
+                doc.setFontSize(14);
+                doc.setFont("helvetica", "bold");
+                doc.text("1. ESTADO DE ÓRDENES", 14, 55);
+                
+                // Preparar datos para tabla
+                const ordersBody = [];
+                let countPend = 0, countProc = 0, countDesp = 0;
+                
+                if (App.Data.orders) {
+                    Object.values(App.Data.orders).forEach(o => {
+                        let estado = (o.status || 'Pendiente').toUpperCase();
+                        if(estado.includes('PENDIENTE')) countPend++;
+                        if(estado.includes('PROCESO')) countProc++;
+                        if(estado.includes('DESPACHADO')) countDesp++;
+                        
+                        ordersBody.push([
+                            o.ocNumber || '---',
+                            o.client || 'Sin Cliente',
+                            o.invoice || 'Pendiente',
+                            estado,
+                            o.date || '-'
+                        ]);
+                    });
+                }
+
+                doc.autoTable({
+                    startY: 60,
+                    head: [['N° OC', 'CLIENTE', 'FACTURA/GUÍA', 'ESTADO', 'FECHA']],
+                    body: ordersBody,
+                    theme: 'grid',
+                    headStyles: { 
+                        fillColor: azulBrand, 
+                        textColor: 255, 
+                        fontStyle: 'bold',
+                        halign: 'center'
+                    },
+                    columnStyles: {
+                        0: { fontStyle: 'bold' },
+                        3: { halign: 'center', fontSize: 8 }
+                    },
+                    styles: { fontSize: 9, cellPadding: 3 }
+                });
+
+                // 3. Resumen Estadístico (Cuadros visuales en PDF)
+                let finalY = doc.lastAutoTable.finalY + 10;
+                
+                doc.setDrawColor(200);
+                doc.setFillColor(250, 250, 250);
+                
+                // Cuadro Pendientes
+                doc.rect(14, finalY, 55, 20, 'FD');
+                doc.setFontSize(8); doc.setTextColor(100); doc.text("PENDIENTES", 18, finalY + 6);
+                doc.setFontSize(14); doc.setTextColor(0); doc.text(String(countPend), 18, finalY + 15);
+
+                // Cuadro Proceso
+                doc.rect(77, finalY, 55, 20, 'FD');
+                doc.setFontSize(8); doc.setTextColor(100); doc.text("EN PRODUCCIÓN", 81, finalY + 6);
+                doc.setFontSize(14); doc.setTextColor(azulBrand); doc.text(String(countProc), 81, finalY + 15);
+
+                // Cuadro Despachados
+                doc.rect(140, finalY, 55, 20, 'FD');
+                doc.setFontSize(8); doc.setTextColor(100); doc.text("DESPACHADOS", 144, finalY + 6);
+                doc.setFontSize(14); doc.setTextColor(0, 150, 0); doc.text(String(countDesp), 144, finalY + 15);
+
+                // 4. Inventario Crítico
+                finalY += 30;
+                doc.setFontSize(14);
+                doc.setTextColor(0);
+                doc.text("2. RESUMEN DE BODEGA", 14, finalY);
+
+                const stockBody = [];
+                if(App.Data.inventory) {
+                    Object.values(App.Data.inventory).forEach(p => {
+                        let total = 0;
+                        let detail = "";
+                        if(p.sizes) {
+                            Object.entries(p.sizes).forEach(([t, c]) => {
+                                total += parseInt(c);
+                                if(parseInt(c) > 0) detail += `${t}:${c}  `;
+                            });
+                        }
+                        stockBody.push([p.sku, p.name, detail, total]);
+                    });
+                }
+
+                doc.autoTable({
+                    startY: finalY + 5,
+                    head: [['SKU', 'PRODUCTO', 'DESGLOSE TALLAS', 'TOTAL']],
+                    body: stockBody,
+                    theme: 'striped',
+                    headStyles: { fillColor: [50, 50, 50] },
+                    columnStyles: { 3: { fontStyle: 'bold', halign: 'right' } }
+                });
+
+                // Footer de Auditoría
+                const pageCount = doc.internal.getNumberOfPages();
+                for(let i = 1; i <= pageCount; i++) {
+                    doc.setPage(i);
+                    doc.setFontSize(8);
+                    doc.setTextColor(150);
+                    doc.text(`Documento generado por Sistema ERP Ideas Textiles - Pág ${i} de ${pageCount}`, 105, 285, {align:'center'});
+                    doc.text(`Usuario: Administración - Fecha: ${new Date().toLocaleString()}`, 105, 290, {align:'center'});
+                }
+
+                doc.save(`Reporte_Gerencial_${new Date().toISOString().slice(0,10)}.pdf`);
+            },
+
+            // Generador de OC Individual (Con checklist para bodega)
+            generateOC: function(id) {
+                const order = App.Data.orders[id];
+                if (!order) {
+                    Swal.fire('Error', 'No se encontraron datos de la orden', 'error');
+                    return;
+                }
+
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF();
+                const azulBrand = "#0071e3";
+
+                // --- MARCO DE SEGURIDAD ---
+                doc.setDrawColor(azulBrand);
+                doc.setLineWidth(0.5);
+                doc.rect(5, 5, 200, 287); // Borde página completo
+
+                // --- HEADER DISEÑO ---
+                doc.setFillColor(azulBrand);
+                doc.rect(6, 6, 198, 30, 'F');
+                
+                doc.setTextColor(255, 255, 255);
+                doc.setFontSize(24);
+                doc.setFont("helvetica", "bold");
+                doc.text("IDEAS TEXTILES", 15, 20);
+                doc.setFontSize(9);
+                doc.setFont("helvetica", "normal");
+                doc.text("SOLUCIONES EN VESTUARIO CORPORATIVO", 15, 28);
+
+                // Etiqueta de Orden
+                doc.setFillColor(255, 255, 255);
+                doc.roundedRect(140, 10, 60, 20, 3, 3, 'F');
+                doc.setTextColor(azulBrand);
+                doc.setFontSize(14);
+                doc.setFont("helvetica", "bold");
+                doc.text(`OC Nº ${order.ocNumber}`, 170, 19, {align: 'center'});
+                doc.setFontSize(8);
+                doc.text("DOCUMENTO INTERNO", 170, 26, {align: 'center'});
+
+                // --- INFORMACIÓN CLIENTE Y LOGÍSTICA ---
+                let yPos = 45;
+                
+                // Columna Izquierda: Cliente
+                doc.setTextColor(0);
+                doc.setFontSize(10);
+                doc.setFont("helvetica", "bold");
+                doc.text("DESTINATARIO / CLIENTE:", 15, yPos);
+                doc.setLineWidth(0.2);
+                doc.line(15, yPos+2, 100, yPos+2);
+                
+                yPos += 8;
+                doc.setFontSize(12);
+                doc.text(order.client.toUpperCase(), 15, yPos);
+                yPos += 6;
+                doc.setFontSize(10);
+                doc.setFont("helvetica", "normal");
+                doc.text(`Referencia Factura: ${order.invoice || 'PENDIENTE'}`, 15, yPos);
+                yPos += 6;
+                doc.text(`Fecha Emisión: ${order.date}`, 15, yPos);
+
+                // Columna Derecha: Instrucciones Bodega
+                doc.setFillColor(240, 240, 245);
+                doc.rect(120, 42, 75, 30, 'F');
+                doc.setFont("helvetica", "bold");
+                doc.setFontSize(9);
+                doc.text("CONTROL DE CALIDAD Y DESPACHO", 125, 48);
+                
+                // Checkboxes simulados
+                doc.setFont("helvetica", "normal");
+                doc.setFontSize(9);
+                doc.text("[   ] Conteo de prendas conforme", 125, 55);
+                doc.text("[   ] Etiquetas de talla verificadas", 125, 62);
+                doc.text("[   ] Embalaje sellado", 125, 69);
+
+                // --- TABLA DE PRODUCTOS (Cuerpo Principal) ---
+                const itemsBody = [];
+                // Si la orden tiene items guardados, los usamos. Si no, mostramos filas vacías para llenar a mano.
+                if (order.items && Object.keys(order.items).length > 0) {
+                    Object.values(order.items).forEach(item => {
+                        itemsBody.push([
+                            item.sku || '-',
+                            item.name || 'Producto General',
+                            item.qty || 1,
+                            '[ OK ]'
+                        ]);
+                    });
+                } else {
+                    // Fallback si no hay items detallados en el sistema (común en OCs rápidas)
+                    itemsBody.push(['-', 'DETALLE GENERAL SEGÚN OC ORIGINAL', 'GLOBAL', '[   ]']);
+                }
+
+                doc.autoTable({
+                    startY: 85,
+                    head: [['CÓDIGO', 'DESCRIPCIÓN DEL PRODUCTO', 'CANT.', 'CHECK BODEGA']],
+                    body: itemsBody,
+                    theme: 'plain', // Limpio para imprimir
+                    headStyles: { 
+                        fillColor: azulBrand, 
+                        textColor: 255, 
+                        fontStyle: 'bold',
+                        halign: 'center'
+                    },
+                    bodyStyles: {
+                        lineColor: [200, 200, 200],
+                        lineWidth: 0.1,
+                        minCellHeight: 12
+                    },
+                    columnStyles: {
+                        0: { cellWidth: 30 },
+                        2: { halign: 'center', cellWidth: 20 },
+                        3: { halign: 'center', cellWidth: 35, fontStyle: 'bold' }
+                    },
+                    margin: { left: 15, right: 15 }
+                });
+
+                // --- ESPACIO PARA NOTAS Y FIRMAS ---
+                let finalY = doc.lastAutoTable.finalY + 20;
+                
+                // Notas
+                doc.setFontSize(8);
+                doc.setTextColor(100);
+                doc.text("OBSERVACIONES / COMENTARIOS DE BODEGA:", 15, finalY);
+                doc.setDrawColor(200);
+                doc.line(15, finalY + 2, 195, finalY + 2);
+                doc.line(15, finalY + 10, 195, finalY + 10);
+                doc.line(15, finalY + 18, 195, finalY + 18);
+
+                // Firmas (Pie de página)
+                const pageHeight = doc.internal.pageSize.height;
+                const firmaY = pageHeight - 40;
+
+                doc.setDrawColor(0);
+                doc.line(30, firmaY, 90, firmaY);
+                doc.line(120, firmaY, 180, firmaY);
+                
+                doc.setFontSize(8);
+                doc.setTextColor(0);
+                doc.text("RESPONSABLE BODEGA", 60, firmaY + 5, { align: 'center' });
+                doc.text("RECIBIDO CONFORME (CLIENTE)", 150, firmaY + 5, { align: 'center' });
+                doc.text("Firma y Fecha", 150, firmaY + 10, { align: 'center' });
+
+                // Marca de Agua Digital
+                doc.setTextColor(200, 200, 200);
+                doc.setFontSize(40);
+                doc.text("ORIGINAL", 105, 150, { align: 'center', angle: 45 });
+
+                doc.save(`OC_${order.ocNumber}_Packing.pdf`);
+            }
+        };
+
+        // -----------------------------------------------------------------------------
+        // MÓDULO 3: MOTOR DE CÁMARA (EVIDENCIA FOTOGRÁFICA)
+        // -----------------------------------------------------------------------------
+        App.Camera = {
+            stream: null,
+            activeContext: null,
+
+            // Abrir cámara en un Modal Seguro
+            open: async function(contextId = 'general') {
+                this.activeContext = contextId;
+                
+                // Inyectar HTML del visor de cámara
+                const cameraHTML = `
+                    <div class="flex flex-col items-center w-full">
+                        <div class="relative w-full max-w-sm bg-black rounded-2xl overflow-hidden aspect-[3/4] shadow-2xl">
+                            <video id="video-feed" autoplay playsinline class="w-full h-full object-cover"></video>
+                            <div class="absolute inset-0 border-2 border-white/30 pointer-events-none m-4 rounded-xl"></div>
+                            <div class="absolute bottom-4 left-0 right-0 text-center">
+                                <p class="text-white text-xs bg-black/50 px-2 py-1 inline-block rounded">Encuadre la evidencia</p>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-6 flex gap-6">
+                            <button onclick="App.UI.closeModal(); App.Camera.stop()" class="w-12 h-12 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center">
+                                <i class="fas fa-times"></i>
+                            </button>
+                            <button onclick="App.Camera.capture()" class="w-20 h-20 rounded-full border-4 border-blue-600 bg-white flex items-center justify-center shadow-lg hover:bg-blue-50 transition">
+                                <div class="w-16 h-16 bg-blue-600 rounded-full"></div>
+                            </button>
+                        </div>
+                    </div>
+                    <canvas id="photo-canvas" class="hidden"></canvas>
+                `;
+
+                App.UI.showModal('CÁMARA DE EVIDENCIA', cameraHTML);
+
+                // Iniciar Hardware
+                try {
+                    // Intenta usar la cámara trasera preferentemente
+                    this.stream = await navigator.mediaDevices.getUserMedia({ 
+                        video: { facingMode: "environment" } 
+                    });
+                    const video = document.getElementById('video-feed');
+                    video.srcObject = this.stream;
+                } catch (err) {
+                    Swal.fire('Error de Cámara', 'No se pudo acceder a la cámara. Verifique los permisos del navegador.', 'error');
+                    App.UI.closeModal();
+                }
+            },
+
+            // Detener el flujo de video para ahorrar batería
+            stop: function() {
+                if (this.stream) {
+                    this.stream.getTracks().forEach(track => track.stop());
+                    this.stream = null;
+                }
+            },
+
+            // Capturar foto y guardar en Firebase (Calendario)
+            capture: function() {
+                const video = document.getElementById('video-feed');
+                const canvas = document.getElementById('photo-canvas');
+                
+                if (!video || !canvas) return;
+
+                // Configurar canvas al tamaño del video
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+                
+                // Dibujar foto
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                
+                // Agregar Sello de Tiempo (Marca de agua en la foto)
+                ctx.font = "20px Arial";
+                ctx.fillStyle = "white";
+                ctx.shadowColor="black";
+                ctx.shadowBlur=4;
+                ctx.fillText(`IDEAS TEXTILES - ${new Date().toLocaleString()}`, 20, canvas.height - 30);
+
+                // Convertir a imagen base64
+                const imageData = canvas.toDataURL('image/jpeg', 0.7); // Compresión 0.7 para no saturar BD
+                
+                // Guardar
+                this.saveToCalendar(imageData);
+                this.stop();
+            },
+
+            saveToCalendar: function(base64Image) {
+                // Generar llave de fecha YYYY-MM-DD
+                const today = new Date();
+                const dateKey = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
+                
+                const evidenceData = {
+                    type: 'FOTO',
+                    image: base64Image,
+                    context: this.activeContext,
+                    timestamp: Date.now(),
+                    user: 'Admin'
+                };
+
+                // Guardar en nodo 'calendar' asociado al día
+                firebase.database().ref(`calendar/${dateKey}`).push(evidenceData)
+                    .then(() => {
+                        App.UI.closeModal();
+                        Swal.fire({
+                            title: 'Evidencia Guardada',
+                            text: 'La foto se ha vinculado al calendario de hoy.',
+                            icon: 'success',
+                            imageUrl: base64Image,
+                            imageHeight: 100,
+                            timer: 3000
+                        });
+                        // Recargar calendario lateral para mostrar el punto verde
+                        App.Calendar.initMini();
+                    })
+                    .catch(err => Swal.fire('Error', 'No se pudo guardar la foto: ' + err.message, 'error'));
+            }
+        };
+
+        // --- FIN BLOQUE 2 ---
+        // ESPERANDO BLOQUE 3 PARA CIERRE DE SISTEMA Y LÓGICA DE ESCÁNER
