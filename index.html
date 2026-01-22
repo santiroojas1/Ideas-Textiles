@@ -3,760 +3,872 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>IDEAS TEXTILES SPA | ERP SYSTEM v15.0 - UNLIMITED</title>
-    
+    <title>IDEAS TEXTILES SPA | SISTEMA ERP PROFESIONAL</title>
+
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
-
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-
-    <script>
-        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';
-    </script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
     <style>
         :root {
-            --brand-dark: #0f172a;
-            --brand-primary: #2563eb;
-            --brand-accent: #3b82f6;
-            --bg-app: #f8fafc;
-            --glass-bg: rgba(255, 255, 255, 0.95);
-            --border-light: #e2e8f0;
-            --shadow-soft: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-            --shadow-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            --ios-blue: #007AFF;
+            --sea-blue: #0051A8;
+            --ios-bg: #F2F2F7;
+            --glass: rgba(255, 255, 255, 0.72);
+            --glass-dark: rgba(255, 255, 255, 0.4);
+            --border-ios: rgba(0, 0, 0, 0.1);
+            --text-main: #1C1C1E;
+        }
+
+        * {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+            scrollbar-width: thin;
+            scrollbar-color: var(--sea-blue) transparent;
         }
 
         body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--bg-app);
-            color: #334155;
-            -webkit-font-smoothing: antialiased;
-            overflow-x: hidden;
+            background-color: #FFFFFF;
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(0, 122, 255, 0.05) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(0, 81, 168, 0.05) 0px, transparent 50%);
+            color: var(--text-main);
+            height: 100vh;
+            overflow: hidden;
         }
 
-        /* --- COMPONENTES DE UI MEJORADOS --- */
-        .nav-bubble {
-            position: relative; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            overflow: hidden; border: 1px solid transparent;
-        }
-        .nav-bubble:hover {
-            transform: translateY(-2px); background: rgba(255, 255, 255, 0.1);
-            border-color: rgba(255, 255, 255, 0.2);
-        }
-        .nav-bubble.active {
-            background: white; color: var(--brand-dark);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            font-weight: 800;
-        }
-        .nav-bubble.active i { color: var(--brand-primary); }
-
-        .card-glass {
-            background: white; border-radius: 20px; border: 1px solid var(--border-light);
-            padding: 24px; transition: all 0.3s ease; position: relative;
-            box-shadow: var(--shadow-soft);
-        }
-        .card-glass:hover {
-            transform: translateY(-4px); box-shadow: var(--shadow-hover);
-            border-color: #3b82f6;
+        /* --- DISEÑO ESTILO BURBUJA iOS --- */
+        .glass-panel {
+            background: var(--glass);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border: 1px solid var(--border-ios);
+            border-radius: 24px;
         }
 
-        .search-input {
-            background: #f1f5f9; border: 1px solid #e2e8f0; border-radius: 12px;
-            padding: 12px 16px; font-size: 0.9rem; font-weight: 600; color: #334155;
-            transition: all 0.3s; width: 100%;
-        }
-        .search-input:focus {
-            background: white; border-color: var(--brand-primary); outline: none;
-            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
-        }
-
-        .btn-action { transition: all 0.2s active; cursor: pointer; user-select: none; }
-        .btn-action:active { transform: scale(0.95); }
-
-        /* --- TACHAS 3 COLUMNAS --- */
-        .label-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
+        .bubble-card {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            border: 1px solid var(--border-ios);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.01);
+            transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
         }
 
-        /* --- CALENDARIO & PLANNER --- */
-        .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; }
-        .cal-day {
-            min-height: 130px; background: white; border-radius: 14px;
-            border: 1px solid #f1f5f9; padding: 10px; display: flex; flex-direction: column;
-            cursor: pointer; transition: 0.2s; position: relative;
+        .bubble-card:hover {
+            transform: scale(1.02);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05);
         }
-        .cal-day:hover { border-color: var(--brand-primary); background: #f8fafc; z-index: 10; transform: scale(1.02); }
-        .cal-day.today { background: #eff6ff; border: 2px solid var(--brand-primary); }
-        .cal-event {
-            font-size: 0.7rem; padding: 4px 8px; border-radius: 6px; margin-top: 4px;
-            font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-            display: flex; align-items: center; gap: 4px; border-left: 4px solid;
-        }
-        
-        /* --- ESTADOS PIPELINE --- */
-        .st-pendiente { background-color: #f1f5f9; color: #64748b; border-color: #cbd5e1; }
-        .st-proceso { background-color: #fff7ed; color: #c2410c; border-color: #fdba74; }
-        .st-empaquetado { background-color: #eff6ff; color: #1e40af; border-color: #93c5fd; }
-        .st-despachado { background-color: #f0fdf4; color: #15803d; border-color: #86efac; }
-        
-        /* --- MODO SABUESO (LOGS) --- */
-        .sabueso-log {
-            font-family: 'JetBrains Mono', monospace;
-            background: #0f172a;
-            color: #10b981;
-            padding: 15px;
+
+        /* --- INPUTS MINIMALISTAS --- */
+        .editable-field {
+            cursor: pointer;
+            padding: 4px 8px;
             border-radius: 8px;
-            font-size: 11px;
-            max-height: 200px;
-            overflow-y: auto;
+            transition: background 0.2s;
+            border: 1px solid transparent;
         }
 
-        /* GEMINI STYLES */
-        .gemini-glow { animation: geminiPulse 2s infinite; }
-        @keyframes geminiPulse { 0% { box-shadow: 0 0 0 0 rgba(147, 51, 234, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(147, 51, 234, 0); } 100% { box-shadow: 0 0 0 0 rgba(147, 51, 234, 0); } }
+        .editable-field:hover {
+            background: rgba(0, 122, 255, 0.1);
+            border-color: var(--ios-blue);
+        }
+
+        .editing-input {
+            background: white;
+            border: 2px solid var(--ios-blue) !important;
+            outline: none;
+            width: 100%;
+            padding: 4px 8px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 122, 255, 0.2);
+        }
+
+        /* --- NAVEGACIÓN iOS --- */
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #8E8E93;
+            font-size: 10px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .nav-item i {
+            font-size: 20px;
+            margin-bottom: 4px;
+        }
+
+        .nav-item.active {
+            color: var(--ios-blue);
+        }
+
+        /* --- BARRAS DE BÚSQUEDA --- */
+        .ios-search-bar {
+            background: rgba(118, 118, 128, 0.12);
+            border-radius: 12px;
+            padding: 10px 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .ios-search-bar input {
+            background: transparent;
+            border: none;
+            outline: none;
+            width: 100%;
+            font-size: 15px;
+        }
+
+        /* --- TABLA DINÁMICA --- */
+        .table-container {
+            border-radius: 18px;
+            overflow: hidden;
+            border: 1px solid var(--border-ios);
+        }
+
+        .table-header {
+            background: rgba(242, 242, 247, 0.8);
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-weight: 700;
+            color: #8E8E93;
+        }
+
+        /* --- BOTONES PROFESIONALES --- */
+        .btn-ios-primary {
+            background: var(--sea-blue);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 14px;
+            font-weight: 700;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 14px rgba(0, 81, 168, 0.3);
+        }
+
+        .btn-ios-primary:active {
+            transform: scale(0.95);
+            opacity: 0.8;
+        }
+
+        /* --- ESTRUCTURA DE CAPAS --- */
+        #app-layout {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            height: 100vh;
+        }
 
         @media (max-width: 1024px) {
-            .sidebar {
-                position: fixed; bottom: 0; left: 0; width: 100%; height: auto;
-                flex-direction: row; justify-content: space-evenly;
-                border-radius: 24px 24px 0 0; padding: 12px; z-index: 50;
-                background: #0f172a; box-shadow: 0 -4px 20px rgba(0,0,0,0.5);
+            #app-layout {
+                grid-template-columns: 1fr;
             }
-            .sidebar-logo, .nav-label, .sidebar-footer { display: none; }
-            .nav-bubble { padding: 12px; width: 55px; height: 55px; display: flex; align-items: center; justify-content: center; border-radius: 50%; }
-            main { padding-bottom: 120px; }
+            .sidebar {
+                display: none;
+            }
+            .mobile-nav {
+                display: flex !important;
+            }
         }
 
-        .hidden { display: none !important; }
-        .fade-in { animation: fadeIn 0.4s ease-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        /* --- LOADERS Y ANIMACIONES --- */
+        .ios-loader {
+            width: 24px;
+            height: 24px;
+            border: 3px solid rgba(0, 122, 255, 0.2);
+            border-top: 3px solid var(--ios-blue);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
 
-        /* CUSTOM SCROLLBAR */
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
     </style>
 </head>
-<body class="selection:bg-blue-100">
+<body>
 
-    <div id="loader" class="fixed inset-0 bg-slate-950 z-[100] flex flex-col justify-center items-center text-white transition-opacity duration-700">
-        <div class="relative mb-8">
-            <div class="w-24 h-24 border-8 border-blue-500/20 border-t-blue-500 rounded-full animate-spin"></div>
-            <i class="fas fa-microchip absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-3xl text-blue-400 animate-pulse"></i>
-        </div>
-        <h2 class="font-black text-3xl tracking-[10px] uppercase italic">IDEAS TEXTILES</h2>
-        <p class="text-xs font-bold text-slate-400 mt-4 uppercase tracking-[4px]">Sincronizando con Red Neuronal Firebase...</p>
-        <div class="mt-8 w-48 bg-slate-800 h-1 rounded-full overflow-hidden">
-            <div id="loader-bar" class="bg-blue-500 h-full w-0 transition-all duration-300"></div>
-        </div>
+    <div id="main-loader" class="fixed inset-0 bg-white z-[100] flex flex-col items-center justify-center transition-opacity duration-500">
+        <div class="ios-loader mb-4"></div>
+        <h1 class="text-xl font-black text-slate-800 tracking-tighter italic">IDEAS TEXTILES <span class="text-blue-600">SPA</span></h1>
+        <p class="text-[10px] uppercase tracking-widest font-bold text-slate-400 mt-2">Sincronizando con la Nube...</p>
     </div>
 
-    <div id="config-modal" class="fixed inset-0 bg-slate-900/90 z-[95] hidden p-4 flex items-center justify-center backdrop-blur-sm">
-        <div class="bg-white w-full max-w-lg rounded-3xl shadow-2xl p-8 animate__animated animate__fadeInUp">
-            <div class="flex justify-between items-center mb-6">
-                <h3 class="font-black text-2xl text-slate-800 flex items-center gap-3">
-                    <i class="fas fa-satellite-dish text-blue-600"></i> CONFIGURACIÓN CORE
-                </h3>
-                <button onclick="document.getElementById('config-modal').classList.add('hidden')" class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 hover:text-red-500 transition">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            
-            <div class="space-y-6">
-                <div>
-                    <label class="block text-xs font-black text-slate-500 uppercase tracking-widest mb-2">Google Gemini API Key</label>
-                    <div class="relative">
-                        <i class="fas fa-brain absolute left-4 top-1/2 transform -translate-y-1/2 text-purple-400"></i>
-                        <input type="password" id="gemini-api-key" class="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl pl-12 pr-4 py-4 text-sm font-mono focus:border-purple-500 outline-none transition" placeholder="AI-Key-...">
-                    </div>
-                </div>
+    <div id="toast-container" class="fixed top-6 right-6 z-[110] space-y-4"></div>
 
-                <div>
-                    <label class="block text-xs font-black text-slate-500 uppercase tracking-widest mb-2">Firebase Config (JSON)</label>
-                    <textarea id="firebase-config-input" rows="4" class="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl p-4 text-[10px] font-mono focus:border-blue-500 outline-none transition" placeholder='{"apiKey": "...", "databaseURL": "..."}'></textarea>
-                </div>
-
-                <button onclick="App.Core.saveConfig()" class="w-full bg-slate-900 text-white font-black py-5 rounded-2xl hover:bg-blue-600 transition shadow-xl shadow-blue-500/20 uppercase tracking-widest">
-                    REINICIAR SISTEMA CON NUEVA CONFIG
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <div id="sabueso-modal" class="fixed inset-0 bg-slate-950/80 z-[95] hidden p-4 flex items-center justify-center backdrop-blur-md">
-        <div class="bg-white w-full max-w-4xl h-[80vh] rounded-3xl shadow-2xl flex flex-col overflow-hidden animate__animated animate__zoomIn">
-            <div class="bg-slate-900 p-6 flex justify-between items-center text-white">
-                <div>
-                    <h3 class="font-black text-xl flex items-center gap-3">
-                        <i class="fas fa-dog text-orange-400"></i> MOTOR SABUESO v2.1
-                    </h3>
-                    <p class="text-xs text-slate-400">Rastreador de datos en Excel/PDF para importación masiva</p>
-                </div>
-                <button onclick="document.getElementById('sabueso-modal').classList.add('hidden')" class="text-slate-400 hover:text-white"><i class="fas fa-times text-2xl"></i></button>
-            </div>
-            
-            <div class="flex-1 p-8 overflow-y-auto">
-                <div id="sabueso-drop-zone" class="border-4 border-dashed border-slate-200 rounded-3xl p-12 flex flex-col items-center justify-center text-slate-400 hover:border-blue-500 hover:bg-blue-50 transition cursor-pointer mb-8">
-                    <i class="fas fa-cloud-upload-alt text-6xl mb-4"></i>
-                    <p class="font-bold">Arrastra el archivo de despacho o Excel de producción</p>
-                    <p class="text-xs mt-2 italic">Soportamos .xlsx, .xls y .pdf</p>
-                    <input type="file" id="sabueso-file-input" class="hidden" accept=".xlsx,.xls,.pdf">
-                </div>
-
-                <div id="sabueso-results" class="hidden">
-                    <h4 class="font-black text-slate-800 mb-4 flex items-center gap-2">
-                        <i class="fas fa-microscope text-blue-600"></i> DATOS ENCONTRADOS
-                    </h4>
-                    <div id="sabueso-log-container" class="sabueso-log mb-6"></div>
-                    <div id="sabueso-table-preview" class="overflow-x-auto rounded-xl border border-slate-100"></div>
-                </div>
-            </div>
-
-            <div class="p-6 border-t border-slate-100 flex justify-end gap-4">
-                <button onclick="App.Logic.Sabueso.reset()" class="px-6 py-3 font-bold text-slate-500 hover:text-slate-800">LIMPIAR</button>
-                <button id="sabueso-import-btn" class="hidden px-8 py-3 bg-blue-600 text-white font-black rounded-xl shadow-lg hover:bg-blue-700 transition">IMPORTAR A BODEGA</button>
-            </div>
-        </div>
-    </div>
-
-    <div class="flex flex-col lg:flex-row min-h-screen">
+    <div id="app-layout">
         
-        <aside class="sidebar bg-[#0b1120] text-slate-400 w-full lg:w-80 lg:p-8 flex lg:flex-col justify-between relative shadow-2xl z-40 border-r border-slate-800">
-            <div class="sidebar-logo z-10 mb-12">
-                <div class="flex items-center gap-4">
-                    <div class="w-12 h-12 bg-blue-600 rounded-2xl flex items-center justify-center shadow-2xl shadow-blue-500/50 rotate-3">
-                        <i class="fas fa-vector-square text-white text-2xl"></i>
-                    </div>
-                    <div>
-                        <h1 class="font-black italic text-xl leading-none tracking-tighter text-white">IDEAS<br><span class="text-blue-500">TEXTILES</span></h1>
-                    </div>
+        <aside class="sidebar bg-[#F9F9F9] border-r border-slate-200 p-8 flex flex-col justify-between">
+            <div>
+                <div class="mb-12">
+                    <img id="logo-main" src="https://i.ibb.co/VmxP6Xh/Logo-Ideas-Textiles.png" alt="Logo" class="w-48 mb-2">
+                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-tighter pl-1">Ropa de Trabajo y Corporativa</p>
                 </div>
+
+                <nav class="space-y-2">
+                    <button onclick="App.UI.switchView('dashboard')" id="btn-dashboard" class="nav-btn w-full flex items-center gap-4 px-4 py-3 rounded-xl text-slate-500 font-bold transition-all active-nav">
+                        <i class="fas fa-chart-pie text-lg"></i> Dashboard
+                    </button>
+                    <button onclick="App.UI.switchView('inventory')" id="btn-inventory" class="nav-btn w-full flex items-center gap-4 px-4 py-3 rounded-xl text-slate-500 font-bold transition-all">
+                        <i class="fas fa-boxes-stacked text-lg"></i> Bodega
+                    </button>
+                    <button onclick="App.UI.switchView('orders')" id="btn-orders" class="nav-btn w-full flex items-center gap-4 px-4 py-3 rounded-xl text-slate-500 font-bold transition-all">
+                        <i class="fas fa-receipt text-lg"></i> Órdenes de Compra
+                    </button>
+                    <button onclick="App.UI.switchView('movements')" id="btn-movements" class="nav-btn w-full flex items-center gap-4 px-4 py-3 rounded-xl text-slate-500 font-bold transition-all">
+                        <i class="fas fa-truck-ramp-box text-lg"></i> Movimientos
+                    </button>
+                    <button onclick="App.UI.switchView('calendar')" id="btn-calendar" class="nav-btn w-full flex items-center gap-4 px-4 py-3 rounded-xl text-slate-500 font-bold transition-all">
+                        <i class="fas fa-calendar-day text-lg"></i> Agenda & Fotos
+                    </button>
+                </nav>
             </div>
 
-            <nav class="flex lg:flex-col gap-3 w-full lg:flex-1 z-10 overflow-x-auto lg:overflow-visible pb-4 lg:pb-0">
-                <div onclick="App.Router.go('dashboard')" id="nav-dashboard" class="nav-bubble active p-4 rounded-2xl cursor-pointer flex items-center gap-4 text-sm font-bold shrink-0">
-                    <i class="fas fa-th-large w-6 text-center text-lg"></i> <span class="nav-label uppercase tracking-widest">Dashboard</span>
+            <div class="bg-blue-50 p-4 rounded-2xl border border-blue-100">
+                <p class="text-[10px] font-black text-blue-600 uppercase mb-1">Usuario Activo</p>
+                <p class="font-bold text-slate-800 text-sm">Administrador Pro</p>
+                <div class="flex items-center gap-2 mt-3 text-[10px] font-bold text-blue-500">
+                    <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span> Sistema En Línea
                 </div>
-                <div onclick="App.Router.go('inventory')" id="nav-inventory" class="nav-bubble p-4 rounded-2xl cursor-pointer flex items-center gap-4 text-sm font-bold shrink-0">
-                    <i class="fas fa-boxes-stacked w-6 text-center text-lg"></i> <span class="nav-label uppercase tracking-widest">Bodega Central</span>
-                </div>
-                <div onclick="App.Router.go('orders')" id="nav-orders" class="nav-bubble p-4 rounded-2xl cursor-pointer flex items-center gap-4 text-sm font-bold shrink-0">
-                    <i class="fas fa-file-invoice-dollar w-6 text-center text-lg"></i> <span class="nav-label uppercase tracking-widest">Órdenes</span>
-                </div>
-                <div onclick="App.Router.go('sabueso')" id="nav-sabueso" class="nav-bubble p-4 rounded-2xl cursor-pointer flex items-center gap-4 text-sm font-bold shrink-0 bg-blue-500/5 border-blue-500/20">
-                    <i class="fas fa-dog w-6 text-center text-lg text-orange-400"></i> <span class="nav-label uppercase tracking-widest">Sabueso AI</span>
-                </div>
-                <div onclick="App.Router.go('calendar')" id="nav-calendar" class="nav-bubble p-4 rounded-2xl cursor-pointer flex items-center gap-4 text-sm font-bold shrink-0">
-                    <i class="fas fa-calendar-day w-6 text-center text-lg"></i> <span class="nav-label uppercase tracking-widest">Planificación</span>
-                </div>
-            </nav>
-
-            <div class="sidebar-footer z-10 mt-auto pt-6 border-t border-slate-800 flex items-center justify-between">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center border border-slate-700">
-                        <i class="fas fa-user-shield text-blue-400"></i>
-                    </div>
-                    <div>
-                        <p class="text-xs font-black text-white uppercase">SISTEMA ERP</p>
-                        <p id="user-status" class="text-[9px] text-green-500 font-bold uppercase tracking-tighter">ONLINE SYNC</p>
-                    </div>
-                </div>
-                <button onclick="document.getElementById('config-modal').classList.remove('hidden')" class="w-10 h-10 rounded-xl bg-slate-800 text-slate-400 hover:bg-blue-600 hover:text-white transition">
-                    <i class="fas fa-cog"></i>
-                </button>
             </div>
         </aside>
 
-        <main class="flex-1 p-6 lg:p-12 overflow-y-auto relative bg-[#f8fafc]">
+        <main class="relative h-screen overflow-y-auto p-6 md:p-12">
             
-            <div id="connection-status" class="fixed top-6 right-6 z-50 px-4 py-2 rounded-full bg-white shadow-xl border border-slate-100 flex items-center gap-3 animate__animated animate__fadeInRight">
-                <div class="relative flex h-3 w-3">
-                    <span id="ping-indicator" class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                    <span class="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
-                </div>
-                <span id="conn-text" class="text-[10px] font-black text-slate-700 uppercase tracking-widest">Firebase Live</span>
-            </div>
-
-            <section id="view-dashboard" class="fade-in space-y-8">
-                <header class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-                    <div>
-                        <h2 class="text-4xl font-black text-slate-900 tracking-tighter italic">PANEL OPERATIVO</h2>
-                        <p class="text-slate-500 font-bold uppercase text-xs tracking-[3px] mt-1">Control de Flujo Global • Ideas Textiles SPA</p>
-                    </div>
-                    <div class="flex gap-4">
-                        <button onclick="App.Logic.Reports.fullSync()" class="bg-white p-4 rounded-2xl shadow-lg border border-slate-100 hover:border-blue-500 transition text-slate-600">
-                            <i class="fas fa-sync-alt"></i>
-                        </button>
-                        <button onclick="App.PDF.Management.generate()" class="bg-slate-900 text-white px-8 py-4 rounded-2xl font-black text-xs uppercase tracking-widest shadow-2xl shadow-slate-900/30 flex items-center gap-3">
-                            <i class="fas fa-file-invoice"></i> Generar Balance
-                        </button>
-                    </div>
-                </header>
-
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-                    <div class="card-glass bg-gradient-to-br from-blue-600 to-blue-800 text-white border-none">
-                        <p class="text-[10px] font-black uppercase tracking-widest opacity-80">Stock en Bodega</p>
-                        <div class="flex justify-between items-end mt-4">
-                            <h3 id="stat-total-stock" class="text-5xl font-black">0</h3>
-                            <i class="fas fa-box-open text-3xl opacity-30 mb-2"></i>
-                        </div>
-                    </div>
-                    <div class="card-glass">
-                        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Órdenes Activas</p>
-                        <div class="flex justify-between items-end mt-4">
-                            <h3 id="stat-active-orders" class="text-5xl font-black text-slate-800">0</h3>
-                            <i class="fas fa-clock text-3xl text-orange-500 opacity-20 mb-2"></i>
-                        </div>
-                    </div>
-                    <div class="card-glass">
-                        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Producción Mes</p>
-                        <div class="flex justify-between items-end mt-4">
-                            <h3 id="stat-month-prod" class="text-5xl font-black text-slate-800">0</h3>
-                            <i class="fas fa-industry text-3xl text-blue-500 opacity-20 mb-2"></i>
-                        </div>
-                    </div>
-                    <div class="card-glass">
-                        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Eficiencia</p>
-                        <div class="flex justify-between items-end mt-4">
-                            <h3 id="stat-efficiency" class="text-5xl font-black text-slate-800">98%</h3>
-                            <i class="fas fa-bolt text-3xl text-yellow-500 opacity-20 mb-2"></i>
-                        </div>
-                    </div>
+            <header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-6">
+                <div>
+                    <h2 id="view-title" class="text-4xl font-black text-slate-900 tracking-tight">Cargando...</h2>
+                    <p id="view-subtitle" class="text-slate-500 font-medium">Espere un momento</p>
                 </div>
 
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                    <div class="card-glass border-l-8 border-l-blue-600">
-                        <div class="flex justify-between items-center mb-6">
-                            <h4 class="font-black text-xl text-slate-800 italic uppercase">Logística en Tiempo Real</h4>
-                            <span class="text-[10px] bg-blue-100 text-blue-700 px-3 py-1 rounded-full font-black">LIVE STREAM</span>
-                        </div>
-                        <div id="dashboard-recent-activity" class="space-y-4">
-                            </div>
+                <div class="flex items-center gap-4 w-full md:w-auto">
+                    <div class="ios-search-bar flex-1 md:flex-none">
+                        <i class="fas fa-search text-slate-400"></i>
+                        <input type="text" id="global-search" placeholder="Buscar en todo el ERP..." oninput="App.Core.search(this.value)">
                     </div>
-                    <div class="card-glass border-l-8 border-l-orange-500">
-                        <div class="flex justify-between items-center mb-6">
-                            <h4 class="font-black text-xl text-slate-800 italic uppercase">Alertas de Stock</h4>
-                            <i class="fas fa-exclamation-triangle text-orange-500"></i>
-                        </div>
-                        <div id="dashboard-stock-alerts" class="space-y-3">
-                            </div>
-                    </div>
+                    <button onclick="App.PDF.generateGlobalReport()" class="w-12 h-12 glass-panel flex items-center justify-center text-slate-700 hover:text-blue-600 transition shadow-sm">
+                        <i class="fas fa-print"></i>
+                    </button>
                 </div>
-            </section>
+            </header>
 
-            <section id="view-inventory" class="hidden fade-in space-y-8">
-                <header class="flex flex-col md:flex-row justify-between items-center gap-6">
-                    <div>
-                        <h2 class="text-4xl font-black text-slate-900 tracking-tighter">BODEGA CENTRAL</h2>
-                        <p class="text-slate-500 font-bold uppercase text-xs tracking-widest">Maestro de Telas y Prendas</p>
-                    </div>
-                    <div class="flex gap-3 w-full md:w-auto">
-                        <div class="relative flex-1">
-                            <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
-                            <input type="text" oninput="App.Logic.Inventory.filter(this.value)" class="search-input pl-12" placeholder="Buscar por SKU, Nombre o Categoría...">
-                        </div>
-                        <button onclick="App.UI.Modals.openProduct()" class="bg-slate-900 text-white px-8 py-4 rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl flex items-center gap-3">
-                            <i class="fas fa-plus"></i> NUEVO SKU
-                        </button>
-                    </div>
-                </header>
-
-                <div id="inventory-container" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                    </div>
-            </section>
-
-            <section id="view-orders" class="hidden fade-in space-y-8">
-                <header class="flex justify-between items-center">
-                    <h2 class="text-4xl font-black text-slate-900 tracking-tighter italic">ÓRDENES DE TRABAJO</h2>
-                    <div class="flex gap-4">
-                        <button onclick="App.PDF.Labels.generate3Columns()" class="bg-orange-600 text-white px-6 py-3 rounded-xl font-bold text-xs uppercase flex items-center gap-2">
-                            <i class="fas fa-print"></i> TACHAS 3 COL
-                        </button>
-                        <button onclick="App.UI.Modals.openOrder()" class="bg-blue-600 text-white px-6 py-3 rounded-xl font-bold text-xs uppercase flex items-center gap-2">
-                            <i class="fas fa-file-medical"></i> CREAR ORDEN
-                        </button>
-                    </div>
-                </header>
+            <div id="views-wrapper">
                 
-                <div class="flex bg-white rounded-2xl p-2 shadow-sm border border-slate-100 w-fit mb-6">
-                    <button class="px-6 py-2 rounded-xl text-xs font-black uppercase bg-slate-100 text-slate-800">Todas</button>
-                    <button class="px-6 py-2 rounded-xl text-xs font-black uppercase text-slate-400 hover:text-slate-800">Pendientes</button>
-                    <button class="px-6 py-2 rounded-xl text-xs font-black uppercase text-slate-400 hover:text-slate-800">Finalizadas</button>
-                </div>
-
-                <div id="orders-list" class="space-y-4">
+                <section id="view-dashboard" class="view-content fade-in space-y-8">
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                        <div class="bubble-card bg-gradient-to-br from-blue-600 to-blue-800 text-white">
+                            <p class="text-xs font-bold opacity-80 uppercase tracking-widest">Stock Total</p>
+                            <h3 class="text-4xl font-black mt-2" id="stat-total-stock">0</h3>
+                            <div class="mt-4 text-[10px] font-bold bg-white/20 p-2 rounded-lg inline-block">BODEGA CENTRAL</div>
+                        </div>
+                        <div class="bubble-card">
+                            <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">OC en Proceso</p>
+                            <h3 class="text-4xl font-black mt-2 text-slate-800" id="stat-pending-orders">0</h3>
+                            <div class="mt-4 text-[10px] font-bold text-orange-500 flex items-center gap-1">
+                                <i class="fas fa-clock"></i> ACTUALIZADO AHORA
+                            </div>
+                        </div>
+                        <div class="bubble-card">
+                            <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">Facturado Mes</p>
+                            <h3 class="text-4xl font-black mt-2 text-slate-800" id="stat-monthly-total">0</h3>
+                            <div class="mt-4 text-[10px] font-bold text-blue-500">PENDIENTE DE PAGO</div>
+                        </div>
+                        <div class="bubble-card">
+                            <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">Despachado</p>
+                            <h3 class="text-4xl font-black mt-2 text-green-600" id="stat-dispatched">0</h3>
+                            <div class="mt-4 text-[10px] font-bold text-green-500 flex items-center gap-1">
+                                <i class="fas fa-check-circle"></i> ENTREGAS EXITOSAS
+                            </div>
+                        </div>
                     </div>
-            </section>
 
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div class="glass-panel p-8">
+                            <h4 class="font-black text-lg mb-6 flex items-center gap-3">
+                                <i class="fas fa-bolt text-yellow-500"></i> Acciones Rápidas
+                            </h4>
+                            <div class="grid grid-cols-2 gap-4">
+                                <button onclick="App.UI.openModal('new-order')" class="p-6 rounded-2xl border-2 border-dashed border-slate-200 hover:border-blue-500 hover:bg-blue-50 transition text-left group">
+                                    <i class="fas fa-file-circle-plus text-2xl mb-2 text-slate-400 group-hover:text-blue-500"></i>
+                                    <p class="font-bold text-slate-800">Nueva OC</p>
+                                    <p class="text-[10px] text-slate-400">Crear pedido de cliente</p>
+                                </button>
+                                <button onclick="App.UI.openModal('new-product')" class="p-6 rounded-2xl border-2 border-dashed border-slate-200 hover:border-blue-500 hover:bg-blue-50 transition text-left group">
+                                    <i class="fas fa-box-open text-2xl mb-2 text-slate-400 group-hover:text-blue-500"></i>
+                                    <p class="font-bold text-slate-800">Ingreso Stock</p>
+                                    <p class="text-[10px] text-slate-400">Aumentar inventario</p>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="glass-panel p-8">
+                            <h4 class="font-black text-lg mb-6">Alertas de Stock Bajo</h4>
+                            <div id="stock-alerts-list" class="space-y-4">
+                                </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="view-inventory" class="view-content hidden fade-in">
+                    <div class="flex justify-between items-center mb-6">
+                        <div class="flex gap-4">
+                            <button onclick="App.Store.Inventory.exportExcel()" class="bg-green-100 text-green-700 px-4 py-2 rounded-xl text-xs font-bold hover:bg-green-200 transition">
+                                <i class="fas fa-file-excel mr-2"></i> EXCEL
+                            </button>
+                        </div>
+                        <button onclick="App.UI.openModal('new-product')" class="btn-ios-primary">
+                            <i class="fas fa-plus"></i> AGREGAR PRODUCTO
+                        </button>
+                    </div>
+
+                    <div class="table-container bg-white">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="table-header">
+                                    <th class="py-5 px-6">SKU / PRODUCTO</th>
+                                    <th class="py-5 px-4 text-center">TALLAS (TOTAL)</th>
+                                    <th class="py-5 px-4 text-center">CATEGORÍA</th>
+                                    <th class="py-5 px-4 text-right">ACCIONES</th>
+                                </tr>
+                            </thead>
+                            <tbody id="inventory-table-body" class="divide-y divide-slate-100">
+                                </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section id="view-orders" class="view-content hidden fade-in">
+                    <div class="flex flex-col md:flex-row gap-4 mb-8">
+                        <div class="ios-search-bar">
+                            <i class="fas fa-filter text-slate-400"></i>
+                            <select id="filter-order-status" class="bg-transparent border-none outline-none text-sm font-bold w-full" onchange="App.Core.filterOrders()">
+                                <option value="all">Todos los Estados</option>
+                                <option value="pendiente">Pendientes</option>
+                                <option value="proceso">En Producción</option>
+                                <option value="empaquetado">Empaquetado</option>
+                                <option value="despachado">Despachado</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div id="orders-kanban" class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                        <div class="kanban-col">
+                            <h5 class="font-black text-slate-400 text-[10px] uppercase mb-4 tracking-widest flex items-center justify-between">
+                                Pendientes <span id="count-pendiente" class="bg-slate-200 px-2 py-0.5 rounded-full">0</span>
+                            </h5>
+                            <div id="col-pendiente" class="space-y-4 min-h-[500px]"></div>
+                        </div>
+                        <div class="kanban-col">
+                            <h5 class="font-black text-blue-500 text-[10px] uppercase mb-4 tracking-widest flex items-center justify-between">
+                                Producción <span id="count-proceso" class="bg-blue-100 px-2 py-0.5 rounded-full">0</span>
+                            </h5>
+                            <div id="col-proceso" class="space-y-4 min-h-[500px]"></div>
+                        </div>
+                        <div class="kanban-col">
+                            <h5 class="font-black text-orange-500 text-[10px] uppercase mb-4 tracking-widest flex items-center justify-between">
+                                Empaque <span id="count-empaquetado" class="bg-orange-100 px-2 py-0.5 rounded-full">0</span>
+                            </h5>
+                            <div id="col-empaquetado" class="space-y-4 min-h-[500px]"></div>
+                        </div>
+                        <div class="kanban-col">
+                            <h5 class="font-black text-green-600 text-[10px] uppercase mb-4 tracking-widest flex items-center justify-between">
+                                Despachado <span id="count-despachado" class="bg-green-100 px-2 py-0.5 rounded-full">0</span>
+                            </h5>
+                            <div id="col-despachado" class="space-y-4 min-h-[500px]"></div>
+                        </div>
+                    </div>
+                </section>
+
+            </div>
         </main>
     </div>
 
+    <nav class="mobile-nav fixed bottom-0 left-0 w-full bg-white/80 backdrop-blur-xl border-t border-slate-200 h-20 hidden items-center justify-around px-4 z-[90]">
+        <div onclick="App.UI.switchView('dashboard')" class="nav-item active">
+            <i class="fas fa-chart-pie"></i> Panel
+        </div>
+        <div onclick="App.UI.switchView('inventory')" class="nav-item">
+            <i class="fas fa-boxes-stacked"></i> Bodega
+        </div>
+        <div onclick="App.UI.switchView('orders')" class="nav-item">
+            <i class="fas fa-receipt"></i> OC
+        </div>
+        <div onclick="App.UI.switchView('calendar')" class="nav-item">
+            <i class="fas fa-camera"></i> Fotos
+        </div>
+    </nav>
+
+    <div id="ios-modal" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-[150] hidden flex items-center justify-center p-4">
+        <div class="glass-panel w-full max-w-2xl max-h-[90vh] overflow-y-auto animate__animated animate__fadeInUp">
+            <div class="sticky top-0 bg-white/80 backdrop-blur-md px-8 py-6 border-b border-slate-100 flex justify-between items-center z-10">
+                <h3 id="modal-title" class="text-2xl font-black text-slate-800 tracking-tighter">Nueva Operación</h3>
+                <button onclick="App.UI.closeModal()" class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center hover:bg-red-50 hover:text-red-500 transition">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div id="modal-content" class="p-8">
+                </div>
+        </div>
+    </div>
+
     <script>
-        // --- MOTOR DE DATOS Y ESTADO ---
+        /**
+         * IDEAS TEXTILES SPA - NÚCLEO ARQUITECTÓNICO V1.0
+         * Sistema de Gestión de Alta Disponibilidad
+         */
+
         const App = {
-            DB: {
-                inventory: [],
-                orders: [],
+            // --- ESTADO GLOBAL (SINGLE SOURCE OF TRUTH) ---
+            State: {
+                inventory: {},
+                orders: {},
                 movements: [],
-                tasks: [],
-                config: {
-                    geminiKey: localStorage.getItem('gemini_key') || '',
-                    firebase: JSON.parse(localStorage.getItem('firebase_config') || '{}')
-                }
+                currentView: 'dashboard',
+                searchQuery: '',
+                isOnline: false
             },
 
-            // LÓGICA DE RUTEO
-            Router: {
-                go(viewId) {
-                    document.querySelectorAll('main section').forEach(s => s.classList.add('hidden'));
-                    document.getElementById(`view-${viewId}`).classList.remove('hidden');
-                    
-                    document.querySelectorAll('.nav-bubble').forEach(b => b.classList.remove('active'));
-                    document.getElementById(`nav-${viewId}`).classList.add('active');
-                }
-            },
-
-            // LÓGICA DE FIREBASE (SINCRONIZACIÓN)
+            // --- MOTOR PRINCIPAL ---
             Core: {
-                init() {
-                    const config = App.DB.config.firebase;
-                    if (config.apiKey) {
-                        try {
-                            firebase.initializeApp(config);
-                            this.db = firebase.database();
-                            this.bindRealtime();
-                            console.log("🔥 Firebase Online");
-                        } catch (e) {
-                            console.error("Firebase Config Error:", e);
-                        }
-                    } else {
-                        // Fallback Local
-                        App.Core.loadLocal();
-                    }
+                init: function() {
+                    console.log("🚀 Iniciando IDEAS TEXTILES ERP...");
                     
-                    App.UI.Loader.hide();
-                    App.Router.go('dashboard');
+                    // Configuración Firebase del Usuario
+                    const firebaseConfig = {
+                        databaseURL: "https://ideastextilesapp-default-rtdb.firebaseio.com/"
+                    };
+
+                    if (!firebase.apps.length) {
+                        firebase.initializeApp(firebaseConfig);
+                    }
+
+                    this.bindDatabase();
+                    App.UI.switchView('dashboard');
+                    
+                    setTimeout(() => {
+                        document.getElementById('main-loader').style.opacity = '0';
+                        setTimeout(() => document.getElementById('main-loader').classList.add('hidden'), 500);
+                    }, 2000);
                 },
 
-                bindRealtime() {
-                    const refs = ['inventory', 'orders', 'movements', 'tasks'];
-                    refs.forEach(ref => {
-                        this.db.ref(ref).on('value', snapshot => {
-                            const data = snapshot.val();
-                            App.DB[ref] = data ? Object.values(data) : [];
-                            App.UI.Refresh.all();
-                        });
+                bindDatabase: function() {
+                    const db = firebase.database();
+                    
+                    // Escuchar Bodega
+                    db.ref('inventory').on('value', (snap) => {
+                        App.State.inventory = snap.val() || {};
+                        App.UI.renderInventory();
+                        App.UI.updateStats();
+                    });
+
+                    // Escuchar Órdenes
+                    db.ref('orders').on('value', (snap) => {
+                        App.State.orders = snap.val() || {};
+                        App.UI.renderOrders();
+                        App.UI.updateStats();
+                    });
+
+                    // Conexión Status
+                    db.ref('.info/connected').on('value', (snap) => {
+                        App.State.isOnline = snap.val();
                     });
                 },
 
-                saveConfig() {
-                    const geminiKey = document.getElementById('gemini-api-key').value;
-                    const firebaseJson = document.getElementById('firebase-config-input').value;
-                    
-                    localStorage.setItem('gemini_key', geminiKey);
-                    localStorage.setItem('firebase_config', firebaseJson);
-                    
-                    Swal.fire('Reiniciando...', 'Se ha actualizado la configuración global', 'success')
-                        .then(() => location.reload());
+                search: function(query) {
+                    App.State.searchQuery = query.toLowerCase();
+                    App.UI.renderInventory();
+                    App.UI.renderOrders();
                 }
             },
 
-            // MOTOR SABUESO (LECTURA DE ARCHIVOS)
-            Logic: {
-                Sabueso: {
-                    async process(file) {
-                        const reader = new FileReader();
-                        App.UI.Loader.show("SABUESO RASTREANDO...");
-                        
-                        if (file.name.endsWith('.pdf')) {
-                            // Lectura de PDF vía PDF.js y Gemini
-                            const text = await this.extractPdfText(file);
-                            this.analyzeWithGemini(text);
-                        } else {
-                            // Lectura de Excel
-                            reader.onload = (e) => {
-                                const data = new Uint8Array(e.target.result);
-                                const workbook = XLSX.read(data, {type: 'array'});
-                                const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-                                const jsonData = XLSX.utils.sheet_to_json(firstSheet);
-                                this.showPreview(jsonData);
-                            };
-                            reader.readAsArrayBuffer(file);
-                        }
-                    },
-
-                    async analyzeWithGemini(text) {
-                        const key = App.DB.config.geminiKey;
-                        if(!key) return Swal.fire('Error', 'Falta API Key de Gemini', 'error');
-
-                        const prompt = `Extrae de este texto de despacho textil los productos, cantidades y tallas. Devuelve solo un JSON puro. Texto: ${text}`;
-                        
-                        try {
-                            const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${key}`, {
-                                method: 'POST',
-                                headers: {'Content-Type': 'application/json'},
-                                body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
-                            });
-                            const json = await res.json();
-                            const cleanJson = JSON.parse(json.candidates[0].content.parts[0].text.replace(/```json|```/g, ''));
-                            this.showPreview(cleanJson);
-                        } catch (e) {
-                            Swal.fire('Error IA', 'No se pudo interpretar el archivo', 'error');
-                        }
-                    },
-
-                    showPreview(data) {
-                        const container = document.getElementById('sabueso-results');
-                        container.classList.remove('hidden');
-                        document.getElementById('sabueso-log-container').innerHTML = `> ANALISIS FINALIZADO\n> ${data.length} ÍTEMS ENCONTRADOS\n> SINCRONIZANDO SKUS...`;
-                        
-                        let html = `<table class="w-full text-xs font-bold">
-                                    <thead class="bg-slate-50 text-slate-500 uppercase">
-                                        <tr><th class="p-3 text-left">SKU/PRENDA</th><th class="p-3">CANTIDAD</th><th class="p-3">TALLAS</th></tr>
-                                    </thead><tbody>`;
-                        
-                        data.forEach(row => {
-                            html += `<tr class="border-t border-slate-100">
-                                        <td class="p-3">${row.producto || row.SKU || 'N/A'}</td>
-                                        <td class="p-3 text-center">${row.cantidad || 0}</td>
-                                        <td class="p-3 text-center font-mono">${row.tallas || '-'}</td>
-                                     </tr>`;
-                        });
-                        html += `</tbody></table>`;
-                        document.getElementById('sabueso-table-preview').innerHTML = html;
-                        document.getElementById('sabueso-import-btn').classList.remove('hidden');
-                        App.UI.Loader.hide();
-                    }
-                }
-            },
-
-            // MOTOR PDF Y TACHAS 3 COLUMNAS
-            PDF: {
-                Labels: {
-                    generate3Columns() {
-                        const { jsPDF } = window.jspdf;
-                        const doc = new jsPDF({ orientation: 'p', unit: 'mm', format: 'a4' });
-                        
-                        const items = App.DB.orders.filter(o => o.status === 'proceso');
-                        if(items.length === 0) return Swal.fire('Sin datos', 'No hay órdenes en proceso para imprimir', 'warning');
-
-                        let x = 10;
-                        let y = 10;
-                        const w = 60; // Ancho de columna
-                        const h = 80; // Alto de etiqueta
-                        const margin = 5;
-
-                        items.forEach((order, index) => {
-                            // Dibujar Rectángulo de Etiqueta
-                            doc.setDrawColor(200);
-                            doc.rect(x, y, w, h);
-                            
-                            // Cabecera
-                            doc.setFontSize(8);
-                            doc.setFont("helvetica", "bold");
-                            doc.text("IDEAS TEXTILES SPA", x + w/2, y + 5, {align: 'center'});
-                            
-                            // Datos de Orden
-                            doc.setFontSize(14);
-                            doc.text(`#${order.id || 'N/A'}`, x + 5, y + 15);
-                            doc.setFontSize(8);
-                            doc.text(`CLIENTE: ${order.client || 'GENERICO'}`, x + 5, y + 22);
-                            
-                            // Tallas (Tacha)
-                            doc.setFontSize(10);
-                            doc.text("TACHA DE PRODUCCIÓN", x + w/2, y + 32, {align: 'center'});
-                            
-                            let startTachaY = y + 38;
-                            let cellX = x + 5;
-                            Object.entries(order.sizes || { S:0, M:0, L:0 }).forEach(([size, qty]) => {
-                                doc.rect(cellX, startTachaY, 15, 12);
-                                doc.setFontSize(7); doc.text(size, cellX + 7.5, startTachaY + 4, {align: 'center'});
-                                doc.setFontSize(10); doc.text(qty.toString(), cellX + 7.5, startTachaY + 10, {align: 'center'});
-                                cellX += 17;
-                                if(cellX > x + w - 10) { cellX = x + 5; startTachaY += 15; }
-                            });
-
-                            // Total
-                            doc.setFontSize(12);
-                            doc.text(`TOTAL: ${order.total || 0} UN`, x + w/2, y + h - 10, {align: 'center'});
-
-                            // Lógica de 3 columnas
-                            x += w + margin;
-                            if ((index + 1) % 3 === 0) {
-                                x = 10;
-                                y += h + margin;
-                            }
-                            
-                            if (y + h > 280) {
-                                doc.addPage();
-                                x = 10; y = 10;
-                            }
-                        });
-
-                        doc.save(`TACHAS_3COL_${Date.now()}.pdf`);
-                    }
-                },
-
-                Management: {
-                    generate() {
-                        const { jsPDF } = window.jspdf;
-                        const doc = new jsPDF();
-                        doc.setFontSize(22);
-                        doc.text("REPORTE GERENCIAL - IDEAS TEXTILES", 20, 20);
-                        
-                        doc.autoTable({
-                            startY: 30,
-                            head: [['Categoría', 'Métrica', 'Estado']],
-                            body: [
-                                ['Bodega', `${App.DB.inventory.length} SKUs activos`, 'Óptimo'],
-                                ['Producción', `${App.DB.orders.length} Órdenes totales`, 'En curso'],
-                                ['Sincronización', 'Realtime Firebase', 'Activo']
-                            ]
-                        });
-                        doc.save("Balance_General.pdf");
-                    }
-                }
-            },
-
-            // CONTROLADORES DE INTERFAZ
+            // --- INTERFAZ DE USUARIO (iOS DESIGN) ---
             UI: {
-                Loader: {
-                    show(text) { 
-                        document.getElementById('loader').classList.remove('hidden', 'opacity-0');
-                        if(text) document.querySelector('#loader p').innerText = text;
-                    },
-                    hide() {
-                        document.getElementById('loader').classList.add('opacity-0');
-                        setTimeout(() => document.getElementById('loader').classList.add('hidden'), 700);
-                    }
+                switchView: function(viewId) {
+                    document.querySelectorAll('.view-content').forEach(v => v.classList.add('hidden'));
+                    document.getElementById(`view-${viewId}`).classList.remove('hidden');
+                    
+                    document.querySelectorAll('.nav-btn, .nav-item').forEach(b => b.classList.remove('active-nav', 'active'));
+                    const btn = document.getElementById(`btn-${viewId}`);
+                    if(btn) btn.classList.add('active-nav');
+
+                    const titles = {
+                        'dashboard': { t: 'Panel de Control', s: 'Vista general del rendimiento hoy' },
+                        'inventory': { t: 'Bodega de Stock', s: 'Gestión de SKUs y tallas por producto' },
+                        'orders': { t: 'Órdenes de Compra', s: 'Flujo de producción y despachos' },
+                        'movements': { t: 'Movimientos', s: 'Historial de entradas y salidas' },
+                        'calendar': { t: 'Agenda & Fotos', s: 'Confirmaciones visuales de entrega' }
+                    };
+
+                    document.getElementById('view-title').innerText = titles[viewId].t;
+                    document.getElementById('view-subtitle').innerText = titles[viewId].s;
+                    App.State.currentView = viewId;
                 },
-                
-                Refresh: {
-                    all() {
-                        this.dashboard();
-                        this.inventory();
-                        this.orders();
-                    },
 
-                    dashboard() {
-                        document.getElementById('stat-total-stock').innerText = App.DB.inventory.reduce((a, b) => a + (parseInt(b.stock) || 0), 0);
-                        document.getElementById('stat-active-orders').innerText = App.DB.orders.filter(o => o.status !== 'despachado').length;
-                        
-                        // Feed de actividad
-                        const feed = document.getElementById('dashboard-recent-activity');
-                        feed.innerHTML = App.DB.movements.slice(-5).reverse().map(m => `
-                            <div class="flex items-center gap-4 p-3 bg-slate-50 rounded-xl">
-                                <div class="w-10 h-10 rounded-full flex items-center justify-center ${m.type === 'in' ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'}">
-                                    <i class="fas fa-exchange-alt"></i>
-                                </div>
-                                <div class="flex-1">
-                                    <p class="text-xs font-black uppercase tracking-tighter">${m.product}</p>
-                                    <p class="text-[9px] text-slate-400 font-bold">${m.date}</p>
-                                </div>
-                                <div class="font-black text-sm">${m.type === 'in' ? '+' : '-'}${m.qty}</div>
-                            </div>
-                        `).join('');
-                    },
+                updateStats: function() {
+                    // Cálculo de Stock Total
+                    let totalItems = 0;
+                    Object.values(App.State.inventory).forEach(prod => {
+                        if(prod.sizes) {
+                            Object.values(prod.sizes).forEach(qty => totalItems += parseInt(qty || 0));
+                        }
+                    });
+                    document.getElementById('stat-total-stock').innerText = totalItems.toLocaleString();
 
-                    inventory() {
-                        const container = document.getElementById('inventory-container');
-                        container.innerHTML = App.DB.inventory.map(prod => `
-                            <div class="card-glass group overflow-hidden">
-                                <div class="absolute top-0 right-0 p-4">
-                                    <span class="px-3 py-1 bg-slate-100 rounded-full text-[9px] font-black uppercase text-slate-500">${prod.category}</span>
-                                </div>
-                                <h4 class="font-black text-xl text-slate-800 mb-1">${prod.name}</h4>
-                                <p class="text-xs font-mono text-blue-600 font-bold mb-4">${prod.sku}</p>
-                                
-                                <div class="flex justify-between items-center bg-slate-50 p-4 rounded-2xl mb-4">
-                                    <div><p class="text-[9px] font-black text-slate-400 uppercase">Stock Actual</p><p class="text-2xl font-black">${prod.stock}</p></div>
-                                    <div class="text-right"><p class="text-[9px] font-black text-slate-400 uppercase">Comprometido</p><p class="text-lg font-bold text-orange-500">${prod.reserved || 0}</p></div>
-                                </div>
+                    // Órdenes en Proceso (Pendiente + Proceso + Empaque)
+                    const activeOrders = Object.values(App.State.orders).filter(o => o.status !== 'despachado').length;
+                    document.getElementById('stat-pending-orders').innerText = activeOrders;
 
-                                <div class="flex gap-2">
-                                    <button onclick="App.Actions.edit('${prod.sku}')" class="flex-1 py-3 bg-slate-900 text-white rounded-xl text-[10px] font-black uppercase hover:bg-blue-600 transition">Gestionar</button>
-                                    <button onclick="App.Actions.quickAdd('${prod.sku}')" class="w-12 h-12 bg-slate-100 rounded-xl flex items-center justify-center hover:bg-green-100 hover:text-green-600 transition"><i class="fas fa-plus"></i></button>
-                                </div>
-                            </div>
-                        `).join('');
-                    },
+                    // Despachos
+                    const dispatched = Object.values(App.State.orders).filter(o => o.status === 'despachado').length;
+                    document.getElementById('stat-dispatched').innerText = dispatched;
+                },
 
-                    orders() {
-                        const list = document.getElementById('orders-list');
-                        list.innerHTML = App.DB.orders.map(order => `
-                            <div class="bg-white border border-slate-100 p-6 rounded-3xl shadow-sm flex flex-col md:flex-row justify-between items-center gap-6">
-                                <div class="flex items-center gap-6">
-                                    <div class="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600">
-                                        <i class="fas fa-file-invoice text-2xl"></i>
+                renderInventory: function() {
+                    const tbody = document.getElementById('inventory-table-body');
+                    if(!tbody) return;
+                    
+                    let html = '';
+                    Object.entries(App.State.inventory).forEach(([id, prod]) => {
+                        if(App.State.searchQuery && !prod.name.toLowerCase().includes(App.State.searchQuery) && !prod.sku.toLowerCase().includes(App.State.searchQuery)) return;
+
+                        let totalStock = 0;
+                        let sizesHtml = '';
+                        if(prod.sizes) {
+                            Object.entries(prod.sizes).forEach(([size, qty]) => {
+                                totalStock += parseInt(qty || 0);
+                                sizesHtml += `
+                                    <div class="flex flex-col items-center bg-slate-50 px-3 py-1 rounded-lg border border-slate-100">
+                                        <span class="text-[9px] font-black text-slate-400 uppercase">${size}</span>
+                                        <span class="text-xs font-bold text-slate-700 editable-field" onclick="App.UI.editInline('inventory', '${id}', 'sizes/${size}', this)">${qty}</span>
                                     </div>
-                                    <div>
-                                        <h5 class="font-black text-lg text-slate-800 uppercase tracking-tighter">ORD-${order.id} | ${order.client}</h5>
-                                        <div class="flex gap-2 mt-1">
-                                            <span class="text-[10px] font-black px-3 py-1 rounded-full uppercase ${this.getStatusClass(order.status)}">${order.status}</span>
-                                            <span class="text-[10px] font-black text-slate-400 uppercase italic">Fecha: ${order.date}</span>
+                                `;
+                            });
+                        }
+
+                        html += `
+                            <tr class="hover:bg-slate-50/50 transition">
+                                <td class="py-6 px-6">
+                                    <p class="text-[10px] font-black text-blue-600 mb-1">${prod.sku}</p>
+                                    <p class="font-bold text-slate-800 text-sm editable-field" onclick="App.UI.editInline('inventory', '${id}', 'name', this)">${prod.name}</p>
+                                </td>
+                                <td class="py-6 px-4">
+                                    <div class="flex flex-wrap gap-2 justify-center">
+                                        ${sizesHtml}
+                                        <div class="flex flex-col items-center bg-blue-600 px-3 py-1 rounded-lg shadow-sm">
+                                            <span class="text-[9px] font-black text-white/70 uppercase">TOTAL</span>
+                                            <span class="text-xs font-black text-white">${totalStock}</span>
                                         </div>
                                     </div>
-                                </div>
-                                <div class="flex items-center gap-8">
-                                    <div class="text-center">
-                                        <p class="text-[9px] font-black text-slate-400 uppercase">Total Prendas</p>
-                                        <p class="text-xl font-black text-slate-800">${order.total}</p>
+                                </td>
+                                <td class="py-6 px-4 text-center">
+                                    <span class="text-[10px] font-black px-3 py-1 bg-slate-100 rounded-full text-slate-500 uppercase">${prod.category || 'General'}</span>
+                                </td>
+                                <td class="py-6 px-4 text-right">
+                                    <div class="flex justify-end gap-2">
+                                        <button onclick="App.UI.openHistory('${id}')" class="w-8 h-8 rounded-full flex items-center justify-center text-slate-400 hover:bg-blue-50 hover:text-blue-500 transition"><i class="fas fa-history text-xs"></i></button>
+                                        <button onclick="App.Store.Inventory.delete('${id}')" class="w-8 h-8 rounded-full flex items-center justify-center text-slate-400 hover:bg-red-50 hover:text-red-500 transition"><i class="fas fa-trash-alt text-xs"></i></button>
                                     </div>
-                                    <div class="flex gap-2">
-                                        <button onclick="App.PDF.Labels.printOne('${order.id}')" class="w-12 h-12 rounded-2xl bg-slate-100 text-slate-600 hover:bg-orange-600 hover:text-white transition"><i class="fas fa-print"></i></button>
-                                        <button onclick="App.Actions.advanceOrder('${order.id}')" class="h-12 px-6 rounded-2xl bg-slate-900 text-white font-black text-[10px] uppercase hover:bg-blue-600 transition">Siguiente Paso</button>
+                                </td>
+                            </tr>
+                        `;
+                    });
+                    tbody.innerHTML = html || '<tr><td colspan="4" class="py-12 text-center text-slate-400 font-bold">No hay productos en bodega</td></tr>';
+                },
+
+                renderOrders: function() {
+                    const cols = ['pendiente', 'proceso', 'empaquetado', 'despachado'];
+                    cols.forEach(status => {
+                        const container = document.getElementById(`col-${status}`);
+                        const counter = document.getElementById(`count-${status}`);
+                        if(!container) return;
+
+                        let html = '';
+                        let count = 0;
+
+                        Object.entries(App.State.orders).forEach(([id, order]) => {
+                            if(order.status !== status) return;
+                            if(App.State.searchQuery && !order.client.toLowerCase().includes(App.State.searchQuery) && !order.ocNumber.toLowerCase().includes(App.State.searchQuery)) return;
+                            
+                            count++;
+                            html += `
+                                <div class="bubble-card animate__animated animate__fadeInUp cursor-grab active:cursor-grabbing" onclick="App.UI.editOrder('${id}')">
+                                    <div class="flex justify-between items-start mb-3">
+                                        <span class="text-[10px] font-black text-blue-600 bg-blue-50 px-2 py-1 rounded-md">OC #${order.ocNumber}</span>
+                                        <div class="flex gap-1">
+                                            <button onclick="event.stopPropagation(); App.PDF.generateOC('${id}')" class="w-7 h-7 bg-slate-100 rounded-full flex items-center justify-center hover:bg-blue-500 hover:text-white transition"><i class="fas fa-file-pdf text-[10px]"></i></button>
+                                        </div>
+                                    </div>
+                                    <h6 class="font-black text-slate-800 text-sm mb-1">${order.client}</h6>
+                                    <p class="text-[10px] text-slate-400 font-bold uppercase mb-3"><i class="fas fa-file-invoice mr-1"></i> FAC: ${order.invoice || 'PENDIENTE'}</p>
+                                    
+                                    <div class="space-y-1 mb-4">
+                                        ${Object.values(order.items || {}).map(i => `
+                                            <div class="flex justify-between text-[10px] font-bold text-slate-600 bg-slate-50 p-1.5 rounded-lg border border-slate-100">
+                                                <span>${i.name}</span>
+                                                <span class="text-blue-600">${i.total} UN</span>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+
+                                    <div class="flex justify-between items-center pt-3 border-t border-slate-100">
+                                        <div class="flex -space-x-2">
+                                            <div class="w-6 h-6 rounded-full bg-slate-200 border-2 border-white flex items-center justify-center text-[8px] font-black text-slate-500">AC</div>
+                                        </div>
+                                        <p class="text-[9px] font-bold text-slate-400">${order.date || ''}</p>
                                     </div>
                                 </div>
+                            `;
+                        });
+
+                        container.innerHTML = html;
+                        counter.innerText = count;
+                    });
+                },
+
+                // --- LÓGICA DE EDICIÓN INLINE (CLICK TO EDIT) ---
+                editInline: function(path, id, field, element) {
+                    const currentValue = element.innerText;
+                    const input = document.createElement('input');
+                    input.value = currentValue;
+                    input.className = 'editing-input';
+                    
+                    element.innerHTML = '';
+                    element.appendChild(input);
+                    input.focus();
+
+                    const save = () => {
+                        const newValue = input.value;
+                        if(newValue !== currentValue) {
+                            firebase.database().ref(`${path}/${id}/${field}`).set(newValue);
+                            App.UI.notify('Cambio guardado en la nube', 'success');
+                        }
+                        element.innerText = newValue;
+                    };
+
+                    input.onblur = save;
+                    input.onkeydown = (e) => { if(e.key === 'Enter') save(); };
+                },
+
+                // --- GESTIÓN DE MODALES ---
+                openModal: function(type) {
+                    const modal = document.getElementById('ios-modal');
+                    const content = document.getElementById('modal-content');
+                    const title = document.getElementById('modal-title');
+                    modal.classList.remove('hidden');
+
+                    if(type === 'new-product') {
+                        title.innerText = 'Ingresar Producto a Bodega';
+                        content.innerHTML = `
+                            <div class="space-y-6">
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div class="space-y-2">
+                                        <label class="text-[10px] font-black text-slate-400 uppercase">Código SKU</label>
+                                        <input id="new-sku" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-4 font-bold outline-none focus:border-blue-500" placeholder="Ej: POL-001">
+                                    </div>
+                                    <div class="space-y-2">
+                                        <label class="text-[10px] font-black text-slate-400 uppercase">Categoría</label>
+                                        <select id="new-cat" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-4 font-bold outline-none focus:border-blue-500">
+                                            <option value="Poleras">Poleras</option>
+                                            <option value="Pantalones">Pantalones</option>
+                                            <option value="Chaquetas">Chaquetas</option>
+                                            <option value="Seguridad">Seguridad</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="space-y-2">
+                                    <label class="text-[10px] font-black text-slate-400 uppercase">Nombre Completo del Producto</label>
+                                    <input id="new-name" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-4 font-bold outline-none focus:border-blue-500" placeholder="Ej: Polera Piqué 100% Algodón">
+                                </div>
+                                <div class="space-y-2">
+                                    <label class="text-[10px] font-black text-slate-400 uppercase">Definir Tallas Iniciales</label>
+                                    <div class="grid grid-cols-4 gap-3">
+                                        <input id="size-S" class="bg-slate-50 border border-slate-100 rounded-lg p-3 text-center font-bold" placeholder="S">
+                                        <input id="size-M" class="bg-slate-50 border border-slate-100 rounded-lg p-3 text-center font-bold" placeholder="M">
+                                        <input id="size-L" class="bg-slate-50 border border-slate-100 rounded-lg p-3 text-center font-bold" placeholder="L">
+                                        <input id="size-XL" class="bg-slate-50 border border-slate-100 rounded-lg p-3 text-center font-bold" placeholder="XL">
+                                    </div>
+                                </div>
+                                <button onclick="App.Store.Inventory.save()" class="btn-ios-primary w-full justify-center py-5">
+                                    GUARDAR PRODUCTO EN BODEGA
+                                </button>
                             </div>
-                        `).join('');
+                        `;
+                    }
+                },
+
+                closeModal: function() {
+                    document.getElementById('ios-modal').classList.add('hidden');
+                },
+
+                notify: function(msg, type) {
+                    const id = Date.now();
+                    const container = document.getElementById('toast-container');
+                    const color = type === 'success' ? 'bg-blue-600' : 'bg-red-600';
+                    const icon = type === 'success' ? 'fa-check-circle' : 'fa-exclamation-triangle';
+
+                    const toast = document.createElement('div');
+                    toast.id = `toast-${id}`;
+                    toast.className = `animate__animated animate__fadeInRight ${color} text-white px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-4 min-w-[300px] border border-white/20 backdrop-blur-md`;
+                    toast.innerHTML = `
+                        <i class="fas ${icon} text-xl"></i>
+                        <div>
+                            <p class="font-black text-xs uppercase tracking-widest">SISTEMA</p>
+                            <p class="text-sm font-bold">${msg}</p>
+                        </div>
+                    `;
+                    container.appendChild(toast);
+                    setTimeout(() => {
+                        toast.classList.replace('animate__fadeInRight', 'animate__fadeOutRight');
+                        setTimeout(() => toast.remove(), 500);
+                    }, 3000);
+                }
+            },
+
+            // --- ALMACENAMIENTO DE DATOS ---
+            Store: {
+                Inventory: {
+                    save: function() {
+                        const product = {
+                            sku: document.getElementById('new-sku').value,
+                            name: document.getElementById('new-name').value,
+                            category: document.getElementById('new-cat').value,
+                            sizes: {
+                                S: parseInt(document.getElementById('size-S').value || 0),
+                                M: parseInt(document.getElementById('size-M').value || 0),
+                                L: parseInt(document.getElementById('size-L').value || 0),
+                                XL: parseInt(document.getElementById('size-XL').value || 0)
+                            }
+                        };
+
+                        if(!product.sku || !product.name) return App.UI.notify('Faltan campos obligatorios', 'error');
+
+                        firebase.database().ref('inventory').push(product).then(() => {
+                            App.UI.notify('Producto registrado con éxito', 'success');
+                            App.UI.closeModal();
+                        });
                     },
 
-                    getStatusClass(status) {
-                        const states = {
-                            'pendiente': 'bg-slate-100 text-slate-600',
-                            'proceso': 'bg-orange-100 text-orange-600',
-                            'empaquetado': 'bg-blue-100 text-blue-600',
-                            'despachado': 'bg-green-100 text-green-600'
-                        };
-                        return states[status] || states.pendiente;
+                    delete: function(id) {
+                        Swal.fire({
+                            title: '¿Eliminar producto?',
+                            text: "Esta acción no se puede deshacer",
+                            icon: 'warning',
+                            showCancelButton: true,
+                            confirmButtonColor: '#0051A8',
+                            cancelButtonColor: '#EF4444',
+                            confirmButtonText: 'Sí, eliminar de bodega'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                firebase.database().ref(`inventory/${id}`).remove();
+                                App.UI.notify('Producto eliminado', 'success');
+                            }
+                        });
                     }
+                }
+            },
+
+            // --- MOTOR DE PDF (CORPORATIVO) ---
+            PDF: {
+                generateOC: function(id) {
+                    const order = App.State.orders[id];
+                    const { jsPDF } = window.jspdf;
+                    const doc = new jsPDF();
+                    
+                    // Configuración Visual
+                    const azulMar = "#0051A8";
+                    const grisSuave = "#F8FAFC";
+
+                    // Cabecera Profesional
+                    doc.setFillColor(azulMar);
+                    doc.rect(0, 0, 210, 40, 'F');
+                    
+                    doc.setTextColor(255, 255, 255);
+                    doc.setFontSize(22);
+                    doc.setFont("helvetica", "bold");
+                    doc.text("IDEAS TEXTILES SPA", 15, 20);
+                    
+                    doc.setFontSize(9);
+                    doc.text("ROPA DE TRABAJO Y CORPORATIVA", 15, 27);
+                    doc.text(`ORDEN DE COMPRA #${order.ocNumber}`, 150, 20);
+                    doc.text(`FACTURA/GUÍA: ${order.invoice || 'PENDIENTE'}`, 150, 27);
+
+                    // Información del Cliente
+                    doc.setTextColor(azulMar);
+                    doc.setFontSize(10);
+                    doc.text("CLIENTE / DESTINATARIO", 15, 55);
+                    doc.line(15, 57, 100, 57);
+                    
+                    doc.setTextColor(0, 0, 0);
+                    doc.setFontSize(14);
+                    doc.text(order.client.toUpperCase(), 15, 65);
+                    doc.setFontSize(10);
+                    doc.text(`Fecha de Emisión: ${order.date || 'N/A'}`, 15, 72);
+
+                    // Tabla de Productos con RESUMEN Y CASILLA DE CONFIRMACIÓN
+                    const tableData = Object.values(order.items || {}).map(i => {
+                        const tallasStr = Object.entries(i.sizes || {}).map(([s, q]) => `${s}: ${q}`).join(' | ');
+                        return [
+                            i.name.toUpperCase(),
+                            tallasStr,
+                            `${i.total} UN`,
+                            "[   ]" // Casilla de bodega
+                        ];
+                    });
+
+                    doc.autoTable({
+                        startY: 85,
+                        head: [['DESCRIPCIÓN DEL PRODUCTO', 'DESGLOSE DE TALLAS', 'CANT.', 'EMPAQUE']],
+                        body: tableData,
+                        theme: 'striped',
+                        headStyles: { fillColor: azulMar, fontSize: 10, fontStyle: 'bold' },
+                        styles: { fontSize: 9, cellPadding: 6 },
+                        columnStyles: {
+                            0: { cellWidth: 60 },
+                            1: { cellWidth: 80 },
+                            2: { cellWidth: 20, halign: 'center' },
+                            3: { cellWidth: 25, halign: 'center', fontStyle: 'bold' }
+                        }
+                    });
+
+                    // Mensajes Extra
+                    let finalY = doc.lastAutoTable.finalY + 20;
+                    doc.setFillColor(grisSuave);
+                    doc.rect(15, finalY, 180, 25, 'F');
+                    doc.setTextColor(azulMar);
+                    doc.setFontSize(8);
+                    doc.text("NOTAS Y MENSAJES ADICIONALES:", 20, finalY + 8);
+                    doc.setTextColor(0, 0, 0);
+                    doc.text(order.notes || "Sin observaciones adicionales para esta orden.", 20, finalY + 16);
+
+                    // Pie de página
+                    doc.setFontSize(8);
+                    doc.setTextColor(150, 150, 150);
+                    const now = new Date().toLocaleString();
+                    doc.text(`Documento generado por ERP Ideas Textiles SPA el ${now}`, 105, 285, { align: "center" });
+
+                    doc.save(`OC_${order.ocNumber}_${order.client}.pdf`);
                 }
             }
         };
 
-        // --- INICIALIZACIÓN DE SABUESO DROPZONE ---
-        document.addEventListener('DOMContentLoaded', () => {
-            const dropZone = document.getElementById('sabueso-drop-zone');
-            const fileInput = document.getElementById('sabueso-file-input');
-
-            dropZone.onclick = () => fileInput.click();
-            fileInput.onchange = (e) => App.Logic.Sabueso.process(e.target.files[0]);
-
-            dropZone.ondragover = (e) => { e.preventDefault(); dropZone.classList.add('bg-blue-50', 'border-blue-500'); };
-            dropZone.ondragleave = () => dropZone.classList.remove('bg-blue-50', 'border-blue-500');
-            dropZone.ondrop = (e) => {
-                e.preventDefault();
-                dropZone.classList.remove('bg-blue-50', 'border-blue-500');
-                App.Logic.Sabueso.process(e.dataTransfer.files[0]);
-            };
-
-            // Iniciar Sistema
-            App.Core.init();
-        });
-
+        // INICIALIZACIÓN
+        window.onload = () => App.Core.init();
     </script>
 </body>
 </html>
