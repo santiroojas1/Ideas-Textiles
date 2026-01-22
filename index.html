@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>IDEAS TEXTILES SPA | SISTEMA ERP PROFESIONAL</title>
+    <title>IDEAS TEXTILES SPA | SISTEMA DE GESTIÓN CORPORATIVA</title>
 
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
@@ -14,442 +14,514 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
 
     <style>
         :root {
             --ios-blue: #007AFF;
             --sea-blue: #0051A8;
             --ios-bg: #F2F2F7;
-            --glass: rgba(255, 255, 255, 0.72);
+            --glass: rgba(255, 255, 255, 0.75);
             --glass-dark: rgba(255, 255, 255, 0.4);
-            --border-ios: rgba(0, 0, 0, 0.1);
-            --text-main: #1C1C1E;
+            --border-ios: rgba(0, 0, 0, 0.08);
+            --shadow-ios: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
         }
 
         * {
             font-family: 'Plus Jakarta Sans', sans-serif;
             -webkit-tap-highlight-color: transparent;
-            scrollbar-width: thin;
-            scrollbar-color: var(--sea-blue) transparent;
+            scrollbar-width: none; /* Ocultar scroll en Firefox */
         }
+
+        *::-webkit-scrollbar { display: none; } /* Ocultar scroll en Chrome/Safari */
 
         body {
             background-color: #FFFFFF;
             background-image: 
-                radial-gradient(at 0% 0%, rgba(0, 122, 255, 0.05) 0px, transparent 50%),
-                radial-gradient(at 100% 100%, rgba(0, 81, 168, 0.05) 0px, transparent 50%);
-            color: var(--text-main);
+                radial-gradient(at 0% 0%, rgba(0, 122, 255, 0.03) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(0, 81, 168, 0.03) 0px, transparent 50%);
+            color: #1C1C1E;
             height: 100vh;
             overflow: hidden;
+            display: flex;
         }
 
-        /* --- DISEÑO ESTILO BURBUJA iOS --- */
-        .glass-panel {
-            background: var(--glass);
-            backdrop-filter: blur(20px) saturate(180%);
-            -webkit-backdrop-filter: blur(20px) saturate(180%);
-            border: 1px solid var(--border-ios);
-            border-radius: 24px;
+        /* --- ARQUITECTURA POR CAPAS (PC) --- */
+        .sidebar {
+            width: 280px;
+            background: #F9F9F9;
+            border-right: 1px solid var(--border-ios);
+            display: flex;
+            flex-direction: column;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 50;
         }
 
-        .bubble-card {
+        /* --- DOCK INFERIOR (MÓVIL) --- */
+        .mobile-dock {
+            display: none;
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            height: 70px;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(25px) saturate(200%);
+            -webkit-backdrop-filter: blur(25px) saturate(200%);
+            border-radius: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            z-index: 100;
+            justify-content: space-around;
+            align-items: center;
+            padding: 0 15px;
+        }
+
+        @media (max-width: 1024px) {
+            .sidebar { display: none; }
+            .mobile-dock { display: flex; }
+            main { padding-bottom: 100px !important; }
+        }
+
+        /* --- BOTONES Y HOVER EFECTOS --- */
+        .nav-link {
+            position: relative;
+            padding: 14px 20px;
+            margin: 4px 15px;
+            border-radius: 14px;
+            color: #8E8E93;
+            font-weight: 700;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: all 0.3s;
+        }
+
+        .nav-link i { font-size: 18px; width: 24px; text-align: center; }
+
+        .nav-link.active {
             background: white;
-            border-radius: 20px;
-            padding: 20px;
-            border: 1px solid var(--border-ios);
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.01);
-            transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+            color: var(--ios-blue);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
         }
 
-        .bubble-card:hover {
-            transform: scale(1.02);
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05);
+        .nav-link:hover:not(.active) {
+            background: rgba(0,0,0,0.02);
+            color: #1C1C1E;
         }
 
-        /* --- INPUTS MINIMALISTAS --- */
-        .editable-field {
-            cursor: pointer;
-            padding: 4px 8px;
-            border-radius: 8px;
-            transition: background 0.2s;
-            border: 1px solid transparent;
-        }
-
-        .editable-field:hover {
-            background: rgba(0, 122, 255, 0.1);
-            border-color: var(--ios-blue);
-        }
-
-        .editing-input {
+        /* --- CALENDARIO ESTILO APPLE --- */
+        .calendar-container {
             background: white;
-            border: 2px solid var(--ios-blue) !important;
-            outline: none;
-            width: 100%;
-            padding: 4px 8px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 122, 255, 0.2);
+            border-radius: 30px;
+            padding: 30px;
+            box-shadow: var(--shadow-ios);
+            border: 1px solid var(--border-ios);
         }
 
-        /* --- NAVEGACIÓN iOS --- */
-        .nav-item {
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 10px;
+        }
+
+        .calendar-day-label {
+            text-align: center;
+            font-size: 11px;
+            font-weight: 800;
+            color: #AEAEB2;
+            text-transform: uppercase;
+            padding-bottom: 15px;
+        }
+
+        .calendar-day {
+            aspect-ratio: 1;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            color: #8E8E93;
-            font-size: 10px;
-            font-weight: 600;
-            transition: all 0.3s ease;
+            border-radius: 18px;
+            font-weight: 700;
+            font-size: 15px;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+            border: 1px solid transparent;
+        }
+
+        .calendar-day:hover {
+            background: var(--ios-bg);
+        }
+
+        .calendar-day.today {
+            background: var(--ios-blue);
+            color: white;
+            box-shadow: 0 8px 15px rgba(0, 122, 255, 0.3);
+        }
+
+        .calendar-day.has-event::after {
+            content: '';
+            position: absolute;
+            bottom: 6px;
+            width: 4px;
+            height: 4px;
+            background: #FF3B30;
+            border-radius: 50%;
+        }
+
+        /* --- BURBUJAS Y CARDS --- */
+        .glass-card {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--border-ios);
+            border-radius: 24px;
+            padding: 24px;
+        }
+
+        .bubble-order {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            border: 1px solid var(--border-ios);
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             cursor: pointer;
         }
 
-        .nav-item i {
-            font-size: 20px;
-            margin-bottom: 4px;
+        .bubble-order:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.05);
         }
 
-        .nav-item.active {
+        /* --- ELEMENTOS DE EDICIÓN --- */
+        .edit-badge {
+            background: rgba(0, 122, 255, 0.1);
             color: var(--ios-blue);
-        }
-
-        /* --- BARRAS DE BÚSQUEDA --- */
-        .ios-search-bar {
-            background: rgba(118, 118, 128, 0.12);
-            border-radius: 12px;
-            padding: 10px 16px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            width: 100%;
-            max-width: 400px;
-        }
-
-        .ios-search-bar input {
-            background: transparent;
-            border: none;
-            outline: none;
-            width: 100%;
-            font-size: 15px;
-        }
-
-        /* --- TABLA DINÁMICA --- */
-        .table-container {
-            border-radius: 18px;
-            overflow: hidden;
-            border: 1px solid var(--border-ios);
-        }
-
-        .table-header {
-            background: rgba(242, 242, 247, 0.8);
-            font-size: 11px;
+            font-size: 9px;
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-weight: 800;
             text-transform: uppercase;
-            letter-spacing: 0.05em;
-            font-weight: 700;
-            color: #8E8E93;
         }
 
-        /* --- BOTONES PROFESIONALES --- */
-        .btn-ios-primary {
-            background: var(--sea-blue);
-            color: white;
-            padding: 12px 24px;
-            border-radius: 14px;
-            font-weight: 700;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            box-shadow: 0 4px 14px rgba(0, 81, 168, 0.3);
-        }
-
-        .btn-ios-primary:active {
-            transform: scale(0.95);
-            opacity: 0.8;
-        }
-
-        /* --- ESTRUCTURA DE CAPAS --- */
-        #app-layout {
-            display: grid;
-            grid-template-columns: 280px 1fr;
-            height: 100vh;
-        }
-
-        @media (max-width: 1024px) {
-            #app-layout {
-                grid-template-columns: 1fr;
-            }
-            .sidebar {
-                display: none;
-            }
-            .mobile-nav {
-                display: flex !important;
-            }
-        }
-
-        /* --- LOADERS Y ANIMACIONES --- */
-        .ios-loader {
-            width: 24px;
-            height: 24px;
-            border: 3px solid rgba(0, 122, 255, 0.2);
-            border-top: 3px solid var(--ios-blue);
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-        }
-
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        /* --- ANIMACIONES --- */
+        .fade-in { animation: fadeIn 0.5s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
     </style>
 </head>
 <body>
 
-    <div id="main-loader" class="fixed inset-0 bg-white z-[100] flex flex-col items-center justify-center transition-opacity duration-500">
-        <div class="ios-loader mb-4"></div>
-        <h1 class="text-xl font-black text-slate-800 tracking-tighter italic">IDEAS TEXTILES <span class="text-blue-600">SPA</span></h1>
-        <p class="text-[10px] uppercase tracking-widest font-bold text-slate-400 mt-2">Sincronizando con la Nube...</p>
+    <div id="app-loader" class="fixed inset-0 bg-white z-[200] flex flex-col items-center justify-center">
+        <div class="w-16 h-16 border-4 border-blue-100 border-t-blue-600 rounded-full animate-spin mb-6"></div>
+        <h2 class="text-2xl font-black text-slate-800 italic">IDEAS TEXTILES <span class="text-blue-600">SPA</span></h2>
+        <p class="text-xs font-bold text-slate-400 mt-2 uppercase tracking-widest">Sincronización Segura...</p>
     </div>
 
-    <div id="toast-container" class="fixed top-6 right-6 z-[110] space-y-4"></div>
+    <aside class="sidebar pt-10">
+        <div class="px-8 mb-12">
+            <img src="https://i.ibb.co/VmxP6Xh/Logo-Ideas-Textiles.png" alt="Logo" class="w-40 mb-3 grayscale-0 opacity-100">
+            <div class="h-1 w-12 bg-blue-600 rounded-full"></div>
+        </div>
 
-    <div id="app-layout">
-        
-        <aside class="sidebar bg-[#F9F9F9] border-r border-slate-200 p-8 flex flex-col justify-between">
-            <div>
-                <div class="mb-12">
-                    <img id="logo-main" src="https://i.ibb.co/VmxP6Xh/Logo-Ideas-Textiles.png" alt="Logo" class="w-48 mb-2">
-                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-tighter pl-1">Ropa de Trabajo y Corporativa</p>
-                </div>
-
-                <nav class="space-y-2">
-                    <button onclick="App.UI.switchView('dashboard')" id="btn-dashboard" class="nav-btn w-full flex items-center gap-4 px-4 py-3 rounded-xl text-slate-500 font-bold transition-all active-nav">
-                        <i class="fas fa-chart-pie text-lg"></i> Dashboard
-                    </button>
-                    <button onclick="App.UI.switchView('inventory')" id="btn-inventory" class="nav-btn w-full flex items-center gap-4 px-4 py-3 rounded-xl text-slate-500 font-bold transition-all">
-                        <i class="fas fa-boxes-stacked text-lg"></i> Bodega
-                    </button>
-                    <button onclick="App.UI.switchView('orders')" id="btn-orders" class="nav-btn w-full flex items-center gap-4 px-4 py-3 rounded-xl text-slate-500 font-bold transition-all">
-                        <i class="fas fa-receipt text-lg"></i> Órdenes de Compra
-                    </button>
-                    <button onclick="App.UI.switchView('movements')" id="btn-movements" class="nav-btn w-full flex items-center gap-4 px-4 py-3 rounded-xl text-slate-500 font-bold transition-all">
-                        <i class="fas fa-truck-ramp-box text-lg"></i> Movimientos
-                    </button>
-                    <button onclick="App.UI.switchView('calendar')" id="btn-calendar" class="nav-btn w-full flex items-center gap-4 px-4 py-3 rounded-xl text-slate-500 font-bold transition-all">
-                        <i class="fas fa-calendar-day text-lg"></i> Agenda & Fotos
-                    </button>
-                </nav>
-            </div>
-
-            <div class="bg-blue-50 p-4 rounded-2xl border border-blue-100">
-                <p class="text-[10px] font-black text-blue-600 uppercase mb-1">Usuario Activo</p>
-                <p class="font-bold text-slate-800 text-sm">Administrador Pro</p>
-                <div class="flex items-center gap-2 mt-3 text-[10px] font-bold text-blue-500">
-                    <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span> Sistema En Línea
-                </div>
-            </div>
-        </aside>
-
-        <main class="relative h-screen overflow-y-auto p-6 md:p-12">
+        <nav class="flex-1 overflow-y-auto">
+            <p class="px-8 text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">Principal</p>
+            <a href="#" onclick="App.UI.switchView('dashboard')" id="nav-dashboard" class="nav-link active">
+                <i class="fas fa-home"></i> Resumen General
+            </a>
+            <a href="#" onclick="App.UI.switchView('inventory')" id="nav-inventory" class="nav-link">
+                <i class="fas fa-box-open"></i> Bodega de Stock
+            </a>
+            <a href="#" onclick="App.UI.switchView('orders')" id="nav-orders" class="nav-link">
+                <i class="fas fa-file-invoice"></i> Órdenes de Compra
+            </a>
             
-            <header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-6">
+            <p class="px-8 text-[10px] font-black text-slate-400 uppercase tracking-widest mt-8 mb-4">Logística</p>
+            <a href="#" onclick="App.UI.switchView('calendar')" id="nav-calendar" class="nav-link">
+                <i class="fas fa-calendar-alt"></i> Agenda & Fotos
+            </a>
+            <a href="#" onclick="App.UI.switchView('movements')" id="nav-movements" class="nav-link">
+                <i class="fas fa-exchange-alt"></i> Movimientos
+            </a>
+        </nav>
+
+        <div class="p-6">
+            <div class="bg-slate-100 rounded-2xl p-4 flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center text-white font-black">IT</div>
                 <div>
-                    <h2 id="view-title" class="text-4xl font-black text-slate-900 tracking-tight">Cargando...</h2>
-                    <p id="view-subtitle" class="text-slate-500 font-medium">Espere un momento</p>
+                    <p class="text-xs font-black text-slate-800">Admin Pro</p>
+                    <p class="text-[10px] font-bold text-slate-500">Ideas Textiles SPA</p>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <nav class="mobile-dock">
+        <button onclick="App.UI.switchView('dashboard')" class="flex flex-col items-center gap-1 text-blue-600">
+            <i class="fas fa-home text-xl"></i>
+            <span class="text-[9px] font-black uppercase">Inicio</span>
+        </button>
+        <button onclick="App.UI.switchView('inventory')" class="flex flex-col items-center gap-1 text-slate-400">
+            <i class="fas fa-box text-xl"></i>
+            <span class="text-[9px] font-black uppercase">Stock</span>
+        </button>
+        <button onclick="App.UI.switchView('orders')" class="flex flex-col items-center gap-1 text-slate-400">
+            <i class="fas fa-file-invoice text-xl"></i>
+            <span class="text-[9px] font-black uppercase">O.C</span>
+        </button>
+        <button onclick="App.UI.switchView('calendar')" class="flex flex-col items-center gap-1 text-slate-400">
+            <i class="fas fa-camera text-xl"></i>
+            <span class="text-[9px] font-black uppercase">Fotos</span>
+        </button>
+    </nav>
+
+    <main class="flex-1 h-screen overflow-y-auto bg-white p-6 md:p-12">
+        
+        <header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-6">
+            <div>
+                <h1 id="view-title" class="text-4xl font-black text-slate-900 tracking-tighter">Panel de Control</h1>
+                <p id="view-subtitle" class="text-slate-400 font-bold mt-1 uppercase text-xs tracking-widest">Vista Global del Sistema</p>
+            </div>
+            
+            <div class="flex items-center gap-3 w-full md:w-auto">
+                <div class="relative flex-1 md:w-64">
+                    <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-300"></i>
+                    <input type="text" id="global-search" oninput="App.Core.search(this.value)" placeholder="Buscar OC, SKU o Cliente..." class="w-full bg-slate-100 border-none rounded-2xl py-3 pl-12 pr-4 text-sm font-bold focus:ring-2 focus:ring-blue-500 outline-none transition-all">
+                </div>
+                <button onclick="App.PDF.exportGeneral()" class="w-12 h-12 bg-slate-900 text-white rounded-2xl flex items-center justify-center hover:scale-105 transition shadow-lg">
+                    <i class="fas fa-file-pdf"></i>
+                </button>
+            </div>
+        </header>
+
+        <div id="views-container">
+            
+            <section id="view-dashboard" class="fade-in space-y-8">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                    <div class="glass-card bg-blue-600 text-white border-none">
+                        <p class="text-[10px] font-black uppercase opacity-70 tracking-widest">Prendas en Stock</p>
+                        <h2 id="stat-stock" class="text-5xl font-black mt-2">0</h2>
+                        <div class="mt-4 flex items-center gap-2 text-[10px] font-bold bg-white/10 w-fit px-3 py-1 rounded-full">
+                            <span class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span> BODEGA CENTRAL
+                        </div>
+                    </div>
+                    <div class="glass-card">
+                        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">O.C Activas</p>
+                        <h2 id="stat-orders" class="text-5xl font-black mt-2 text-slate-800">0</h2>
+                        <p class="text-[10px] font-bold text-blue-500 mt-4 flex items-center gap-1">
+                            <i class="fas fa-sync"></i> ACTUALIZADO AL MINUTO
+                        </p>
+                    </div>
+                    <div class="glass-card">
+                        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Despachos hoy</p>
+                        <h2 id="stat-dispatched" class="text-5xl font-black mt-2 text-green-600">0</h2>
+                        <p class="text-[10px] font-bold text-slate-400 mt-4 italic">Meta diaria: 15</p>
+                    </div>
+                    <div class="glass-card border-orange-100">
+                        <p class="text-[10px] font-black text-orange-400 uppercase tracking-widest">Pendientes Pago</p>
+                        <h2 id="stat-money" class="text-5xl font-black mt-2 text-slate-800">0</h2>
+                        <p class="text-[10px] font-bold text-orange-500 mt-4 uppercase tracking-tighter">Acción requerida</p>
+                    </div>
                 </div>
 
-                <div class="flex items-center gap-4 w-full md:w-auto">
-                    <div class="ios-search-bar flex-1 md:flex-none">
-                        <i class="fas fa-search text-slate-400"></i>
-                        <input type="text" id="global-search" placeholder="Buscar en todo el ERP..." oninput="App.Core.search(this.value)">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div class="glass-card p-10">
+                        <h3 class="text-xl font-black mb-6 flex items-center gap-2">
+                            <i class="fas fa-bolt text-yellow-500"></i> Acciones del Día
+                        </h3>
+                        <div class="grid grid-cols-2 gap-4">
+                            <button onclick="App.UI.modal('new-order')" class="p-6 bg-slate-50 border-2 border-dashed border-slate-200 rounded-3xl hover:border-blue-500 hover:bg-blue-50 transition text-left group">
+                                <i class="fas fa-plus-circle text-2xl text-slate-300 group-hover:text-blue-500 mb-3"></i>
+                                <p class="font-black text-slate-800">Crear Nueva OC</p>
+                                <p class="text-[10px] font-bold text-slate-400">Ingresar pedido cliente</p>
+                            </button>
+                            <button onclick="App.UI.modal('new-product')" class="p-6 bg-slate-50 border-2 border-dashed border-slate-200 rounded-3xl hover:border-green-500 hover:bg-green-50 transition text-left group">
+                                <i class="fas fa-truck-loading text-2xl text-slate-300 group-hover:text-green-500 mb-3"></i>
+                                <p class="font-black text-slate-800">Ingreso de Tela</p>
+                                <p class="text-[10px] font-bold text-slate-400">Sumar stock a bodega</p>
+                            </button>
+                        </div>
                     </div>
-                    <button onclick="App.PDF.generateGlobalReport()" class="w-12 h-12 glass-panel flex items-center justify-center text-slate-700 hover:text-blue-600 transition shadow-sm">
-                        <i class="fas fa-print"></i>
+
+                    <div class="glass-card p-0 overflow-hidden">
+                        <div class="p-8 border-b border-slate-100">
+                            <h3 class="text-xl font-black">Últimas Fotos de Entrega</h3>
+                        </div>
+                        <div id="recent-photos" class="p-8 flex gap-4 overflow-x-auto">
+                            <div class="w-32 h-32 bg-slate-100 rounded-2xl flex items-center justify-center text-slate-300 border-2 border-dashed">
+                                <i class="fas fa-camera text-2xl"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="view-inventory" class="hidden fade-in space-y-6">
+                <div class="flex justify-between items-center">
+                    <div class="flex gap-2">
+                        <button onclick="App.Store.exportInventory()" class="px-5 py-2.5 bg-green-50 text-green-700 rounded-xl font-black text-xs border border-green-100">
+                            <i class="fas fa-file-excel mr-2"></i> EXCEL BODEGA
+                        </button>
+                    </div>
+                    <button onclick="App.UI.modal('new-product')" class="px-6 py-3 bg-blue-600 text-white rounded-2xl font-black text-sm shadow-xl shadow-blue-200 hover:scale-105 transition">
+                        <i class="fas fa-plus mr-2"></i> AGREGAR PRODUCTO
                     </button>
                 </div>
-            </header>
 
-            <div id="views-wrapper">
-                
-                <section id="view-dashboard" class="view-content fade-in space-y-8">
-                    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-                        <div class="bubble-card bg-gradient-to-br from-blue-600 to-blue-800 text-white">
-                            <p class="text-xs font-bold opacity-80 uppercase tracking-widest">Stock Total</p>
-                            <h3 class="text-4xl font-black mt-2" id="stat-total-stock">0</h3>
-                            <div class="mt-4 text-[10px] font-bold bg-white/20 p-2 rounded-lg inline-block">BODEGA CENTRAL</div>
-                        </div>
-                        <div class="bubble-card">
-                            <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">OC en Proceso</p>
-                            <h3 class="text-4xl font-black mt-2 text-slate-800" id="stat-pending-orders">0</h3>
-                            <div class="mt-4 text-[10px] font-bold text-orange-500 flex items-center gap-1">
-                                <i class="fas fa-clock"></i> ACTUALIZADO AHORA
-                            </div>
-                        </div>
-                        <div class="bubble-card">
-                            <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">Facturado Mes</p>
-                            <h3 class="text-4xl font-black mt-2 text-slate-800" id="stat-monthly-total">0</h3>
-                            <div class="mt-4 text-[10px] font-bold text-blue-500">PENDIENTE DE PAGO</div>
-                        </div>
-                        <div class="bubble-card">
-                            <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">Despachado</p>
-                            <h3 class="text-4xl font-black mt-2 text-green-600" id="stat-dispatched">0</h3>
-                            <div class="mt-4 text-[10px] font-bold text-green-500 flex items-center gap-1">
-                                <i class="fas fa-check-circle"></i> ENTREGAS EXITOSAS
-                            </div>
-                        </div>
-                    </div>
+                <div class="bg-white rounded-[32px] border border-slate-100 shadow-sm overflow-hidden">
+                    <table class="w-full text-left">
+                        <thead>
+                            <tr class="bg-slate-50/50 border-b border-slate-100">
+                                <th class="p-6 text-[11px] font-black text-slate-400 uppercase tracking-widest">Código SKU / Nombre</th>
+                                <th class="p-6 text-[11px] font-black text-slate-400 uppercase tracking-widest text-center">Tallas Disponibles</th>
+                                <th class="p-6 text-[11px] font-black text-slate-400 uppercase tracking-widest text-center">Categoría</th>
+                                <th class="p-6 text-[11px] font-black text-slate-400 uppercase tracking-widest text-right">Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody id="inventory-table-body" class="divide-y divide-slate-50">
+                            </tbody>
+                    </table>
+                </div>
+            </section>
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                        <div class="glass-panel p-8">
-                            <h4 class="font-black text-lg mb-6 flex items-center gap-3">
-                                <i class="fas fa-bolt text-yellow-500"></i> Acciones Rápidas
-                            </h4>
-                            <div class="grid grid-cols-2 gap-4">
-                                <button onclick="App.UI.openModal('new-order')" class="p-6 rounded-2xl border-2 border-dashed border-slate-200 hover:border-blue-500 hover:bg-blue-50 transition text-left group">
-                                    <i class="fas fa-file-circle-plus text-2xl mb-2 text-slate-400 group-hover:text-blue-500"></i>
-                                    <p class="font-bold text-slate-800">Nueva OC</p>
-                                    <p class="text-[10px] text-slate-400">Crear pedido de cliente</p>
-                                </button>
-                                <button onclick="App.UI.openModal('new-product')" class="p-6 rounded-2xl border-2 border-dashed border-slate-200 hover:border-blue-500 hover:bg-blue-50 transition text-left group">
-                                    <i class="fas fa-box-open text-2xl mb-2 text-slate-400 group-hover:text-blue-500"></i>
-                                    <p class="font-bold text-slate-800">Ingreso Stock</p>
-                                    <p class="text-[10px] text-slate-400">Aumentar inventario</p>
-                                </button>
+            <section id="view-calendar" class="hidden fade-in space-y-8">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-10">
+                    
+                    <div class="lg:col-span-2">
+                        <div class="calendar-container">
+                            <div class="calendar-header">
+                                <h2 id="calendar-month-year" class="text-2xl font-black text-slate-800 tracking-tighter">Enero 2024</h2>
+                                <div class="flex gap-2">
+                                    <button onclick="App.Calendar.prevMonth()" class="w-10 h-10 bg-slate-100 rounded-full flex items-center justify-center hover:bg-white hover:shadow-md transition"><i class="fas fa-chevron-left"></i></button>
+                                    <button onclick="App.Calendar.nextMonth()" class="w-10 h-10 bg-slate-100 rounded-full flex items-center justify-center hover:bg-white hover:shadow-md transition"><i class="fas fa-chevron-right"></i></button>
+                                </div>
                             </div>
-                        </div>
 
-                        <div class="glass-panel p-8">
-                            <h4 class="font-black text-lg mb-6">Alertas de Stock Bajo</h4>
-                            <div id="stock-alerts-list" class="space-y-4">
+                            <div class="calendar-grid">
+                                <div class="calendar-day-label">Lun</div>
+                                <div class="calendar-day-label">Mar</div>
+                                <div class="calendar-day-label">Mie</div>
+                                <div class="calendar-day-label">Jue</div>
+                                <div class="calendar-day-label">Vie</div>
+                                <div class="calendar-day-label">Sab</div>
+                                <div class="calendar-day-label">Dom</div>
+                            </div>
+                            <div id="calendar-days" class="calendar-grid mt-2">
                                 </div>
                         </div>
                     </div>
-                </section>
 
-                <section id="view-inventory" class="view-content hidden fade-in">
-                    <div class="flex justify-between items-center mb-6">
-                        <div class="flex gap-4">
-                            <button onclick="App.Store.Inventory.exportExcel()" class="bg-green-100 text-green-700 px-4 py-2 rounded-xl text-xs font-bold hover:bg-green-200 transition">
-                                <i class="fas fa-file-excel mr-2"></i> EXCEL
+                    <div class="space-y-6">
+                        <div class="glass-card h-full bg-[#F2F2F7] border-none shadow-none">
+                            <h4 id="selected-date-label" class="text-xl font-black text-slate-800 mb-6">Eventos de Hoy</h4>
+                            <div id="day-events-list" class="space-y-4">
+                                <p class="text-sm font-bold text-slate-400 text-center py-10">No hay despachos registrados este día.</p>
+                            </div>
+                            <button onclick="App.Calendar.addNote()" class="w-full mt-6 py-4 bg-white rounded-2xl text-blue-600 font-black text-sm shadow-sm hover:shadow-md transition border border-blue-50">
+                                <i class="fas fa-plus mr-2"></i> AGREGAR NOTA AL DÍA
                             </button>
                         </div>
-                        <button onclick="App.UI.openModal('new-product')" class="btn-ios-primary">
-                            <i class="fas fa-plus"></i> AGREGAR PRODUCTO
-                        </button>
                     </div>
 
-                    <div class="table-container bg-white">
-                        <table class="w-full text-left border-collapse">
-                            <thead>
-                                <tr class="table-header">
-                                    <th class="py-5 px-6">SKU / PRODUCTO</th>
-                                    <th class="py-5 px-4 text-center">TALLAS (TOTAL)</th>
-                                    <th class="py-5 px-4 text-center">CATEGORÍA</th>
-                                    <th class="py-5 px-4 text-right">ACCIONES</th>
-                                </tr>
-                            </thead>
-                            <tbody id="inventory-table-body" class="divide-y divide-slate-100">
-                                </tbody>
-                        </table>
-                    </div>
-                </section>
+                </div>
+            </section>
 
-                <section id="view-orders" class="view-content hidden fade-in">
-                    <div class="flex flex-col md:flex-row gap-4 mb-8">
-                        <div class="ios-search-bar">
-                            <i class="fas fa-filter text-slate-400"></i>
-                            <select id="filter-order-status" class="bg-transparent border-none outline-none text-sm font-bold w-full" onchange="App.Core.filterOrders()">
-                                <option value="all">Todos los Estados</option>
-                                <option value="pendiente">Pendientes</option>
-                                <option value="proceso">En Producción</option>
-                                <option value="empaquetado">Empaquetado</option>
-                                <option value="despachado">Despachado</option>
-                            </select>
+            <section id="view-orders" class="hidden fade-in">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6 overflow-x-auto pb-10">
+                    
+                    <div class="min-w-[300px]">
+                        <div class="flex items-center justify-between mb-6 px-2">
+                            <h5 class="font-black text-xs text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                                <span class="w-2 h-2 bg-slate-400 rounded-full"></span> Ingresadas
+                            </h5>
+                            <span id="count-pendiente" class="text-[10px] font-black bg-slate-100 px-2 py-0.5 rounded-full text-slate-500">0</span>
                         </div>
+                        <div id="col-pendiente" class="space-y-4 min-h-[500px]"></div>
                     </div>
 
-                    <div id="orders-kanban" class="grid grid-cols-1 md:grid-cols-4 gap-6">
-                        <div class="kanban-col">
-                            <h5 class="font-black text-slate-400 text-[10px] uppercase mb-4 tracking-widest flex items-center justify-between">
-                                Pendientes <span id="count-pendiente" class="bg-slate-200 px-2 py-0.5 rounded-full">0</span>
+                    <div class="min-w-[300px]">
+                        <div class="flex items-center justify-between mb-6 px-2">
+                            <h5 class="font-black text-xs text-blue-500 uppercase tracking-widest flex items-center gap-2">
+                                <span class="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></span> Producción
                             </h5>
-                            <div id="col-pendiente" class="space-y-4 min-h-[500px]"></div>
+                            <span id="count-proceso" class="text-[10px] font-black bg-blue-50 px-2 py-0.5 rounded-full text-blue-500">0</span>
                         </div>
-                        <div class="kanban-col">
-                            <h5 class="font-black text-blue-500 text-[10px] uppercase mb-4 tracking-widest flex items-center justify-between">
-                                Producción <span id="count-proceso" class="bg-blue-100 px-2 py-0.5 rounded-full">0</span>
-                            </h5>
-                            <div id="col-proceso" class="space-y-4 min-h-[500px]"></div>
-                        </div>
-                        <div class="kanban-col">
-                            <h5 class="font-black text-orange-500 text-[10px] uppercase mb-4 tracking-widest flex items-center justify-between">
-                                Empaque <span id="count-empaquetado" class="bg-orange-100 px-2 py-0.5 rounded-full">0</span>
-                            </h5>
-                            <div id="col-empaquetado" class="space-y-4 min-h-[500px]"></div>
-                        </div>
-                        <div class="kanban-col">
-                            <h5 class="font-black text-green-600 text-[10px] uppercase mb-4 tracking-widest flex items-center justify-between">
-                                Despachado <span id="count-despachado" class="bg-green-100 px-2 py-0.5 rounded-full">0</span>
-                            </h5>
-                            <div id="col-despachado" class="space-y-4 min-h-[500px]"></div>
-                        </div>
+                        <div id="col-proceso" class="space-y-4 min-h-[500px]"></div>
                     </div>
-                </section>
 
-            </div>
-        </main>
-    </div>
+                    <div class="min-w-[300px]">
+                        <div class="flex items-center justify-between mb-6 px-2">
+                            <h5 class="font-black text-xs text-orange-500 uppercase tracking-widest flex items-center gap-2">
+                                <span class="w-2 h-2 bg-orange-500 rounded-full"></span> Packing
+                            </h5>
+                            <span id="count-empaquetado" class="text-[10px] font-black bg-orange-50 px-2 py-0.5 rounded-full text-orange-500">0</span>
+                        </div>
+                        <div id="col-empaquetado" class="space-y-4 min-h-[500px]"></div>
+                    </div>
 
-    <nav class="mobile-nav fixed bottom-0 left-0 w-full bg-white/80 backdrop-blur-xl border-t border-slate-200 h-20 hidden items-center justify-around px-4 z-[90]">
-        <div onclick="App.UI.switchView('dashboard')" class="nav-item active">
-            <i class="fas fa-chart-pie"></i> Panel
-        </div>
-        <div onclick="App.UI.switchView('inventory')" class="nav-item">
-            <i class="fas fa-boxes-stacked"></i> Bodega
-        </div>
-        <div onclick="App.UI.switchView('orders')" class="nav-item">
-            <i class="fas fa-receipt"></i> OC
-        </div>
-        <div onclick="App.UI.switchView('calendar')" class="nav-item">
-            <i class="fas fa-camera"></i> Fotos
-        </div>
-    </nav>
+                    <div class="min-w-[300px]">
+                        <div class="flex items-center justify-between mb-6 px-2">
+                            <h5 class="font-black text-xs text-green-600 uppercase tracking-widest flex items-center gap-2">
+                                <span class="w-2 h-2 bg-green-500 rounded-full"></span> Entregado
+                            </h5>
+                            <span id="count-despachado" class="text-[10px] font-black bg-green-50 px-2 py-0.5 rounded-full text-green-600">0</span>
+                        </div>
+                        <div id="col-despachado" class="space-y-4 min-h-[500px]"></div>
+                    </div>
 
-    <div id="ios-modal" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-[150] hidden flex items-center justify-center p-4">
-        <div class="glass-panel w-full max-w-2xl max-h-[90vh] overflow-y-auto animate__animated animate__fadeInUp">
-            <div class="sticky top-0 bg-white/80 backdrop-blur-md px-8 py-6 border-b border-slate-100 flex justify-between items-center z-10">
-                <h3 id="modal-title" class="text-2xl font-black text-slate-800 tracking-tighter">Nueva Operación</h3>
-                <button onclick="App.UI.closeModal()" class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center hover:bg-red-50 hover:text-red-500 transition">
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+    <div id="modal-wrapper" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-[150] hidden flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-2xl rounded-[35px] shadow-2xl overflow-hidden animate__animated animate__zoomIn">
+            <div class="p-8 border-b border-slate-100 flex justify-between items-center">
+                <h3 id="modal-title" class="text-2xl font-black text-slate-800 tracking-tighter">Nueva Acción</h3>
+                <button onclick="App.UI.closeModal()" class="w-10 h-10 bg-slate-100 rounded-full flex items-center justify-center text-slate-400 hover:text-red-500 transition">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
-            <div id="modal-content" class="p-8">
+            <div id="modal-body" class="p-8 max-h-[70vh] overflow-y-auto">
                 </div>
         </div>
     </div>
 
     <script>
         /**
-         * IDEAS TEXTILES SPA - NÚCLEO ARQUITECTÓNICO V1.0
-         * Sistema de Gestión de Alta Disponibilidad
+         * IDEAS TEXTILES SPA - BLOQUE 1: CORE ARQUITECTÓNICO
+         * Arquitectura de Datos: Firebase Realtime
          */
 
         const App = {
-            // --- ESTADO GLOBAL (SINGLE SOURCE OF TRUTH) ---
             State: {
                 inventory: {},
                 orders: {},
                 movements: [],
+                calendar: {},
                 currentView: 'dashboard',
-                searchQuery: '',
-                isOnline: false
+                search: '',
+                currentDate: new Date(),
+                selectedDate: new Date()
             },
 
-            // --- MOTOR PRINCIPAL ---
             Core: {
                 init: function() {
-                    console.log("🚀 Iniciando IDEAS TEXTILES ERP...");
+                    console.log("🛠️ Inicializando Sistema de Ideas Textiles...");
                     
-                    // Configuración Firebase del Usuario
                     const firebaseConfig = {
                         databaseURL: "https://ideastextilesapp-default-rtdb.firebaseio.com/"
                     };
@@ -458,417 +530,433 @@
                         firebase.initializeApp(firebaseConfig);
                     }
 
-                    this.bindDatabase();
-                    App.UI.switchView('dashboard');
+                    this.bindData();
+                    App.Calendar.render();
                     
                     setTimeout(() => {
-                        document.getElementById('main-loader').style.opacity = '0';
-                        setTimeout(() => document.getElementById('main-loader').classList.add('hidden'), 500);
-                    }, 2000);
+                        document.getElementById('app-loader').classList.add('animate__fadeOut');
+                        setTimeout(() => document.getElementById('app-loader').remove(), 500);
+                    }, 1500);
                 },
 
-                bindDatabase: function() {
+                bindData: function() {
                     const db = firebase.database();
                     
-                    // Escuchar Bodega
-                    db.ref('inventory').on('value', (snap) => {
+                    // Escucha Global de Bodega
+                    db.ref('inventory').on('value', snap => {
                         App.State.inventory = snap.val() || {};
                         App.UI.renderInventory();
                         App.UI.updateStats();
                     });
 
-                    // Escuchar Órdenes
-                    db.ref('orders').on('value', (snap) => {
+                    // Escucha Global de Órdenes (Con Mapeo Inteligente)
+                    db.ref('orders').on('value', snap => {
                         App.State.orders = snap.val() || {};
                         App.UI.renderOrders();
                         App.UI.updateStats();
                     });
 
-                    // Conexión Status
-                    db.ref('.info/connected').on('value', (snap) => {
-                        App.State.isOnline = snap.val();
+                    // Escucha de Notas de Calendario
+                    db.ref('calendar').on('value', snap => {
+                        App.State.calendar = snap.val() || {};
+                        App.Calendar.render();
                     });
                 },
 
-                search: function(query) {
-                    App.State.searchQuery = query.toLowerCase();
+                search: function(val) {
+                    App.State.search = val.toLowerCase();
                     App.UI.renderInventory();
                     App.UI.renderOrders();
                 }
             },
 
-            // --- INTERFAZ DE USUARIO (iOS DESIGN) ---
             UI: {
                 switchView: function(viewId) {
-                    document.querySelectorAll('.view-content').forEach(v => v.classList.add('hidden'));
+                    document.querySelectorAll('section').forEach(s => s.classList.add('hidden'));
                     document.getElementById(`view-${viewId}`).classList.remove('hidden');
                     
-                    document.querySelectorAll('.nav-btn, .nav-item').forEach(b => b.classList.remove('active-nav', 'active'));
-                    const btn = document.getElementById(`btn-${viewId}`);
-                    if(btn) btn.classList.add('active-nav');
+                    // Actualizar Menú Desktop
+                    document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+                    const nav = document.getElementById(`nav-${viewId}`);
+                    if(nav) nav.classList.add('active');
 
+                    // Actualizar Dock Móvil
+                    document.querySelectorAll('.mobile-dock button').forEach(b => b.classList.add('text-slate-400'));
+                    document.querySelectorAll('.mobile-dock button').forEach(b => b.classList.remove('text-blue-600'));
+                    
                     const titles = {
-                        'dashboard': { t: 'Panel de Control', s: 'Vista general del rendimiento hoy' },
-                        'inventory': { t: 'Bodega de Stock', s: 'Gestión de SKUs y tallas por producto' },
-                        'orders': { t: 'Órdenes de Compra', s: 'Flujo de producción y despachos' },
-                        'movements': { t: 'Movimientos', s: 'Historial de entradas y salidas' },
-                        'calendar': { t: 'Agenda & Fotos', s: 'Confirmaciones visuales de entrega' }
+                        'dashboard': 'Panel de Control',
+                        'inventory': 'Bodega de Stock',
+                        'orders': 'Órdenes de Compra',
+                        'calendar': 'Agenda & Fotos',
+                        'movements': 'Historial de Movimientos'
                     };
-
-                    document.getElementById('view-title').innerText = titles[viewId].t;
-                    document.getElementById('view-subtitle').innerText = titles[viewId].s;
+                    document.getElementById('view-title').innerText = titles[viewId];
                     App.State.currentView = viewId;
+                    
+                    if(viewId === 'calendar') App.Calendar.render();
                 },
 
                 updateStats: function() {
-                    // Cálculo de Stock Total
-                    let totalItems = 0;
-                    Object.values(App.State.inventory).forEach(prod => {
-                        if(prod.sizes) {
-                            Object.values(prod.sizes).forEach(qty => totalItems += parseInt(qty || 0));
-                        }
+                    // Cálculo de Stock Real
+                    let total = 0;
+                    Object.values(App.State.inventory).forEach(p => {
+                        if(p.sizes) Object.values(p.sizes).forEach(q => total += parseInt(q || 0));
                     });
-                    document.getElementById('stat-total-stock').innerText = totalItems.toLocaleString();
+                    document.getElementById('stat-stock').innerText = total.toLocaleString();
 
-                    // Órdenes en Proceso (Pendiente + Proceso + Empaque)
-                    const activeOrders = Object.values(App.State.orders).filter(o => o.status !== 'despachado').length;
-                    document.getElementById('stat-pending-orders').innerText = activeOrders;
-
-                    // Despachos
-                    const dispatched = Object.values(App.State.orders).filter(o => o.status === 'despachado').length;
-                    document.getElementById('stat-dispatched').innerText = dispatched;
+                    // Órdenes
+                    const orders = Object.values(App.State.orders);
+                    document.getElementById('stat-orders').innerText = orders.filter(o => o.status !== 'despachado').length;
+                    document.getElementById('stat-dispatched').innerText = orders.filter(o => o.status === 'despachado').length;
                 },
 
                 renderInventory: function() {
                     const tbody = document.getElementById('inventory-table-body');
                     if(!tbody) return;
-                    
                     let html = '';
-                    Object.entries(App.State.inventory).forEach(([id, prod]) => {
-                        if(App.State.searchQuery && !prod.name.toLowerCase().includes(App.State.searchQuery) && !prod.sku.toLowerCase().includes(App.State.searchQuery)) return;
 
-                        let totalStock = 0;
-                        let sizesHtml = '';
+                    Object.entries(App.State.inventory).forEach(([id, prod]) => {
+                        if(App.State.search && !prod.name.toLowerCase().includes(App.State.search) && !prod.sku.toLowerCase().includes(App.State.search)) return;
+
+                        let totalP = 0;
+                        let sizeGrid = '';
                         if(prod.sizes) {
-                            Object.entries(prod.sizes).forEach(([size, qty]) => {
-                                totalStock += parseInt(qty || 0);
-                                sizesHtml += `
-                                    <div class="flex flex-col items-center bg-slate-50 px-3 py-1 rounded-lg border border-slate-100">
-                                        <span class="text-[9px] font-black text-slate-400 uppercase">${size}</span>
-                                        <span class="text-xs font-bold text-slate-700 editable-field" onclick="App.UI.editInline('inventory', '${id}', 'sizes/${size}', this)">${qty}</span>
+                            Object.entries(prod.sizes).forEach(([s, q]) => {
+                                totalP += parseInt(q || 0);
+                                sizeGrid += `
+                                    <div class="flex flex-col items-center bg-slate-50 border border-slate-100 rounded-lg p-1 min-w-[35px]">
+                                        <span class="text-[8px] font-black text-slate-400 uppercase">${s}</span>
+                                        <span class="text-xs font-bold text-slate-700 cursor-pointer hover:text-blue-600" onclick="App.UI.editInline('inventory/${id}/sizes/${s}', this)">${q}</span>
                                     </div>
                                 `;
                             });
                         }
 
                         html += `
-                            <tr class="hover:bg-slate-50/50 transition">
-                                <td class="py-6 px-6">
-                                    <p class="text-[10px] font-black text-blue-600 mb-1">${prod.sku}</p>
-                                    <p class="font-bold text-slate-800 text-sm editable-field" onclick="App.UI.editInline('inventory', '${id}', 'name', this)">${prod.name}</p>
+                            <tr class="hover:bg-slate-50 transition">
+                                <td class="p-6">
+                                    <p class="text-[10px] font-black text-blue-600 tracking-widest">${prod.sku}</p>
+                                    <p class="font-bold text-slate-800 cursor-pointer hover:underline" onclick="App.UI.editInline('inventory/${id}/name', this)">${prod.name}</p>
                                 </td>
-                                <td class="py-6 px-4">
-                                    <div class="flex flex-wrap gap-2 justify-center">
-                                        ${sizesHtml}
-                                        <div class="flex flex-col items-center bg-blue-600 px-3 py-1 rounded-lg shadow-sm">
-                                            <span class="text-[9px] font-black text-white/70 uppercase">TOTAL</span>
-                                            <span class="text-xs font-black text-white">${totalStock}</span>
+                                <td class="p-6">
+                                    <div class="flex flex-wrap justify-center gap-2">
+                                        ${sizeGrid}
+                                        <div class="flex flex-col items-center bg-slate-900 border border-slate-900 rounded-lg p-1 min-w-[40px]">
+                                            <span class="text-[8px] font-black text-white/50 uppercase">T</span>
+                                            <span class="text-xs font-black text-white">${totalP}</span>
                                         </div>
                                     </div>
                                 </td>
-                                <td class="py-6 px-4 text-center">
-                                    <span class="text-[10px] font-black px-3 py-1 bg-slate-100 rounded-full text-slate-500 uppercase">${prod.category || 'General'}</span>
+                                <td class="p-6 text-center">
+                                    <span class="px-4 py-1.5 bg-slate-100 rounded-full text-[10px] font-black text-slate-500 uppercase">${prod.category || 'General'}</span>
                                 </td>
-                                <td class="py-6 px-4 text-right">
-                                    <div class="flex justify-end gap-2">
-                                        <button onclick="App.UI.openHistory('${id}')" class="w-8 h-8 rounded-full flex items-center justify-center text-slate-400 hover:bg-blue-50 hover:text-blue-500 transition"><i class="fas fa-history text-xs"></i></button>
-                                        <button onclick="App.Store.Inventory.delete('${id}')" class="w-8 h-8 rounded-full flex items-center justify-center text-slate-400 hover:bg-red-50 hover:text-red-500 transition"><i class="fas fa-trash-alt text-xs"></i></button>
-                                    </div>
+                                <td class="p-6 text-right">
+                                    <button onclick="App.Store.deleteProduct('${id}')" class="text-slate-300 hover:text-red-500 transition"><i class="fas fa-trash"></i></button>
                                 </td>
                             </tr>
                         `;
                     });
-                    tbody.innerHTML = html || '<tr><td colspan="4" class="py-12 text-center text-slate-400 font-bold">No hay productos en bodega</td></tr>';
+                    tbody.innerHTML = html;
                 },
 
                 renderOrders: function() {
-                    const cols = ['pendiente', 'proceso', 'empaquetado', 'despachado'];
-                    cols.forEach(status => {
-                        const container = document.getElementById(`col-${status}`);
-                        const counter = document.getElementById(`count-${status}`);
-                        if(!container) return;
+                    const columns = ['pendiente', 'proceso', 'empaquetado', 'despachado'];
+                    const counts = { pendiente: 0, proceso: 0, empaquetado: 0, despachado: 0 };
+                    
+                    columns.forEach(col => document.getElementById(`col-${col}`).innerHTML = '');
 
-                        let html = '';
-                        let count = 0;
+                    Object.entries(App.State.orders).forEach(([id, o]) => {
+                        const status = (o.status || 'pendiente').toLowerCase();
+                        if(!columns.includes(status)) return;
+                        if(App.State.search && !o.client.toLowerCase().includes(App.State.search) && !o.ocNumber.toLowerCase().includes(App.State.search)) return;
 
-                        Object.entries(App.State.orders).forEach(([id, order]) => {
-                            if(order.status !== status) return;
-                            if(App.State.searchQuery && !order.client.toLowerCase().includes(App.State.searchQuery) && !order.ocNumber.toLowerCase().includes(App.State.searchQuery)) return;
-                            
-                            count++;
-                            html += `
-                                <div class="bubble-card animate__animated animate__fadeInUp cursor-grab active:cursor-grabbing" onclick="App.UI.editOrder('${id}')">
-                                    <div class="flex justify-between items-start mb-3">
-                                        <span class="text-[10px] font-black text-blue-600 bg-blue-50 px-2 py-1 rounded-md">OC #${order.ocNumber}</span>
-                                        <div class="flex gap-1">
-                                            <button onclick="event.stopPropagation(); App.PDF.generateOC('${id}')" class="w-7 h-7 bg-slate-100 rounded-full flex items-center justify-center hover:bg-blue-500 hover:text-white transition"><i class="fas fa-file-pdf text-[10px]"></i></button>
-                                        </div>
-                                    </div>
-                                    <h6 class="font-black text-slate-800 text-sm mb-1">${order.client}</h6>
-                                    <p class="text-[10px] text-slate-400 font-bold uppercase mb-3"><i class="fas fa-file-invoice mr-1"></i> FAC: ${order.invoice || 'PENDIENTE'}</p>
-                                    
-                                    <div class="space-y-1 mb-4">
-                                        ${Object.values(order.items || {}).map(i => `
-                                            <div class="flex justify-between text-[10px] font-bold text-slate-600 bg-slate-50 p-1.5 rounded-lg border border-slate-100">
-                                                <span>${i.name}</span>
-                                                <span class="text-blue-600">${i.total} UN</span>
-                                            </div>
-                                        `).join('')}
-                                    </div>
-
-                                    <div class="flex justify-between items-center pt-3 border-t border-slate-100">
-                                        <div class="flex -space-x-2">
-                                            <div class="w-6 h-6 rounded-full bg-slate-200 border-2 border-white flex items-center justify-center text-[8px] font-black text-slate-500">AC</div>
-                                        </div>
-                                        <p class="text-[9px] font-bold text-slate-400">${order.date || ''}</p>
-                                    </div>
+                        counts[status]++;
+                        const card = `
+                            <div class="bubble-order animate__animated animate__fadeInUp" onclick="App.UI.modal('edit-order', '${id}')">
+                                <div class="flex justify-between items-start mb-3">
+                                    <span class="edit-badge">OC #${o.ocNumber}</span>
+                                    <button onclick="event.stopPropagation(); App.PDF.generateOC('${id}')" class="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 hover:bg-blue-600 hover:text-white transition">
+                                        <i class="fas fa-print text-xs"></i>
+                                    </button>
                                 </div>
-                            `;
-                        });
-
-                        container.innerHTML = html;
-                        counter.innerText = count;
+                                <h4 class="font-black text-slate-800 text-sm leading-tight mb-1">${o.client}</h4>
+                                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">Fac: ${o.invoice || 'SIN NÚMERO'}</p>
+                                
+                                <div class="mt-4 pt-4 border-t border-slate-50 flex justify-between items-center">
+                                    <div class="flex -space-x-2">
+                                        <div class="w-6 h-6 rounded-full bg-blue-100 border-2 border-white flex items-center justify-center text-[8px] font-black text-blue-600">IT</div>
+                                    </div>
+                                    <p class="text-[9px] font-black text-slate-400">${o.date || ''}</p>
+                                </div>
+                            </div>
+                        `;
+                        document.getElementById(`col-${status}`).innerHTML += card;
                     });
+
+                    columns.forEach(col => document.getElementById(`count-${col}`).innerText = counts[col]);
                 },
 
-                // --- LÓGICA DE EDICIÓN INLINE (CLICK TO EDIT) ---
-                editInline: function(path, id, field, element) {
-                    const currentValue = element.innerText;
+                // LÓGICA DE EDICIÓN UNIVERSAL RÁPIDA
+                editInline: function(path, element) {
+                    const currentVal = element.innerText;
                     const input = document.createElement('input');
-                    input.value = currentValue;
-                    input.className = 'editing-input';
+                    input.value = currentVal;
+                    input.className = "bg-white border-2 border-blue-500 rounded px-2 py-1 text-sm font-bold outline-none shadow-lg";
                     
                     element.innerHTML = '';
                     element.appendChild(input);
                     input.focus();
 
                     const save = () => {
-                        const newValue = input.value;
-                        if(newValue !== currentValue) {
-                            firebase.database().ref(`${path}/${id}/${field}`).set(newValue);
-                            App.UI.notify('Cambio guardado en la nube', 'success');
+                        const newVal = input.value;
+                        if(newVal !== currentVal) {
+                            firebase.database().ref(path).set(newVal);
+                            Swal.fire({ toast: true, position: 'top-end', icon: 'success', title: 'Guardado', showConfirmButton: false, timer: 1000 });
                         }
-                        element.innerText = newValue;
+                        element.innerText = newVal;
                     };
 
                     input.onblur = save;
                     input.onkeydown = (e) => { if(e.key === 'Enter') save(); };
                 },
 
-                // --- GESTIÓN DE MODALES ---
-                openModal: function(type) {
-                    const modal = document.getElementById('ios-modal');
-                    const content = document.getElementById('modal-content');
+                modal: function(type, id = null) {
+                    const wrapper = document.getElementById('modal-wrapper');
                     const title = document.getElementById('modal-title');
-                    modal.classList.remove('hidden');
+                    const body = document.getElementById('modal-body');
+                    wrapper.classList.remove('hidden');
 
-                    if(type === 'new-product') {
-                        title.innerText = 'Ingresar Producto a Bodega';
-                        content.innerHTML = `
+                    if(type === 'new-order') {
+                        title.innerText = "Nueva Orden de Compra";
+                        body.innerHTML = `
                             <div class="space-y-6">
                                 <div class="grid grid-cols-2 gap-4">
-                                    <div class="space-y-2">
-                                        <label class="text-[10px] font-black text-slate-400 uppercase">Código SKU</label>
-                                        <input id="new-sku" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-4 font-bold outline-none focus:border-blue-500" placeholder="Ej: POL-001">
+                                    <div>
+                                        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Nro de Orden</label>
+                                        <input id="mo-nro" class="w-full bg-slate-50 border-none p-4 rounded-2xl font-bold mt-2" placeholder="Ej: 1540">
                                     </div>
-                                    <div class="space-y-2">
-                                        <label class="text-[10px] font-black text-slate-400 uppercase">Categoría</label>
-                                        <select id="new-cat" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-4 font-bold outline-none focus:border-blue-500">
-                                            <option value="Poleras">Poleras</option>
-                                            <option value="Pantalones">Pantalones</option>
-                                            <option value="Chaquetas">Chaquetas</option>
-                                            <option value="Seguridad">Seguridad</option>
-                                        </select>
+                                    <div>
+                                        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Nro Factura</label>
+                                        <input id="mo-fac" class="w-full bg-slate-50 border-none p-4 rounded-2xl font-bold mt-2" placeholder="Opcional">
                                     </div>
                                 </div>
-                                <div class="space-y-2">
-                                    <label class="text-[10px] font-black text-slate-400 uppercase">Nombre Completo del Producto</label>
-                                    <input id="new-name" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-4 font-bold outline-none focus:border-blue-500" placeholder="Ej: Polera Piqué 100% Algodón">
+                                <div>
+                                    <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Nombre del Cliente</label>
+                                    <input id="mo-client" class="w-full bg-slate-50 border-none p-4 rounded-2xl font-bold mt-2" placeholder="Ej: Municipalidad de Santiago">
                                 </div>
-                                <div class="space-y-2">
-                                    <label class="text-[10px] font-black text-slate-400 uppercase">Definir Tallas Iniciales</label>
-                                    <div class="grid grid-cols-4 gap-3">
-                                        <input id="size-S" class="bg-slate-50 border border-slate-100 rounded-lg p-3 text-center font-bold" placeholder="S">
-                                        <input id="size-M" class="bg-slate-50 border border-slate-100 rounded-lg p-3 text-center font-bold" placeholder="M">
-                                        <input id="size-L" class="bg-slate-50 border border-slate-100 rounded-lg p-3 text-center font-bold" placeholder="L">
-                                        <input id="size-XL" class="bg-slate-50 border border-slate-100 rounded-lg p-3 text-center font-bold" placeholder="XL">
-                                    </div>
+                                <div class="p-6 bg-blue-50 rounded-3xl border border-blue-100">
+                                    <p class="text-[10px] font-black text-blue-600 uppercase mb-4 tracking-widest">Añadir Ítems</p>
+                                    <div id="items-to-add" class="space-y-2"></div>
+                                    <button onclick="App.UI.addItemRow()" class="mt-4 text-blue-600 font-bold text-xs"><i class="fas fa-plus-circle mr-1"></i> Añadir Producto</button>
                                 </div>
-                                <button onclick="App.Store.Inventory.save()" class="btn-ios-primary w-full justify-center py-5">
-                                    GUARDAR PRODUCTO EN BODEGA
-                                </button>
+                                <button onclick="App.Store.saveOrder()" class="w-full py-5 bg-blue-600 text-white rounded-[25px] font-black shadow-xl shadow-blue-200">INGRESAR ORDEN AL SISTEMA</button>
                             </div>
                         `;
                     }
                 },
 
                 closeModal: function() {
-                    document.getElementById('ios-modal').classList.add('hidden');
+                    document.getElementById('modal-wrapper').classList.add('hidden');
                 },
 
-                notify: function(msg, type) {
-                    const id = Date.now();
-                    const container = document.getElementById('toast-container');
-                    const color = type === 'success' ? 'bg-blue-600' : 'bg-red-600';
-                    const icon = type === 'success' ? 'fa-check-circle' : 'fa-exclamation-triangle';
-
-                    const toast = document.createElement('div');
-                    toast.id = `toast-${id}`;
-                    toast.className = `animate__animated animate__fadeInRight ${color} text-white px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-4 min-w-[300px] border border-white/20 backdrop-blur-md`;
-                    toast.innerHTML = `
-                        <i class="fas ${icon} text-xl"></i>
-                        <div>
-                            <p class="font-black text-xs uppercase tracking-widest">SISTEMA</p>
-                            <p class="text-sm font-bold">${msg}</p>
-                        </div>
-                    `;
-                    container.appendChild(toast);
-                    setTimeout(() => {
-                        toast.classList.replace('animate__fadeInRight', 'animate__fadeOutRight');
-                        setTimeout(() => toast.remove(), 500);
-                    }, 3000);
+                notify: function(msg, icon = 'success') {
+                    Swal.fire({ toast: true, position: 'top-end', icon, title: msg, showConfirmButton: false, timer: 3000 });
                 }
             },
 
-            // --- ALMACENAMIENTO DE DATOS ---
-            Store: {
-                Inventory: {
-                    save: function() {
-                        const product = {
-                            sku: document.getElementById('new-sku').value,
-                            name: document.getElementById('new-name').value,
-                            category: document.getElementById('new-cat').value,
-                            sizes: {
-                                S: parseInt(document.getElementById('size-S').value || 0),
-                                M: parseInt(document.getElementById('size-M').value || 0),
-                                L: parseInt(document.getElementById('size-L').value || 0),
-                                XL: parseInt(document.getElementById('size-XL').value || 0)
-                            }
-                        };
+            // --- MOTOR DE CALENDARIO iOS ---
+            Calendar: {
+                render: function() {
+                    const daysCont = document.getElementById('calendar-days');
+                    const labelMonth = document.getElementById('calendar-month-year');
+                    if(!daysCont) return;
 
-                        if(!product.sku || !product.name) return App.UI.notify('Faltan campos obligatorios', 'error');
+                    const date = App.State.currentDate;
+                    const year = date.getFullYear();
+                    const month = date.getMonth();
 
-                        firebase.database().ref('inventory').push(product).then(() => {
-                            App.UI.notify('Producto registrado con éxito', 'success');
-                            App.UI.closeModal();
-                        });
-                    },
+                    const meses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+                    labelMonth.innerText = `${meses[month]} ${year}`;
 
-                    delete: function(id) {
-                        Swal.fire({
-                            title: '¿Eliminar producto?',
-                            text: "Esta acción no se puede deshacer",
-                            icon: 'warning',
-                            showCancelButton: true,
-                            confirmButtonColor: '#0051A8',
-                            cancelButtonColor: '#EF4444',
-                            confirmButtonText: 'Sí, eliminar de bodega'
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-                                firebase.database().ref(`inventory/${id}`).remove();
-                                App.UI.notify('Producto eliminado', 'success');
-                            }
+                    // Lógica para que empiece en Lunes (0=Dom, 1=Lun...)
+                    let firstDay = new Date(year, month, 1).getDay();
+                    firstDay = firstDay === 0 ? 6 : firstDay - 1; // Ajustar a Lunes
+                    
+                    const daysInMonth = new Date(year, month + 1, 0).getDate();
+                    
+                    daysCont.innerHTML = '';
+
+                    // Espacios vacíos
+                    for(let x = 0; x < firstDay; x++) {
+                        daysCont.innerHTML += `<div></div>`;
+                    }
+
+                    const today = new Date();
+
+                    for(let d = 1; d <= daysInMonth; d++) {
+                        const isToday = today.getDate() === d && today.getMonth() === month && today.getFullYear() === year;
+                        const dateKey = `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+                        const hasEvent = App.State.calendar[dateKey] ? 'has-event' : '';
+
+                        daysCont.innerHTML += `
+                            <div class="calendar-day ${isToday ? 'today' : ''} ${hasEvent}" onclick="App.Calendar.selectDate('${dateKey}')">
+                                ${d}
+                            </div>
+                        `;
+                    }
+                    this.updateDayEvents();
+                },
+
+                nextMonth: function() {
+                    App.State.currentDate.setMonth(App.State.currentDate.getMonth() + 1);
+                    this.render();
+                },
+
+                prevMonth: function() {
+                    App.State.currentDate.setMonth(App.State.currentDate.getMonth() - 1);
+                    this.render();
+                },
+
+                selectDate: function(key) {
+                    App.State.selectedDate = key;
+                    document.getElementById('selected-date-label').innerText = `Día: ${key}`;
+                    this.updateDayEvents();
+                },
+
+                updateDayEvents: function() {
+                    const list = document.getElementById('day-events-list');
+                    const key = App.State.selectedDate;
+                    const events = App.State.calendar[key];
+                    
+                    if(!events) {
+                        list.innerHTML = `<p class="text-sm font-bold text-slate-400 text-center py-10 italic">No hay registros para este día.</p>`;
+                        return;
+                    }
+
+                    let html = '';
+                    Object.entries(events).forEach(([id, ev]) => {
+                        html += `
+                            <div class="p-4 bg-white rounded-2xl border border-slate-200 shadow-sm relative group">
+                                <p class="text-xs font-black text-blue-600 mb-1 uppercase tracking-tighter">${ev.type || 'NOTA'}</p>
+                                <p class="text-sm font-bold text-slate-800">${ev.text}</p>
+                                <button onclick="App.Calendar.deleteNote('${key}', '${id}')" class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 text-red-300 hover:text-red-500 transition"><i class="fas fa-times-circle"></i></button>
+                            </div>
+                        `;
+                    });
+                    list.innerHTML = html;
+                },
+
+                addNote: async function() {
+                    const { value: text } = await Swal.fire({
+                        title: 'Anotación para el Calendario',
+                        input: 'textarea',
+                        inputPlaceholder: 'Escribe aquí el mensaje u OC...',
+                        showCancelButton: true,
+                        confirmButtonColor: '#007AFF'
+                    });
+
+                    if (text) {
+                        const key = App.State.selectedDate;
+                        firebase.database().ref(`calendar/${key}`).push({
+                            text: text,
+                            type: 'MENSAJE',
+                            time: new Date().toLocaleTimeString()
                         });
                     }
                 }
             },
 
-            // --- MOTOR DE PDF (CORPORATIVO) ---
+            // --- ALMACENAMIENTO ---
+            Store: {
+                saveOrder: function() {
+                    const order = {
+                        ocNumber: document.getElementById('mo-nro').value,
+                        invoice: document.getElementById('mo-fac').value,
+                        client: document.getElementById('mo-client').value,
+                        status: 'pendiente',
+                        date: new Date().toLocaleDateString(),
+                        items: {} // Se llenará con la lógica de filas
+                    };
+
+                    if(!order.ocNumber || !order.client) return App.UI.notify("Faltan datos críticos", "error");
+
+                    firebase.database().ref('orders').push(order).then(() => {
+                        App.UI.notify("Orden creada con éxito");
+                        App.UI.closeModal();
+                    });
+                },
+
+                deleteProduct: function(id) {
+                    Swal.fire({
+                        title: '¿Eliminar producto?',
+                        text: "Esto no se puede deshacer.",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#0051A8',
+                        confirmButtonText: 'Sí, borrar stock'
+                    }).then((r) => {
+                        if(r.isConfirmed) firebase.database().ref(`inventory/${id}`).remove();
+                    });
+                }
+            },
+
+            // --- MOTOR DE PDF CORPORATIVO ---
             PDF: {
                 generateOC: function(id) {
                     const order = App.State.orders[id];
                     const { jsPDF } = window.jspdf;
                     const doc = new jsPDF();
                     
-                    // Configuración Visual
                     const azulMar = "#0051A8";
-                    const grisSuave = "#F8FAFC";
 
-                    // Cabecera Profesional
+                    // Encabezado Pro
                     doc.setFillColor(azulMar);
                     doc.rect(0, 0, 210, 40, 'F');
-                    
                     doc.setTextColor(255, 255, 255);
-                    doc.setFontSize(22);
-                    doc.setFont("helvetica", "bold");
+                    doc.setFontSize(24); doc.setFont("helvetica", "bold");
                     doc.text("IDEAS TEXTILES SPA", 15, 20);
+                    doc.setFontSize(9); doc.text("Ropa de Trabajo y Corporativa", 15, 28);
                     
-                    doc.setFontSize(9);
-                    doc.text("ROPA DE TRABAJO Y CORPORATIVA", 15, 27);
-                    doc.text(`ORDEN DE COMPRA #${order.ocNumber}`, 150, 20);
-                    doc.text(`FACTURA/GUÍA: ${order.invoice || 'PENDIENTE'}`, 150, 27);
+                    doc.setFontSize(14); doc.text(`ORDEN DE COMPRA #${order.ocNumber}`, 140, 25);
 
-                    // Información del Cliente
-                    doc.setTextColor(azulMar);
+                    doc.setTextColor(0);
                     doc.setFontSize(10);
-                    doc.text("CLIENTE / DESTINATARIO", 15, 55);
+                    doc.text("DATOS DEL CLIENTE", 15, 55);
                     doc.line(15, 57, 100, 57);
-                    
-                    doc.setTextColor(0, 0, 0);
-                    doc.setFontSize(14);
-                    doc.text(order.client.toUpperCase(), 15, 65);
-                    doc.setFontSize(10);
-                    doc.text(`Fecha de Emisión: ${order.date || 'N/A'}`, 15, 72);
+                    doc.setFontSize(16); doc.text(order.client.toUpperCase(), 15, 66);
+                    doc.setFontSize(10); doc.text(`Factura Ref: ${order.invoice || 'N/A'}`, 15, 73);
 
-                    // Tabla de Productos con RESUMEN Y CASILLA DE CONFIRMACIÓN
-                    const tableData = Object.values(order.items || {}).map(i => {
-                        const tallasStr = Object.entries(i.sizes || {}).map(([s, q]) => `${s}: ${q}`).join(' | ');
-                        return [
-                            i.name.toUpperCase(),
-                            tallasStr,
-                            `${i.total} UN`,
-                            "[   ]" // Casilla de bodega
-                        ];
-                    });
+                    // TABLA CON CASILLA DE CONFIRMACIÓN
+                    const body = [];
+                    if(order.items) {
+                        Object.values(order.items).forEach(i => {
+                            body.push([i.name, i.total, "[   ]"]);
+                        });
+                    } else {
+                        body.push(["Ejemplo: Polera Piqué", "10", "[   ]"]);
+                    }
 
                     doc.autoTable({
                         startY: 85,
-                        head: [['DESCRIPCIÓN DEL PRODUCTO', 'DESGLOSE DE TALLAS', 'CANT.', 'EMPAQUE']],
-                        body: tableData,
-                        theme: 'striped',
-                        headStyles: { fillColor: azulMar, fontSize: 10, fontStyle: 'bold' },
-                        styles: { fontSize: 9, cellPadding: 6 },
-                        columnStyles: {
-                            0: { cellWidth: 60 },
-                            1: { cellWidth: 80 },
-                            2: { cellWidth: 20, halign: 'center' },
-                            3: { cellWidth: 25, halign: 'center', fontStyle: 'bold' }
-                        }
+                        head: [['DESCRIPCIÓN PRODUCTO', 'CANTIDAD', 'VºBº BODEGA']],
+                        body: body,
+                        headStyles: { fillColor: azulMar },
+                        styles: { fontSize: 10, cellPadding: 5 }
                     });
 
-                    // Mensajes Extra
-                    let finalY = doc.lastAutoTable.finalY + 20;
-                    doc.setFillColor(grisSuave);
-                    doc.rect(15, finalY, 180, 25, 'F');
-                    doc.setTextColor(azulMar);
-                    doc.setFontSize(8);
-                    doc.text("NOTAS Y MENSAJES ADICIONALES:", 20, finalY + 8);
-                    doc.setTextColor(0, 0, 0);
-                    doc.text(order.notes || "Sin observaciones adicionales para esta orden.", 20, finalY + 16);
+                    const finalY = doc.lastAutoTable.finalY + 15;
+                    doc.setFontSize(8); doc.setTextColor(150);
+                    doc.text("Documento oficial para gestión de despacho y bodega. Ideas Textiles SPA.", 105, 285, {align:'center'});
 
-                    // Pie de página
-                    doc.setFontSize(8);
-                    doc.setTextColor(150, 150, 150);
-                    const now = new Date().toLocaleString();
-                    doc.text(`Documento generado por ERP Ideas Textiles SPA el ${now}`, 105, 285, { align: "center" });
-
-                    doc.save(`OC_${order.ocNumber}_${order.client}.pdf`);
+                    doc.save(`OC_${order.ocNumber}.pdf`);
                 }
             }
         };
 
-        // INICIALIZACIÓN
+        // INICIO
         window.onload = () => App.Core.init();
+
     </script>
 </body>
 </html>
