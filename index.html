@@ -3,1958 +3,321 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>IDEAS TEXTILES SPA | ERP MANAGMENT SYSTEM</title>
-    <meta name="description" content="Sistema de Gestión de Producción y Despacho">
+    <title>IDEAS TEXTILES SPA | SISTEMA DE GESTIÓN CORPORATIVA</title>
+    
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#0f172a">
+    <meta name="format-detection" content="telephone=no">
 
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
-    
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
-    
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
-    
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
 
+    <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 
     <style>
-        /* ====================================================================================
-           2. SISTEMA DE DISEÑO "NAVY PROFESSIONAL"
-           ==================================================================================== */
-        
         :root {
-            /* Colores Principales (Identidad Corporativa) */
-            --color-navy-dark: #0f172a;       /* Fondo Sidebar / Header Oscuro */
-            --color-navy-light: #1e293b;      /* Elementos UI Oscuros */
-            --color-primary: #2563eb;         /* Azul Acción (Botones) */
-            --color-primary-hover: #1d4ed8;   /* Azul Acción Hover */
-            --color-success: #059669;         /* Verde Éxito */
-            --color-warning: #d97706;         /* Naranja Alerta */
-            --color-danger: #dc2626;          /* Rojo Error */
-            
-            /* Colores de Fondo y Superficie */
-            --color-bg-canvas: #f1f5f9;       /* Fondo General (Gris Acero Claro) */
-            --color-surface: #ffffff;         /* Blanco Tarjetas */
-            
-            /* Tipografía */
-            --font-main: 'Inter', sans-serif;
-            --font-mono: 'JetBrains Mono', monospace;
-            
-            /* Sombras Elevadas (Depth System) */
-            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
-            --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+            /* Paleta Corporativa Ideas Textiles */
+            --corp-navy: #0f172a;    /* Autoridad */
+            --corp-blue: #0ea5e9;    /* Acción */
+            --corp-teal: #14b8a6;    /* Detalle */
+            --corp-green: #10b981;   /* Éxito */
+            --corp-bg: #f1f5f9;      /* Superficie */
         }
 
-        /* --- RESET & BASE --- */
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        
         body {
-            font-family: var(--font-main);
-            background-color: var(--color-bg-canvas);
-            color: #334155;
-            height: 100vh;
-            width: 100vw;
-            overflow: hidden; /* Scroll controlado internamente */
-            display: flex;
-            flex-direction: column;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background-color: var(--corp-bg);
+            -webkit-tap-highlight-color: transparent;
+            overflow: hidden; /* App-like behavior */
         }
 
-        /* --- LAYOUT GRID SYSTEM --- */
-        #app-layout {
-            display: grid;
-            grid-template-columns: 280px 1fr; /* Sidebar fija 280px | Contenido flexible */
-            height: 100%;
-            width: 100%;
-            transition: all 0.3s ease;
+        /* --- CLASES UTILITARIAS ENTERPRISE --- */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
         }
 
-        /* --- COMPONENTE: SIDEBAR (IZQUIERDA) --- */
-        .sidebar-container {
-            background-color: var(--color-navy-dark);
-            color: white;
-            display: flex;
-            flex-direction: column;
+        .glass-dark {
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             border-right: 1px solid rgba(255, 255, 255, 0.1);
-            position: relative;
-            z-index: 20;
         }
 
-        .brand-section {
-            padding: 24px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            background: rgba(0,0,0,0.2);
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-        }
-
-        .nav-menu {
-            flex: 1;
-            padding: 20px 12px;
+        .ios-scroll {
             overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+        }
+        .ios-scroll::-webkit-scrollbar { display: none; }
+
+        .btn-touch {
+            transition: transform 0.1s ease, opacity 0.1s ease;
+        }
+        .btn-touch:active {
+            transform: scale(0.96);
+            opacity: 0.8;
         }
 
-        .nav-link {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 12px 16px;
-            border-radius: 8px;
-            color: #94a3b8;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            margin-bottom: 4px;
-        }
-        .nav-link:hover {
-            background-color: rgba(255,255,255,0.05);
-            color: white;
-        }
-        .nav-link.active {
-            background-color: var(--color-primary);
-            color: white;
-            box-shadow: 0 0 15px rgba(37, 99, 235, 0.4);
+        /* --- UI COMPONENTS --- */
+        .card-shadow {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
         }
 
-        /* --- COMPONENTE: CALENDARIO LATERAL --- */
-        .calendar-widget {
-            padding: 20px;
-            background: rgba(0,0,0,0.15);
-            border-top: 1px solid rgba(255,255,255,0.05);
-        }
-        .cal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: baseline;
-            margin-bottom: 12px;
-        }
-        .cal-grid {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            gap: 4px;
-            text-align: center;
-        }
-        .cal-day-label {
-            font-size: 10px;
-            color: #64748b;
-            margin-bottom: 4px;
-        }
-        .cal-day {
-            aspect-ratio: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-            color: #cbd5e1;
-            border-radius: 6px;
-            cursor: pointer;
-            position: relative;
-            transition: background 0.2s;
-        }
-        .cal-day:hover { background: rgba(255,255,255,0.1); color: white; }
-        .cal-day.today { background: var(--color-primary); color: white; font-weight: 700; }
-        .cal-day.has-notes::after {
-            content: ''; position: absolute; bottom: 3px;
-            width: 4px; height: 4px; background: #fbbf24; border-radius: 50%;
-        }
-        .cal-day.has-photo::before {
-            content: ''; position: absolute; top: 3px; right: 3px;
-            width: 4px; height: 4px; background: #34d399; border-radius: 50%;
-        }
-
-        /* --- COMPONENTE: CONTENIDO PRINCIPAL (DERECHA) --- */
-        .main-wrapper {
-            display: flex;
-            flex-direction: column;
-            height: 100%;
-            overflow: hidden;
-            position: relative;
-        }
-
-        /* Barra Superior */
-        .top-toolbar {
-            height: 72px;
-            background: var(--color-surface);
-            border-bottom: 1px solid #e2e8f0;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 32px;
-            flex-shrink: 0;
-            z-index: 10;
-        }
-
-        /* Buscador Global */
-        .search-box {
-            position: relative;
-            width: 300px;
-        }
-        .search-input {
-            width: 100%;
-            padding: 10px 16px 10px 40px;
-            background: #f8fafc;
-            border: 1px solid #e2e8f0;
-            border-radius: 10px;
-            color: var(--color-navy-dark);
-            font-size: 14px;
+        .input-enterprise {
             transition: all 0.2s;
+            border: 1px solid #e2e8f0;
         }
-        .search-input:focus {
-            background: white;
-            border-color: var(--color-primary);
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        .input-enterprise:focus {
+            border-color: var(--corp-blue);
+            box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1);
             outline: none;
         }
-        .search-icon {
-            position: absolute;
-            left: 14px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #94a3b8;
-        }
 
-        /* --- TABLERO KANBAN (BOARD) --- */
-        .kanban-container {
-            flex: 1;
-            overflow-x: auto;
-            overflow-y: hidden; /* Scroll vertical dentro de columnas */
-            padding: 24px 32px;
-            background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
-            background-size: 20px 20px;
+        /* Animaciones de Entrada */
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
         }
-
-        .kanban-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr; /* SOLO DOS COLUMNAS COMO PEDISTE */
-            gap: 24px;
-            height: 100%;
-            min-width: 800px; /* Asegura ancho en pantallas pequeñas */
-        }
-
-        .kanban-column {
-            background: #e2e8f0;
-            border-radius: 16px;
-            display: flex;
-            flex-direction: column;
-            height: 100%;
-            max-height: 100%;
-            border: 1px solid #cbd5e1;
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
-        }
-
-        .column-header {
-            padding: 16px 20px;
-            border-bottom: 1px solid rgba(0,0,0,0.05);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            color: var(--color-navy-dark);
-            background: rgba(255,255,255,0.5);
-            border-radius: 16px 16px 0 0;
-            backdrop-filter: blur(5px);
-        }
-
-        .column-body {
-            flex: 1;
-            padding: 16px;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-        }
-        
-        /* Personalización Scrollbar Columna */
-        .column-body::-webkit-scrollbar { width: 6px; }
-        .column-body::-webkit-scrollbar-track { background: transparent; }
-        .column-body::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-        .column-body::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
-
-        /* --- TARJETAS (CARDS) --- */
-        .task-card {
-            background: var(--color-surface);
-            border-radius: 12px;
-            padding: 16px;
-            box-shadow: var(--shadow-sm);
-            border: 1px solid #e2e8f0;
-            cursor: grab;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-            overflow: hidden;
-        }
-        .task-card:hover {
-            transform: translateY(-3px) scale(1.01);
-            box-shadow: var(--shadow-lg);
-            border-color: #cbd5e1;
-        }
-        .task-card:active { cursor: grabbing; }
-
-        /* Borde indicador de estado */
-        .task-card::before {
-            content: '';
-            position: absolute;
-            left: 0; top: 0; bottom: 0;
-            width: 4px;
-            background: #94a3b8; /* Default */
-        }
-        .task-card[data-col="proceso"]::before { background: var(--color-primary); }
-        .task-card[data-col="despachado"]::before { background: var(--color-success); }
-
-        .card-top {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 8px;
-        }
-        .card-oc {
-            font-family: var(--font-mono);
-            font-weight: 700;
-            font-size: 15px;
-            color: var(--color-navy-dark);
-        }
-        .card-invoice {
-            font-size: 11px;
-            background: #f1f5f9;
-            color: #64748b;
-            padding: 2px 6px;
-            border-radius: 4px;
-            border: 1px solid #e2e8f0;
-            font-weight: 600;
-        }
-        
-        .card-client {
-            font-weight: 600;
-            color: #1e293b;
-            margin-bottom: 8px;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-        }
-
-        .card-meta {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 12px;
-            padding-top: 12px;
-            border-top: 1px dashed #e2e8f0;
-            font-size: 12px;
-            color: #64748b;
-        }
-
-        /* Botón Mini-Cámara en tarjeta */
-        .btn-card-action {
-            width: 28px;
-            height: 28px;
-            border-radius: 6px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: #f8fafc;
-            color: #64748b;
-            transition: all 0.2s;
-            border: 1px solid #e2e8f0;
-        }
-        .btn-card-action:hover {
-            background: var(--color-navy-dark);
-            color: white;
-            border-color: var(--color-navy-dark);
-        }
-
-        /* --- BOTÓN FLOTANTE (FAB) PARA CÁMARA GLOBAL --- */
-        .fab-main {
-            position: fixed;
-            bottom: 32px;
-            right: 32px;
-            width: 64px;
-            height: 64px;
-            background: var(--color-navy-dark);
-            border-radius: 50%;
-            box-shadow: var(--shadow-xl);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 24px;
-            cursor: pointer;
-            z-index: 100;
-            transition: transform 0.2s, background 0.2s;
-            border: 2px solid rgba(255,255,255,0.1);
-        }
-        .fab-main:hover {
-            transform: scale(1.1) rotate(-5deg);
-            background: var(--color-primary);
-        }
-
-        /* --- RESPONSIVE MOBILE (Adapta todo a celular) --- */
-        @media (max-width: 768px) {
-            #app-layout { grid-template-columns: 1fr; }
-            .sidebar-container { display: none; } /* Ocultar sidebar en móvil (se podría poner menú hamburguesa) */
-            
-            .kanban-container {
-                padding: 16px;
-                background-size: 100% 100%; /* Quitar patrón puntos en móvil para rendimiento */
-            }
-            .kanban-grid {
-                grid-template-columns: 1fr; /* Una columna debajo de otra */
-                display: flex;
-                flex-direction: column;
-                min-width: 0;
-                gap: 32px;
-                padding-bottom: 80px; /* Espacio para el botón flotante */
-            }
-            .kanban-column {
-                min-height: 400px; /* Altura mínima para poder soltar items */
-            }
-            .top-toolbar {
-                padding: 0 16px;
-                height: 64px;
-            }
-            .search-box { width: 100%; } /* Buscador ancho completo */
-        }
-
+        .slide-in-panel { animation: slideInRight 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
     </style>
 </head>
-<body>
 
-    <div id="app-layout">
+<body class="h-screen w-screen flex text-slate-800 antialiased selection:bg-sky-200 selection:text-sky-900">
+
+    <aside class="w-20 md:w-24 glass-dark h-full flex flex-col items-center py-6 z-50 shadow-2xl shrink-0 flex-none">
         
-        <aside class="sidebar-container">
-            <div class="brand-section">
-                <div class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center text-white text-lg shadow-lg">
-                    <i class="fa-solid fa-scissors"></i>
-                </div>
-                <div>
-                    <h1 class="font-bold text-white tracking-wide text-sm">IDEAS TEXTILES</h1>
-                    <p class="text-xs text-slate-400">ERP Corporativo v2.0</p>
-                </div>
+        <div class="mb-8 group cursor-pointer" onclick="window.location.reload()">
+            <div class="w-12 h-12 rounded-2xl bg-white flex items-center justify-center shadow-lg group-hover:rotate-12 transition-transform duration-300">
+                <i class="fa-solid fa-scissors text-slate-900 text-xl"></i>
             </div>
+            <div class="mt-2 text-[9px] text-gray-400 font-bold tracking-widest text-center">IDEAS</div>
+        </div>
 
-            <nav class="nav-menu">
-                <div class="nav-link active" onclick="App.UI.switchView('board')">
-                    <i class="fa-solid fa-table-columns w-5"></i>
-                    <span>Tablero Kanban</span>
-                </div>
-                <div class="nav-link" onclick="App.UI.switchView('history')">
-                    <i class="fa-solid fa-clock-rotate-left w-5"></i>
-                    <span>Historial / Auditoría</span>
-                </div>
-                <div class="mt-8 px-4 text-xs font-bold text-slate-500 uppercase tracking-wider">
-                    Herramientas
-                </div>
-                <div class="nav-link" onclick="App.Logic.triggerGlobalPDF()">
-                    <i class="fa-solid fa-file-pdf w-5"></i>
-                    <span>Reporte Gerencial</span>
-                </div>
-            </nav>
-
-            <div class="calendar-widget">
-                <div class="cal-header">
-                    <span class="text-sm font-bold text-white" id="cal-month-display">ENERO</span>
-                    <span class="text-xs text-slate-400" id="cal-year-display">2026</span>
-                </div>
-                <div class="grid grid-cols-7 text-[10px] text-slate-500 text-center mb-2">
-                    <span>L</span><span>M</span><span>M</span><span>J</span><span>V</span><span>S</span><span>D</span>
-                </div>
-                <div id="mini-calendar-grid" class="cal-grid"></div>
-            </div>
-        </aside>
-
-        <main class="main-wrapper">
+        <nav class="flex-1 flex flex-col gap-6 w-full items-center">
             
-            <header class="top-toolbar">
-                <div class="search-box">
-                    <i class="fa-solid fa-search search-icon"></i>
-                    <input type="text" id="global-search-input" class="search-input" placeholder="Buscar Cliente, OC, Factura...">
-                </div>
+            <button onclick="Core.UI.openEditor()" class="w-10 h-10 rounded-xl bg-blue-500 text-white shadow-lg shadow-blue-500/30 flex items-center justify-center btn-touch hover:bg-blue-400 transition-colors tooltip-container" title="Crear Orden">
+                <i class="fa-solid fa-plus text-lg"></i>
+            </button>
 
-                <div class="flex items-center gap-4">
-                    <button onclick="App.Logic.createNewOrder()" 
-                            class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg text-sm font-medium shadow-md transition flex items-center gap-2">
-                        <i class="fa-solid fa-plus"></i>
-                        <span class="hidden sm:inline">Nueva Orden</span>
-                    </button>
-                    <div class="w-9 h-9 rounded-full bg-slate-800 text-white flex items-center justify-center text-xs font-bold border border-slate-300 shadow-sm cursor-pointer" title="Admin">
-                        IT
-                    </div>
-                </div>
-            </header>
+            <button onclick="Core.UI.switchView('kanban')" id="nav-kanban" class="w-10 h-10 rounded-xl bg-slate-800/50 text-sky-400 border border-sky-500/30 flex items-center justify-center btn-touch transition-all">
+                <i class="fa-solid fa-layer-group"></i>
+            </button>
 
-            <div id="view-container" class="kanban-container">
-                
-                <div id="view-kanban" class="kanban-grid">
-                    
-                    <div class="kanban-column">
-                        <div class="column-header text-blue-900 border-b-4 border-blue-500">
-                            <div class="flex items-center gap-2">
-                                <i class="fa-solid fa-spinner fa-spin-pulse"></i>
-                                <span>EN PROCESO</span>
-                            </div>
-                            <span id="count-proceso" class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs font-bold">0</span>
-                        </div>
-                        <div id="col-proceso" class="column-body" data-status="proceso">
-                            </div>
-                    </div>
+            <button onclick="Core.UI.switchView('calendar')" id="nav-calendar" class="w-10 h-10 rounded-xl bg-transparent text-gray-400 hover:text-white flex items-center justify-center btn-touch transition-all relative">
+                <i class="fa-solid fa-calendar-day"></i>
+                <span class="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full hidden" id="badge-calendar"></span>
+            </button>
 
-                    <div class="kanban-column">
-                        <div class="column-header text-green-900 border-b-4 border-green-500">
-                            <div class="flex items-center gap-2">
-                                <i class="fa-solid fa-check-circle"></i>
-                                <span>DESPACHADO</span>
-                            </div>
-                            <span id="count-despachado" class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs font-bold">0</span>
-                        </div>
-                        <div id="col-despachado" class="column-body" data-status="despachado">
-                            </div>
-                    </div>
+            <div class="w-8 h-[1px] bg-gray-700/50"></div>
 
-                </div>
+            <button onclick="Core.PDF.generateGlobalReport()" class="w-10 h-10 rounded-xl bg-transparent text-emerald-400 hover:bg-emerald-500/10 hover:text-emerald-300 flex items-center justify-center btn-touch transition-all" title="Reporte Gerencial">
+                <i class="fa-solid fa-file-invoice-dollar"></i>
+            </button>
 
-            </div>
+        </nav>
 
-            <div class="fab-main animate__animated animate__zoomIn" onclick="App.Logic.openCameraGlobal()">
+        <div class="mt-auto">
+             <button onclick="Core.Camera.open('global')" class="w-12 h-12 rounded-full border-2 border-gray-600 text-gray-400 hover:border-white hover:text-white flex items-center justify-center btn-touch transition-all">
                 <i class="fa-solid fa-camera"></i>
+            </button>
+        </div>
+    </aside>
+
+
+    <main class="flex-1 flex flex-col h-full overflow-hidden relative bg-slate-100">
+
+        <header class="h-16 px-6 md:px-8 flex items-center justify-between bg-white border-b border-gray-200/50 z-40 shrink-0">
+            <div>
+                <h1 class="text-lg font-bold text-slate-800 tracking-tight flex items-center gap-2">
+                    <span class="text-blue-600">IDEAS TEXTILES</span>
+                    <span class="text-gray-300">|</span>
+                    <span class="text-gray-500 font-normal text-sm uppercase hidden md:inline">Gestión de Ropa Corporativa</span>
+                </h1>
+            </div>
+            
+            <div class="relative group w-48 md:w-80">
+                <i class="fa-solid fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-blue-500 transition-colors"></i>
+                <input type="text" id="global-search" onkeyup="Core.UI.filterViews(this.value)" 
+                       placeholder="Buscar OC, Cliente, Factura..." 
+                       class="w-full bg-slate-50 border border-slate-200 rounded-lg pl-10 pr-4 py-2 text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all">
+            </div>
+        </header>
+
+        <div class="flex-1 relative overflow-hidden">
+            
+            <div id="view-kanban" class="absolute inset-0 flex overflow-x-auto overflow-y-hidden p-6 gap-6 items-start transition-opacity duration-300">
+                
+                <div class="flex-1 min-w-[340px] max-w-xl flex flex-col h-full bg-slate-200/50 rounded-3xl border border-white shadow-inner overflow-hidden">
+                    <div class="p-4 border-b border-gray-200/50 flex justify-between items-center bg-white/40 backdrop-blur sticky top-0 z-10">
+                        <div class="flex items-center gap-2">
+                            <span class="w-2 h-8 bg-blue-500 rounded-full"></span>
+                            <h2 class="font-bold text-slate-700 text-sm uppercase tracking-wide">En Proceso / Bodega</h2>
+                        </div>
+                        <span id="count-process" class="bg-white px-2 py-0.5 rounded text-xs font-bold text-gray-500 shadow-sm border">0</span>
+                    </div>
+                    <div id="col-process" class="flex-1 overflow-y-auto p-3 space-y-3 ios-scroll"></div>
+                </div>
+
+                <div class="flex-1 min-w-[340px] max-w-xl flex flex-col h-full bg-slate-200/50 rounded-3xl border border-white shadow-inner overflow-hidden">
+                    <div class="p-4 border-b border-gray-200/50 flex justify-between items-center bg-white/40 backdrop-blur sticky top-0 z-10">
+                        <div class="flex items-center gap-2">
+                            <span class="w-2 h-8 bg-emerald-500 rounded-full"></span>
+                            <h2 class="font-bold text-slate-700 text-sm uppercase tracking-wide">Despachado</h2>
+                        </div>
+                        <span id="count-dispatch" class="bg-white px-2 py-0.5 rounded text-xs font-bold text-gray-500 shadow-sm border">0</span>
+                    </div>
+                    <div id="col-dispatch" class="flex-1 overflow-y-auto p-3 space-y-3 ios-scroll"></div>
+                </div>
             </div>
 
-        </main>
-    </div>
+            <div id="view-calendar" class="absolute inset-0 bg-slate-100 p-6 hidden opacity-0 transition-opacity duration-300 overflow-y-auto ios-scroll">
+                <div class="max-w-6xl mx-auto">
+                    <div class="flex justify-between items-end mb-6">
+                        <div>
+                            <h2 class="text-2xl font-bold text-slate-800">Bitácora Visual</h2>
+                            <p class="text-gray-500 text-sm">Registro cronológico de evidencia y movimientos.</p>
+                        </div>
+                        <div class="bg-white px-4 py-2 rounded-lg shadow-sm border text-sm font-mono text-blue-600">
+                            <i class="fa-regular fa-clock mr-2"></i>HOY
+                        </div>
+                    </div>
+                    
+                    <div id="calendar-grid" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                        </div>
+                </div>
+            </div>
 
-    <script>
-        /**
-         * CONFIGURACIÓN DE FIREBASE
-         * -----------------------------------------------------------------
-         * He insertado tu URL de base de datos.
-         * IMPORTANTE: Si ves errores de permiso en la consola, deberás agregar
-         * tu 'apiKey' y 'appId' reales. Si las reglas están abiertas, esto basta.
-         */
-        const firebaseConfig = {
-            databaseURL: "https://ideastextilesapp-default-rtdb.firebaseio.com/",
-            // apiKey: "PON_AQUI_TU_API_KEY_SI_ES_NECESARIO",
-            // projectId: "ideastextilesapp",
-            // appId: "PON_AQUI_TU_APP_ID_SI_ES_NECESARIO"
-        };
+        </div>
+    </main>
 
-        // Inicialización Segura
-        if (!firebase.apps.length) {
-            firebase.initializeApp(firebaseConfig);
-        } else {
-            firebase.app(); // Usar instancia existente si ya se cargó
-        }
+
+    <div id="modal-editor" class="fixed inset-0 z-[100] hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <div class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm transition-opacity" onclick="Core.UI.closeEditor()"></div>
         
-        // Referencias Globales
-        const db = firebase.database();
-        const storage = firebase.storage(); // Preparado para Bloque 2
-
-        // NAMESPACE PRINCIPAL DE LA APLICACIÓN
-        const App = {
-            // Almacén de Datos en Memoria (Estado Local)
-            State: {
-                orders: {},
-                calendar: {},
-                currentView: 'kanban',
-                filterText: ''
-            },
-
-            // --- INICIALIZADOR MAESTRO ---
-            Init: function() {
-                console.log("%c IDEAS TEXTILES ERP v2.0 %c INICIANDO...", "background: #0f172a; color: #fff; padding: 4px;", "color: #2563eb;");
-                
-                // 1. Iniciar Escuchas de Firebase (Realtime)
-                this.Data.listenToOrders();
-                this.Data.listenToCalendar();
-
-                // 2. Renderizar Componentes Estáticos
-                this.UI.renderCalendarWidget();
-
-                // 3. Configurar Interacciones
-                this.UI.setupDragAndDrop();
-                this.UI.setupSearch();
-            },
-
-            // --- MÓDULO DE DATOS (DATA LAYER) ---
-            Data: {
-                // Escucha órdenes y aplica el "Algoritmo de Rescate"
-                listenToOrders: function() {
-                    const ordersRef = db.ref('orders');
-                    
-                    ordersRef.on('value', (snapshot) => {
-                        const rawData = snapshot.val();
-                        App.State.orders = rawData || {};
-                        App.UI.refreshBoard(); // Redibujar tablero al recibir cambios
-                    }, (error) => {
-                        console.error("Error Firebase:", error);
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Error de Conexión',
-                            text: 'Verifica tu conexión a internet o las credenciales.'
-                        });
-                    });
-                },
-
-                listenToCalendar: function() {
-                    db.ref('calendar_events').on('value', (snapshot) => {
-                        App.State.calendar = snapshot.val() || {};
-                        App.UI.updateCalendarMarkers();
-                    });
-                }
-            },
-
-            // --- MÓDULO DE INTERFAZ (UI LAYER) ---
-            UI: {
-                // Función Principal: Dibuja las tarjetas en las columnas
-                refreshBoard: function() {
-                    const colProceso = document.getElementById('col-proceso');
-                    const colDespachado = document.getElementById('col-despachado');
-                    const filter = App.State.filterText.toLowerCase();
-
-                    // Limpiar columnas
-                    colProceso.innerHTML = '';
-                    colDespachado.innerHTML = '';
-
-                    let countP = 0, countD = 0;
-
-                    // Iterar datos
-                    Object.entries(App.State.orders).forEach(([id, order]) => {
-                        // 1. Filtro de Búsqueda
-                        const searchString = `${order.oc || ''} ${order.client || ''} ${order.invoice || ''}`.toLowerCase();
-                        if (filter && !searchString.includes(filter)) return;
-
-                        // 2. Normalización de Estados (Algoritmo de Rescate)
-                        // Si no tiene estado, o es raro, lo manda a PROCESO.
-                        // Solo va a DESPACHADO si explícitamente lo dice.
-                        let status = (order.status || 'proceso').toLowerCase();
-                        let targetCol = colProceso;
-                        let statusClass = 'proceso';
-
-                        if (status.includes('despachado') || status.includes('entregado') || status === 'done') {
-                            targetCol = colDespachado;
-                            statusClass = 'despachado';
-                            countD++;
-                        } else {
-                            countP++;
-                        }
-
-                        // 3. Normalización de Datos Visuales (Evitar "undefined")
-                        const displayOC = order.oc || order.numero || 'S/N';
-                        const displayClient = order.client || order.cliente || 'CLIENTE SIN NOMBRE';
-                        const displayInvoice = order.invoice || order.factura || '---';
-                        const displayDate = order.date || '---';
-
-                        // 4. Construcción del HTML de la Tarjeta
-                        const card = document.createElement('div');
-                        card.className = `task-card animate__animated animate__fadeIn`;
-                        card.setAttribute('data-id', id);
-                        card.setAttribute('data-col', statusClass);
-                        
-                        // Evento Click -> Abrirá el Editor (Bloque 2)
-                        card.onclick = () => App.Logic.openEditor(id);
-
-                        card.innerHTML = `
-                            <div class="card-top">
-                                <span class="card-oc">#${displayOC}</span>
-                                <span class="card-invoice" title="N° Factura/Guía">
-                                    <i class="fa-solid fa-file-invoice"></i> ${displayInvoice}
-                                </div>
-                            </div>
-                            <div class="card-client" title="${displayClient}">${displayClient}</div>
-                            
-                            <div class="text-xs text-slate-500 mb-2">
-                                ${order.products ? `<i class="fa-solid fa-shirt"></i> ${Array.isArray(order.products) ? order.products.length + ' Items' : 'Detalles'} ` : ''}
-                            </div>
-
-                            <div class="card-meta">
-                                <span><i class="fa-regular fa-calendar-days"></i> ${displayDate}</span>
-                                <div class="flex gap-2">
-                                    <button class="btn-card-action" onclick="event.stopPropagation(); App.Logic.quickPhoto('${id}')" title="Adjuntar Evidencia">
-                                        <i class="fa-solid fa-camera"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        `;
-
-                        targetCol.appendChild(card);
-                    });
-
-                    // Actualizar contadores
-                    document.getElementById('count-proceso').textContent = countP;
-                    document.getElementById('count-despachado').textContent = countD;
-                },
-
-                // Configura SortableJS en las dos columnas
-                setupDragAndDrop: function() {
-                    const columns = [document.getElementById('col-proceso'), document.getElementById('col-despachado')];
-                    
-                    columns.forEach(col => {
-                        new Sortable(col, {
-                            group: 'kanban-orders', // Permite mover entre columnas
-                            animation: 150,
-                            delay: 100, // Vital para móviles: evita arrastre accidental al hacer scroll
-                            delayOnTouchOnly: true,
-                            ghostClass: 'opacity-50',
-                            onEnd: function (evt) {
-                                const itemEl = evt.item;
-                                const newColId = evt.to.id; // 'col-proceso' o 'col-despachado'
-                                const orderId = itemEl.getAttribute('data-id');
-                                
-                                // Determinar nuevo estado basado en la columna destino
-                                const newStatus = (newColId === 'col-despachado') ? 'despachado' : 'proceso';
-                                
-                                // Llamar a lógica de actualización (Persistencia)
-                                App.Logic.updateOrderStatus(orderId, newStatus);
-                                
-                                // Actualizar visualmente el borde de color
-                                itemEl.setAttribute('data-col', newStatus);
-                            }
-                        });
-                    });
-                },
-
-                // Renderiza el Calendario Pequeño Lateral
-                renderCalendarWidget: function() {
-                    const grid = document.getElementById('mini-calendar-grid');
-                    grid.innerHTML = '';
-                    
-                    const now = new Date();
-                    const year = now.getFullYear();
-                    const month = now.getMonth();
-                    
-                    // Nombres
-                    const months = ["ENERO", "FEBRERO", "MARZO", "ABRIL", "MAYO", "JUNIO", "JULIO", "AGOSTO", "SEPTIEMBRE", "OCTUBRE", "NOVIEMBRE", "DICIEMBRE"];
-                    document.getElementById('cal-month-display').textContent = months[month];
-                    document.getElementById('cal-year-display').textContent = year;
-
-                    const daysInMonth = new Date(year, month + 1, 0).getDate();
-                    const firstDayIndex = new Date(year, month, 1).getDay(); // 0=Dom
-                    
-                    // Ajuste lunes (0=Lun en nuestra lógica visual, JS da 0=Dom)
-                    let offset = firstDayIndex === 0 ? 6 : firstDayIndex - 1;
-
-                    // Celdas vacías
-                    for(let i=0; i<offset; i++) grid.appendChild(document.createElement('div'));
-
-                    // Días
-                    for(let d=1; d<=daysInMonth; d++) {
-                        const cell = document.createElement('div');
-                        cell.className = 'cal-day';
-                        cell.textContent = d;
-                        
-                        if(d === now.getDate()) cell.classList.add('today');
-                        
-                        // ID Fecha ISO para vincular eventos: YYYY-MM-DD
-                        const dateKey = `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-                        cell.setAttribute('data-date', dateKey);
-                        
-                        // Click -> Bloque 2 abrirá modal de notas
-                        cell.onclick = () => App.Logic.openCalendarDay(dateKey);
-
-                        grid.appendChild(cell);
-                    }
-                },
-
-                updateCalendarMarkers: function() {
-                    // Se implementará completamente en Bloque 2
-                    // Aquí iría la lógica para poner puntos verdes/amarillos
-                },
-
-                setupSearch: function() {
-                    const input = document.getElementById('global-search-input');
-                    input.addEventListener('input', (e) => {
-                        App.State.filterText = e.target.value;
-                        App.UI.refreshBoard();
-                    });
-                },
-
-                switchView: function(viewName) {
-                    // Simple switcher por ahora
-                    if(viewName === 'board') {
-                        document.getElementById('view-kanban').style.display = 'grid';
-                    } else {
-                        // Placeholder para futuras vistas
-                        Swal.fire('Sección en Construcción', 'Estará disponible en la próxima actualización.', 'info');
-                    }
-                }
-            },
-
-            // --- MÓDULO DE LÓGICA DE NEGOCIO (BUSINESS LOGIC) ---
-            // Estas funciones son los "enchufes" que conectaremos en el Bloque 2
-            Logic: {
-                updateOrderStatus: function(id, status) {
-                    console.log(`[LOGIC] Moviendo orden ${id} a estado: ${status}`);
-                    // Actualización atómica en Firebase
-                    db.ref(`orders/${id}`).update({ status: status, updatedAt: firebase.database.ServerValue.TIMESTAMP })
-                      .then(() => {
-                          const Toast = Swal.mixin({ toast: true, position: 'top-end', showConfirmButton: false, timer: 3000 });
-                          Toast.fire({ icon: 'success', title: 'Estado actualizado' });
-                      });
-                },
-
-                // Placeholders para Bloque 2 (Evitan errores si haces click ahora)
-                openEditor: function(id) { 
-                    Swal.fire({
-                        title: 'Editor Cargando...',
-                        text: 'El módulo de edición total viene en el Bloque 2.',
-                        icon: 'info'
-                    });
-                },
-                createNewOrder: function() { this.openEditor(null); },
-                quickPhoto: function(id) { 
-                    Swal.fire('Cámara', 'Activando módulo de cámara (Bloque 3)...', 'info'); 
-                },
-                openCameraGlobal: function() {
-                    this.quickPhoto(null);
-                },
-                openCalendarDay: function(date) {
-                    Swal.fire('Agenda', `Notas del día: ${date} (Bloque 2)`, 'info');
-                },
-                triggerGlobalPDF: function() {
-                    Swal.fire('Reportes', 'Generador PDF Navy Pro (Bloque 3)', 'info');
-                }
-            }
-        };
-
-        // --- ARRANQUE DEL SISTEMA ---
-        window.onload = function() {
-            App.Init();
-        };
-
-    <script>
-    /**
-     * ====================================================================================
-     * BLOQUE 2: LÓGICA MAESTRA (THE BRAIN) - IDEAS TEXTILES ERP v2.0
-     * Desarrollado con arquitectura MVC (Modelo-Vista-Controlador)
-     * Optimizado para: iOS Safari, Android Chrome, Desktop
-     * ====================================================================================
-     */
-
-    // --- 1. CONFIGURACIÓN Y CONSTANTES DEL SISTEMA ---
-    const AppConfig = {
-        version: "2.5.0-Build-Production",
-        animationSpeed: 300,
-        dateFormat: "dd/mm/yyyy",
-        dbPaths: {
-            orders: "orders",
-            calendar: "calendar_events",
-            logs: "audit_logs"
-        },
-        colors: {
-            primary: "#2563eb",
-            success: "#059669",
-            danger: "#dc2626",
-            navy: "#0f172a"
-        }
-    };
-
-    // --- 2. GESTIÓN DE FIREBASE (CREDENCIALES) ---
-    // IMPORTANTE: Si ya configuraste esto en Bloque 1, el objeto 'firebase' ya existe.
-    // Aseguramos la conexión aquí por si acaso.
-    const firebaseConfig = {
-        databaseURL: "https://ideastextilesapp-default-rtdb.firebaseio.com/",
-        // Si tienes reglas de seguridad activas, descomenta y agrega tus keys:
-        // apiKey: "TU_API_KEY",
-        // appId: "TU_APP_ID"
-    };
-
-    if (!firebase.apps.length) {
-        firebase.initializeApp(firebaseConfig);
-    }
-    const db = firebase.database();
-
-    // --- 3. NAMESPACE PRINCIPAL (APP CORE) ---
-    const App = {
-        // Estado Local Reactivo
-        State: {
-            orders: {},
-            calendar: {},
-            currentUser: "Admin", // Se puede expandir para auth real
-            isDragging: false,
-            filter: "",
-            currentModalOrder: null // Orden que se está editando actualmente
-        },
-
-        // --- INICIALIZADOR (BOOTSTRAP) ---
-        Init: function() {
-            this.UX.logSystem("Iniciando Core System...");
+        <div class="absolute right-0 top-0 bottom-0 w-full max-w-2xl bg-white shadow-2xl slide-in-panel flex flex-col">
             
-            // Inyectar estilos dinámicos para efectos iOS
-            this.UX.injectDynamicStyles();
-
-            // Iniciar Listeners de Datos
-            this.Data.listenToOrders();
-            this.Data.listenToCalendar();
-
-            // Configurar Interfaz
-            this.UI.setupGlobalEvents();
-            this.UI.renderCalendarWidget();
-            
-            // Efecto Burbuja en toda la app
-            document.addEventListener('click', (e) => this.UX.createRipple(e));
-        },
-
-        // --- MÓDULO UX (EXPERIENCIA DE USUARIO TIPO iOS) ---
-        UX: {
-            logSystem: (msg) => console.log(`%c[SYSTEM] ${msg}`, "color: #0ea5e9; font-weight: bold;"),
-
-            // Inyección de CSS para animaciones avanzadas sin tocar el HTML
-            injectDynamicStyles: function() {
-                const style = document.createElement('style');
-                style.innerHTML = `
-                    .ripple {
-                        position: absolute;
-                        border-radius: 50%;
-                        transform: scale(0);
-                        animation: ripple-anim 0.6s linear;
-                        background-color: rgba(37, 99, 235, 0.3);
-                        pointer-events: none;
-                        z-index: 9999;
-                    }
-                    @keyframes ripple-anim {
-                        to { transform: scale(4); opacity: 0; }
-                    }
-                    .modal-backdrop {
-                        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-                        background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px);
-                        z-index: 1000; display: flex; justify-content: center; align-items: center;
-                        opacity: 0; transition: opacity 0.3s;
-                    }
-                    .modal-backdrop.visible { opacity: 1; }
-                    .modal-panel {
-                        background: white; width: 90%; max-width: 600px; max-height: 90vh;
-                        border-radius: 16px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-                        transform: translateY(20px) scale(0.95); transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-                        overflow-y: auto; display: flex; flex-direction: column;
-                    }
-                    .modal-backdrop.visible .modal-panel { transform: translateY(0) scale(1); }
-                    /* Toggle Switch iOS Style */
-                    .toggle-checkbox:checked { right: 0; border-color: #2563eb; }
-                    .toggle-checkbox:checked + .toggle-label { background-color: #2563eb; }
-                `;
-                document.head.appendChild(style);
-            },
-
-            // Efecto "Burbuja" al tocar
-            createRipple: function(event) {
-                const ripple = document.createElement("span");
-                ripple.classList.add("ripple");
-                const size = 20;
-                ripple.style.width = ripple.style.height = `${size}px`;
-                ripple.style.left = `${event.clientX - size/2}px`;
-                ripple.style.top = `${event.clientY - size/2}px`;
-                document.body.appendChild(ripple);
-                setTimeout(() => ripple.remove(), 600);
-            },
-
-            // Notificaciones Toast Profesionales
-            showToast: function(title, icon = 'success') {
-                const Toast = Swal.mixin({
-                    toast: true,
-                    position: 'top-end',
-                    showConfirmButton: false,
-                    timer: 3000,
-                    timerProgressBar: true,
-                    didOpen: (toast) => {
-                        toast.addEventListener('mouseenter', Swal.stopTimer);
-                        toast.addEventListener('mouseleave', Swal.resumeTimer);
-                    }
-                });
-                Toast.fire({ icon: icon, title: title });
-            },
-
-            // Cargando...
-            showLoading: function(text = 'Procesando...') {
-                Swal.fire({
-                    title: text,
-                    allowOutsideClick: false,
-                    didOpen: () => Swal.showLoading()
-                });
-            },
-            
-            hideLoading: () => Swal.close()
-        },
-
-        // --- MÓDULO DE DATOS (FIREBASE CRUD) ---
-        Data: {
-            // Escucha en tiempo real Órdenes
-            listenToOrders: function() {
-                db.ref(AppConfig.dbPaths.orders).on('value', (snapshot) => {
-                    const data = snapshot.val();
-                    App.State.orders = data || {};
-                    App.UI.renderBoard(); // Redibujar tablero
-                });
-            },
-
-            // Escucha en tiempo real Calendario
-            listenToCalendar: function() {
-                db.ref(AppConfig.dbPaths.calendar).on('value', (snapshot) => {
-                    App.State.calendar = snapshot.val() || {};
-                    App.UI.updateCalendarMarkers();
-                });
-            },
-
-            // Guardar o Actualizar Orden
-            saveOrder: async function(orderData, orderId = null) {
-                try {
-                    const ref = orderId ? db.ref(`${AppConfig.dbPaths.orders}/${orderId}`) : db.ref(AppConfig.dbPaths.orders).push();
-                    
-                    // Asegurar timestamps
-                    const payload = {
-                        ...orderData,
-                        updatedAt: firebase.database.ServerValue.TIMESTAMP
-                    };
-                    if (!orderId) payload.createdAt = firebase.database.ServerValue.TIMESTAMP;
-
-                    await ref.update(payload);
-                    App.UX.showToast(orderId ? 'Orden Actualizada' : 'Orden Creada');
-                    return true;
-                } catch (e) {
-                    console.error(e);
-                    Swal.fire('Error', 'No se pudo guardar la orden', 'error');
-                    return false;
-                }
-            },
-
-            // Actualizar solo un campo (ej: status al arrastrar)
-            updateField: function(id, field, value) {
-                db.ref(`${AppConfig.dbPaths.orders}/${id}`).update({
-                    [field]: value,
-                    updatedAt: firebase.database.ServerValue.TIMESTAMP
-                });
-            },
-
-            // Eliminar Orden
-            deleteOrder: async function(id) {
-                const result = await Swal.fire({
-                    title: '¿Eliminar Orden?',
-                    text: "Esta acción no se puede deshacer.",
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#d33',
-                    cancelButtonColor: '#3085d6',
-                    confirmButtonText: 'Sí, borrar',
-                    cancelButtonText: 'Cancelar'
-                });
-
-                if (result.isConfirmed) {
-                    await db.ref(`${AppConfig.dbPaths.orders}/${id}`).remove();
-                    App.UX.showToast('Orden eliminada', 'success');
-                    // Cerrar modal si está abierto
-                    const modal = document.getElementById('dynamic-modal');
-                    if(modal) modal.remove();
-                }
-            },
-
-            // Guardar Nota de Calendario
-            saveCalendarNote: function(dateKey, text) {
-                db.ref(`${AppConfig.dbPaths.calendar}/${dateKey}`).update({
-                    note: text,
-                    updatedAt: firebase.database.ServerValue.TIMESTAMP
-                });
-            }
-        },
-
-        // --- MÓDULO DE LÓGICA DE NEGOCIO ---
-        Logic: {
-            // Genera una estructura de orden vacía
-            getEmptyOrder: function() {
-                return {
-                    oc: '',
-                    client: '',
-                    invoice: '', // FACTURA
-                    date: new Date().toLocaleDateString('es-CL'),
-                    status: 'proceso',
-                    products: [{ qty: 1, desc: '', size: '' }] // Array inicial
-                };
-            },
-
-            // Maneja el movimiento de tarjetas (Kanban)
-            handleDragEnd: function(evt) {
-                const itemEl = evt.item;
-                const newColId = evt.to.id; // 'col-proceso' o 'col-despachado'
-                const orderId = itemEl.getAttribute('data-id');
-                
-                // Determinar nuevo estado
-                const newStatus = (newColId === 'col-despachado') ? 'despachado' : 'proceso';
-                
-                // Actualizar en BD
-                App.Data.updateField(orderId, 'status', newStatus);
-                
-                // Actualizar atributo visual
-                itemEl.setAttribute('data-col', newStatus);
-            },
-
-            // Abrir el "Editor Dios"
-            openOrderEditor: function(orderId) {
-                const order = orderId ? App.State.orders[orderId] : this.getEmptyOrder();
-                App.State.currentModalOrder = { ...order, id: orderId }; // Copia local
-                
-                // Renderizar Modal
-                App.Modals.renderEditor(App.State.currentModalOrder);
-            },
-
-            // Abrir día del calendario
-            openDayDetails: function(dateKey) {
-                const data = App.State.calendar[dateKey] || { note: '' };
-                App.Modals.renderCalendarDay(dateKey, data);
-            },
-
-            // Prepara los datos para los PDFs (Puente al Bloque 3)
-            preparePDFData: function(type) {
-                // Esta función recoge los datos del formulario actual
-                // y los estructura para que el generador PDF no falle.
-                const form = document.getElementById('order-form');
-                if (!form) return null;
-
-                const formData = new FormData(form);
-                
-                // Recolectar productos dinámicamente
-                const products = [];
-                const rows = document.querySelectorAll('.product-row');
-                rows.forEach(row => {
-                    const qty = row.querySelector('.p-qty').value;
-                    const desc = row.querySelector('.p-desc').value;
-                    const size = row.querySelector('.p-size').value;
-                    if(desc) products.push({ qty, desc, size });
-                });
-
-                return {
-                    oc: document.getElementById('input-oc').value,
-                    client: document.getElementById('input-client').value,
-                    invoice: document.getElementById('input-invoice').value,
-                    date: document.getElementById('input-date').value,
-                    products: products,
-                    type: type // 'oc', 'label', 'report'
-                };
-            }
-        },
-
-        // --- MÓDULO UI (RENDERIZADO) ---
-        UI: {
-            setupGlobalEvents: function() {
-                // Buscador
-                document.getElementById('global-search-input').addEventListener('input', (e) => {
-                    App.State.filter = e.target.value.toLowerCase();
-                    App.UI.renderBoard();
-                });
-            },
-
-            // Renderizado del Tablero Kanban (Con Filtros y Lógica de Rescate)
-            renderBoard: function() {
-                const colProceso = document.getElementById('col-proceso');
-                const colDespachado = document.getElementById('col-despachado');
-                const filter = App.State.filter;
-
-                if (!colProceso || !colDespachado) return;
-
-                colProceso.innerHTML = '';
-                colDespachado.innerHTML = '';
-
-                let countP = 0, countD = 0;
-
-                Object.entries(App.State.orders).forEach(([id, order]) => {
-                    // 1. Filtro
-                    const searchStr = `${order.oc} ${order.client} ${order.invoice}`.toLowerCase();
-                    if (filter && !searchStr.includes(filter)) return;
-
-                    // 2. Normalización de Estado (Lógica de Rescate)
-                    let status = (order.status || 'proceso').toLowerCase();
-                    let target = colProceso;
-                    let visualClass = 'proceso';
-
-                    // Si dice despachado/entregado va a la derecha. Todo lo demás a la izquierda.
-                    if (status.includes('despachado') || status.includes('entregado')) {
-                        target = colDespachado;
-                        visualClass = 'despachado';
-                        countD++;
-                    } else {
-                        countP++;
-                    }
-
-                    // 3. Crear Tarjeta HTML
-                    const card = document.createElement('div');
-                    card.className = `task-card animate__animated animate__fadeIn`;
-                    card.setAttribute('data-id', id);
-                    card.setAttribute('data-col', visualClass);
-                    card.onclick = () => App.Logic.openOrderEditor(id);
-
-                    // Datos seguros
-                    const oc = order.oc || 'S/N';
-                    const client = order.client || 'Sin Cliente';
-                    const invoice = order.invoice || '---';
-
-                    card.innerHTML = `
-                        <div class="card-top">
-                            <span class="card-oc">#${oc}</span>
-                            ${invoice !== '---' ? `<span class="card-invoice"><i class="fa-solid fa-file-invoice"></i> ${invoice}</span>` : ''}
-                        </div>
-                        <div class="card-client">${client}</div>
-                        <div class="card-meta">
-                            <span><i class="fa-regular fa-calendar"></i> ${order.date || ''}</span>
-                            <button class="btn-card-action" onclick="event.stopPropagation(); App.UI.triggerCamera('${id}')">
-                                <i class="fa-solid fa-camera"></i>
-                            </button>
-                        </div>
-                    `;
-
-                    target.appendChild(card);
-                });
-
-                // Actualizar contadores
-                document.getElementById('count-proceso').textContent = countP;
-                document.getElementById('count-despachado').textContent = countD;
-            },
-
-            // Renderizar Calendario Lateral
-            renderCalendarWidget: function() {
-                const grid = document.getElementById('mini-calendar-grid');
-                if(!grid) return;
-                grid.innerHTML = '';
-                
-                const now = new Date();
-                const year = now.getFullYear();
-                const month = now.getMonth();
-                
-                const daysInMonth = new Date(year, month + 1, 0).getDate();
-                const firstDay = new Date(year, month, 1).getDay();
-                let offset = firstDay === 0 ? 6 : firstDay - 1;
-
-                // Celdas vacías
-                for(let i=0; i<offset; i++) grid.appendChild(document.createElement('div'));
-
-                // Días
-                for(let d=1; d<=daysInMonth; d++) {
-                    const cell = document.createElement('div');
-                    cell.className = 'cal-day';
-                    cell.textContent = d;
-                    
-                    const dateKey = `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-                    
-                    if(d === now.getDate()) cell.classList.add('today');
-                    
-                    // Hook para evento click
-                    cell.onclick = () => App.Logic.openDayDetails(dateKey);
-                    
-                    // Guardar referencia para actualizar marcadores
-                    cell.setAttribute('data-date', dateKey);
-
-                    grid.appendChild(cell);
-                }
-                
-                this.updateCalendarMarkers();
-            },
-
-            // Poner puntitos en el calendario si hay datos
-            updateCalendarMarkers: function() {
-                const events = App.State.calendar;
-                document.querySelectorAll('.cal-day[data-date]').forEach(cell => {
-                    const key = cell.getAttribute('data-date');
-                    if(events[key]) {
-                        if(events[key].note) cell.classList.add('has-notes');
-                        if(events[key].photos) cell.classList.add('has-photo');
-                    }
-                });
-            },
-
-            // Trigger visual para la cámara (Bloque 3 la implementa real)
-            triggerCamera: function(id) {
-                // En Bloque 2 solo mostramos que la interacción existe.
-                // En Bloque 3 aquí se abrirá el stream de video.
-                Swal.fire({
-                    title: 'Cámara Lista',
-                    text: 'El módulo de hardware se activará en el Bloque 3.',
-                    icon: 'info'
-                });
-            }
-        },
-
-        // --- MÓDULO DE MODALES (HTML DINÁMICO) ---
-        // Aquí está la magia de la "Edición Total"
-        Modals: {
-            
-            // Renderiza el EDITOR DE ORDEN COMPLETO
-            renderEditor: function(order) {
-                const isNew = !order.id;
-                
-                // Construir filas de productos
-                let productsHtml = '';
-                const products = order.products || [{qty:1, desc:'', size:''}];
-                
-                products.forEach((prod, index) => {
-                    productsHtml += `
-                        <div class="product-row flex gap-2 mb-2 items-center">
-                            <input type="number" class="p-qty w-16 p-2 border rounded text-center text-sm" placeholder="Cant" value="${prod.qty || 1}">
-                            <input type="text" class="p-desc flex-1 p-2 border rounded text-sm" placeholder="Descripción de la prenda" value="${prod.desc || ''}">
-                            <input type="text" class="p-size w-20 p-2 border rounded text-center text-sm" placeholder="Talla" value="${prod.size || ''}">
-                            <button type="button" class="text-red-500 hover:text-red-700 p-2" onclick="this.parentElement.remove()">
-                                <i class="fa-solid fa-trash"></i>
-                            </button>
-                        </div>
-                    `;
-                });
-
-                const html = `
-                    <div id="dynamic-modal" class="modal-backdrop">
-                        <div class="modal-panel animate__animated animate__fadeInUp">
-                            
-                            <div class="flex justify-between items-center p-5 border-b bg-slate-50 rounded-t-lg">
-                                <h2 class="text-xl font-bold text-slate-800">
-                                    ${isNew ? '<i class="fa-solid fa-plus-circle text-blue-600"></i> Nueva Orden' : '<i class="fa-solid fa-pen-to-square text-blue-600"></i> Editar Orden'}
-                                </h2>
-                                <button onclick="document.getElementById('dynamic-modal').classList.remove('visible'); setTimeout(()=>document.getElementById('dynamic-modal').remove(), 300);" class="text-slate-400 hover:text-slate-600 text-2xl">
-                                    &times;
-                                </button>
-                            </div>
-
-                            <div class="p-6 overflow-y-auto">
-                                <form id="order-form" onsubmit="event.preventDefault();">
-                                    
-                                    <div class="grid grid-cols-2 gap-4 mb-4">
-                                        <div>
-                                            <label class="block text-xs font-bold text-slate-500 uppercase mb-1">N° Orden Compra</label>
-                                            <input type="text" id="input-oc" class="w-full p-3 border border-slate-300 rounded-lg focus:border-blue-500 outline-none font-mono font-bold" value="${order.oc || ''}" placeholder="Ej: 12345">
-                                        </div>
-                                        <div>
-                                            <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Fecha Ingreso</label>
-                                            <input type="text" id="input-date" class="w-full p-3 border border-slate-300 rounded-lg bg-slate-50" value="${order.date || new Date().toLocaleDateString()}" readonly>
-                                        </div>
-                                    </div>
-
-                                    <div class="mb-4">
-                                        <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Cliente / Destino</label>
-                                        <input type="text" id="input-client" class="w-full p-3 border border-slate-300 rounded-lg focus:border-blue-500 outline-none" value="${order.client || ''}" placeholder="Nombre del Cliente">
-                                    </div>
-
-                                    <div class="mb-6 bg-yellow-50 p-3 rounded-lg border border-yellow-200">
-                                        <label class="block text-xs font-bold text-yellow-800 uppercase mb-1"><i class="fa-solid fa-file-invoice-dollar"></i> N° Factura / Guía</label>
-                                        <input type="text" id="input-invoice" class="w-full p-2 bg-white border border-yellow-300 rounded focus:border-yellow-500 outline-none font-bold text-slate-800" value="${order.invoice || ''}" placeholder="---">
-                                        <p class="text-[10px] text-yellow-700 mt-1">* Necesario para etiqueta de despacho</p>
-                                    </div>
-
-                                    <div class="mb-6">
-                                        <div class="flex justify-between items-center mb-2">
-                                            <label class="block text-xs font-bold text-slate-500 uppercase">Detalle Productos</label>
-                                            <button type="button" onclick="App.Modals.addProductRow()" class="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded hover:bg-blue-200">
-                                                <i class="fa-solid fa-plus"></i> Agregar Fila
-                                            </button>
-                                        </div>
-                                        <div id="products-container" class="bg-slate-50 p-3 rounded border">
-                                            ${productsHtml}
-                                        </div>
-                                    </div>
-
-                                    <div class="flex items-center justify-between p-4 bg-gray-100 rounded-lg mb-6">
-                                        <span class="font-bold text-slate-700">Estado Despachado</span>
-                                        <label class="relative inline-flex items-center cursor-pointer">
-                                            <input type="checkbox" id="input-status" class="sr-only peer" ${order.status === 'despachado' ? 'checked' : ''}>
-                                            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-600"></div>
-                                        </label>
-                                    </div>
-
-                                    <div class="grid grid-cols-2 gap-3 mb-4">
-                                        <button type="button" onclick="App.Modals.handlePrint('label')" class="bg-slate-700 text-white py-2 rounded shadow hover:bg-slate-800 flex justify-center items-center gap-2">
-                                            <i class="fa-solid fa-tag"></i> Etiqueta
-                                        </button>
-                                        <button type="button" onclick="App.Modals.handlePrint('oc')" class="bg-slate-700 text-white py-2 rounded shadow hover:bg-slate-800 flex justify-center items-center gap-2">
-                                            <i class="fa-solid fa-file-pdf"></i> Imprimir OC
-                                        </button>
-                                    </div>
-
-                                </form>
-                            </div>
-
-                            <div class="p-5 border-t bg-slate-50 flex justify-between rounded-b-lg">
-                                ${!isNew ? `<button onclick="App.Data.deleteOrder('${order.id}')" class="text-red-500 hover:text-red-700 text-sm font-medium">Eliminar</button>` : '<div></div>'}
-                                
-                                <div class="flex gap-3">
-                                    <button onclick="document.getElementById('dynamic-modal').remove()" class="px-4 py-2 text-slate-600 hover:bg-slate-200 rounded transition">Cancelar</button>
-                                    <button onclick="App.Modals.submitOrder('${order.id || ''}')" class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded font-bold shadow-lg transition transform active:scale-95">
-                                        ${isNew ? 'Crear Orden' : 'Guardar Cambios'}
-                                    </button>
-                                </div>
-                            </div>
-
-                        </div>
-                    </div>
-                `;
-
-                // Inyección al DOM
-                document.body.insertAdjacentHTML('beforeend', html);
-                // Animación de entrada
-                setTimeout(() => document.querySelector('.modal-backdrop').classList.add('visible'), 10);
-            },
-
-            // Renderiza el Modal del Calendario (Notas y Eventos)
-            renderCalendarDay: function(dateKey, data) {
-                const html = `
-                    <div id="calendar-modal" class="modal-backdrop">
-                        <div class="modal-panel animate__animated animate__zoomIn" style="max-width: 400px;">
-                            <div class="p-5 bg-gradient-to-r from-slate-800 to-slate-900 text-white rounded-t-lg">
-                                <h3 class="font-bold text-lg"><i class="fa-regular fa-calendar-check"></i> ${dateKey}</h3>
-                                <p class="text-slate-300 text-xs mt-1">Bitácora diaria</p>
-                            </div>
-                            <div class="p-6">
-                                <label class="block text-xs font-bold text-slate-500 uppercase mb-2">Notas del día</label>
-                                <textarea id="cal-note" class="w-full border rounded p-3 h-32 text-sm focus:border-blue-500 outline-none" placeholder="Escribe aquí (ej: Llega tela, despacho urgente...)">${data.note || ''}</textarea>
-                                
-                                <div class="mt-4 pt-4 border-t">
-                                    <label class="block text-xs font-bold text-slate-500 uppercase mb-2">Evidencia Fotográfica</label>
-                                    <div class="bg-slate-100 p-4 rounded text-center text-slate-400 text-sm">
-                                        ${data.photos ? 'Ver Fotos (Bloque 3)' : 'No hay fotos para este día.'}
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="p-4 border-t flex justify-end gap-2">
-                                <button onclick="document.getElementById('calendar-modal').remove()" class="px-4 py-2 text-slate-500">Cerrar</button>
-                                <button onclick="App.Data.saveCalendarNote('${dateKey}', document.getElementById('cal-note').value); document.getElementById('calendar-modal').remove();" class="px-4 py-2 bg-blue-600 text-white rounded">Guardar Nota</button>
-                            </div>
-                        </div>
-                    </div>
-                `;
-                document.body.insertAdjacentHTML('beforeend', html);
-                setTimeout(() => document.querySelector('.modal-backdrop').classList.add('visible'), 10);
-            },
-
-            // Añadir fila de producto dinámicamente
-            addProductRow: function() {
-                const container = document.getElementById('products-container');
-                const div = document.createElement('div');
-                div.className = 'product-row flex gap-2 mb-2 items-center animate__animated animate__fadeIn';
-                div.innerHTML = `
-                    <input type="number" class="p-qty w-16 p-2 border rounded text-center text-sm" placeholder="Cant" value="1">
-                    <input type="text" class="p-desc flex-1 p-2 border rounded text-sm" placeholder="Descripción">
-                    <input type="text" class="p-size w-20 p-2 border rounded text-center text-sm" placeholder="Talla">
-                    <button type="button" class="text-red-500 hover:text-red-700 p-2" onclick="this.parentElement.remove()">
+            <div class="p-6 border-b border-gray-100 flex justify-between items-center bg-white z-10">
+                <div>
+                    <h3 class="text-xl font-bold text-slate-800">Gestión de Orden</h3>
+                    <p class="text-xs text-gray-400 font-medium tracking-wider uppercase">Ideas Textiles Enterprise</p>
+                </div>
+                <div class="flex gap-2">
+                    <button onclick="Core.Logic.deleteOrder()" class="w-8 h-8 rounded-full text-red-400 hover:bg-red-50 flex items-center justify-center transition" title="Eliminar">
                         <i class="fa-solid fa-trash"></i>
                     </button>
-                `;
-                container.appendChild(div);
-            },
-
-            // Procesar el formulario de orden y guardar
-            submitOrder: async function(orderId) {
-                // Recopilar datos
-                const data = {
-                    oc: document.getElementById('input-oc').value.toUpperCase(),
-                    client: document.getElementById('input-client').value.toUpperCase(),
-                    invoice: document.getElementById('input-invoice').value,
-                    date: document.getElementById('input-date').value,
-                    status: document.getElementById('input-status').checked ? 'despachado' : 'proceso',
-                    products: []
-                };
-
-                // Validar
-                if(!data.client) return Swal.fire('Falta Cliente', 'Por favor ingresa el nombre del cliente', 'warning');
-
-                // Recopilar productos
-                document.querySelectorAll('.product-row').forEach(row => {
-                    const q = row.querySelector('.p-qty').value;
-                    const d = row.querySelector('.p-desc').value;
-                    const s = row.querySelector('.p-size').value;
-                    if(d) data.products.push({ qty: q, desc: d, size: s });
-                });
-
-                // Guardar en Firebase
-                const success = await App.Data.saveOrder(data, orderId || null);
-                
-                if(success) {
-                    // Cerrar modal
-                    const modal = document.getElementById('dynamic-modal');
-                    modal.classList.remove('visible');
-                    setTimeout(() => modal.remove(), 300);
-                }
-            },
-
-            // Manejador de impresión (Prepara datos y llamará al Bloque 3)
-            handlePrint: function(type) {
-                const data = App.Logic.preparePDFData(type);
-                
-                // Aquí validamos antes de enviar al motor PDF
-                if(type === 'label' && (!data.invoice || data.invoice.length < 2)) {
-                    Swal.fire('Falta Factura', 'Para imprimir etiqueta debes ingresar el N° de Factura o Guía.', 'warning');
-                    return;
-                }
-
-                // Guardar datos temporalmente en el objeto global para que el Bloque 3 los consuma
-                window.tempPDFData = data;
-
-                // Simulación de llamada al Bloque 3 (se reemplazará con la llamada real)
-                Swal.fire({
-                    title: 'Generando PDF...',
-                    text: 'Los datos están listos y validados. El motor gráfico del Bloque 3 renderizará el documento ahora.',
-                    icon: 'success',
-                    timer: 2000
-                });
-                
-                // NOTA: En el Bloque 3 añadiremos la función App.PDF.generate(data) que se llamará aquí.
-            }
-        },
-
-        // --- ARRANQUE MÓVIL Y TOUCH ---
-        Mobile: {
-            init: function() {
-                // Ajustes específicos para evitar el "Pull to refresh" en el tablero
-                document.body.style.overscrollBehavior = 'none';
-            }
-        }
-    };
-
-    // --- PUNTO DE ENTRADA ---
-    window.addEventListener('DOMContentLoaded', () => {
-        App.Init();
-        App.Mobile.init();
-    });
-
-    // Exponer App globalmente para uso en consola o extensiones
-    window.App = App;
-
-    // --- ACCESOS DIRECTOS DESDE EL HTML (Bloque 1) ---
-    // Estas funciones conectan los botones del Bloque 1 con la lógica del Bloque 2
-    App.Logic.createNewOrder = () => App.Logic.openOrderEditor(null);
-    App.Logic.openCameraGlobal = () => App.UI.triggerCamera('global');
-    App.Logic.triggerGlobalPDF = () => Swal.fire('Reporte', 'Selecciona fecha en Bloque 3', 'info');
-    App.UI.switchView = (view) => {
-        if(view === 'history') Swal.fire('Historial', 'Módulo de auditoría (Bloque 3)', 'info');
-        else {
-            document.getElementById('view-kanban').style.display = 'grid';
-            document.getElementById('view-container').scrollTo(0,0);
-        }
-    };
-
-</script>
-<script>
-    /**
-     * ====================================================================================
-     * BLOQUE 3: MOTORES DE HARDWARE Y SALIDA (ENGINEERING LAYER)
-     * ------------------------------------------------------------------------------------
-     * Incluye:
-     * 1. Motor Gráfico PDF (jsPDF + AutoTable + Vector Draw)
-     * 2. Motor de Acceso a Hardware (Cámara / Stream / Base64)
-     * 3. Hooks de Integración Final
-     * ====================================================================================
-     */
-
-    // --- EXTENSIÓN DEL NAMESPACE 'App' (Fusión con Bloques 1 y 2) ---
-
-    // 1. MOTOR PDF PROFESIONAL "NAVY PRO"
-    App.PDF = {
-        // Configuración de Identidad Corporativa para Documentos
-        config: {
-            companyName: "IDEAS TEXTILES SPA",
-            rut: "76.XXX.XXX-K",
-            address: "Av. Industrial 1234, Santiago",
-            colorMain: [37, 99, 235], // Azul Corporativo (RGB)
-            colorDark: [15, 23, 42],  // Navy Dark (RGB)
-            colorGray: [100, 116, 139] // Slate 500
-        },
-
-        // Función Maestra de Generación
-        generate: function(data) {
-            if (!data) return;
-            
-            // Selector de Estrategia
-            if (data.type === 'oc') this.renderOC(data);
-            else if (data.type === 'label') this.renderLabel(data);
-            else if (data.type === 'report') this.renderManagementReport();
-        },
-
-        // --- RENDERIZADOR 1: ORDEN DE COMPRA / TRABAJO ---
-        renderOC: function(data) {
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
-            const config = this.config;
-
-            // 1. Encabezado Corporativo
-            doc.setFillColor(...config.colorDark);
-            doc.rect(0, 0, 210, 40, 'F'); // Barra superior oscura
-
-            doc.setTextColor(255, 255, 255);
-            doc.setFont("helvetica", "bold");
-            doc.setFontSize(22);
-            doc.text("ORDEN DE TRABAJO", 15, 20);
-            
-            doc.setFontSize(10);
-            doc.setFont("helvetica", "normal");
-            doc.text(`REF: #${data.oc}`, 15, 30);
-            
-            // Datos Empresa (Derecha)
-            doc.setFontSize(12);
-            doc.text(config.companyName, 195, 15, { align: 'right' });
-            doc.setFontSize(9);
-            doc.text(config.address, 195, 22, { align: 'right' });
-            doc.text(`Fecha Emisión: ${new Date().toLocaleDateString()}`, 195, 29, { align: 'right' });
-
-            // 2. Información del Cliente (Tarjeta Visual)
-            doc.setDrawColor(200, 200, 200);
-            doc.setFillColor(248, 250, 252);
-            doc.roundedRect(14, 50, 182, 35, 3, 3, 'FD');
-
-            doc.setTextColor(...config.colorDark);
-            doc.setFontSize(11);
-            doc.setFont("helvetica", "bold");
-            doc.text("DATOS DEL CLIENTE / DESTINO", 20, 60);
-
-            doc.setFontSize(10);
-            doc.setFont("helvetica", "normal");
-            doc.text(`CLIENTE:`, 20, 70);
-            doc.text(`FACTURA/GUÍA:`, 110, 70);
-            
-            doc.setFont("helvetica", "bold");
-            doc.text(data.client.toUpperCase(), 40, 70);
-            doc.text(data.invoice || "---", 140, 70);
-
-            doc.setFont("helvetica", "normal");
-            doc.text(`FECHA ORDEN: ${data.date}`, 20, 78);
-
-            // 3. Tabla de Productos (Usando AutoTable)
-            const tableBody = data.products.map(p => [
-                p.qty, 
-                p.desc.toUpperCase(), 
-                p.size.toUpperCase()
-            ]);
-
-            doc.autoTable({
-                startY: 95,
-                head: [['CANT', 'DESCRIPCIÓN', 'TALLA']],
-                body: tableBody,
-                theme: 'grid',
-                headStyles: { 
-                    fillColor: config.colorMain, 
-                    textColor: 255, 
-                    fontStyle: 'bold',
-                    halign: 'center' 
-                },
-                columnStyles: {
-                    0: { halign: 'center', cellWidth: 30 },
-                    2: { halign: 'center', cellWidth: 30 }
-                },
-                styles: { fontSize: 10, cellPadding: 4 }
-            });
-
-            // 4. Footer y Firmas
-            const finalY = doc.lastAutoTable.finalY + 20;
-            
-            // Líneas de firma
-            doc.setDrawColor(150);
-            doc.line(20, finalY + 30, 80, finalY + 30); // Firma 1
-            doc.line(130, finalY + 30, 190, finalY + 30); // Firma 2
-
-            doc.setFontSize(8);
-            doc.setTextColor(100);
-            doc.text("FIRMA RESPONSABLE BODEGA", 50, finalY + 35, { align: 'center' });
-            doc.text("RECIBÍ CONFORME", 160, finalY + 35, { align: 'center' });
-
-            // Marca de agua sistema
-            doc.setFontSize(7);
-            doc.text("Generado por Ideas Textiles ERP v2.0 - Documento Interno", 105, 290, { align: 'center' });
-
-            // Abrir PDF
-            window.open(doc.output('bloburl'), '_blank');
-        },
-
-        // --- RENDERIZADOR 2: ETIQUETA DE DESPACHO (VECTORIAL) ---
-        // Dibuja tijeras reales con código, sin imágenes externas.
-        renderLabel: function(data) {
-            const { jsPDF } = window.jspdf;
-            // Formato Oficio (Legal) partido o A4. Usaremos A4 vertical y dibujaremos 2 etiquetas.
-            const doc = new jsPDF(); 
-            
-            // Función auxiliar para dibujar una etiqueta en una posición Y específica
-            const drawLabelAt = (startY, content) => {
-                // Borde Exterior
-                doc.setLineWidth(1);
-                doc.setDrawColor(0);
-                doc.rect(10, startY, 190, 130); // Marco etiqueta
-
-                // Título Gigante "DESTINATARIO"
-                doc.setFont("helvetica", "bold");
-                doc.setFontSize(40);
-                doc.setTextColor(0, 0, 0);
-                doc.text(content.client.substr(0, 15), 105, startY + 25, { align: 'center' });
-                if(content.client.length > 15) {
-                    doc.setFontSize(20);
-                    doc.text(content.client.substr(15), 105, startY + 35, { align: 'center' });
-                }
-
-                // Línea divisoria gruesa
-                doc.setLineWidth(2);
-                doc.line(10, startY + 45, 200, startY + 45);
-
-                // Bloque Factura (Izquierda)
-                doc.setFontSize(14);
-                doc.setTextColor(100);
-                doc.text("DOCUMENTO TRIBUTARIO", 20, startY + 60);
-                doc.setFontSize(35);
-                doc.setTextColor(0);
-                doc.text(content.invoice || "PENDIENTE", 20, startY + 75);
-
-                // Bloque OC (Derecha)
-                doc.setFontSize(14);
-                doc.setTextColor(100);
-                doc.text("ORDEN DE COMPRA", 120, startY + 60);
-                doc.setFontSize(35);
-                doc.setTextColor(0);
-                doc.text(`#${content.oc}`, 120, startY + 75);
-
-                // Detalle Contenido
-                doc.setLineWidth(0.5);
-                doc.line(10, startY + 90, 200, startY + 90);
-                
-                doc.setFontSize(12);
-                doc.setTextColor(50);
-                doc.text("CONTENIDO / OBSERVACIONES:", 15, startY + 105);
-                
-                // Resumen rápido de productos (primeros 3)
-                let prodText = content.products.slice(0, 3).map(p => `${p.qty} x ${p.desc} (${p.size})`).join(", ");
-                if(content.products.length > 3) prodText += `... (+${content.products.length - 3} más)`;
-                
-                doc.setFontSize(14);
-                doc.setTextColor(0);
-                doc.text(prodText, 15, startY + 115, { maxWidth: 180 });
-
-                // Footer Etiqueta
-                doc.setFontSize(10);
-                doc.setTextColor(150);
-                doc.text("IDEAS TEXTILES - CONTROL DE DESPACHO", 105, startY + 125, { align: 'center' });
-            };
-
-            // Dibujar Etiqueta Superior
-            drawLabelAt(10, data);
-
-            // --- DIBUJO VECTORIAL DE TIJERAS Y LÍNEA DE CORTE ---
-            const cutY = 148; // Mitad de página aprox
-            
-            // Línea punteada
-            doc.setLineWidth(0.5);
-            doc.setDrawColor(100);
-            doc.setLineDash([3, 3], 0);
-            doc.line(0, cutY, 210, cutY);
-            doc.setLineDash([]); // Reset
-
-            // Icono Tijeras (Dibujado vectorialmente)
-            doc.setFillColor(50);
-            // Círculos del mango
-            doc.circle(10, cutY - 2, 2, 'S'); 
-            doc.circle(10, cutY + 2, 2, 'S');
-            // Aspas
-            doc.line(12, cutY - 2, 18, cutY + 1);
-            doc.line(12, cutY + 2, 18, cutY - 1);
-            
-            // Texto "CORTAR AQUÍ"
-            doc.setFontSize(8);
-            doc.text("CORTAR AQUÍ", 22, cutY + 1);
-
-            // Dibujar Etiqueta Inferior (Copia)
-            drawLabelAt(155, data);
-
-            window.open(doc.output('bloburl'), '_blank');
-        },
-
-        // Renderizador 3: Reporte Gerencial (Auditoría)
-        renderManagementReport: function() {
-            // Este reporte escanea todas las órdenes en memoria
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
-            const orders = Object.values(App.State.orders);
-            
-            doc.setFontSize(18);
-            doc.text("REPORTE DE GESTIÓN Y AUDITORÍA", 14, 20);
-            doc.setFontSize(10);
-            doc.text(`Generado: ${new Date().toLocaleString()}`, 14, 28);
-
-            const body = orders.map(o => [
-                o.oc,
-                o.client,
-                o.invoice || '-',
-                o.status.toUpperCase(),
-                o.date
-            ]);
-
-            doc.autoTable({
-                startY: 35,
-                head: [['OC', 'CLIENTE', 'FACTURA', 'ESTADO', 'FECHA']],
-                body: body,
-                theme: 'striped'
-            });
-
-            window.open(doc.output('bloburl'), '_blank');
-        }
-    };
-
-    // 2. MOTOR DE HARDWARE (CÁMARA AVANZADA)
-    App.Camera = {
-        stream: null,
-        targetId: null, // ID de la orden o fecha a la que se adjuntará
-
-        // Inicia la interfaz de cámara
-        start: async function(contextId) {
-            this.targetId = contextId;
-
-            // Verificar soporte
-            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-                Swal.fire('Error', 'Tu dispositivo no permite acceso a cámara segura.', 'error');
-                return;
-            }
-
-            // Crear Modal de Cámara en el DOM
-            const modalHtml = `
-                <div id="camera-modal" class="fixed inset-0 bg-black bg-opacity-90 z-[2000] flex flex-col items-center justify-center p-4">
-                    <div class="relative w-full max-w-lg bg-black rounded-2xl overflow-hidden shadow-2xl border border-gray-700">
-                        <video id="camera-feed" autoplay playsinline class="w-full h-auto bg-gray-900"></video>
-                        <canvas id="camera-canvas" class="hidden"></canvas>
-                        
-                        <div class="absolute bottom-6 left-0 right-0 flex justify-center items-center gap-8">
-                            <button onclick="App.Camera.close()" class="w-12 h-12 rounded-full bg-gray-600 text-white flex items-center justify-center shadow-lg">
-                                <i class="fa-solid fa-times"></i>
-                            </button>
-                            
-                            <button onclick="App.Camera.capture()" class="w-20 h-20 rounded-full border-4 border-white bg-white/20 flex items-center justify-center shadow-lg active:scale-95 transition">
-                                <div class="w-16 h-16 bg-white rounded-full"></div>
-                            </button>
-                            
-                            <button onclick="App.Camera.switch()" class="w-12 h-12 rounded-full bg-gray-600 text-white flex items-center justify-center shadow-lg">
-                                <i class="fa-solid fa-rotate"></i>
-                            </button>
-                        </div>
-                    </div>
-                    <p class="text-white mt-4 text-sm"><i class="fa-solid fa-camera"></i> Modo Evidencia: ${contextId ? 'Adjuntando a Orden' : 'Captura Rápida'}</p>
+                    <button onclick="Core.UI.closeEditor()" class="w-8 h-8 rounded-full bg-gray-100 text-gray-500 hover:bg-gray-200 flex items-center justify-center btn-touch">
+                        <i class="fa-solid fa-times"></i>
+                    </button>
                 </div>
-            `;
-            document.body.insertAdjacentHTML('beforeend', modalHtml);
+            </div>
 
-            // Iniciar Stream
-            try {
-                const video = document.getElementById('camera-feed');
-                this.stream = await navigator.mediaDevices.getUserMedia({ 
-                    video: { facingMode: 'environment' }, // Intenta usar cámara trasera en móviles
-                    audio: false 
-                });
-                video.srcObject = this.stream;
-            } catch (err) {
-                console.error(err);
-                document.getElementById('camera-modal').remove();
-                Swal.fire('Permiso Denegado', 'No pudimos acceder a la cámara. Revisa los permisos del navegador.', 'warning');
-            }
-        },
+            <div class="flex-1 overflow-y-auto p-6 space-y-8 ios-scroll bg-slate-50/50">
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="col-span-2">
+                        <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5 ml-1">Cliente / Empresa</label>
+                        <input type="text" id="edit-client" class="w-full p-3 rounded-xl bg-white input-enterprise text-slate-800 font-bold text-lg" placeholder="Ej: CODELCO GABY">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5 ml-1">Orden de Compra (O.C.)</label>
+                        <input type="text" id="edit-oc" class="w-full p-3 rounded-xl bg-white input-enterprise font-mono text-sm" placeholder="4500-XXXXXX">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5 ml-1">Factura / Guía Despacho</label>
+                        <input type="text" id="edit-invoice" class="w-full p-3 rounded-xl bg-white input-enterprise font-mono text-sm" placeholder="N° Documento">
+                    </div>
+                    <div class="col-span-2">
+                         <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5 ml-1">Notas / Observaciones</label>
+                         <textarea id="edit-notes" rows="2" class="w-full p-3 rounded-xl bg-white input-enterprise text-sm" placeholder="Detalles de entrega, contacto, etc."></textarea>
+                    </div>
+                </div>
 
-        // Capturar Foto
-        capture: function() {
-            const video = document.getElementById('camera-feed');
-            const canvas = document.getElementById('camera-canvas');
+                <div class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm">
+                    <div class="flex justify-between items-end mb-4 border-b border-gray-100 pb-2">
+                        <label class="flex items-center gap-2 text-xs font-bold text-blue-600 uppercase">
+                            <i class="fa-solid fa-shirt"></i> Detalle de Prendas
+                        </label>
+                        <button onclick="Core.UI.addProductRow()" class="text-xs font-bold text-blue-500 hover:text-blue-700 bg-blue-50 px-3 py-1 rounded-lg transition">
+                            + Agregar Item
+                        </button>
+                    </div>
+                    <div id="products-container" class="space-y-3">
+                        </div>
+                </div>
+
+                <div id="evidence-panel" class="hidden">
+                    <label class="block text-xs font-bold text-emerald-600 uppercase mb-3 flex items-center gap-2">
+                        <i class="fa-solid fa-camera-retro"></i> Evidencia de Despacho
+                    </label>
+                    <div class="grid grid-cols-3 gap-3" id="evidence-gallery">
+                        </div>
+                    <button onclick="Core.Camera.open(Core.state.currentId)" class="mt-3 w-full py-3 border-2 border-dashed border-emerald-300 text-emerald-600 rounded-xl hover:bg-emerald-50 font-bold text-sm transition">
+                        <i class="fa-solid fa-camera mr-2"></i> Agregar Nueva Foto
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4 pt-4 border-t border-gray-200">
+                    <button onclick="Core.PDF.generateLabel()" class="flex flex-col items-center justify-center p-4 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition gap-2 border border-slate-200">
+                        <i class="fa-solid fa-tag text-xl"></i>
+                        <span class="text-xs font-bold">Imprimir Etiqueta</span>
+                    </button>
+                    <button onclick="Core.PDF.generateFormalOrder()" class="flex flex-col items-center justify-center p-4 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition gap-2 border border-slate-200">
+                        <i class="fa-solid fa-file-contract text-xl"></i>
+                        <span class="text-xs font-bold">Orden Formal</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="p-4 border-t border-gray-100 bg-white">
+                <button onclick="Core.Logic.saveOrder()" class="w-full bg-slate-900 text-white font-bold py-4 rounded-xl shadow-xl shadow-slate-900/20 btn-touch flex justify-center items-center gap-2">
+                    <i class="fa-regular fa-save"></i> GUARDAR CAMBIOS
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-camera" class="fixed inset-0 z-[200] bg-black hidden flex flex-col">
+        <div class="relative flex-1 bg-black overflow-hidden flex items-center justify-center">
+            <video id="camera-feed" autoplay playsinline class="absolute inset-0 w-full h-full object-cover"></video>
+            <canvas id="camera-canvas" class="hidden"></canvas>
             
-            // Configurar canvas al tamaño del video
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
-            
-            // Dibujar
-            const ctx = canvas.getContext('2d');
-            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-            
-            // Convertir a Base64 (JPG calidad 0.7 para ahorrar espacio)
-            const imageData = canvas.toDataURL('image/jpeg', 0.7);
-            
-            this.savePhoto(imageData);
-            this.close();
-        },
+            <div class="absolute inset-0 pointer-events-none flex flex-col justify-between p-6">
+                <div class="flex justify-between items-start pointer-events-auto">
+                    <div class="bg-black/50 backdrop-blur px-3 py-1 rounded-lg text-white text-xs font-mono">
+                        <i class="fa-solid fa-circle text-red-500 animate-pulse text-[8px] mr-2"></i>LIVE
+                    </div>
+                    <button onclick="Core.Camera.close()" class="w-10 h-10 rounded-full bg-black/40 text-white backdrop-blur flex items-center justify-center">
+                        <i class="fa-solid fa-times"></i>
+                    </button>
+                </div>
+                
+                <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[70%] aspect-square border border-white/30 rounded-2xl">
+                    <div class="absolute top-0 left-0 w-4 h-4 border-t-4 border-l-4 border-white rounded-tl-lg"></div>
+                    <div class="absolute top-0 right-0 w-4 h-4 border-t-4 border-r-4 border-white rounded-tr-lg"></div>
+                    <div class="absolute bottom-0 left-0 w-4 h-4 border-b-4 border-l-4 border-white rounded-bl-lg"></div>
+                    <div class="absolute bottom-0 right-0 w-4 h-4 border-b-4 border-r-4 border-white rounded-br-lg"></div>
+                </div>
 
-        // Guardar en Firebase
-        savePhoto: function(base64Data) {
-            Swal.fire({
-                title: 'Subiendo...',
-                didOpen: () => Swal.showLoading()
-            });
+                <div class="flex justify-center pb-8 pointer-events-auto">
+                    <button onclick="Core.Camera.capture()" class="w-20 h-20 rounded-full border-[6px] border-white/30 bg-white transition-transform active:scale-90 flex items-center justify-center shadow-2xl">
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 
-            // Estrategia: Guardar en el Calendario de hoy si es captura rápida,
-            // o en la Orden si hay ID.
-            
-            const todayKey = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
-            const path = this.targetId 
-                ? `orders/${this.targetId}/evidence` 
-                : `calendar_events/${todayKey}/photos`;
-
-            // Nota: En producción real, esto debería ir a Firebase Storage.
-            // Aquí lo guardamos en Realtime DB como string para cumplir con el requisito de "todo en uno" sin configurar Storage rules complejas.
-            // Usamos push() para permitir múltiples fotos.
-            
-            db.ref(path).push({
-                image: base64Data,
-                timestamp: firebase.database.ServerValue.TIMESTAMP,
-                user: "Admin"
-            }).then(() => {
-                Swal.fire({ icon: 'success', title: 'Evidencia Guardada', timer: 1500, showConfirmButton: false });
-            }).catch(e => {
-                Swal.fire('Error', 'No se pudo subir la imagen', 'error');
-            });
-        },
-
-        close: function() {
-            if (this.stream) {
-                this.stream.getTracks().forEach(track => track.stop());
-            }
-            const modal = document.getElementById('camera-modal');
-            if (modal) modal.remove();
-        },
-
-        switch: function() {
-            // Para cambiar de cámara habría que reiniciar el stream con 'user' o 'environment'
-            // Simplificado para este bloque: Reinicia proceso
-            this.close();
-            Swal.fire('Info', 'Función de cambio rápido en desarrollo. Usa la cámara predeterminada.', 'info');
-        }
-    };
-
-    // --- 3. INTEGRACIÓN FINAL (WIRING) ---
-    // Aquí conectamos los cables sueltos del Bloque 2 con los motores del Bloque 3
-
-    // A. Conectar Botones de Impresión del Modal
-    const originalPrepare = App.Logic.preparePDFData; // Guardamos ref por seguridad
-    
-    // Sobrescribimos el manejador de impresión temporal del Bloque 2
-    App.Modals.handlePrint = function(type) {
-        // 1. Obtener datos limpios
-        const data = App.Logic.preparePDFData(type);
-        
-        // 2. Validaciones
-        if (!data) return;
-        if (type === 'label' && (!data.invoice || data.invoice.length < 2)) {
-            Swal.fire('Falta Factura', 'Ingresa el N° de Factura/Guía para generar la etiqueta de despacho.', 'warning');
-            return;
-        }
-
-        // 3. Ejecutar Motor PDF
-        App.PDF.generate(data);
-    };
-
-    // B. Conectar Botones de Cámara
-    // Sobrescribimos el trigger visual del Bloque 2
-    App.UI.triggerCamera = function(id) {
-        // id puede ser un ID de orden hash o 'global'
-        const context = id === 'global' ? null : id;
-        App.Camera.start(context);
-    };
-
-    // C. Conectar Reporte Global
-    App.Logic.triggerGlobalPDF = function() {
-        App.PDF.generate({ type: 'report' });
-    };
-
-    // D. Inicialización de Auditoría
-    // (Opcional) Log de inicio del Bloque 3
-    console.log("%c [SYSTEM] BLOQUE 3 CARGADO: Motores Gráficos y Hardware Listos.", "color: #059669; font-weight: bold;");
-
-</script> 
+    <script src="app.js"></script>
 </body>
 </html>
