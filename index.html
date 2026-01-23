@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>IDEAS TEXTILES SPA | SISTEMA DE GESTIÓN CORPORATIVA</title>
+    <title>IDEAS TEXTILES SPA </title>
     
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -12,7 +12,7 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
 
     <script src="https://cdn.tailwindcss.com"></script>
@@ -25,296 +25,329 @@
 
     <style>
         :root {
-            /* Paleta Corporativa Ideas Textiles */
-            --corp-navy: #0f172a;    /* Autoridad */
-            --corp-blue: #0ea5e9;    /* Acción */
-            --corp-teal: #14b8a6;    /* Detalle */
-            --corp-green: #10b981;   /* Éxito */
-            --corp-bg: #f1f5f9;      /* Superficie */
+            --brand-navy: #0F172A;
+            --brand-blue: #3B82F6;
+            --brand-teal: #14B8A6;
+            --bg-surface: #F8FAFC;
         }
 
         body {
-            font-family: 'Inter', system-ui, -apple-system, sans-serif;
-            background-color: var(--corp-bg);
-            -webkit-tap-highlight-color: transparent;
-            overflow: hidden; /* App-like behavior */
+            font-family: 'Inter', system-ui, sans-serif;
+            background-color: var(--bg-surface);
+            overflow: hidden; /* App feel */
         }
 
-        /* --- CLASES UTILITARIAS ENTERPRISE --- */
+        /* --- COMPONENTS --- */
+        .nav-item {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            padding: 14px 0;
+            color: #64748B;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            border-left: 3px solid transparent;
+        }
+        .nav-item:hover { background: rgba(255,255,255,0.05); color: #E2E8F0; }
+        .nav-item.active { 
+            color: var(--brand-blue); 
+            border-left-color: var(--brand-blue);
+            background: linear-gradient(90deg, rgba(59, 130, 246, 0.1) 0%, transparent 100%);
+        }
+        .nav-icon { font-size: 1.25rem; margin-bottom: 4px; }
+        .nav-label { font-size: 0.6rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; }
+
         .glass-panel {
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.5);
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(226, 232, 240, 0.8);
         }
 
-        .glass-dark {
-            background: rgba(15, 23, 42, 0.95);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-right: 1px solid rgba(255, 255, 255, 0.1);
-        }
+        .scroll-hide::-webkit-scrollbar { display: none; }
+        .scroll-hide { -ms-overflow-style: none; scrollbar-width: none; }
 
-        .ios-scroll {
-            overflow-y: auto;
-            -webkit-overflow-scrolling: touch;
-            scrollbar-width: none;
+        /* CALENDAR GRID */
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 1px;
+            background-color: #E2E8F0;
+            border: 1px solid #E2E8F0;
         }
-        .ios-scroll::-webkit-scrollbar { display: none; }
+        .calendar-day {
+            background-color: white;
+            min-height: 100px;
+            padding: 8px;
+            transition: background 0.2s;
+        }
+        .calendar-day:hover { background-color: #F8FAFC; }
+        .calendar-day.today { background-color: #F0F9FF; }
 
-        .btn-touch {
-            transition: transform 0.1s ease, opacity 0.1s ease;
+        /* CAMERA OVERLAY (Mercado Libre Style) */
+        .scan-overlay {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 85%;
+            aspect-ratio: 3/4;
+            border: 2px solid rgba(255,255,255,0.8);
+            border-radius: 20px;
+            box-shadow: 0 0 0 9999px rgba(0,0,0,0.7); /* Darkens everything outside */
         }
-        .btn-touch:active {
-            transform: scale(0.96);
-            opacity: 0.8;
+        .scan-corner {
+            position: absolute; width: 40px; height: 40px;
+            border-color: #3B82F6; border-style: solid;
         }
-
-        /* --- UI COMPONENTS --- */
-        .card-shadow {
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
-        }
-
-        .input-enterprise {
-            transition: all 0.2s;
-            border: 1px solid #e2e8f0;
-        }
-        .input-enterprise:focus {
-            border-color: var(--corp-blue);
-            box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1);
-            outline: none;
-        }
-
-        /* Animaciones de Entrada */
-        @keyframes slideInRight {
-            from { transform: translateX(100%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
-        .slide-in-panel { animation: slideInRight 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .tl { top: -2px; left: -2px; border-width: 4px 0 0 4px; border-radius: 18px 0 0 0; }
+        .tr { top: -2px; right: -2px; border-width: 4px 4px 0 0; border-radius: 0 18px 0 0; }
+        .bl { bottom: -2px; left: -2px; border-width: 0 0 4px 4px; border-radius: 0 0 0 18px; }
+        .br { bottom: -2px; right: -2px; border-width: 0 4px 4px 0; border-radius: 0 0 18px 0; }
     </style>
 </head>
+<body class="h-screen flex text-slate-800">
 
-<body class="h-screen w-screen flex text-slate-800 antialiased selection:bg-sky-200 selection:text-sky-900">
-
-    <aside class="w-20 md:w-24 glass-dark h-full flex flex-col items-center py-6 z-50 shadow-2xl shrink-0 flex-none">
-        
-        <div class="mb-8 group cursor-pointer" onclick="window.location.reload()">
-            <div class="w-12 h-12 rounded-2xl bg-white flex items-center justify-center shadow-lg group-hover:rotate-12 transition-transform duration-300">
-                <i class="fa-solid fa-scissors text-slate-900 text-xl"></i>
+    <aside class="w-24 h-full bg-[#0F172A] flex flex-col items-center py-6 z-50 shadow-2xl shrink-0">
+        <div class="mb-10 text-center group cursor-pointer" onclick="window.location.reload()">
+            <div class="w-12 h-12 mx-auto bg-gradient-to-tr from-blue-600 to-blue-400 rounded-xl flex items-center justify-center text-white shadow-lg mb-2">
+                <i class="fa-solid fa-scissors text-xl"></i>
             </div>
-            <div class="mt-2 text-[9px] text-gray-400 font-bold tracking-widest text-center">IDEAS</div>
+            <h1 class="text-white text-[10px] font-black leading-tight tracking-widest">IDEAS<br>TEXTILES</h1>
         </div>
 
-        <nav class="flex-1 flex flex-col gap-6 w-full items-center">
+        <nav class="w-full flex-1 space-y-2">
             
-            <button onclick="Core.UI.openEditor()" class="w-10 h-10 rounded-xl bg-blue-500 text-white shadow-lg shadow-blue-500/30 flex items-center justify-center btn-touch hover:bg-blue-400 transition-colors tooltip-container" title="Crear Orden">
-                <i class="fa-solid fa-plus text-lg"></i>
-            </button>
+            <div class="nav-item" onclick="App.UI.switchView('inventory')" id="btn-inventory">
+                <i class="fa-solid fa-boxes-stacked nav-icon"></i>
+                <span class="nav-label">Bodega</span>
+            </div>
 
-            <button onclick="Core.UI.switchView('kanban')" id="nav-kanban" class="w-10 h-10 rounded-xl bg-slate-800/50 text-sky-400 border border-sky-500/30 flex items-center justify-center btn-touch transition-all">
-                <i class="fa-solid fa-layer-group"></i>
-            </button>
+            <div class="nav-item active" onclick="App.UI.switchView('operations')" id="btn-operations">
+                <i class="fa-solid fa-industry nav-icon"></i>
+                <span class="nav-label">Taller</span>
+            </div>
 
-            <button onclick="Core.UI.switchView('calendar')" id="nav-calendar" class="w-10 h-10 rounded-xl bg-transparent text-gray-400 hover:text-white flex items-center justify-center btn-touch transition-all relative">
-                <i class="fa-solid fa-calendar-day"></i>
-                <span class="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full hidden" id="badge-calendar"></span>
-            </button>
+            <div class="nav-item" onclick="App.UI.switchView('agenda')" id="btn-agenda">
+                <i class="fa-solid fa-calendar-days nav-icon"></i>
+                <span class="nav-label">Agenda</span>
+            </div>
 
-            <div class="w-8 h-[1px] bg-gray-700/50"></div>
-
-            <button onclick="Core.PDF.generateGlobalReport()" class="w-10 h-10 rounded-xl bg-transparent text-emerald-400 hover:bg-emerald-500/10 hover:text-emerald-300 flex items-center justify-center btn-touch transition-all" title="Reporte Gerencial">
-                <i class="fa-solid fa-file-invoice-dollar"></i>
-            </button>
-
+            <div class="nav-item" onclick="App.UI.switchView('reports')" id="btn-reports">
+                <i class="fa-solid fa-chart-pie nav-icon"></i>
+                <span class="nav-label">Reportes</span>
+            </div>
+            
         </nav>
 
-        <div class="mt-auto">
-             <button onclick="Core.Camera.open('global')" class="w-12 h-12 rounded-full border-2 border-gray-600 text-gray-400 hover:border-white hover:text-white flex items-center justify-center btn-touch transition-all">
-                <i class="fa-solid fa-camera"></i>
-            </button>
+        <div class="mt-auto pb-4">
+            <div class="w-10 h-10 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-gray-400">
+                <i class="fa-solid fa-cog"></i>
+            </div>
         </div>
     </aside>
 
+    <main class="flex-1 relative bg-slate-100 overflow-hidden">
 
-    <main class="flex-1 flex flex-col h-full overflow-hidden relative bg-slate-100">
-
-        <header class="h-16 px-6 md:px-8 flex items-center justify-between bg-white border-b border-gray-200/50 z-40 shrink-0">
-            <div>
-                <h1 class="text-lg font-bold text-slate-800 tracking-tight flex items-center gap-2">
-                    <span class="text-blue-600">IDEAS TEXTILES</span>
-                    <span class="text-gray-300">|</span>
-                    <span class="text-gray-500 font-normal text-sm uppercase hidden md:inline">Gestión de Ropa Corporativa</span>
-                </h1>
-            </div>
-            
-            <div class="relative group w-48 md:w-80">
-                <i class="fa-solid fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-blue-500 transition-colors"></i>
-                <input type="text" id="global-search" onkeyup="Core.UI.filterViews(this.value)" 
-                       placeholder="Buscar OC, Cliente, Factura..." 
-                       class="w-full bg-slate-50 border border-slate-200 rounded-lg pl-10 pr-4 py-2 text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all">
-            </div>
-        </header>
-
-        <div class="flex-1 relative overflow-hidden">
-            
-            <div id="view-kanban" class="absolute inset-0 flex overflow-x-auto overflow-y-hidden p-6 gap-6 items-start transition-opacity duration-300">
-                
-                <div class="flex-1 min-w-[340px] max-w-xl flex flex-col h-full bg-slate-200/50 rounded-3xl border border-white shadow-inner overflow-hidden">
-                    <div class="p-4 border-b border-gray-200/50 flex justify-between items-center bg-white/40 backdrop-blur sticky top-0 z-10">
-                        <div class="flex items-center gap-2">
-                            <span class="w-2 h-8 bg-blue-500 rounded-full"></span>
-                            <h2 class="font-bold text-slate-700 text-sm uppercase tracking-wide">En Proceso / Bodega</h2>
-                        </div>
-                        <span id="count-process" class="bg-white px-2 py-0.5 rounded text-xs font-bold text-gray-500 shadow-sm border">0</span>
+        <section id="view-inventory" class="view-section absolute inset-0 flex flex-col hidden bg-white">
+            <header class="h-16 border-b px-8 flex items-center justify-between shrink-0">
+                <h2 class="text-xl font-bold text-slate-800"><i class="fa-solid fa-boxes-stacked text-blue-600 mr-2"></i>Bodega Central</h2>
+                <div class="flex gap-4">
+                    <input type="text" id="search-inventory" onkeyup="App.Controllers.Inventory.filter()" placeholder="Buscar SKU, Tela, Producto..." class="bg-slate-50 border rounded-lg px-4 py-2 text-sm w-64 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <button onclick="App.Controllers.Inventory.openModal()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-bold shadow-md transition">
+                        <i class="fa-solid fa-plus mr-2"></i>Nuevo Producto
+                    </button>
+                </div>
+            </header>
+            <div class="flex-1 overflow-y-auto p-8 scroll-hide">
+                <div id="inventory-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                     </div>
-                    <div id="col-process" class="flex-1 overflow-y-auto p-3 space-y-3 ios-scroll"></div>
+            </div>
+        </section>
+
+        <section id="view-operations" class="view-section absolute inset-0 flex flex-col bg-slate-100">
+            <header class="h-16 glass-panel px-6 flex items-center justify-between shrink-0 z-20">
+                <div class="flex items-center gap-4">
+                    <h2 class="text-xl font-bold text-slate-800">Tablero de Producción</h2>
+                    <span class="bg-blue-100 text-blue-700 text-xs font-bold px-2 py-1 rounded-full border border-blue-200">En Vivo</span>
+                </div>
+                <div class="flex gap-4">
+                    <input type="text" id="search-operations" onkeyup="App.Controllers.Kanban.filter()" placeholder="Buscar Orden, Cliente, OC..." class="bg-white border border-slate-300 rounded-lg px-4 py-2 text-sm w-72 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <button onclick="App.Controllers.Order.create()" class="bg-slate-900 hover:bg-slate-800 text-white px-4 py-2 rounded-lg text-sm font-bold shadow-lg transition flex items-center gap-2">
+                        <i class="fa-solid fa-file-circle-plus"></i> Nueva Orden
+                    </button>
+                </div>
+            </header>
+
+            <div class="flex-1 flex overflow-x-auto p-6 gap-6 scroll-hide">
+                <div class="flex-1 min-w-[400px] flex flex-col bg-slate-200/60 rounded-2xl border border-white shadow-inner">
+                    <div class="p-4 flex justify-between items-center border-b border-white/50 bg-white/40 rounded-t-2xl sticky top-0 backdrop-blur-sm z-10">
+                        <div class="flex items-center gap-2">
+                            <div class="w-3 h-3 rounded-full bg-blue-500 animate-pulse"></div>
+                            <span class="font-bold text-slate-700 uppercase text-sm tracking-wide">En Confección / Taller</span>
+                        </div>
+                        <span id="count-process" class="bg-white px-2 py-1 rounded text-xs font-bold text-slate-500 shadow-sm">0</span>
+                    </div>
+                    <div id="col-process" class="flex-1 overflow-y-auto p-3 space-y-3 scroll-hide">
+                        </div>
                 </div>
 
-                <div class="flex-1 min-w-[340px] max-w-xl flex flex-col h-full bg-slate-200/50 rounded-3xl border border-white shadow-inner overflow-hidden">
-                    <div class="p-4 border-b border-gray-200/50 flex justify-between items-center bg-white/40 backdrop-blur sticky top-0 z-10">
+                <div class="flex-1 min-w-[400px] flex flex-col bg-slate-200/60 rounded-2xl border border-white shadow-inner">
+                    <div class="p-4 flex justify-between items-center border-b border-white/50 bg-white/40 rounded-t-2xl sticky top-0 backdrop-blur-sm z-10">
                         <div class="flex items-center gap-2">
-                            <span class="w-2 h-8 bg-emerald-500 rounded-full"></span>
-                            <h2 class="font-bold text-slate-700 text-sm uppercase tracking-wide">Despachado</h2>
+                            <div class="w-3 h-3 rounded-full bg-emerald-500"></div>
+                            <span class="font-bold text-slate-700 uppercase text-sm tracking-wide">Listo para Despacho</span>
                         </div>
-                        <span id="count-dispatch" class="bg-white px-2 py-0.5 rounded text-xs font-bold text-gray-500 shadow-sm border">0</span>
+                        <span id="count-dispatched" class="bg-white px-2 py-1 rounded text-xs font-bold text-slate-500 shadow-sm">0</span>
                     </div>
-                    <div id="col-dispatch" class="flex-1 overflow-y-auto p-3 space-y-3 ios-scroll"></div>
+                    <div id="col-dispatched" class="flex-1 overflow-y-auto p-3 space-y-3 scroll-hide">
+                        </div>
                 </div>
             </div>
+        </section>
 
-            <div id="view-calendar" class="absolute inset-0 bg-slate-100 p-6 hidden opacity-0 transition-opacity duration-300 overflow-y-auto ios-scroll">
+        <section id="view-agenda" class="view-section absolute inset-0 flex flex-col hidden bg-white">
+            <header class="h-16 border-b px-8 flex items-center justify-between shrink-0">
+                <h2 class="text-xl font-bold text-slate-800"><i class="fa-regular fa-calendar-alt text-blue-600 mr-2"></i>Agenda Corporativa</h2>
+                <div class="text-sm font-mono text-slate-500" id="current-month-display">ENERO 2026</div>
+            </header>
+            <div class="flex-1 overflow-y-auto p-8 scroll-hide">
                 <div class="max-w-6xl mx-auto">
-                    <div class="flex justify-between items-end mb-6">
-                        <div>
-                            <h2 class="text-2xl font-bold text-slate-800">Bitácora Visual</h2>
-                            <p class="text-gray-500 text-sm">Registro cronológico de evidencia y movimientos.</p>
-                        </div>
-                        <div class="bg-white px-4 py-2 rounded-lg shadow-sm border text-sm font-mono text-blue-600">
-                            <i class="fa-regular fa-clock mr-2"></i>HOY
-                        </div>
+                    <div class="grid grid-cols-7 mb-2">
+                        <div class="text-center text-xs font-bold text-gray-400 uppercase">Lun</div>
+                        <div class="text-center text-xs font-bold text-gray-400 uppercase">Mar</div>
+                        <div class="text-center text-xs font-bold text-gray-400 uppercase">Mié</div>
+                        <div class="text-center text-xs font-bold text-gray-400 uppercase">Jue</div>
+                        <div class="text-center text-xs font-bold text-gray-400 uppercase">Vie</div>
+                        <div class="text-center text-xs font-bold text-gray-400 uppercase text-red-400">Sáb</div>
+                        <div class="text-center text-xs font-bold text-gray-400 uppercase text-red-400">Dom</div>
                     </div>
-                    
-                    <div id="calendar-grid" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                    <div id="calendar-grid-container" class="calendar-grid rounded-xl border overflow-hidden">
                         </div>
                 </div>
             </div>
+        </section>
 
-        </div>
+        <section id="view-reports" class="view-section absolute inset-0 flex flex-col hidden bg-slate-50">
+            <header class="h-16 border-b px-8 flex items-center justify-between shrink-0 bg-white">
+                <h2 class="text-xl font-bold text-slate-800">Centro de Documentos</h2>
+            </header>
+            <div class="p-8 grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+                
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col items-center text-center hover:shadow-md transition">
+                    <div class="w-16 h-16 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center mb-4 text-2xl">
+                        <i class="fa-solid fa-chart-line"></i>
+                    </div>
+                    <h3 class="font-bold text-slate-800 text-lg">Reporte Gerencial</h3>
+                    <p class="text-sm text-gray-500 mt-2 mb-6">Resumen global de inventario valorizado, órdenes activas y métricas de despacho mensual.</p>
+                    <button onclick="App.PDF.generateManagerReport()" class="w-full py-3 rounded-xl bg-slate-900 text-white font-bold text-sm">Descargar PDF</button>
+                </div>
+
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col items-center text-center hover:shadow-md transition">
+                    <div class="w-16 h-16 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center mb-4 text-2xl">
+                        <i class="fa-solid fa-image"></i>
+                    </div>
+                    <h3 class="font-bold text-slate-800 text-lg">Exportar Evidencias</h3>
+                    <p class="text-sm text-gray-500 mt-2 mb-6">Compilado de fotografías de despacho del mes actual, organizadas por fecha y cliente.</p>
+                    <button onclick="App.PDF.generateEvidenceReport()" class="w-full py-3 rounded-xl border-2 border-slate-200 text-slate-700 font-bold text-sm hover:border-slate-400">Generar Álbum</button>
+                </div>
+
+            </div>
+        </section>
+
     </main>
 
-
-    <div id="modal-editor" class="fixed inset-0 z-[100] hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-        <div class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm transition-opacity" onclick="Core.UI.closeEditor()"></div>
-        
-        <div class="absolute right-0 top-0 bottom-0 w-full max-w-2xl bg-white shadow-2xl slide-in-panel flex flex-col">
+    <div id="modal-order" class="fixed inset-0 z-[100] hidden">
+        <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity" onclick="App.Controllers.Order.close()"></div>
+        <div class="absolute right-0 top-0 bottom-0 w-full max-w-2xl bg-white shadow-2xl flex flex-col transform transition-transform duration-300 translate-x-full" id="modal-order-panel">
             
-            <div class="p-6 border-b border-gray-100 flex justify-between items-center bg-white z-10">
+            <div class="px-8 py-5 border-b flex justify-between items-center bg-white z-10">
                 <div>
-                    <h3 class="text-xl font-bold text-slate-800">Gestión de Orden</h3>
-                    <p class="text-xs text-gray-400 font-medium tracking-wider uppercase">Ideas Textiles Enterprise</p>
+                    <h3 class="text-xl font-bold text-slate-800">Orden de Trabajo</h3>
+                    <p class="text-xs text-slate-400 uppercase tracking-wider font-bold">Edición Manual Total</p>
                 </div>
                 <div class="flex gap-2">
-                    <button onclick="Core.Logic.deleteOrder()" class="w-8 h-8 rounded-full text-red-400 hover:bg-red-50 flex items-center justify-center transition" title="Eliminar">
+                    <button onclick="App.PDF.generateFormalOrder()" class="w-10 h-10 rounded-full border border-slate-200 text-slate-600 hover:bg-slate-50 flex items-center justify-center" title="Generar PDF Formal">
+                        <i class="fa-solid fa-file-invoice"></i>
+                    </button>
+                    <button onclick="App.Controllers.Order.delete()" class="w-10 h-10 rounded-full text-red-500 hover:bg-red-50 flex items-center justify-center">
                         <i class="fa-solid fa-trash"></i>
                     </button>
-                    <button onclick="Core.UI.closeEditor()" class="w-8 h-8 rounded-full bg-gray-100 text-gray-500 hover:bg-gray-200 flex items-center justify-center btn-touch">
+                    <button onclick="App.Controllers.Order.close()" class="w-10 h-10 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center">
                         <i class="fa-solid fa-times"></i>
                     </button>
                 </div>
             </div>
 
-            <div class="flex-1 overflow-y-auto p-6 space-y-8 ios-scroll bg-slate-50/50">
-                
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="flex-1 overflow-y-auto p-8 space-y-8 bg-slate-50">
+                <div class="grid grid-cols-2 gap-6">
                     <div class="col-span-2">
-                        <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5 ml-1">Cliente / Empresa</label>
-                        <input type="text" id="edit-client" class="w-full p-3 rounded-xl bg-white input-enterprise text-slate-800 font-bold text-lg" placeholder="Ej: CODELCO GABY">
+                        <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Cliente / Empresa</label>
+                        <input type="text" id="inp-client" class="w-full p-4 rounded-xl border-slate-200 border focus:border-blue-500 outline-none text-lg font-bold" placeholder="Ej: CODELCO NORTE">
                     </div>
                     <div>
-                        <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5 ml-1">Orden de Compra (O.C.)</label>
-                        <input type="text" id="edit-oc" class="w-full p-3 rounded-xl bg-white input-enterprise font-mono text-sm" placeholder="4500-XXXXXX">
+                        <label class="block text-xs font-bold text-gray-500 uppercase mb-2">N° Orden Compra</label>
+                        <input type="text" id="inp-oc" class="w-full p-3 rounded-lg border-slate-200 border focus:border-blue-500 outline-none font-mono" placeholder="OC-450099">
                     </div>
                     <div>
-                        <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5 ml-1">Factura / Guía Despacho</label>
-                        <input type="text" id="edit-invoice" class="w-full p-3 rounded-xl bg-white input-enterprise font-mono text-sm" placeholder="N° Documento">
-                    </div>
-                    <div class="col-span-2">
-                         <label class="block text-xs font-bold text-gray-500 uppercase mb-1.5 ml-1">Notas / Observaciones</label>
-                         <textarea id="edit-notes" rows="2" class="w-full p-3 rounded-xl bg-white input-enterprise text-sm" placeholder="Detalles de entrega, contacto, etc."></textarea>
+                        <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Factura / Guía</label>
+                        <input type="text" id="inp-invoice" class="w-full p-3 rounded-lg border-slate-200 border focus:border-blue-500 outline-none font-mono" placeholder="F-102030">
                     </div>
                 </div>
 
-                <div class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm">
-                    <div class="flex justify-between items-end mb-4 border-b border-gray-100 pb-2">
-                        <label class="flex items-center gap-2 text-xs font-bold text-blue-600 uppercase">
-                            <i class="fa-solid fa-shirt"></i> Detalle de Prendas
-                        </label>
-                        <button onclick="Core.UI.addProductRow()" class="text-xs font-bold text-blue-500 hover:text-blue-700 bg-blue-50 px-3 py-1 rounded-lg transition">
-                            + Agregar Item
-                        </button>
+                <div class="bg-white p-4 rounded-xl border shadow-sm">
+                    <div class="flex justify-between items-center mb-4">
+                        <h4 class="font-bold text-slate-700 text-sm uppercase">Detalle de Prendas</h4>
+                        <button onclick="App.Controllers.Order.addRow()" class="text-xs bg-blue-50 text-blue-600 px-3 py-1 rounded hover:bg-blue-100 font-bold">+ Agregar Línea</button>
                     </div>
-                    <div id="products-container" class="space-y-3">
+                    <div id="order-rows-container" class="space-y-2">
                         </div>
                 </div>
 
-                <div id="evidence-panel" class="hidden">
-                    <label class="block text-xs font-bold text-emerald-600 uppercase mb-3 flex items-center gap-2">
-                        <i class="fa-solid fa-camera-retro"></i> Evidencia de Despacho
-                    </label>
-                    <div class="grid grid-cols-3 gap-3" id="evidence-gallery">
-                        </div>
-                    <button onclick="Core.Camera.open(Core.state.currentId)" class="mt-3 w-full py-3 border-2 border-dashed border-emerald-300 text-emerald-600 rounded-xl hover:bg-emerald-50 font-bold text-sm transition">
-                        <i class="fa-solid fa-camera mr-2"></i> Agregar Nueva Foto
-                    </button>
-                </div>
-
-                <div class="grid grid-cols-2 gap-4 pt-4 border-t border-gray-200">
-                    <button onclick="Core.PDF.generateLabel()" class="flex flex-col items-center justify-center p-4 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition gap-2 border border-slate-200">
-                        <i class="fa-solid fa-tag text-xl"></i>
-                        <span class="text-xs font-bold">Imprimir Etiqueta</span>
-                    </button>
-                    <button onclick="Core.PDF.generateFormalOrder()" class="flex flex-col items-center justify-center p-4 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition gap-2 border border-slate-200">
-                        <i class="fa-solid fa-file-contract text-xl"></i>
-                        <span class="text-xs font-bold">Orden Formal</span>
+                <div id="section-evidence" class="hidden">
+                    <h4 class="font-bold text-slate-700 text-sm uppercase mb-4 flex items-center gap-2">
+                        <i class="fa-solid fa-camera text-emerald-500"></i> Evidencia de Despacho
+                    </h4>
+                    <div id="evidence-gallery" class="grid grid-cols-3 gap-3 mb-3"></div>
+                    <button onclick="App.Camera.init(App.state.activeOrderId)" class="w-full py-4 border-2 border-dashed border-emerald-300 text-emerald-600 rounded-xl hover:bg-emerald-50 font-bold transition">
+                        Capturar Fotografía de Entrega
                     </button>
                 </div>
             </div>
 
-            <div class="p-4 border-t border-gray-100 bg-white">
-                <button onclick="Core.Logic.saveOrder()" class="w-full bg-slate-900 text-white font-bold py-4 rounded-xl shadow-xl shadow-slate-900/20 btn-touch flex justify-center items-center gap-2">
-                    <i class="fa-regular fa-save"></i> GUARDAR CAMBIOS
+            <div class="p-6 border-t bg-white">
+                <button onclick="App.Controllers.Order.save()" class="w-full py-4 bg-slate-900 text-white rounded-xl font-bold shadow-lg hover:bg-slate-800 transition">
+                    GUARDAR ORDEN
                 </button>
             </div>
         </div>
     </div>
 
-    <div id="modal-camera" class="fixed inset-0 z-[200] bg-black hidden flex flex-col">
-        <div class="relative flex-1 bg-black overflow-hidden flex items-center justify-center">
-            <video id="camera-feed" autoplay playsinline class="absolute inset-0 w-full h-full object-cover"></video>
-            <canvas id="camera-canvas" class="hidden"></canvas>
-            
-            <div class="absolute inset-0 pointer-events-none flex flex-col justify-between p-6">
-                <div class="flex justify-between items-start pointer-events-auto">
-                    <div class="bg-black/50 backdrop-blur px-3 py-1 rounded-lg text-white text-xs font-mono">
-                        <i class="fa-solid fa-circle text-red-500 animate-pulse text-[8px] mr-2"></i>LIVE
-                    </div>
-                    <button onclick="Core.Camera.close()" class="w-10 h-10 rounded-full bg-black/40 text-white backdrop-blur flex items-center justify-center">
-                        <i class="fa-solid fa-times"></i>
-                    </button>
-                </div>
-                
-                <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[70%] aspect-square border border-white/30 rounded-2xl">
-                    <div class="absolute top-0 left-0 w-4 h-4 border-t-4 border-l-4 border-white rounded-tl-lg"></div>
-                    <div class="absolute top-0 right-0 w-4 h-4 border-t-4 border-r-4 border-white rounded-tr-lg"></div>
-                    <div class="absolute bottom-0 left-0 w-4 h-4 border-b-4 border-l-4 border-white rounded-bl-lg"></div>
-                    <div class="absolute bottom-0 right-0 w-4 h-4 border-b-4 border-r-4 border-white rounded-br-lg"></div>
-                </div>
+    <div id="modal-camera" class="fixed inset-0 z-[200] bg-black hidden">
+        <video id="camera-feed" autoplay playsinline class="w-full h-full object-cover"></video>
+        <canvas id="camera-canvas" class="hidden"></canvas>
+        
+        <div class="scan-overlay">
+            <div class="scan-corner tl"></div>
+            <div class="scan-corner tr"></div>
+            <div class="scan-corner bl"></div>
+            <div class="scan-corner br"></div>
+        </div>
 
-                <div class="flex justify-center pb-8 pointer-events-auto">
-                    <button onclick="Core.Camera.capture()" class="w-20 h-20 rounded-full border-[6px] border-white/30 bg-white transition-transform active:scale-90 flex items-center justify-center shadow-2xl">
-                    </button>
-                </div>
+        <div class="absolute top-0 left-0 right-0 p-6 flex justify-between items-start z-10">
+            <button onclick="App.Camera.close()" class="w-10 h-10 rounded-full bg-black/40 text-white backdrop-blur flex items-center justify-center">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <div class="bg-black/60 px-3 py-1 rounded-full text-white text-xs font-bold backdrop-blur">
+                Encuadre el bulto completo
             </div>
+        </div>
+
+        <div class="absolute bottom-10 left-0 right-0 flex justify-center z-10">
+            <button onclick="App.Camera.capture()" class="w-20 h-20 rounded-full border-4 border-white bg-white/20 backdrop-blur flex items-center justify-center active:scale-95 transition">
+                <div class="w-16 h-16 rounded-full bg-white"></div>
+            </button>
         </div>
     </div>
 
