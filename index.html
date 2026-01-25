@@ -670,48 +670,79 @@
         };
 
         // ==========================================
-        // 4. MÓDULO DE ÓRDENES (EDITABLE & COMPLEX)
+        // 4. MÓDULO DE ÓRDENES (CORREGIDO / COMPATIBLE)
         // ==========================================
 
         const OrdersModule = {
-            currentEditorItems: [], // Almacena temporalmente los items en el modal
+            currentEditorItems: [], 
 
             render: () => {
                 const container = document.getElementById('orders-container');
-                const searchTerm = document.getElementById('order-search').value.toLowerCase();
+                const searchInput = document.getElementById('order-search');
+                const searchTerm = searchInput ? searchInput.value.toLowerCase() : '';
                 container.innerHTML = '';
 
-                let orders = DB.state.orders.filter(o => 
-                    o.client.toLowerCase().includes(searchTerm) || 
-                    o.number.toString().includes(searchTerm)
-                );
+                // COMPATIBILIDAD: Intentamos leer 'orders' (si está vacío, intenta cambiar la palabra 'orders' por 'ordenes' en el DatabaseService)
+                let orders = DB.state.orders || [];
+                
+                // Filtro de búsqueda seguro
+                orders = orders.filter(o => {
+                    const client = o.client || o.cliente || "Sin Cliente";
+                    const number = o.number || o.numero || "???";
+                    return client.toLowerCase().includes(searchTerm) || number.toString().includes(searchTerm);
+                });
                 
                 // Ordenar por fecha (más nuevas primero)
-                orders.sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt));
+                orders.sort((a,b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+
+                if(orders.length === 0) {
+                    container.innerHTML = `<div class="p-8 text-center text-slate-400">No se encontraron órdenes o la ruta de Firebase es distinta (revisa si es 'orders' o 'ordenes').</div>`;
+                    return;
+                }
 
                 orders.forEach(o => {
                     const isDespachado = o.status === 'Despachado';
                     const statusClass = isDespachado ? 'bg-green-100 text-green-700 border-green-200' : 'bg-orange-100 text-orange-700 border-orange-200';
                     const icon = isDespachado ? '<i class="fas fa-check-circle"></i>' : '<i class="fas fa-clock"></i>';
                     
-                    // Cálculo total items
-                    const totalItems = o.items.reduce((acc, item) => {
-                        if(item.type === 'tela') return acc + 1; // 1 rollo
-                        return acc + Object.values(item.distribution).reduce((a,b)=>a+b,0);
-                    }, 0);
+                    // CORRECCIÓN CRÍTICA: Detectar si es estructura nueva (items) o vieja (products)
+                    const productsList = o.items || o.products || [];
+                    
+                    // Cálculo total items a prueba de fallos
+                    let totalItems = 0;
+                    try {
+                        totalItems = productsList.reduce((acc, item) => {
+                            // Caso Tela
+                            if(item.type === 'tela') return acc + 1;
+                            // Caso Prenda Nueva
+                            if(item.distribution) return acc + Object.values(item.distribution).reduce((a,b)=>a+b,0);
+                            // Caso Prenda Antigua (Legacy)
+                            if(item.stock) return acc + Object.values(item.stock).reduce((a,b)=>a+b,0); // Si usabas stock
+                            // Caso Genérico
+                            return acc + (parseInt(item.cantidad || item.quantity || 1));
+                        }, 0);
+                    } catch(e) { totalItems = "?"; }
+
+                    // Usar nombres de campos compatibles (inglés o español)
+                    const displayNumber = o.number || o.numero || "S/N";
+                    const displayClient = o.client || o.cliente || "Cliente Desconocido";
+                    const displayDate = o.deliveryDate || o.fechaEntrega || "";
 
                     const html = `
                         <div class="card-premium p-6 border-l-4 ${isDespachado ? 'border-l-green-500' : 'border-l-orange-500'}">
                             <div class="flex flex-col md:flex-row justify-between md:items-center gap-4">
                                 <div>
                                     <div class="flex items-center gap-3 mb-1">
-                                        <span class="text-xl font-black text-slate-800">#${o.number}</span>
+                                        <span class="text-xl font-black text-slate-800">#${displayNumber}</span>
                                         <span class="px-3 py-1 rounded-full text-[10px] font-bold uppercase border flex items-center gap-1 ${statusClass}">
-                                            ${icon} ${o.status}
+                                            ${icon} ${o.status || 'Pendiente'}
                                         </span>
                                     </div>
-                                    <h4 class="font-bold text-slate-600">${o.client}</h4>
-                                    <p class="text-xs text-slate-400 mt-1"><i class="fas fa-calendar mr-1"></i> Entrega: ${Utils.formatDate(o.deliveryDate)}</p>
+                                    <h4 class="font-bold text-slate-600">${displayClient}</h4>
+                                    <div class="flex gap-4 mt-1">
+                                        <p class="text-xs text-slate-400"><i class="fas fa-calendar mr-1"></i> ${displayDate ? Utils.formatDate(displayDate) : 'Sin Fecha'}</p>
+                                        <p class="text-xs text-slate-400"><i class="fas fa-box mr-1"></i> Total: ${totalItems} un.</p>
+                                    </div>
                                 </div>
                                 
                                 <div class="flex items-center gap-2">
@@ -737,9 +768,10 @@
 
             populateSelector: () => {
                 const select = document.getElementById('editor-product-select');
+                if(!select) return;
                 select.innerHTML = '<option value="">-- Seleccionar --</option>';
-                DB.state.inventory.forEach(p => {
-                    select.innerHTML += `<option value="${p.id}">${p.sku} - ${p.name} (${p.type === 'tela' ? 'Tela' : 'Prenda'})</option>`;
+                (DB.state.inventory || []).forEach(p => {
+                    select.innerHTML += `<option value="${p.id}">${p.sku || '???'} - ${p.name || 'Sin Nombre'} (${p.type === 'tela' ? 'Tela' : 'Prenda'})</option>`;
                 });
             },
 
@@ -759,32 +791,70 @@
                 OrdersModule.currentEditorItems = [];
 
                 if(id) {
-                    // MODO EDICIÓN: REHIDRATAR
+                    // MODO EDICIÓN: REHIDRATAR CON COMPATIBILIDAD
                     const order = DB.state.orders.find(o => o.id === id);
                     if(order) {
                         document.getElementById('editor-order-id').value = order.id;
-                        document.getElementById('editor-number').value = order.number;
-                        document.getElementById('editor-client').value = order.client;
-                        document.getElementById('editor-date').value = order.deliveryDate;
-                        document.getElementById('editor-notes').value = order.notes;
+                        document.getElementById('editor-number').value = order.number || order.numero || "";
+                        document.getElementById('editor-client').value = order.client || order.cliente || "";
+                        document.getElementById('editor-date').value = order.deliveryDate || order.fechaEntrega || "";
+                        document.getElementById('editor-notes').value = order.notes || order.notas || "";
                         
-                        // Reconstruir items en memoria y UI
-                        order.items.forEach(item => {
-                            // Buscar datos frescos del producto (nombre/sku) por si cambiaron, pero mantener las cantidades de la orden
-                            const freshProd = DB.state.inventory.find(p => p.id === item.productId);
+                        // Detectar lista de productos (Nueva o Vieja)
+                        const rawItems = order.items || order.products || [];
+
+                        rawItems.forEach(item => {
+                            // Intento de vincular con inventario actual
+                            const prodId = item.productId || item.id; 
+                            const freshProd = DB.state.inventory.find(p => p.id === prodId);
+                            
                             if(freshProd) {
-                                OrdersModule.addItemToUI(freshProd, item.distribution, item.meters);
+                                // Si existe el producto en bodega, usamos sus datos frescos + cantidad guardada
+                                OrdersModule.addItemToUI(freshProd, item.distribution || item.stock || {}, item.meters || 0);
+                            } else {
+                                // PRODUCTO FANTASMA (Se borró de bodega o es muy viejo)
+                                // Lo agregamos como "Item Legacy" para que no se pierda la info visual
+                                OrdersModule.addLegacyItemToUI(item);
                             }
                         });
                     }
                 } else {
-                    // MODO CREAR: Generar numero autoincremental sugerido
-                    const maxNum = DB.state.orders.reduce((max, o) => Math.max(max, parseInt(o.number)||0), 1000);
+                    // MODO CREAR
+                    const maxNum = DB.state.orders.reduce((max, o) => Math.max(max, parseInt(o.number || o.numero)||0), 1000);
                     document.getElementById('editor-number').value = maxNum + 1;
                 }
 
                 OrdersModule.updateTotals();
                 App.UI.openModal('modal-order');
+            },
+
+            // Función auxiliar para mostrar items viejos que ya no están en bodega
+            addLegacyItemToUI: (item) => {
+                const rowsContainer = document.getElementById('editor-rows-container');
+                document.getElementById('editor-empty-state').style.display = 'none';
+                
+                // Intentamos rescatar datos
+                const name = item.name || item.nombre || "Item Antiguo";
+                const sku = item.sku || "LEGACY";
+                const qty = item.quantity || item.cantidad || "?";
+
+                const tr = document.createElement('tr');
+                tr.className = "bg-orange-50 opacity-70";
+                tr.innerHTML = `
+                    <td class="p-3 align-middle">
+                        <div class="font-bold text-slate-800 text-sm">${name} <span class="text-[9px] text-red-500">(Archivo)</span></div>
+                        <div class="text-[10px] text-slate-400 font-mono">${sku}</div>
+                    </td>
+                    <td class="p-3 align-middle text-xs text-slate-500">
+                        Datos no editables (Formato Antiguo)<br>
+                        Cantidad original: <b>${qty}</b>
+                    </td>
+                    <td class="p-3"></td>
+                    <td class="p-3 align-middle text-center">
+                        <button type="button" onclick="this.closest('tr').remove(); OrdersModule.updateTotals();" class="text-red-500"><i class="fas fa-trash"></i></button>
+                    </td>
+                `;
+                rowsContainer.appendChild(tr);
             },
 
             addProductRow: () => {
@@ -793,14 +863,12 @@
                 if(!prodId) return;
 
                 const product = DB.state.inventory.find(p => p.id === prodId);
-                // Si ya existe en la lista, advertir
                 if(OrdersModule.currentEditorItems.find(i => i.productId === prodId)){
-                    Swal.fire('Atención', 'Este producto ya está en la lista. Edita la fila existente.', 'warning');
+                    Swal.fire('Atención', 'Este producto ya está en la lista.', 'warning');
                     return;
                 }
-
                 OrdersModule.addItemToUI(product);
-                select.value = ""; // Reset
+                select.value = ""; 
             },
 
             addItemToUI: (product, savedDistribution = {}, savedMeters = 0) => {
@@ -810,7 +878,6 @@
                 const rowId = 'row-' + product.id;
                 const isTela = product.type === 'tela';
                 
-                // Guardar en memoria temporal
                 OrdersModule.currentEditorItems.push({
                     productId: product.id,
                     type: product.type,
@@ -825,18 +892,15 @@
                 tr.id = rowId;
                 tr.className = "hover:bg-slate-50 transition-colors group";
                 
-                // Generar Inputs Dinámicos (Matriz o Metros)
                 let inputsHTML = '';
                 if(isTela) {
                     inputsHTML = `
                         <div class="flex items-center gap-2">
                             <input type="number" step="0.01" class="w-32 border border-blue-300 rounded p-2 text-center font-bold text-blue-600 bg-blue-50" 
-                                value="${savedMeters || ''}" 
-                                placeholder="0.00"
+                                value="${savedMeters || ''}" placeholder="0.00"
                                 onchange="App.Modules.Orders.updateItemData('${product.id}', 'meters', this.value)">
                             <span class="text-xs font-bold text-slate-500">MTS</span>
-                        </div>
-                    `;
+                        </div>`;
                 } else {
                     inputsHTML = `<div class="grid grid-cols-5 md:grid-cols-9 gap-1">`;
                     Config.sizes.forEach(s => {
@@ -847,8 +911,7 @@
                                 <input type="number" class="w-full text-center border border-slate-200 rounded text-xs p-1 focus:border-blue-500 focus:bg-white transition-colors" 
                                     placeholder="-" value="${val}"
                                     onchange="App.Modules.Orders.updateItemData('${product.id}', '${s}', this.value)">
-                            </div>
-                        `;
+                            </div>`;
                     });
                     inputsHTML += `</div>`;
                 }
@@ -859,17 +922,12 @@
                         <div class="text-[10px] text-slate-400 font-mono">${product.sku}</div>
                     </td>
                     <td class="p-3 align-middle">${inputsHTML}</td>
-                    <td class="p-3 align-middle text-right font-mono text-xs text-slate-500" id="subtotal-${product.id}">
-                        -
-                    </td>
+                    <td class="p-3 align-middle text-right font-mono text-xs text-slate-500">-</td>
                     <td class="p-3 align-middle text-center">
-                        <button onclick="App.Modules.Orders.removeItem('${product.id}')" class="text-slate-300 hover:text-red-500 transition-colors">
-                            <i class="fas fa-trash"></i>
-                        </button>
+                        <button onclick="App.Modules.Orders.removeItem('${product.id}')" class="text-slate-300 hover:text-red-500 transition-colors"><i class="fas fa-trash"></i></button>
                     </td>
                 `;
                 rowsContainer.appendChild(tr);
-                OrdersModule.updateItemSubtotal(product.id);
             },
 
             updateItemData: (prodId, key, value) => {
@@ -879,26 +937,23 @@
                 if(key === 'meters') {
                     item.meters = parseFloat(value) || 0;
                 } else {
-                    // Es una talla
                     if(!item.distribution) item.distribution = {};
                     const qty = parseInt(value);
                     if(qty > 0) item.distribution[key] = qty;
                     else delete item.distribution[key];
                 }
-                OrdersModule.updateItemSubtotal(prodId);
                 OrdersModule.updateTotals();
             },
 
-            updateItemSubtotal: (prodId) => {
-                // Solo para visualización, no tenemos lógica de precios compleja requerida, pero dejamos el placeholder
-                // Aquí podrías multiplicar por item.price si quisieras
-            },
+            updateItemSubtotal: (prodId) => {},
 
             removeItem: (prodId) => {
                 OrdersModule.currentEditorItems = OrdersModule.currentEditorItems.filter(i => i.productId !== prodId);
-                document.getElementById('row-'+prodId).remove();
+                const row = document.getElementById('row-'+prodId);
+                if(row) row.remove();
                 if(OrdersModule.currentEditorItems.length === 0) {
-                    document.getElementById('editor-empty-state').style.display = 'block';
+                    const empty = document.getElementById('editor-empty-state');
+                    if(empty) empty.style.display = 'block';
                 }
                 OrdersModule.updateTotals();
             },
@@ -906,10 +961,11 @@
             updateTotals: () => {
                 let totalUn = 0;
                 OrdersModule.currentEditorItems.forEach(i => {
-                    if(i.type === 'tela') totalUn += 1; // Contamos 1 rollo como unidad
-                    else totalUn += Object.values(i.distribution).reduce((a,b)=>a+b,0);
+                    if(i.type === 'tela') totalUn += 1; 
+                    else totalUn += Object.values(i.distribution || {}).reduce((a,b)=>a+b,0);
                 });
-                document.getElementById('editor-total-units').innerText = totalUn;
+                const totalEl = document.getElementById('editor-total-units');
+                if(totalEl) totalEl.innerText = totalUn;
             },
 
             save: async () => {
@@ -920,7 +976,12 @@
                 const notes = document.getElementById('editor-notes').value;
 
                 if(!number || !client || !date) return Swal.fire('Error', 'Completa los campos obligatorios', 'error');
-                if(OrdersModule.currentEditorItems.length === 0) return Swal.fire('Error', 'Agrega al menos un producto', 'error');
+                
+                // Validar que hay items (o items viejos que no tocamos)
+                const hasNewItems = OrdersModule.currentEditorItems.length > 0;
+                // En un caso real, podríamos querer permitir guardar sin items nuevos si solo hay legacy, 
+                // pero por ahora exigimos re-hacer la orden para modernizarla.
+                if(!hasNewItems) return Swal.fire('Error', 'La orden debe tener productos válidos.', 'error');
 
                 const orderData = {
                     id: id || Utils.uid(),
@@ -928,30 +989,32 @@
                     client,
                     deliveryDate: date,
                     notes,
-                    items: OrdersModule.currentEditorItems,
+                    items: OrdersModule.currentEditorItems, // Esto sobrescribe lo viejo con formato nuevo
                     status: id ? (DB.state.orders.find(o=>o.id===id)?.status || 'Pendiente') : 'Pendiente',
                     createdAt: id ? (DB.state.orders.find(o=>o.id===id)?.createdAt) : new Date().toISOString()
                 };
 
-                // Guardar en DB
+                // Preservar info despacho
+                if(id) {
+                    const oldOrder = DB.state.orders.find(o => o.id === id);
+                    if(oldOrder && oldOrder.dispatchInfo) orderData.dispatchInfo = oldOrder.dispatchInfo;
+                }
+
                 let newOrders = [...DB.state.orders];
                 if(id) {
                     const idx = newOrders.findIndex(o => o.id === id);
-                    // Mantener info de despacho si existía
-                    if(newOrders[idx].dispatchInfo) orderData.dispatchInfo = newOrders[idx].dispatchInfo;
                     newOrders[idx] = orderData;
                 } else {
                     newOrders.push(orderData);
                 }
 
-                await DB.save('orders', newOrders);
+                await DB.save('orders', newOrders); // AQUÍ ESTÁ EL NOMBRE DE LA COLECCIÓN
                 App.UI.closeModal('modal-order');
-                Swal.fire('Éxito', 'Orden guardada correctamente', 'success');
+                Swal.fire('Éxito', 'Orden guardada y actualizada al formato v2.0', 'success');
             },
             
             filter: () => OrdersModule.render()
         };
-
         // ==========================================
         // 5. MÓDULO DE DESPACHO (ADUANA & PDF)
         // ==========================================
