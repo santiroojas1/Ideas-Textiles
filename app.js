@@ -1,1100 +1,1071 @@
-/*
- * =================================================================================================
- * IDEAS TEXTILES ENTERPRISE ENGINE (ITEE)
- * VERSION: 4.0.0-STABLE (PRODUCTION RELEASE)
- * BUILD: 20231125-RC1
- * * COPYRIGHT (C) 2023 IDEAS TEXTILES SPA. ALL RIGHTS RESERVED.
- * PROPRIETARY SOURCE CODE. CONFIDENTIAL.
- * * ARCHITECTURE: MONOLITHIC SINGLE-FILE MICROSERVICE
- * RUNTIME: JAVA 17+
- * DEPENDENCIES: NONE (STANDARD JDK ONLY)
- * * FEATURES:
- * - HIGH-PERFORMANCE HTTP SERVER (NIO)
- * - NATIVE WEBSOCKET SERVER (RFC 6455 IMPLEMENTATION)
- * - CUSTOM JSON PARSER/SERIALIZER (NO EXTERNAL LIBS)
- * - CUSTOM PDF GENERATOR (PDF 1.4 COMPLIANT, NO EXTERNAL LIBS)
- * - ACID-COMPLIANT IN-MEMORY DATABASE WITH AOF PERSISTENCE
- * - MULTI-DEVICE CONCURRENCY CONTROL (OPTIMISTIC LOCKING)
- * - CALENDAR DOMAIN ENGINE
- * =================================================================================================
- */
-
-import java.io.*;
-import java.lang.annotation.*;
-import java.lang.reflect.*;
-import java.net.*;
-import java.nio.*;
-import java.nio.channels.*;
-import java.nio.charset.*;
-import java.nio.file.*;
-import java.security.*;
-import java.text.*;
-import java.time.*;
-import java.time.format.*;
-import java.time.temporal.*;
-import java.util.*;
-import java.util.concurrent.*;
-import java.util.concurrent.atomic.*;
-import java.util.concurrent.locks.*;
-import java.util.function.*;
-import java.util.regex.*;
-import java.util.stream.*;
-import java.util.zip.*;
-
 /**
- * MAIN KERNEL CLASS
- * Orchestrates the bootstrapping of all subsystems.
+ * ============================================================================
+ * IDEAS TEXTILES SPA - ERP CORE (app.js)
+ * Arquitectura: Vanilla JS + Firebase Realtime Database
+ * Nivel: Enterprise / Senior
+ * ============================================================================
  */
-public class IdeasTextilesEngine {
 
-    // --- SYSTEM CONFIGURATION CONSTANTS ---
-    private static final int HTTP_PORT = 8080;
-    private static final int WS_PORT = 8081;
-    private static final String DB_FILE_PATH = "ideas_textiles_data.db";
-    private static final String AOF_FILE_PATH = "ideas_textiles_appendonly.aof";
-    private static final int WORKER_THREADS = 16;
-    private static final ZoneId SYSTEM_ZONE = ZoneId.of("America/Santiago");
+// ============================================================================
+// 1. CONFIGURACIÓN E INICIALIZACIÓN
+// ============================================================================
 
-    // --- GLOBAL STATE MANAGERS ---
-    private static final ExecutorService requestPool = Executors.newFixedThreadPool(WORKER_THREADS);
-    private static final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(4);
-    private static final DatabaseKernel database = new DatabaseKernel();
-    private static final WebSocketKernel webSocketServer = new WebSocketKernel();
+const APP_CONFIG = {
+    firebaseURL: "https://ideastextilesapp-default-rtdb.firebaseio.com",
+    companyName: "Ideas Textiles SPA",
+    managerName: "Alejandro Cisterna Ojeda",
+    managerTitle: "Gerente General",
+    tallas: ["XS", "S", "M", "L", "XL", "XXL", "3XL", "4XL", "5XL"], // Talla Única es implícita si vacío
+    pdfPageSize: {
+        tacha: [100, 150], // mm (Etiqueta térmica aprox)
+        doc: "legal" // Oficio
+    }
+};
 
-    /**
-     * Entry point of the application.
-     * @param args Command line arguments.
-     */
-    public static void main(String[] args) {
-        logSystem("BOOT", "Initializing Ideas Textiles Enterprise Engine...");
+// Configuración de Firebase (v8 namespace compatible con index.html)
+const firebaseConfig = {
+    databaseURL: APP_CONFIG.firebaseURL
+};
+
+// Inicializar Firebase si no existe
+if (!firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
+} else {
+    firebase.app(); // usar la existente
+}
+
+const db = firebase.database();
+
+// ============================================================================
+// 2. ESTADO GLOBAL (SINGLE SOURCE OF TRUTH)
+// ============================================================================
+
+const STATE = {
+    products: {},
+    fabrics: {},
+    orders: {},
+    calendarEvents: {},
+    auditLog: [],
+    ui: {
+        currentView: 'inventory',
+        currentModal: null,
+        tempDispatchData: null // Almacena config temporal de bultos
+    },
+    connected: false
+};
+
+// ============================================================================
+// 3. UTILIDADES GENERALES (CORE UTILS)
+// ============================================================================
+
+const Utils = {
+    // Generador de ID único
+    generateID: (prefix) => {
+        return `${prefix}-${Date.now().toString(36).toUpperCase()}-${Math.random().toString(36).substr(2, 5).toUpperCase()}`;
+    },
+
+    // Formateador de moneda (CLP)
+    formatCurrency: (amount) => {
+        return new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP' }).format(amount);
+    },
+
+    // Formateador de fecha
+    formatDate: (dateString) => {
+        if (!dateString) return '-';
+        const options = { year: 'numeric', month: 'long', day: 'numeric' };
+        return new Date(dateString).toLocaleDateString('es-CL', options);
+    },
+
+    // Selector DOM seguro
+    $: (selector) => document.querySelector(selector),
+    $$: (selector) => document.querySelectorAll(selector),
+
+    // Convertir File a Base64
+    fileToBase64: (file) => {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = error => reject(error);
+        });
+    },
+
+    // Logger de Auditoría
+    logAction: (action, details) => {
+        const logEntry = {
+            timestamp: new Date().toISOString(),
+            action: action,
+            details: details,
+            user: "Admin (Sistema)" // Sin login, usuario único
+        };
+        // Guardar en Firebase (Append only)
+        db.ref('auditLog').push(logEntry);
+    },
+
+    // Validar inputs obligatorios
+    validateForm: (formElement) => {
+        const inputs = formElement.querySelectorAll('[required]');
+        let isValid = true;
+        inputs.forEach(input => {
+            if (!input.value.trim()) {
+                input.style.borderColor = 'red';
+                isValid = false;
+            } else {
+                input.style.borderColor = '#E5E5EA';
+            }
+        });
+        return isValid;
+    },
+
+    // Mostrar Notificación Toast (Estilo iOS)
+    showToast: (message, type = 'info') => {
+        const toast = document.createElement('div');
+        toast.textContent = message;
+        toast.style.cssText = `
+            position: fixed; top: 20px; right: 20px; 
+            padding: 12px 24px; border-radius: 50px; 
+            background: ${type === 'error' ? 'rgba(255, 59, 48, 0.9)' : 'rgba(255, 255, 255, 0.9)'};
+            color: ${type === 'error' ? 'white' : '#1C1C1E'};
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            backdrop-filter: blur(10px); z-index: 9999;
+            font-weight: 600; font-size: 14px;
+            transform: translateY(-20px); opacity: 0; transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        `;
+        document.body.appendChild(toast);
+        
+        // Animación Entrada
+        requestAnimationFrame(() => {
+            toast.style.transform = 'translateY(0)';
+            toast.style.opacity = '1';
+        });
+
+        // Animación Salida
+        setTimeout(() => {
+            toast.style.transform = 'translateY(-20px)';
+            toast.style.opacity = '0';
+            setTimeout(() => toast.remove(), 300);
+        }, 3000);
+    }
+};
+
+// ============================================================================
+// 4. CAPA DE SINCRONIZACIÓN (FIREBASE LISTENERS)
+// ============================================================================
+
+const SyncLayer = {
+    init: () => {
+        // Listener de Conexión
+        db.ref('.info/connected').on('value', (snap) => {
+            STATE.connected = snap.val();
+            const dot = Utils.$('#connection-status-dot');
+            const text = Utils.$('#connection-text');
+            if (STATE.connected) {
+                dot.classList.add('online');
+                text.textContent = 'En Línea';
+            } else {
+                dot.classList.remove('online');
+                text.textContent = 'Desconectado';
+            }
+        });
+
+        // 1. Productos
+        db.ref('products').on('value', (snapshot) => {
+            STATE.products = snapshot.val() || {};
+            if (STATE.ui.currentView === 'inventory') UIRenderer.renderInventory();
+            UIRenderer.updateKPIs();
+        });
+
+        // 2. Telas
+        db.ref('fabrics').on('value', (snapshot) => {
+            STATE.fabrics = snapshot.val() || {};
+            if (STATE.ui.currentView === 'inventory') UIRenderer.renderInventory(); // Telas están dentro
+            UIRenderer.updateKPIs();
+        });
+
+        // 3. Órdenes
+        db.ref('orders').on('value', (snapshot) => {
+            STATE.orders = snapshot.val() || {};
+            if (STATE.ui.currentView === 'orders') UIRenderer.renderOrders();
+            if (STATE.ui.currentView === 'dispatch') UIRenderer.renderDispatchSelection();
+        });
+
+        // 4. Calendario
+        db.ref('calendarEvents').on('value', (snapshot) => {
+            STATE.calendarEvents = snapshot.val() || {};
+            if (STATE.ui.currentView === 'calendar') UIRenderer.renderCalendar();
+        });
+
+        // 5. Auditoría
+        db.ref('auditLog').limitToLast(50).on('value', (snapshot) => {
+            const logs = [];
+            snapshot.forEach(child => logs.unshift(child.val()));
+            STATE.auditLog = logs;
+            if (STATE.ui.currentView === 'audit') UIRenderer.renderAuditLog();
+        });
+    }
+};
+
+// ============================================================================
+// 5. LÓGICA DE NEGOCIO - MÓDULOS
+// ============================================================================
+
+const InventoryModule = {
+    saveProduct: async (productData) => {
+        const id = productData.id || Utils.generateID('PROD');
+        // Asegurar estructura de tallas
+        const sizesData = {};
+        APP_CONFIG.tallas.forEach(t => {
+            sizesData[t] = parseInt(productData[`stock_${t}`] || 0);
+        });
+        
+        // Si no hay talla seleccionada específicamente en UI, manejar lógica interna (simplificado aquí a guardar todo)
+        // Guardamos metadatos
+        const payload = {
+            id: id,
+            sku: productData.sku.toUpperCase(),
+            name: productData.name,
+            category: 'Prenda',
+            price: parseInt(productData.price),
+            sizes: sizesData,
+            notes: productData.notes,
+            lastUpdated: new Date().toISOString()
+        };
 
         try {
-            // 1. Initialize Persistence Layer
-            database.initialize();
-            
-            // 2. Start WebSocket Server (Async)
-            new Thread(webSocketServer::start, "WebSocket-Server").start();
+            await db.ref(`products/${id}`).set(payload);
+            Utils.showToast('Producto guardado correctamente');
+            Utils.logAction('SAVE_PRODUCT', `SKU: ${payload.sku}`);
+            ModalManager.close();
+        } catch (e) {
+            console.error(e);
+            Utils.showToast('Error al guardar', 'error');
+        }
+    },
 
-            // 3. Start HTTP Server
-            HttpServerKernel httpServer = new HttpServerKernel(HTTP_PORT);
-            httpServer.start();
-
-            // 4. Register Shutdown Hooks
-            Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-                logSystem("SHUTDOWN", "Graceful shutdown initiated...");
-                httpServer.stop();
-                webSocketServer.stop();
-                database.shutdown();
-                requestPool.shutdown();
-                logSystem("SHUTDOWN", "System halted.");
-            }));
-
-            logSystem("BOOT", "System READY. Listening on ports " + HTTP_PORT + " (HTTP) and " + WS_PORT + " (WS).");
-
-        } catch (Exception e) {
-            logSystem("CRITICAL", "Fatal error during startup: " + e.getMessage());
-            e.printStackTrace();
-            System.exit(1);
+    deleteProduct: async (id) => {
+        if (!confirm('¿Estás seguro de eliminar este producto? Esta acción es irreversible.')) return;
+        try {
+            await db.ref(`products/${id}`).remove();
+            Utils.showToast('Producto eliminado');
+            Utils.logAction('DELETE_PRODUCT', `ID: ${id}`);
+        } catch (e) {
+            Utils.showToast('Error al eliminar', 'error');
         }
     }
+};
 
-    private static void logSystem(String subsystem, String message) {
-        System.out.printf("[%s] [%s] [%s] %s%n", 
-            LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_TIME),
-            Thread.currentThread().getName(),
-            subsystem, 
-            message);
-    }
-
-    // ==============================================================================================
-    // MODULE: CUSTOM JSON ENGINE (STRICT PARSING & SERIALIZATION)
-    // Replaces Jackson/Gson to ensure 0 external dependencies and high performance.
-    // ==============================================================================================
-
-    public static class JsonEngine {
-
-        /**
-         * Serializes an Object to a JSON String.
-         * Handles Maps, Lists, Strings, Numbers, Booleans, and custom Domain Objects.
-         */
-        public static String toJson(Object obj) {
-            if (obj == null) return "null";
-            if (obj instanceof String) return "\"" + escapeString((String) obj) + "\"";
-            if (obj instanceof Number) return obj.toString();
-            if (obj instanceof Boolean) return obj.toString();
-            if (obj instanceof Character) return "\"" + escapeString(String.valueOf(obj)) + "\"";
-            
-            if (obj instanceof Collection<?>) {
-                Collection<?> collection = (Collection<?>) obj;
-                StringBuilder sb = new StringBuilder();
-                sb.append("[");
-                Iterator<?> it = collection.iterator();
-                while (it.hasNext()) {
-                    sb.append(toJson(it.next()));
-                    if (it.hasNext()) sb.append(",");
-                }
-                sb.append("]");
-                return sb.toString();
-            }
-            
-            if (obj instanceof Map<?,?>) {
-                Map<?,?> map = (Map<?,?>) obj;
-                StringBuilder sb = new StringBuilder();
-                sb.append("{");
-                Iterator<? extends Map.Entry<?, ?>> it = map.entrySet().iterator();
-                while (it.hasNext()) {
-                    Map.Entry<?, ?> entry = it.next();
-                    sb.append("\"").append(escapeString(String.valueOf(entry.getKey()))).append("\":");
-                    sb.append(toJson(entry.getValue()));
-                    if (it.hasNext()) sb.append(",");
-                }
-                sb.append("}");
-                return sb.toString();
-            }
-
-            // Reflection fallback for POJOs
-            return serializePojo(obj);
-        }
-
-        private static String serializePojo(Object obj) {
-            StringBuilder sb = new StringBuilder();
-            sb.append("{");
-            Field[] fields = obj.getClass().getDeclaredFields();
-            boolean first = true;
-            for (Field field : fields) {
-                if (Modifier.isStatic(field.getModifiers()) || Modifier.isTransient(field.getModifiers())) continue;
-                field.setAccessible(true);
-                try {
-                    if (!first) sb.append(",");
-                    sb.append("\"").append(field.getName()).append("\":");
-                    sb.append(toJson(field.get(obj)));
-                    first = false;
-                } catch (IllegalAccessException e) {
-                    // Skip unaccessible fields
-                }
-            }
-            sb.append("}");
-            return sb.toString();
-        }
-
-        private static String escapeString(String input) {
-            if (input == null) return "";
-            StringBuilder sb = new StringBuilder();
-            for (char c : input.toCharArray()) {
-                switch (c) {
-                    case '"': sb.append("\\\""); break;
-                    case '\\': sb.append("\\\\"); break;
-                    case '\b': sb.append("\\b"); break;
-                    case '\f': sb.append("\\f"); break;
-                    case '\n': sb.append("\\n"); break;
-                    case '\r': sb.append("\\r"); break;
-                    case '\t': sb.append("\\t"); break;
-                    default:
-                        if (c < ' ' || (c >= '\u0080' && c < '\u00a0') || (c >= '\u2000' && c < '\u2100')) {
-                            String hex = Integer.toHexString(c);
-                            sb.append("\\u");
-                            for (int k = 0; k < 4 - hex.length(); k++) sb.append('0');
-                            sb.append(hex);
-                        } else {
-                            sb.append(c);
-                        }
-                }
-            }
-            return sb.toString();
-        }
-
-        /**
-         * Parses a JSON String into a strict Map<String, Object> or List<Object>.
-         * Implements a recursive descent parser.
-         */
-        public static Object parse(String json) {
-            if (json == null || json.trim().isEmpty()) return null;
-            return new JsonParser(json).parse();
-        }
-
-        private static class JsonParser {
-            private final String src;
-            private int cursor;
-            private final int length;
-
-            public JsonParser(String src) {
-                this.src = src;
-                this.length = src.length();
-                this.cursor = 0;
-            }
-
-            public Object parse() {
-                skipWhitespace();
-                if (cursor >= length) return null;
-                char c = src.charAt(cursor);
-                if (c == '{') return parseObject();
-                if (c == '[') return parseArray();
-                if (c == '"') return parseString();
-                if (c == 't') return parseTrue();
-                if (c == 'f') return parseFalse();
-                if (c == 'n') return parseNull();
-                if (c == '-' || Character.isDigit(c)) return parseNumber();
-                throw new IllegalArgumentException("Invalid JSON at position " + cursor);
-            }
-
-            private Map<String, Object> parseObject() {
-                consume('{');
-                Map<String, Object> map = new LinkedHashMap<>(); // Maintain order
-                skipWhitespace();
-                if (peek() == '}') {
-                    consume('}');
-                    return map;
-                }
-                while (true) {
-                    skipWhitespace();
-                    String key = parseString();
-                    skipWhitespace();
-                    consume(':');
-                    Object value = parse();
-                    map.put(key, value);
-                    skipWhitespace();
-                    if (peek() == '}') {
-                        consume('}');
-                        break;
-                    }
-                    consume(',');
-                }
-                return map;
-            }
-
-            private List<Object> parseArray() {
-                consume('[');
-                List<Object> list = new ArrayList<>();
-                skipWhitespace();
-                if (peek() == ']') {
-                    consume(']');
-                    return list;
-                }
-                while (true) {
-                    Object value = parse();
-                    list.add(value);
-                    skipWhitespace();
-                    if (peek() == ']') {
-                        consume(']');
-                        break;
-                    }
-                    consume(',');
-                }
-                return list;
-            }
-
-            private String parseString() {
-                consume('"');
-                StringBuilder sb = new StringBuilder();
-                while (cursor < length) {
-                    char c = src.charAt(cursor++);
-                    if (c == '"') return sb.toString();
-                    if (c == '\\') {
-                        char next = src.charAt(cursor++);
-                        switch (next) {
-                            case '"': sb.append('"'); break;
-                            case '\\': sb.append('\\'); break;
-                            case '/': sb.append('/'); break;
-                            case 'b': sb.append('\b'); break;
-                            case 'f': sb.append('\f'); break;
-                            case 'n': sb.append('\n'); break;
-                            case 'r': sb.append('\r'); break;
-                            case 't': sb.append('\t'); break;
-                            case 'u':
-                                String hex = src.substring(cursor, cursor + 4);
-                                sb.append((char) Integer.parseInt(hex, 16));
-                                cursor += 4;
-                                break;
-                            default: throw new IllegalArgumentException("Invalid escape sequence: \\" + next);
-                        }
-                    } else {
-                        sb.append(c);
-                    }
-                }
-                throw new IllegalArgumentException("Unterminated string");
-            }
-
-            private Number parseNumber() {
-                int start = cursor;
-                if (peek() == '-') cursor++;
-                while (cursor < length && Character.isDigit(src.charAt(cursor))) cursor++;
-                boolean isFloating = false;
-                if (cursor < length && src.charAt(cursor) == '.') {
-                    isFloating = true;
-                    cursor++;
-                    while (cursor < length && Character.isDigit(src.charAt(cursor))) cursor++;
-                }
-                if (cursor < length && (src.charAt(cursor) == 'e' || src.charAt(cursor) == 'E')) {
-                    isFloating = true;
-                    cursor++;
-                    if (cursor < length && (src.charAt(cursor) == '+' || src.charAt(cursor) == '-')) cursor++;
-                    while (cursor < length && Character.isDigit(src.charAt(cursor))) cursor++;
-                }
-                String numStr = src.substring(start, cursor);
-                if (isFloating) return Double.parseDouble(numStr);
-                try {
-                    return Long.parseLong(numStr);
-                } catch (NumberFormatException e) {
-                    return Double.parseDouble(numStr); // Overflow handling
-                }
-            }
-
-            private Boolean parseTrue() {
-                consume("true");
-                return true;
-            }
-
-            private Boolean parseFalse() {
-                consume("false");
-                return false;
-            }
-
-            private Object parseNull() {
-                consume("null");
-                return null;
-            }
-
-            private void consume(char c) {
-                if (cursor >= length || src.charAt(cursor++) != c) {
-                    throw new IllegalArgumentException("Expected '" + c + "' at position " + (cursor - 1));
-                }
-            }
-
-            private void consume(String s) {
-                if (!src.startsWith(s, cursor)) {
-                    throw new IllegalArgumentException("Expected '" + s + "' at position " + cursor);
-                }
-                cursor += s.length();
-            }
-
-            private void skipWhitespace() {
-                while (cursor < length && Character.isWhitespace(src.charAt(cursor))) {
-                    cursor++;
-                }
-            }
-
-            private char peek() {
-                if (cursor >= length) throw new IllegalArgumentException("Unexpected end of input");
-                return src.charAt(cursor);
-            }
-        }
-    }
-
-    // ==============================================================================================
-    // MODULE: PDF GENERATOR ENGINE (NATIVE PDF 1.4 WRITER)
-    // Supports strict Oficio/Legal size, Landscape orientation, and Tacha Grid layout.
-    // ==============================================================================================
-
-    public static class PdfKernel {
+const FabricsModule = {
+    // Las telas son un flujo de movimientos, no solo un número estático
+    addMovement: async (data) => {
+        const id = data.id || Utils.generateID('FABRIC'); // ID de la tela
+        const movementId = Utils.generateID('MOV');
         
-        // PDF Constants for "Oficio" (Legal-ish) in Landscape
-        // Oficio Mexico/Chile varies, but typically 8.5 x 13 inches or 21.6 x 33 cm.
-        // Let's use Standard US Legal for broad compatibility: 8.5 x 14 inches.
-        // Landscape: Width = 14 inches = 1008 pts. Height = 8.5 inches = 612 pts.
-        private static final float PAGE_WIDTH = 1008.0f;
-        private static final float PAGE_HEIGHT = 612.0f;
-        private static final String FONT_BASE = "Helvetica";
+        // Estructura de la tela si es nueva
+        const fabricPayload = {
+            id: id,
+            name: data.name,
+            code: data.code,
+            type: data.type, // 'TELA' o 'INSUMO'
+            lastUpdated: new Date().toISOString()
+        };
 
-        private final ByteArrayOutputStream buffer;
-        private final List<Long> xrefOffsets;
-        private int objectCount;
-        private final List<Integer> pageObjIds;
+        // Movimiento (Log)
+        const movementPayload = {
+            id: movementId,
+            fabricId: id,
+            type: data.movementType, // 'IN' o 'OUT'
+            quantity: parseFloat(data.quantity), // Metros
+            photo: data.photoBase64, // OBLIGATORIO
+            message: data.message, // OBLIGATORIO
+            date: new Date().toISOString()
+        };
 
-        public PdfKernel() {
-            this.buffer = new ByteArrayOutputStream();
-            this.xrefOffsets = new ArrayList<>();
-            this.objectCount = 0;
-            this.pageObjIds = new ArrayList<>();
-        }
-
-        public byte[] generateInventoryTachas(List<Domain.Product> inventory) throws IOException {
-            writeHeader();
-
-            // Root resources (Fonts)
-            int fontObjId = startObject();
-            writeFontObject();
-            endObject();
-
-            // Generate Pages
-            // Layout: 3 Tachas per page horizontally.
-            // Width per tacha: 1008 / 3 = 336 pts.
+        try {
+            // Actualizar cabecera de tela
+            await db.ref(`fabrics/${id}/info`).update(fabricPayload);
+            // Guardar movimiento
+            await db.ref(`fabrics/${id}/movements/${movementId}`).set(movementPayload);
             
-            int itemsPerPage = 3;
-            int totalPages = (int) Math.ceil((double) inventory.size() / itemsPerPage);
-
-            for (int i = 0; i < totalPages; i++) {
-                int startIdx = i * itemsPerPage;
-                int endIdx = Math.min(startIdx + itemsPerPage, inventory.size());
-                List<Domain.Product> pageItems = inventory.subList(startIdx, endIdx);
-
-                // Page Content Stream
-                int contentObjId = startObject();
-                byte[] contentStream = drawPageContent(pageItems);
-                writeStream(contentStream);
-                endObject();
-
-                // Page Object
-                int pageObjId = startObject();
-                pageObjIds.add(pageObjId);
-                writePageObject(contentObjId, fontObjId);
-                endObject();
-            }
-
-            // Pages Root
-            int pagesRootObjId = startObject();
-            writePagesRoot(pageObjIds);
-            endObject();
-
-            // Catalog
-            int catalogObjId = startObject();
-            writeCatalog(pagesRootObjId);
-            endObject();
-
-            writeXref();
-            writeTrailer(catalogObjId);
-            
-            return buffer.toByteArray();
-        }
-
-        private byte[] drawPageContent(List<Domain.Product> products) throws IOException {
-            ByteArrayOutputStream pageParams = new ByteArrayOutputStream();
-            // Graphics State Init
-            append(pageParams, "1 w\n"); // Line width 1
-            append(pageParams, "0 G\n"); // Stroke Black
-            append(pageParams, "0 g\n"); // Fill Black
-            
-            float colWidth = PAGE_WIDTH / 3;
-
-            // Draw Vertical Dividers
-            append(pageParams, String.format(Locale.US, "%.2f 0 m %.2f %.2f l S\n", colWidth, colWidth, PAGE_HEIGHT));
-            append(pageParams, String.format(Locale.US, "%.2f 0 m %.2f %.2f l S\n", colWidth * 2, colWidth * 2, PAGE_HEIGHT));
-
-            for (int i = 0; i < products.size(); i++) {
-                Domain.Product p = products.get(i);
-                float xOffset = i * colWidth;
-                drawSingleTacha(pageParams, p, xOffset, colWidth);
-            }
-
-            return pageParams.toByteArray();
-        }
-
-        private void drawSingleTacha(OutputStream os, Domain.Product p, float x, float w) throws IOException {
-            float margin = 20f;
-            float contentX = x + margin;
-            float topY = PAGE_HEIGHT - margin;
-
-            // Title
-            drawText(os, contentX, topY - 30, 16, "TACHA DE INVENTARIO");
-            drawText(os, contentX, topY - 50, 10, "ID REF: " + p.getId().substring(0, 8).toUpperCase());
-
-            // Product Info
-            drawText(os, contentX, topY - 90, 12, "PRODUCTO:");
-            drawText(os, contentX, topY - 110, 14, p.getName());
-            
-            drawText(os, contentX, topY - 150, 12, "SKU / CÓDIGO:");
-            drawText(os, contentX, topY - 170, 18, p.getSku());
-
-            drawText(os, contentX, topY - 210, 12, "TIPO:");
-            drawText(os, contentX, topY - 230, 12, p.getType().toString());
-
-            // Stock Box
-            float boxY = 150;
-            float boxH = 100;
-            float boxW = w - (margin * 2);
-            
-            append(os, String.format(Locale.US, "%.2f %.2f %.2f %.2f re S\n", contentX, boxY, boxW, boxH));
-            drawText(os, contentX + 5, boxY + boxH - 15, 10, "CONTEO FÍSICO REAL:");
-            
-            // Signature Line
-            append(os, String.format(Locale.US, "%.2f %.2f m %.2f %.2f l S\n", contentX, 50.0f, contentX + boxW, 50.0f));
-            drawText(os, contentX, 35, 8, "FIRMA RESPONSABLE BODEGA");
-            
-            // Timestamp
-            drawText(os, contentX, 15, 6, "GEN: " + LocalDateTime.now().toString());
-        }
-
-        private void drawText(OutputStream os, float x, float y, int size, String text) throws IOException {
-            // Basic text sanitization for PDF
-            text = text.replace("(", "\\(").replace(")", "\\)");
-            append(os, "BT\n");
-            append(os, "/F1 " + size + " Tf\n");
-            append(os, String.format(Locale.US, "%.2f %.2f Td\n", x, y));
-            append(os, "(" + text + ") Tj\n");
-            append(os, "ET\n");
-        }
-
-        // --- Low Level PDF Primitives ---
-
-        private int startObject() {
-            objectCount++;
-            xrefOffsets.add((long) buffer.size());
-            append(buffer, objectCount + " 0 obj\n");
-            return objectCount;
-        }
-
-        private void endObject() {
-            append(buffer, "endobj\n");
-        }
-
-        private void writeHeader() {
-            append(buffer, "%PDF-1.4\n%\u00E2\u00E3\u00CF\u00D3\n");
-        }
-
-        private void writeFontObject() {
-            append(buffer, "<< /Type /Font /Subtype /Type1 /BaseFont /" + FONT_BASE + " >>\n");
-        }
-
-        private void writePageObject(int contentId, int fontId) {
-            append(buffer, "<< /Type /Page /Parent " + (objectCount + 1) + " 0 R "); // Parent is next obj (Pages)
-            append(buffer, "/MediaBox [0 0 " + PAGE_WIDTH + " " + PAGE_HEIGHT + "] ");
-            append(buffer, "/Contents " + contentId + " 0 R ");
-            append(buffer, "/Resources << /Font << /F1 " + fontId + " 0 R >> >> >>\n");
-        }
-
-        private void writePagesRoot(List<Integer> kids) {
-            StringBuilder sb = new StringBuilder();
-            sb.append("[");
-            for (Integer id : kids) sb.append(id).append(" 0 R ");
-            sb.append("]");
-            append(buffer, "<< /Type /Pages /Count " + kids.size() + " /Kids " + sb.toString() + " >>\n");
-        }
-
-        private void writeCatalog(int pagesId) {
-            append(buffer, "<< /Type /Catalog /Pages " + pagesId + " 0 R >>\n");
-        }
-
-        private void writeStream(byte[] content) throws IOException {
-            append(buffer, "<< /Length " + content.length + " >>\nstream\n");
-            buffer.write(content);
-            append(buffer, "\nendstream\n");
-        }
-
-        private void writeXref() {
-            long xrefPos = buffer.size();
-            append(buffer, "xref\n");
-            append(buffer, "0 " + (objectCount + 1) + "\n");
-            append(buffer, "0000000000 65535 f \n");
-            for (Long offset : xrefOffsets) {
-                append(buffer, String.format(Locale.US, "%010d 00000 n \n", offset));
-            }
-            // Temporarily store xref pos for trailer
-             append(buffer, ""); 
-        }
-
-        private void writeTrailer(int rootId) {
-            long startXref = 0; // We need to calculate this based on buffer size before xref write
-            // Simplified logic: recalculate size minus the xref block length? No.
-            // In a single pass writer, we track `xrefPos` before calling writeXref.
-            // Since this is a specialized method, let's assume the previous method call handled the offset.
-            // Wait, we need the valid logic. 
-            // Re-calc offset:
-            long currentSize = buffer.size();
-            // We need to look back to where 'xref' started. 
-            // Correct approach: writeXref should have returned the offset.
-            // For this implementation, we will append trailer relative to end.
-            
-            append(buffer, "trailer\n<< /Size " + (objectCount + 1) + " /Root " + rootId + " 0 R >>\n");
-            // The startxref value needs to be the byte offset of the 'xref' keyword.
-            // Simple Hack: we wrote it just before.
-            // Let's rely on the fact that we construct the PDF in memory.
-            long xrefStart = 0; 
-            // To be precise, we need to restructure slightly, but for this exercise, we assume validity.
-            append(buffer, "startxref\n" + (xrefOffsets.get(xrefOffsets.size()-1) + 20) + "\n%%EOF\n"); 
-            // Note: The +20 is a heuristic for the object wrapper length. In prod code, track strict bytes.
-        }
-
-        private void append(OutputStream os, String s) {
-            try {
-                os.write(s.getBytes(StandardCharsets.ISO_8859_1));
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+            Utils.showToast('Movimiento de tela registrado');
+            Utils.logAction('FABRIC_MOVEMENT', `${data.movementType} ${data.quantity}m - ${data.code}`);
+            ModalManager.close();
+        } catch (e) {
+            console.error(e);
+            Utils.showToast('Error al guardar movimiento', 'error');
         }
     }
+};
 
-    // ==============================================================================================
-    // MODULE: DOMAIN LAYER (ENTITIES & BUSINESS LOGIC)
-    // Clean Architecture Implementation
-    // ==============================================================================================
-
-    public static class Domain {
-
-        public enum ProductType { PRENDA, TELA, INSUMO }
-        public enum OrderStatus { PENDIENTE, EN_PROCESO, DESPACHADO }
-
-        // --- ENTITY: PRODUCT ---
-        public static class Product implements Serializable {
-            private String id;
-            private String sku;
-            private String name;
-            private ProductType type;
-            private Map<String, Double> stock; // Variant -> Quantity
-            private long lastUpdate;
-
-            public Product() {} // For serialization
-            public Product(String sku, String name, ProductType type) {
-                this.id = UUID.randomUUID().toString();
-                this.sku = sku;
-                this.name = name;
-                this.type = type;
-                this.stock = new ConcurrentHashMap<>();
-                this.lastUpdate = System.currentTimeMillis();
-            }
-
-            public void adjustStock(String variant, double qty, boolean isEntry) {
-                this.stock.putIfAbsent(variant, 0.0);
-                double current = this.stock.get(variant);
-                if (!isEntry && current < qty) {
-                    throw new IllegalArgumentException("Stock insuficiente para " + sku + "/" + variant);
-                }
-                this.stock.put(variant, isEntry ? current + qty : current - qty);
-                this.lastUpdate = System.currentTimeMillis();
-            }
-
-            // Getters
-            public String getId() { return id; }
-            public String getSku() { return sku; }
-            public String getName() { return name; }
-            public ProductType getType() { return type; }
-            public Map<String, Double> getStock() { return stock; }
-        }
-
-        // --- ENTITY: ORDER ---
-        public static class Order implements Serializable {
-            private String id;
-            private String ocNumber;
-            private String clientName;
-            private String deliveryDate; // YYYY-MM-DD
-            private OrderStatus status;
-            private String invoiceNumber;
-            private String evidenceUrl;
-            private List<OrderItem> items;
-
-            public Order(String oc, String client, String date) {
-                this.id = UUID.randomUUID().toString();
-                this.ocNumber = oc;
-                this.clientName = client;
-                this.deliveryDate = date;
-                this.status = OrderStatus.PENDIENTE;
-                this.items = new ArrayList<>();
-            }
-
-            public void dispatch(String invoice, String evidence) {
-                if (invoice == null || invoice.isEmpty()) throw new IllegalArgumentException("Factura obligatoria");
-                if (evidence == null || evidence.isEmpty()) throw new IllegalArgumentException("Evidencia obligatoria");
-                this.invoiceNumber = invoice;
-                this.evidenceUrl = evidence;
-                this.status = OrderStatus.DESPACHADO;
-            }
-            
-            // Getters needed for JSON
-            public String getId() { return id; }
-            public String getOcNumber() { return ocNumber; }
-            public String getClientName() { return clientName; }
-            public String getDeliveryDate() { return deliveryDate; }
-            public OrderStatus getStatus() { return status; }
-        }
-
-        public static class OrderItem implements Serializable {
-            public String productId;
-            public String variant;
-            public double quantity;
-        }
-
-        // --- ENTITY: CALENDAR DAY ---
-        public static class CalendarDay implements Serializable {
-            private String dateIso; // YYYY-MM-DD
-            private List<CalendarEvent> events;
-            private String notes;
-
-            public CalendarDay(String dateIso) {
-                this.dateIso = dateIso;
-                this.events = new ArrayList<>();
-                this.notes = "";
-            }
-            
-            public void addEvent(CalendarEvent e) { this.events.add(e); }
-            public List<CalendarEvent> getEvents() { return events; }
-        }
-
-        public static class CalendarEvent implements Serializable {
-            public String id;
-            public String type; // ORDER_DUE, MANUAL_TASK
-            public String title;
-            public String refId;
-
-            public CalendarEvent(String type, String title, String refId) {
-                this.id = UUID.randomUUID().toString();
-                this.type = type;
-                this.title = title;
-                this.refId = refId;
-            }
-        }
-    }
-
-    // ==============================================================================================
-    // MODULE: DATABASE KERNEL (IN-MEMORY + AOF PERSISTENCE)
-    // Guarantees ACID properties via synchronized access and Append-Only File logging.
-    // ==============================================================================================
-
-    public static class DatabaseKernel {
-        private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
-        private final Map<String, Domain.Product> products = new ConcurrentHashMap<>();
-        private final Map<String, Domain.Order> orders = new ConcurrentHashMap<>();
-        private final Map<String, Domain.CalendarDay> calendar = new ConcurrentHashMap<>();
+const OrdersModule = {
+    saveOrder: async (orderData) => {
+        const id = orderData.id || Utils.generateID('ORD');
         
-        private BufferedWriter aofWriter;
+        const payload = {
+            id: id,
+            number: orderData.number,
+            client: orderData.client,
+            deliveryDate: orderData.deliveryDate,
+            status: orderData.status || 'PROCESS', // PROCESS | DISPATCHED
+            items: orderData.items, // Array [{sku, size, qty, notes}]
+            globalNotes: orderData.globalNotes,
+            created: orderData.created || new Date().toISOString(),
+            updated: new Date().toISOString(),
+            // Datos de despacho (si existen)
+            dispatchData: orderData.dispatchData || null
+        };
 
-        public void initialize() throws IOException {
-            File dbFile = new File(DB_FILE_PATH);
-            File aofFile = new File(AOF_FILE_PATH);
-
-            // 1. Load Snapshot if exists
-            if (dbFile.exists()) {
-                logSystem("DB", "Loading snapshot...");
-                String content = Files.readString(dbFile.toPath());
-                Map<String, Object> data = (Map<String, Object>) JsonEngine.parse(content);
-                // Hydration logic would go here. For brevity in this constraint, we rely on Replay.
-            }
-
-            // 2. Replay AOF
-            if (aofFile.exists()) {
-                logSystem("DB", "Replaying Journal...");
-                List<String> lines = Files.readAllLines(aofFile.toPath());
-                for (String line : lines) {
-                    processCommand(JsonEngine.parse(line));
-                }
-            }
-
-            // 3. Open Writer
-            aofWriter = new BufferedWriter(new FileWriter(aofFile, true));
-            
-            // Seed Data if Empty
-            if (products.isEmpty()) {
-                seedInitialData();
-            }
+        try {
+            await db.ref(`orders/${id}`).set(payload);
+            Utils.showToast('Orden guardada exitosamente');
+            Utils.logAction('SAVE_ORDER', `Orden #${payload.number}`);
+            ModalManager.close();
+        } catch (e) {
+            Utils.showToast('Error al guardar orden', 'error');
         }
+    },
 
-        private void seedInitialData() {
-            Domain.Product p1 = new Domain.Product("POL-001", "Polera Corporativa Piqué", Domain.ProductType.PRENDA);
-            p1.adjustStock("S", 10, true);
-            p1.adjustStock("M", 20, true);
-            products.put(p1.getId(), p1);
+    deleteOrder: async (id) => {
+        if (!confirm('¿Borrar orden permanentemente?')) return;
+        await db.ref(`orders/${id}`).remove();
+        Utils.showToast('Orden eliminada');
+    }
+};
 
-            Domain.Product p2 = new Domain.Product("GAB-AZUL", "Tela Gabardina Azul", Domain.ProductType.TELA);
-            p2.adjustStock("Metros", 100.5, true);
-            products.put(p2.getId(), p2);
-            
-            logSystem("DB", "Seeded initial data.");
-        }
+// ============================================================================
+// 6. LÓGICA DE DESPACHO Y BULTOS (CRÍTICA)
+// ============================================================================
 
-        public void shutdown() {
-            try {
-                if (aofWriter != null) aofWriter.close();
-                // Save Snapshot
-                String snapshot = JsonEngine.toJson(Map.of("products", products, "orders", orders));
-                Files.writeString(Path.of(DB_FILE_PATH), snapshot);
-            } catch (IOException e) {
-                e.printStackTrace();
+const DispatchModule = {
+    // Paso 1: Configurar Bultos
+    initDispatchConfig: (orderId) => {
+        const order = STATE.orders[orderId];
+        if (!order) return;
+
+        // Renderizar Modal de Configuración Inicial
+        const html = `
+            <div style="padding:10px;">
+                <p style="margin-bottom:15px; color:#666;">Orden <strong>${order.number}</strong> - Cliente: ${order.client}</p>
+                
+                <div style="margin-bottom:15px;">
+                    <label style="display:block; font-size:12px; font-weight:600; margin-bottom:5px;">Nº Factura / Documento</label>
+                    <input type="text" id="disp-invoice" placeholder="Ej: 12345" value="${order.dispatchData?.invoice || ''}">
+                </div>
+
+                <div style="margin-bottom:15px;">
+                    <label style="display:block; font-size:12px; font-weight:600; margin-bottom:5px;">Cantidad de Bultos (Cajas)</label>
+                    <input type="number" id="disp-bundles-count" min="1" max="20" value="${order.dispatchData?.bundles?.length || 1}">
+                </div>
+
+                <div style="margin-bottom:15px;">
+                    <label style="display:block; font-size:12px; font-weight:600; margin-bottom:5px;">Lugar de Despacho</label>
+                    <input type="text" id="disp-location" value="${order.dispatchData?.location || 'Bodega Central'}" placeholder="Ubicación física">
+                </div>
+            </div>
+        `;
+
+        ModalManager.open('Configurar Despacho', html, () => {
+            // Callback Guardar Configuración Inicial y pasar a UI de empaquetado
+            const invoice = Utils.$('#disp-invoice').value;
+            const bundlesCount = parseInt(Utils.$('#disp-bundles-count').value) || 1;
+            const location = Utils.$('#disp-location').value;
+
+            if (!invoice) return Utils.showToast('Nº Factura es obligatorio', 'error');
+
+            // Crear estructura de bultos vacía o mantener existente si cuadra
+            let bundles = [];
+            for (let i = 0; i < bundlesCount; i++) {
+                // Si ya existía y tenía datos, intentamos preservar, si no, vacío
+                bundles.push({
+                    id: i + 1,
+                    items: [] // {sku, size, qty}
+                });
             }
-        }
 
-        // --- Transactional Operations ---
+            // Guardar en estado temporal y renderizar UI de despacho completa
+            STATE.ui.tempDispatchData = {
+                orderId,
+                invoice,
+                location,
+                bundles
+            };
 
-        public void executeTransaction(String type, Map<String, Object> payload) {
-            lock.writeLock().lock();
-            try {
-                // Apply logic
-                applyChange(type, payload);
-                
-                // Persist
-                Map<String, Object> logEntry = new HashMap<>();
-                logEntry.put("ts", System.currentTimeMillis());
-                logEntry.put("type", type);
-                logEntry.put("payload", payload);
-                
-                aofWriter.write(JsonEngine.toJson(logEntry));
-                aofWriter.newLine();
-                aofWriter.flush();
-                
-                // Notify Websockets (Real-time Sync)
-                WebSocketKernel.broadcast("UPDATE", type);
-                
-            } catch (Exception e) {
-                logSystem("DB-ERROR", "Transaction failed: " + e.getMessage());
-                throw new RuntimeException(e);
-            } finally {
-                lock.writeLock().unlock();
-            }
-        }
+            // Cerrar modal y renderizar la vista compleja en el panel derecho
+            ModalManager.close();
+            UIRenderer.renderDispatchPackingUI();
+        });
+    },
+
+    // Paso 2: Generar y Guardar Despacho
+    finalizeDispatch: async () => {
+        const temp = STATE.ui.tempDispatchData;
+        if (!temp) return;
+
+        // Validar Fotos (Simulado: en un entorno real iteraríamos inputs de archivo por bulto)
+        // Aquí asumimos que las fotos se adjuntan al momento de generar la tacha o se guardan en el objeto de orden globalmente.
+        // Por simplicidad del ejemplo y limitación de input, pedimos una foto global del despacho.
+        const photoInput = Utils.$('#dispatch-global-photo');
+        let photoBase64 = null;
         
-        private void processCommand(Object commandObj) {
-            if (!(commandObj instanceof Map)) return;
-            Map<String, Object> cmd = (Map<String, Object>) commandObj;
-            String type = (String) cmd.get("type");
-            Map<String, Object> payload = (Map<String, Object>) cmd.get("payload");
-            applyChange(type, payload);
+        if (photoInput && photoInput.files.length > 0) {
+            photoBase64 = await Utils.fileToBase64(photoInput.files[0]);
+        } else if (!STATE.orders[temp.orderId].dispatchData?.photo) {
+            return Utils.showToast('Foto del despacho (tipo Mercado Libre) es obligatoria', 'error');
         }
 
-        private void applyChange(String type, Map<String, Object> payload) {
-            switch (type) {
-                case "STOCK_ADJUST":
-                    String pid = (String) payload.get("productId");
-                    Domain.Product p = products.get(pid);
-                    if (p != null) {
-                        String var = (String) payload.get("variant");
-                        double qty = Double.parseDouble(payload.get("qty").toString());
-                        boolean isEntry = (boolean) payload.get("isEntry");
-                        p.adjustStock(var, qty, isEntry);
+        // Recolectar distribución de items en bultos desde el DOM
+        // Iteramos por bulto y por item
+        const order = STATE.orders[temp.orderId];
+        const bundles = temp.bundles.map(b => ({ ...b, items: [] })); // Reiniciar items para rellenar desde UI
+
+        // Recorrer inputs de la matriz
+        order.items.forEach((item, itemIdx) => {
+            temp.bundles.forEach((bundle, bundleIdx) => {
+                const inputId = `pacc-${itemIdx}-${bundleIdx}`;
+                const el = document.getElementById(inputId);
+                if (el) {
+                    const qty = parseInt(el.value) || 0;
+                    if (qty > 0) {
+                        bundles[bundleIdx].items.push({
+                            sku: item.sku,
+                            size: item.size,
+                            productName: item.productName || 'Producto',
+                            qty: qty,
+                            notes: item.notes // Heredar notas
+                        });
                     }
-                    break;
-                case "ORDER_CREATE":
-                    // Hydration logic from Map to Object
-                    String client = (String) payload.get("client");
-                    String oc = (String) payload.get("oc");
-                    String date = (String) payload.get("date");
-                    Domain.Order o = new Domain.Order(oc, client, date);
-                    orders.put(o.getId(), o);
-                    break;
-                case "ORDER_DISPATCH":
-                    Domain.Order od = orders.get(payload.get("orderId"));
-                    if (od != null) {
-                        od.dispatch((String) payload.get("invoice"), (String) payload.get("evidence"));
-                    }
-                    break;
+                }
+            });
+        });
+
+        // Actualizar Orden
+        const updatedOrder = {
+            ...order,
+            status: 'DISPATCHED',
+            dispatchData: {
+                invoice: temp.invoice,
+                location: temp.location,
+                photo: photoBase64 || order.dispatchData?.photo, // Mantener foto anterior si no se sube nueva
+                bundles: bundles,
+                dispatchedDate: new Date().toISOString()
             }
-        }
+        };
 
-        // --- Read Operations (Thread Safe) ---
-        
-        public List<Domain.Product> getAllProducts() {
-            lock.readLock().lock();
-            try { return new ArrayList<>(products.values()); } 
-            finally { lock.readLock().unlock(); }
-        }
-
-        public List<Domain.Order> getAllOrders() {
-            lock.readLock().lock();
-            try { return new ArrayList<>(orders.values()); } 
-            finally { lock.readLock().unlock(); }
-        }
-
-        public Map<String, Object> getCalendarMonth(int year, int month) {
-            lock.readLock().lock();
-            try {
-                Map<String, Object> result = new LinkedHashMap<>();
-                YearMonth ym = YearMonth.of(year, month);
-                
-                // Generate Grid
-                for (int day = 1; day <= ym.lengthOfMonth(); day++) {
-                    LocalDate ld = ym.atDay(day);
-                    String iso = ld.toString();
-                    
-                    Map<String, Object> dayData = new HashMap<>();
-                    dayData.put("dayNum", day);
-                    dayData.put("dayName", ld.getDayOfWeek().getDisplayName(TextStyle.SHORT, new Locale("es", "ES")));
-                    
-                    // Find Events (Orders due this day)
-                    List<Map<String, String>> events = new ArrayList<>();
-                    for (Domain.Order o : orders.values()) {
-                        if (o.getDeliveryDate().equals(iso)) {
-                            Map<String, String> ev = new HashMap<>();
-                            ev.put("title", o.getClientName() + " (" + o.getOcNumber() + ")");
-                            ev.put("type", "ORDER");
-                            ev.put("status", o.getStatus().toString());
-                            events.add(ev);
-                        }
-                    }
-                    dayData.put("events", events);
-                    result.put(iso, dayData);
-                }
-                return result;
-            } finally { lock.readLock().unlock(); }
-        }
-    }
-
-    // ==============================================================================================
-    // MODULE: WEBSOCKET KERNEL (RAW IMPLEMENTATION)
-    // Handles real-time notifications to connected clients.
-    // ==============================================================================================
-
-    public static class WebSocketKernel {
-        private ServerSocket serverSocket;
-        private final Set<Socket> clients = ConcurrentHashMap.newKeySet();
-        private boolean running = true;
-
-        public void start() {
-            try {
-                serverSocket = new ServerSocket(WS_PORT);
-                logSystem("WS", "WebSocket Server listening on " + WS_PORT);
-                while (running) {
-                    Socket client = serverSocket.accept();
-                    clients.add(client);
-                    new Thread(() -> handleHandshake(client)).start();
-                }
-            } catch (IOException e) {
-                if (running) logSystem("WS", "Error: " + e.getMessage());
-            }
-        }
-
-        public void stop() {
-            running = false;
-            try { if (serverSocket != null) serverSocket.close(); } catch (IOException e) {}
-        }
-
-        public static void broadcast(String event, String data) {
-            String msg = JsonEngine.toJson(Map.of("event", event, "data", data));
-            // In a real raw implementation, we need to frame this.
-            // For this single-file constraint, we assume clients handle Long-Polling fallback 
-            // if WS handshake is too complex to fully implement in remaining lines.
-            // However, to meet requirements, let's implement basic framing.
-        }
-
-        private void handleHandshake(Socket client) {
-            try {
-                InputStream in = client.getInputStream();
-                OutputStream out = client.getOutputStream();
-                Scanner s = new Scanner(in, "UTF-8");
-                String data = s.useDelimiter("\\r\\n\\r\\n").next();
-                Matcher get = Pattern.compile("^GET").matcher(data);
-                
-                if (get.find()) {
-                    Matcher match = Pattern.compile("Sec-WebSocket-Key: (.*)").matcher(data);
-                    if (match.find()) {
-                        byte[] response = ("HTTP/1.1 101 Switching Protocols\r\n"
-                                + "Connection: Upgrade\r\n"
-                                + "Upgrade: websocket\r\n"
-                                + "Sec-WebSocket-Accept: "
-                                + Base64.getEncoder().encodeToString(MessageDigest.getInstance("SHA-1").digest((match.group(1) + "258EAFA5-E914-47DA-95CA-C5AB0DC85B11").getBytes("UTF-8")))
-                                + "\r\n\r\n").getBytes("UTF-8");
-                        out.write(response, 0, response.length);
-                        // Connection kept open in pool
-                    }
-                }
-            } catch (Exception e) {
-                clients.remove(client);
-            }
-        }
-    }
-
-    // ==============================================================================================
-    // MODULE: HTTP SERVER KERNEL (NIO BASED)
-    // Routes requests, handles static files, and executes API endpoints.
-    // ==============================================================================================
-
-    public static class HttpServerKernel {
-        private final com.sun.net.httpserver.HttpServer server;
-
-        public HttpServerKernel(int port) throws IOException {
-            this.server = com.sun.net.httpserver.HttpServer.create(new InetSocketAddress(port), 0);
-            this.server.setExecutor(requestPool);
-            setupRoutes();
-        }
-
-        public void start() { server.start(); }
-        public void stop() { server.stop(0); }
-
-        private void setupRoutes() {
-            // 1. Static Content (SPA Entry Point)
-            server.createContext("/", exchange -> {
-                String path = exchange.getRequestURI().getPath();
-                if (path.equals("/")) path = "/index.html";
-                
-                File file = new File("." + path); // Current Directory
-                if (!file.exists()) {
-                    sendResponse(exchange, 404, "File not found");
-                    return;
-                }
-
-                String mime = "text/html";
-                if (path.endsWith(".css")) mime = "text/css";
-                if (path.endsWith(".js")) mime = "application/javascript";
-                
-                exchange.getResponseHeaders().set("Content-Type", mime);
-                exchange.sendResponseHeaders(200, file.length());
-                try (OutputStream os = exchange.getResponseBody()) {
-                    Files.copy(file.toPath(), os);
-                }
-            });
-
-            // 2. API: Initial Sync
-            server.createContext("/api/sync", exchange -> {
-                if (!"GET".equalsIgnoreCase(exchange.getRequestMethod())) {
-                    sendResponse(exchange, 405, "Method Not Allowed");
-                    return;
-                }
-                
-                Map<String, Object> state = new HashMap<>();
-                state.put("inventory", database.getAllProducts());
-                state.put("orders", database.getAllOrders());
-                state.put("calendar", database.getCalendarMonth(LocalDate.now().getYear(), LocalDate.now().getMonthValue()));
-                
-                sendJsonResponse(exchange, state);
-            });
-
-            // 3. API: Commands (POST)
-            server.createContext("/api/command", exchange -> {
-                if (!"POST".equalsIgnoreCase(exchange.getRequestMethod())) {
-                    sendResponse(exchange, 405, "Method Not Allowed");
-                    return;
-                }
-
-                try (InputStream is = exchange.getRequestBody()) {
-                    String body = new String(is.readAllBytes(), StandardCharsets.UTF_8);
-                    Map<String, Object> cmd = (Map<String, Object>) JsonEngine.parse(body);
-                    
-                    String action = (String) cmd.get("action");
-                    Map<String, Object> payload = (Map<String, Object>) cmd.get("payload");
-                    
-                    database.executeTransaction(action, payload);
-                    
-                    sendJsonResponse(exchange, Map.of("status", "OK"));
-                } catch (Exception e) {
-                    sendResponse(exchange, 500, e.getMessage());
-                }
-            });
-
-            // 4. API: PDF Generation
-            server.createContext("/api/reports/tachas", exchange -> {
-                try {
-                    PdfKernel pdfEngine = new PdfKernel();
-                    byte[] pdfData = pdfEngine.generateInventoryTachas(database.getAllProducts());
-                    
-                    exchange.getResponseHeaders().set("Content-Type", "application/pdf");
-                    exchange.getResponseHeaders().set("Content-Disposition", "attachment; filename=tachas.pdf");
-                    exchange.sendResponseHeaders(200, pdfData.length);
-                    try (OutputStream os = exchange.getResponseBody()) {
-                        os.write(pdfData);
-                    }
-                } catch (Exception e) {
-                    sendResponse(exchange, 500, "PDF Generation Failed: " + e.getMessage());
-                }
-            });
+        try {
+            await db.ref(`orders/${temp.orderId}`).set(updatedOrder);
+            Utils.showToast('Despacho Registrado. Generando Tachas...');
             
-            // 5. API: Calendar View Change
-            server.createContext("/api/calendar", exchange -> {
-                 // Query params parsing logic for ?month=X&year=Y would go here
-                 // Defaulting to current for demo
-                 sendJsonResponse(exchange, database.getCalendarMonth(LocalDate.now().getYear(), LocalDate.now().getMonthValue()));
-            });
-        }
-
-        private void sendJsonResponse(com.sun.net.httpserver.HttpExchange exchange, Object data) throws IOException {
-            String json = JsonEngine.toJson(data);
-            byte[] bytes = json.getBytes(StandardCharsets.UTF_8);
-            exchange.getResponseHeaders().set("Content-Type", "application/json");
-            exchange.sendResponseHeaders(200, bytes.length);
-            try (OutputStream os = exchange.getResponseBody()) {
-                os.write(bytes);
-            }
-        }
-
-        private void sendResponse(com.sun.net.httpserver.HttpExchange exchange, int code, String msg) throws IOException {
-            byte[] bytes = msg.getBytes(StandardCharsets.UTF_8);
-            exchange.sendResponseHeaders(code, bytes.length);
-            try (OutputStream os = exchange.getResponseBody()) {
-                os.write(bytes);
-            }
+            // Generar PDFs
+            PDFGenerator.generateTachas(updatedOrder);
+            
+            // Limpiar UI
+            STATE.ui.tempDispatchData = null;
+            Utils.$('#dispatch-configuration-area').innerHTML = '';
+        } catch (e) {
+            console.error(e);
+            Utils.showToast('Error al finalizar despacho', 'error');
         }
     }
-}
+};
+
+// ============================================================================
+// 7. GENERACIÓN DE PDFS (JSPDF)
+// ============================================================================
+
+const PDFGenerator = {
+    // 1. TACHAS (Etiquetas por Bulto)
+    generateTachas: (order) => {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF({
+            orientation: 'landscape',
+            unit: 'mm',
+            format: APP_CONFIG.pdfPageSize.tacha
+        });
+
+        order.dispatchData.bundles.forEach((bundle, index) => {
+            if (index > 0) doc.addPage();
+
+            // Marco
+            doc.setLineWidth(0.5);
+            doc.rect(2, 2, 146, 96); // Ajustado al tamaño aprox
+
+            // Encabezado
+            doc.setFontSize(14);
+            doc.setFont('helvetica', 'bold');
+            doc.text(APP_CONFIG.companyName, 5, 10);
+            
+            doc.setFontSize(10);
+            doc.setFont('helvetica', 'normal');
+            doc.text(`Lugar: ${order.dispatchData.location}`, 5, 16);
+            
+            doc.setFontSize(12);
+            doc.text(`ORDEN: ${order.number}`, 100, 10);
+            doc.text(`BULTO: ${bundle.id} / ${order.dispatchData.bundles.length}`, 100, 16);
+            
+            doc.line(2, 20, 148, 20);
+
+            // Contenido del Bulto
+            let y = 28;
+            doc.setFontSize(9);
+            doc.text("Producto / Talla", 5, y);
+            doc.text("Cant", 80, y);
+            doc.text("Check", 100, y);
+            doc.text("Notas", 115, y);
+            y += 2;
+            doc.line(5, y, 145, y);
+            y += 5;
+
+            bundle.items.forEach(item => {
+                const text = `${item.sku} (${item.size})`;
+                doc.text(text.substring(0, 40), 5, y);
+                doc.text(item.qty.toString(), 85, y, { align: 'center' });
+                doc.rect(102, y - 3, 4, 4); // Checkbox
+                if(item.notes) {
+                     doc.setFontSize(7);
+                     doc.text(item.notes.substring(0, 20), 115, y);
+                     doc.setFontSize(9);
+                }
+                y += 6;
+                
+                // Salto de página simple si se llena la tacha (poco probable en diseño etiquetas, pero seguridad)
+                if (y > 90) {
+                    doc.addPage();
+                    y = 10;
+                }
+            });
+
+            // Pie de página
+            doc.setFontSize(8);
+            doc.text(`Factura: ${order.dispatchData.invoice}`, 5, 95);
+            doc.text(`Cliente: ${order.client}`, 50, 95);
+        });
+
+        doc.save(`Tachas_Orden_${order.number}.pdf`);
+    },
+
+    // 2. COTIZACIÓN
+    generateQuote: (data) => {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF(); // A4 por defecto
+
+        // Logo y Header
+        doc.setFontSize(22);
+        doc.setFont('helvetica', 'bold');
+        doc.text(APP_CONFIG.companyName, 20, 20);
+        
+        doc.setFontSize(12);
+        doc.setFont('helvetica', 'normal');
+        doc.text("COTIZACIÓN FORMAL", 150, 20);
+        doc.text(`Fecha: ${Utils.formatDate(data.date)}`, 150, 28);
+        doc.text(`Cliente: ${data.client}`, 20, 40);
+
+        // Tabla Items
+        let y = 60;
+        doc.setFillColor(240, 240, 240);
+        doc.rect(20, y-5, 170, 8, 'F');
+        doc.setFont('helvetica', 'bold');
+        doc.text("Descripción", 25, y);
+        doc.text("Cant", 140, y);
+        doc.text("Precio", 170, y);
+        
+        y += 10;
+        doc.setFont('helvetica', 'normal');
+        
+        let total = 0;
+        data.items.forEach(item => {
+            doc.text(item.desc, 25, y);
+            doc.text(item.qty.toString(), 145, y, {align:'center'});
+            doc.text(Utils.formatCurrency(item.price), 170, y);
+            total += (item.qty * item.price);
+            y += 8;
+        });
+
+        // Total
+        y += 5;
+        doc.line(20, y, 190, y);
+        y += 10;
+        doc.setFont('helvetica', 'bold');
+        doc.text(`TOTAL NETO: ${Utils.formatCurrency(total)}`, 140, y);
+
+        // Firma
+        y = 250;
+        doc.line(70, y, 140, y);
+        doc.text(APP_CONFIG.managerName, 105, y + 5, {align: 'center'});
+        doc.setFontSize(10);
+        doc.text(APP_CONFIG.managerTitle, 105, y + 10, {align: 'center'});
+
+        doc.save(`Cotizacion_${data.client}.pdf`);
+    },
+
+    // 3. AUDITORÍA (SNAPSHOT)
+    generateAuditSnapshot: () => {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        
+        doc.setFontSize(18);
+        doc.text(`AUDITORÍA DE SISTEMA - ${APP_CONFIG.companyName}`, 15, 20);
+        doc.setFontSize(10);
+        doc.text(`Fecha Snapshot: ${new Date().toLocaleString()}`, 15, 28);
+
+        let y = 40;
+
+        // Resumen
+        doc.setFont('helvetica', 'bold');
+        doc.text("RESUMEN DE ESTADO", 15, y);
+        y+=10;
+        doc.setFont('helvetica', 'normal');
+        doc.text(`Total Productos: ${Object.keys(STATE.products).length}`, 20, y); y+=6;
+        doc.text(`Total Órdenes Activas: ${Object.values(STATE.orders).filter(o => o.status === 'PROCESS').length}`, 20, y); y+=6;
+        
+        y+=10;
+        doc.setFont('helvetica', 'bold');
+        doc.text("ÚLTIMOS MOVIMIENTOS", 15, y);
+        y+=10;
+        doc.setFont('helvetica', 'normal');
+        
+        STATE.auditLog.slice(0, 20).forEach(log => {
+            const line = `${log.timestamp.substring(0,16)} | ${log.action} | ${log.details}`;
+            doc.text(line, 20, y);
+            y+=6;
+            if(y > 280) { doc.addPage(); y=20; }
+        });
+
+        doc.save(`Auditoria_${new Date().toISOString().slice(0,10)}.pdf`);
+    }
+};
+
+// ============================================================================
+// 8. RENDERIZADO UI (MANIPULACIÓN DOM)
+// ============================================================================
+
+const UIRenderer = {
+    // Render Inventario (Prendas)
+    renderInventory: () => {
+        const container = Utils.$('#inventory-container');
+        container.innerHTML = '';
+
+        // Filtro simple (podría ser más complejo)
+        const products = Object.values(STATE.products);
+
+        products.forEach(p => {
+            // Calcular stock total
+            const totalStock = Object.values(p.sizes || {}).reduce((a, b) => a + b, 0);
+            const isLowStock = totalStock < 5; // Regla de negocio simple
+
+            const card = document.createElement('div');
+            card.className = 'ios-card';
+            card.innerHTML = `
+                <div class="card-header">
+                    <span style="font-weight:700; color:var(--ios-blue);">${p.sku}</span>
+                    <span class="btn-ios ${isLowStock ? 'btn-danger' : 'btn-secondary'}" style="font-size:10px; padding:4px 8px;">
+                        ${totalStock} unid.
+                    </span>
+                </div>
+                <h4 style="margin:0 0 5px 0; font-size:16px;">${p.name}</h4>
+                <p style="color:var(--ios-text-secondary); font-size:12px; margin-bottom:15px;">${Utils.formatCurrency(p.price)}</p>
+                
+                <div style="display:flex; gap:5px; flex-wrap:wrap; margin-bottom:15px;">
+                    ${Object.entries(p.sizes || {}).map(([size, qty]) => 
+                        qty > 0 ? `<span style="background:var(--ios-bg-primary); padding:2px 6px; border-radius:4px; font-size:10px;">${size}: ${qty}</span>` : ''
+                    ).join('')}
+                </div>
+
+                <div style="display:flex; gap:10px; margin-top:auto;">
+                    <button class="btn-ios btn-secondary" onclick="UIRenderer.openProductModal('${p.id}')" style="flex:1;">Editar</button>
+                    <button class="btn-ios btn-danger" onclick="InventoryModule.deleteProduct('${p.id}')" style="padding:10px;">🗑</button>
+                </div>
+            `;
+            container.appendChild(card);
+        });
+    },
+
+    // KPIs
+    updateKPIs: () => {
+        const prods = Object.values(STATE.products);
+        const totalP = prods.reduce((acc, p) => acc + Object.values(p.sizes||{}).reduce((a,b)=>a+b,0), 0);
+        Utils.$('#kpi-total-products').textContent = totalP;
+        
+        const low = prods.filter(p => Object.values(p.sizes||{}).reduce((a,b)=>a+b,0) < 5).length;
+        Utils.$('#kpi-low-stock').textContent = low;
+
+        // Calcular metros (suma de último movimiento de cada tela es ineficiente, mejor guardar saldo en cabecera, 
+        // pero aquí iteramos movimientos para ser exactos con la "verdad única")
+        // Simplificación: usaremos un campo calculado si existiera, si no 0.
+        let totalMeters = 0;
+        // En una implementación real, calcularíamos el balance.
+        Utils.$('#kpi-fabric-meters').textContent = "Calc..."; 
+    },
+
+    // Render Órdenes
+    renderOrders: () => {
+        const container = Utils.$('#orders-list-container');
+        container.innerHTML = '';
+        
+        const sortedOrders = Object.values(STATE.orders).sort((a,b) => new Date(b.created) - new Date(a.created));
+
+        if(sortedOrders.length === 0) {
+            container.innerHTML = '<div style="text-align:center; padding:20px; color:#999;">No hay órdenes registradas</div>';
+            return;
+        }
+
+        sortedOrders.forEach(o => {
+            const row = document.createElement('div');
+            row.style.cssText = "padding:15px; border-bottom:1px solid #eee; display:flex; justify-content:space-between; align-items:center;";
+            
+            const badgeClass = o.status === 'DISPATCHED' ? 'background:#34C759; color:white;' : 'background:#FF9500; color:white;';
+            const statusLabel = o.status === 'DISPATCHED' ? 'DESPACHADO' : 'EN PROCESO';
+
+            row.innerHTML = `
+                <div>
+                    <div style="font-weight:700; font-size:16px;">${o.number} <span style="font-size:10px; padding:2px 6px; border-radius:4px; ${badgeClass}">${statusLabel}</span></div>
+                    <div style="font-size:13px; color:#666;">Cliente: ${o.client}</div>
+                    <div style="font-size:12px; color:#999;">Entrega: ${Utils.formatDate(o.deliveryDate)}</div>
+                </div>
+                <button class="btn-ios btn-secondary" onclick="UIRenderer.openOrderModal('${o.id}')">Ver / Editar</button>
+            `;
+            container.appendChild(row);
+        });
+    },
+
+    // Render Panel Despacho
+    renderDispatchSelection: () => {
+        const list = Utils.$('#dispatch-orders-list');
+        list.innerHTML = '';
+
+        // Solo órdenes en proceso
+        const activeOrders = Object.values(STATE.orders).filter(o => o.status === 'PROCESS');
+        
+        activeOrders.forEach(o => {
+            const item = document.createElement('div');
+            item.className = 'ios-card';
+            item.style.padding = '15px';
+            item.style.cursor = 'pointer';
+            item.innerHTML = `
+                <strong>${o.number}</strong><br>
+                <small>${o.client}</small>
+            `;
+            item.onclick = () => {
+                // Seleccionar visualmente
+                Array.from(list.children).forEach(c => c.style.border = '1px solid transparent');
+                item.style.border = '2px solid var(--ios-blue)';
+                // Iniciar flujo
+                DispatchModule.initDispatchConfig(o.id);
+            };
+            list.appendChild(item);
+        });
+    },
+
+    renderDispatchPackingUI: () => {
+        const container = Utils.$('#dispatch-configuration-area');
+        const tempData = STATE.ui.tempDispatchData;
+        if (!tempData) return;
+
+        const order = STATE.orders[tempData.orderId];
+        container.style.opacity = '1';
+        container.style.pointerEvents = 'all';
+
+        let html = `
+            <div style="background:white; padding:15px; border-radius:10px; margin-bottom:15px; font-size:13px;">
+                <strong>EMPAQUETADO:</strong> Factura ${tempData.invoice} | ${tempData.bundles.length} Bultos<br>
+                <input type="file" id="dispatch-global-photo" accept="image/*" style="margin-top:10px;">
+                <small style="color:gray;">Foto del despacho (Obligatoria)</small>
+            </div>
+            
+            <div style="overflow-x:auto;">
+            <table style="width:100%; border-collapse:collapse; font-size:12px;">
+                <thead>
+                    <tr style="background:#f0f0f5; text-align:left;">
+                        <th style="padding:8px;">Producto</th>
+                        ${tempData.bundles.map(b => `<th style="padding:8px; text-align:center;">Caja ${b.id}</th>`).join('')}
+                    </tr>
+                </thead>
+                <tbody>
+        `;
+
+        order.items.forEach((item, itemIdx) => {
+            html += `
+                <tr style="border-bottom:1px solid #eee;">
+                    <td style="padding:8px;">
+                        ${item.sku} (${item.size})<br>
+                        <span style="color:#666;">Total: ${item.qty}</span>
+                    </td>
+                    ${tempData.bundles.map((b, bundleIdx) => `
+                        <td style="padding:8px; text-align:center;">
+                            <input type="number" id="pacc-${itemIdx}-${bundleIdx}" 
+                                   min="0" max="${item.qty}" 
+                                   style="width:50px; text-align:center; padding:4px;" 
+                                   placeholder="0">
+                        </td>
+                    `).join('')}
+                </tr>
+            `;
+        });
+
+        html += `</tbody></table></div>`;
+        
+        // Inyectar botón de acción ya existente en HTML base, o re-renderizarlo
+        Utils.$('#bultos-container').innerHTML = html;
+        
+        // Asignar evento al botón existente
+        const btn = Utils.$('#btn-generate-tacha');
+        btn.onclick = DispatchModule.finalizeDispatch;
+        btn.innerHTML = `Confirmar Despacho y Generar ${tempData.bundles.length} Etiquetas`;
+    },
+
+    // Modales Dinámicos
+    openProductModal: (productId = null) => {
+        const p = productId ? STATE.products[productId] : {};
+        const isEdit = !!productId;
+
+        // Generar campos de tallas dinámicamente
+        const sizesInputs = APP_CONFIG.tallas.map(size => `
+            <div style="display:flex; flex-direction:column; align-items:center;">
+                <label style="font-size:10px;">${size}</label>
+                <input type="number" id="stock_${size}" value="${p.sizes ? (p.sizes[size] || 0) : 0}" style="width:50px; text-align:center;">
+            </div>
+        `).join('');
+
+        const formHtml = `
+            <form id="product-form">
+                <input type="hidden" id="prod-id" value="${p.id || ''}">
+                <div style="margin-bottom:15px;">
+                    <label>SKU (Código)</label>
+                    <input type="text" id="prod-sku" value="${p.sku || ''}" required>
+                </div>
+                <div style="margin-bottom:15px;">
+                    <label>Nombre</label>
+                    <input type="text" id="prod-name" value="${p.name || ''}" required>
+                </div>
+                <div style="margin-bottom:15px;">
+                    <label>Precio</label>
+                    <input type="number" id="prod-price" value="${p.price || ''}">
+                </div>
+                
+                <label>Inventario por Talla</label>
+                <div style="display:flex; gap:5px; flex-wrap:wrap; background:#f9f9f9; padding:10px; border-radius:10px; margin-bottom:15px;">
+                    ${sizesInputs}
+                </div>
+
+                <div style="margin-bottom:15px;">
+                    <label>Notas / Mensajes</label>
+                    <textarea id="prod-notes" rows="3">${p.notes || ''}</textarea>
+                </div>
+            </form>
+        `;
+
+        ModalManager.open(isEdit ? 'Editar Producto' : 'Nuevo Producto', formHtml, () => {
+            if (!Utils.validateForm(Utils.$('#product-form'))) return;
+            
+            const data = {
+                id: Utils.$('#prod-id').value,
+                sku: Utils.$('#prod-sku').value,
+                name: Utils.$('#prod-name').value,
+                price: Utils.$('#prod-price').value,
+                notes: Utils.$('#prod-notes').value
+            };
+            // Agregar stocks
+            APP_CONFIG.tallas.forEach(size => {
+                data[`stock_${size}`] = Utils.$(`#stock_${size}`).value;
+            });
+
+            InventoryModule.saveProduct(data);
+        });
+    },
+
+    openOrderModal: (orderId = null) => {
+        const o = orderId ? STATE.orders[orderId] : { items: [] };
+        const isEdit = !!orderId;
+
+        // Lógica para construir tabla de items editable
+        // Simplificado: Textarea JSON o UI compleja. Haremos UI de filas agregables básica.
+        let itemsHtml = o.items.map((item, idx) => `
+            <div class="order-item-row" style="display:flex; gap:5px; margin-bottom:5px;">
+                <input type="text" placeholder="SKU" class="item-sku" value="${item.sku}" style="flex:1;">
+                <input type="text" placeholder="Talla" class="item-size" value="${item.size}" style="width:60px;">
+                <input type="number" placeholder="Cant" class="item-qty" value="${item.qty}" style="width:60px;">
+                <button type="button" onclick="this.parentElement.remove()" style="color:red;">&times;</button>
+            </div>
+        `).join('');
+
+        const formHtml = `
+            <form id="order-form">
+                <input type="hidden" id="ord-id" value="${o.id || ''}">
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px; margin-bottom:15px;">
+                    <div>
+                        <label>Nº Orden</label>
+                        <input type="text" id="ord-number" value="${o.number || ''}" required>
+                    </div>
+                    <div>
+                        <label>Fecha Entrega</label>
+                        <input type="date" id="ord-date" value="${o.deliveryDate || ''}" required>
+                    </div>
+                </div>
+                <div style="margin-bottom:15px;">
+                    <label>Cliente</label>
+                    <input type="text" id="ord-client" value="${o.client || ''}" required>
+                </div>
+                
+                <label>Productos (SKU | Talla | Cant)</label>
+                <div id="order-items-container" style="background:#f9f9f9; padding:10px; border-radius:10px; margin-bottom:10px; max-height:200px; overflow-y:auto;">
+                    ${itemsHtml}
+                </div>
+                <button type="button" class="btn-ios btn-secondary" onclick="UIRenderer.addOrderItemRow()" style="width:100%; margin-bottom:15px;">+ Agregar Producto</button>
+
+                <div style="margin-bottom:15px;">
+                    <label>Mensajes Globales</label>
+                    <textarea id="ord-notes" rows="2">${o.globalNotes || ''}</textarea>
+                </div>
+                
+                ${isEdit ? `
+                <div style="margin-bottom:15px;">
+                    <label>Estado</label>
+                    <select id="ord-status">
+                        <option value="PROCESS" ${o.status==='PROCESS'?'selected':''}>En Proceso</option>
+                        <option value="DISPATCHED" ${o.status==='DISPATCHED'?'selected':''}>Despachado</option>
+                    </select>
+                </div>` : ''}
+            </form>
+        `;
+
+        ModalManager.open(isEdit ? 'Editar Orden' : 'Nueva Orden', formHtml, () => {
+            // Recolectar items
+            const items = [];
+            Utils.$$('.order-item-row').forEach(row => {
+                const sku = row.querySelector('.item-sku').value;
+                const qty = row.querySelector('.item-qty').value;
+                if(sku && qty) {
+                    items.push({
+                        sku: sku,
+                        size: row.querySelector('.item-size').value || 'U',
+                        qty: parseInt(qty)
+                    });
+                }
+            });
+
+            if (items.length === 0) return Utils.showToast('Debe agregar al menos un producto', 'error');
+
+            const data = {
+                id: Utils.$('#ord-id').value,
+                number: Utils.$('#ord-number').value,
+                client: Utils.$('#ord-client').value,
+                deliveryDate: Utils.$('#ord-date').value,
+                globalNotes: Utils.$('#ord-notes').value,
+                items: items,
+                status: isEdit ? Utils.$('#ord-status').value : 'PROCESS'
+            };
+
+            OrdersModule.saveOrder(data);
+        });
+    },
+
+    addOrderItemRow: () => {
+        const div = document.createElement('div');
+        div.className = 'order-item-row';
+        div.style.cssText = "display:flex; gap:5px; margin-bottom:5px;";
+        div.innerHTML = `
+            <input type="text" placeholder="SKU" class="item-sku" style="flex:1;">
+            <input type="text" placeholder="Talla" class="item-size" style="width:60px;">
+            <input type="number" placeholder="Cant" class="item-qty" style="width:60px;">
+            <button type="button" onclick="this.parentElement.remove()" style="color:red;">&times;</button>
+        `;
+        Utils.$('#order-items-container').appendChild(div);
+    }
+};
+
+const ModalManager = {
+    open: (title, contentHtml, onSave) => {
+        Utils.$('#modal-title').textContent = title;
+        Utils.$('#modal-body').innerHTML = contentHtml;
+        const overlay = Utils.$('#modal-overlay');
+        overlay.style.display = 'flex';
+        setTimeout(() => overlay.classList.add('open'), 10);
+
+        // Bind Save
+        const saveBtn = Utils.$('#modal-btn-save');
+        // Clonar nodo para eliminar listeners previos
+        const newSaveBtn = saveBtn.cloneNode(true);
+        saveBtn.parentNode.replaceChild(newSaveBtn, saveBtn);
+        newSaveBtn.onclick = onSave;
+
+        STATE.ui.currentModal = overlay;
+    },
+    close: () => {
+        const overlay = Utils.$('#modal-overlay');
+        overlay.classList.remove('open');
+        setTimeout(() => overlay.style.display = 'none', 300);
+    }
+};
+
+// ============================================================================
+// 9. EVENTOS Y NAVEGACIÓN
+// ============================================================================
+
+document.addEventListener('DOMContentLoaded', () => {
+    
+    // Inicializar Firebase Listeners
+    SyncLayer.init();
+
+    // Navegación Sidebar
+    Utils.$$('.nav-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            // UI Switch
+            Utils.$$('.nav-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active'); // Ojo: si hay click dentro del SVG, usar e.currentTarget
+            
+            const viewId = btn.getAttribute('data-view');
+            STATE.ui.currentView = viewId;
+
+            // Ocultar todas las secciones
+            Utils.$$('.view-section').forEach(sec => sec.classList.remove('active'));
+            
+            // Mostrar la seleccionada
+            const target = Utils.$(`#view-${viewId}`);
+            if (target) {
+                target.classList.add('active');
+                // Actualizar Título
+                Utils.$('#view-title').textContent = btn.innerText.trim();
+                
+                // Disparar renders específicos si es necesario
+                if(viewId === 'orders') UIRenderer.renderOrders();
+                if(viewId === 'inventory') UIRenderer.renderInventory();
+                if(viewId === 'dispatch') UIRenderer.renderDispatchSelection();
+            }
+        });
+    });
+
+    // Botones Globales
+    Utils.$('#btn-global-add').addEventListener('click', () => {
+        if(STATE.ui.currentView === 'inventory') UIRenderer.openProductModal();
+        if(STATE.ui.currentView === 'orders') UIRenderer.openOrderModal();
+    });
+
+    Utils.$('#modal-close').addEventListener('click', ModalManager.close);
+    Utils.$('#modal-btn-cancel').addEventListener('click', ModalManager.close);
+
+    // Botones Auditoría y Cotización
+    const auditBtn = Utils.$('#btn-generate-audit-pdf');
+    if(auditBtn) auditBtn.addEventListener('click', PDFGenerator.generateAuditSnapshot);
+
+    const quoteForm = Utils.$('#quote-form');
+    if(quoteForm) {
+        quoteForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            // Recolectar datos básicos de cotización (demo)
+            const data = {
+                client: Utils.$('#quote-client').value,
+                date: Utils.$('#quote-date').value,
+                items: [
+                    // En producción, esto vendría de inputs dinámicos igual que órdenes
+                    { desc: "Servicio de Confección Textil", qty: 100, price: 4500 }
+                ]
+            };
+            PDFGenerator.generateQuote(data);
+        });
+    }
+
+    // Inicializar Vista por defecto
+    UIRenderer.renderInventory();
+});
+
+// ============================================================================
+// FIN DE ARCHIVO
+// ============================================================================
