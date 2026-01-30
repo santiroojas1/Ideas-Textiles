@@ -3,1373 +3,558 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>IDEAS TEXTILES SPA </title>
+    <title>Ideas Textiles APP</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
-    
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-
+    
     <style>
-        :root {
-            --color-primary: #0f172a; /* Slate 900 */
-            --color-accent: #3b82f6; /* Blue 500 */
-            --color-success: #10b981; /* Emerald 500 */
-            --color-warning: #f59e0b; /* Amber 500 */
-            --color-danger: #ef4444; /* Red 500 */
-            --bg-body: #f1f5f9;
-            --glass-border: rgba(255, 255, 255, 0.5);
-        }
-
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--bg-body);
-            color: #1e293b;
-            overflow-x: hidden;
-            -webkit-font-smoothing: antialiased;
-        }
-
-        /* --- COMPONENTES UI AVANZADOS --- */
-        
-        /* Glassmorphism Cards */
-        .card-premium {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(12px);
-            border: 1px solid white;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
-            border-radius: 16px;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
-        .card-premium:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-        }
-
-        /* Navigation Items */
-        .nav-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 12px 16px;
-            border-radius: 12px;
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            color: #94a3b8;
-            font-weight: 500;
-            border: 1px solid transparent;
-        }
-        .nav-item:hover {
-            background: rgba(255, 255, 255, 0.05);
-            color: #e2e8f0;
-        }
-        .nav-item.active {
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-            font-weight: 700;
-            border-color: rgba(255,255,255,0.1);
-            box-shadow: 0 0 20px rgba(59, 130, 246, 0.1);
-        }
-        .nav-item.active i {
-            color: var(--color-accent);
-        }
-
-        /* Inputs & Forms */
-        .input-std {
-            width: 100%;
-            background: #f8fafc;
-            border: 1px solid #e2e8f0;
-            padding: 10px 14px;
-            border-radius: 8px;
-            font-size: 0.9rem;
-            transition: all 0.2s;
-            outline: none;
-        }
-        .input-std:focus {
-            background: white;
-            border-color: var(--color-accent);
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-        }
-
-        /* Buttons */
-        .btn-primary {
-            background: var(--color-primary);
-            color: white;
-            font-weight: 600;
-            padding: 10px 20px;
-            border-radius: 10px;
-            transition: 0.2s;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            justify-content: center;
-        }
-        .btn-primary:hover { background: #1e293b; transform: translateY(-1px); }
-        .btn-primary:active { transform: translateY(0); }
-
-        /* Calendar Grid */
-        .calendar-grid {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            gap: 1px;
-            background: #e2e8f0;
-            border: 1px solid #e2e8f0;
-            border-radius: 16px;
-            overflow: hidden;
-        }
-        .calendar-day {
-            background: white;
-            min-height: 120px;
-            padding: 8px;
-            display: flex;
-            flex-direction: column;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-        .calendar-day:hover { background: #f8fafc; }
-        .calendar-day.today { background: #eff6ff; }
-        .day-header { font-size: 0.75rem; font-weight: 700; color: #64748b; margin-bottom: 4px; }
-        
-        /* Calendar Dots & Badges */
-        .event-dot {
-            height: 6px;
-            width: 6px;
-            border-radius: 50%;
-            display: inline-block;
-        }
-        .photo-badge {
-            font-size: 0.65rem;
-            background: #e0f2fe;
-            color: #0369a1;
-            padding: 2px 6px;
-            border-radius: 4px;
-            margin-top: 2px;
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-        }
-
-        /* Modal Overlay Custom */
-        .modal-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(15, 23, 42, 0.6);
-            backdrop-filter: blur(4px);
-            z-index: 50;
-            display: flex; justify-content: center; align-items: center;
-            opacity: 0; pointer-events: none; transition: 0.3s;
-        }
-        .modal-overlay.open { opacity: 1; pointer-events: all; }
-        
-        .modal-content {
-            background: white;
-            width: 95%; max-width: 900px;
-            max-height: 90vh;
-            border-radius: 20px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-            transform: scale(0.95); transition: 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-            display: flex; flex-direction: column;
-            overflow: hidden;
-        }
-        .modal-overlay.open .modal-content { transform: scale(1); }
-
-        /* Loader */
-        .loader-dots span {
-            width: 8px; height: 8px; background: white; border-radius: 50%;
-            display: inline-block; animation: bounce 1.4s infinite ease-in-out both;
-        }
-        .loader-dots span:nth-child(1){ animation-delay: -0.32s; }
-        .loader-dots span:nth-child(2){ animation-delay: -0.16s; }
-        @keyframes bounce { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1); } }
-
-        /* Helpers */
-        .hidden { display: none !important; }
-        .flex-center { display: flex; justify-content: center; align-items: center; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #F2F2F7; -webkit-tap-highlight-color: transparent; }
+        .ios-card { background: white; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.03); transition: transform 0.2s; }
+        .ios-input { background: #F2F2F7; border-radius: 12px; padding: 14px; width: 100%; outline: none; transition: all 0.2s; font-size: 16px; }
+        .ios-input:focus { background: white; box-shadow: 0 0 0 2px #3B82F6; }
+        .tap-effect:active { transform: scale(0.96); opacity: 0.8; }
+        .loader { border: 3px solid #f3f3f3; border-top: 3px solid #3498db; border-radius: 50%; width: 24px; height: 24px; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        /* Ocultar scrollbar pero permitir scroll */
+        .hide-scroll::-webkit-scrollbar { display: none; }
+        .hide-scroll { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
 </head>
-<body>
+<body class="pb-24 md:pb-0 md:pl-72 text-slate-800">
 
-    <div id="connection-status" class="fixed top-4 right-4 z-[60] bg-white/90 backdrop-blur px-4 py-2 rounded-full border border-slate-200 shadow-xl flex items-center gap-2 transition-all opacity-0">
-        <div class="relative flex h-3 w-3">
-          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75" id="ping-color"></span>
-          <span class="relative inline-flex rounded-full h-3 w-3 bg-red-500" id="dot-color"></span>
+    <div id="app-loader" class="fixed inset-0 bg-white z-[100] flex flex-col items-center justify-center transition-opacity duration-500">
+        <div class="loader w-12 h-12 border-4 border-blue-600 border-t-transparent"></div>
+        <p class="mt-4 text-xs font-bold text-slate-400 tracking-widest">CARGANDO SISTEMA...</p>
+    </div>
+
+    <aside class="hidden md:flex fixed left-0 top-0 h-full w-72 bg-slate-900 text-white flex-col z-50 shadow-2xl">
+        <div class="p-8">
+            <h1 class="text-3xl font-black tracking-tighter">IDEAS<span class="text-blue-500">TEXTILES</span></h1>
+            <p class="text-[10px] text-slate-400 font-bold tracking-[0.2em] mt-2">SYSTEM OS v4.0</p>
         </div>
-        <span class="text-xs font-bold text-slate-700 tracking-wider" id="status-text">OFFLINE</span>
-    </div>
+        <nav class="flex-1 px-4 space-y-2">
+            <button onclick="App.UI.navigate('dashboard')" class="nav-btn w-full text-left p-4 rounded-xl font-bold text-slate-400 hover:bg-white/10 hover:text-white transition-all flex items-center gap-4">
+                <i class="fas fa-chart-pie w-5 text-center"></i> Panorama
+            </button>
+            <button onclick="App.UI.navigate('orders')" class="nav-btn w-full text-left p-4 rounded-xl font-bold text-slate-400 hover:bg-white/10 hover:text-white transition-all flex items-center gap-4">
+                <i class="fas fa-file-invoice w-5 text-center"></i> Órdenes
+            </button>
+            <button onclick="App.UI.navigate('inventory')" class="nav-btn w-full text-left p-4 rounded-xl font-bold text-slate-400 hover:bg-white/10 hover:text-white transition-all flex items-center gap-4">
+                <i class="fas fa-boxes w-5 text-center"></i> Bodega
+            </button>
+        </nav>
+    </aside>
 
-    <div class="flex h-screen overflow-hidden">
+    <header class="md:hidden sticky top-0 bg-white/90 backdrop-blur-md border-b border-slate-200 z-40 px-5 py-4 flex justify-between items-center">
+        <h1 class="font-black text-xl leading-none">IDEAS <span class="text-blue-600">APP</span></h1>
+        <div id="connection-status" class="w-2 h-2 rounded-full bg-green-500"></div>
+    </header>
+
+    <main class="p-4 md:p-10 max-w-7xl mx-auto min-h-screen">
         
-        <aside class="w-20 lg:w-72 bg-[#0f172a] text-slate-300 flex flex-col justify-between shrink-0 transition-all duration-300 relative z-40 shadow-2xl">
-            <div class="p-6 flex items-center gap-4 justify-center lg:justify-start">
-                <div class="w-10 h-10 bg-gradient-to-br from-blue-600 to-blue-800 rounded-xl flex items-center justify-center shadow-lg shadow-blue-900/50 shrink-0">
-                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 3L20 12L6 21V3Z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 12H5"/></svg>
-                </div>
-                <div class="hidden lg:block">
-                    <h1 class="text-white font-black text-lg leading-none tracking-tight italic">IDEAS<br><span class="text-blue-500">TEXTILES</span></h1>
-                </div>
+        <div id="view-dashboard" class="view-section animate-fade-in">
+            <h2 class="text-3xl font-bold mb-6">Agenda de Producción</h2>
+            <div class="ios-card p-4 md:p-8 mb-6 overflow-hidden">
+                <div id="calendar-grid" class="grid grid-cols-7 gap-1 md:gap-3"></div>
             </div>
+            <h3 class="font-bold text-slate-500 text-sm uppercase mb-4">Próximas Entregas</h3>
+            <div id="upcoming-list" class="space-y-3"></div>
+        </div>
 
-            <nav class="flex-1 px-3 py-6 flex flex-col gap-2 overflow-y-auto">
-                <div onclick="App.Navigation.go('calendar')" id="nav-calendar" class="nav-item active">
-                    <i class="fas fa-calendar-check w-6 text-center text-lg"></i>
-                    <span class="hidden lg:block">Agenda Visual</span>
-                </div>
-                <div onclick="App.Navigation.go('orders')" id="nav-orders" class="nav-item">
-                    <i class="fas fa-file-invoice w-6 text-center text-lg"></i>
-                    <span class="hidden lg:block">Órdenes & Prod.</span>
-                </div>
-                <div onclick="App.Navigation.go('inventory')" id="nav-inventory" class="nav-item">
-                    <i class="fas fa-boxes-stacked w-6 text-center text-lg"></i>
-                    <span class="hidden lg:block">Bodega & Telas</span>
-                </div>
-            </nav>
-
-            <div class="p-4 border-t border-slate-800 hidden lg:block">
-                <div class="bg-slate-800/50 rounded-lg p-3 flex items-center gap-3">
-                    <div class="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold text-xs">A</div>
-                    <div>
-                        <p class="text-xs font-bold text-white">Administrador</p>
-                        <p class="text-[10px] text-slate-400">Versión 2.0.1 Enterprise</p>
-                    </div>
-                </div>
-            </div>
-        </aside>
-
-        <main class="flex-1 bg-slate-50 relative overflow-hidden flex flex-col">
-            
-            <header class="bg-white border-b border-slate-200 p-4 lg:hidden flex justify-between items-center">
-                <span class="font-black text-slate-800">IDEAS TEXTILES</span>
-                <button class="text-slate-600"><i class="fas fa-bars"></i></button>
-            </header>
-
-            <div id="main-scroll" class="flex-1 overflow-y-auto p-4 lg:p-8 scroll-smooth">
-                
-                <section id="view-calendar" class="animate__animated animate__fadeIn">
-                    <header class="flex justify-between items-end mb-6">
-                        <div>
-                            <h2 class="text-3xl font-black text-slate-800 tracking-tight">Agenda Visual</h2>
-                            <p class="text-slate-500 font-medium">Planificación de entregas y bitácora fotográfica.</p>
-                        </div>
-                        <div class="flex gap-2 bg-white p-1 rounded-lg border border-slate-200 shadow-sm">
-                            <button onclick="App.Modules.Calendar.changeMonth(-1)" class="w-8 h-8 hover:bg-slate-100 rounded flex items-center justify-center text-slate-600"><i class="fas fa-chevron-left"></i></button>
-                            <span id="cal-current-date" class="px-4 flex items-center font-bold text-slate-800 w-32 justify-center">...</span>
-                            <button onclick="App.Modules.Calendar.changeMonth(1)" class="w-8 h-8 hover:bg-slate-100 rounded flex items-center justify-center text-slate-600"><i class="fas fa-chevron-right"></i></button>
-                        </div>
-                    </header>
-                    
-                    <div class="flex gap-4 mb-4 text-xs font-bold text-slate-500">
-                        <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-orange-500"></span> Pendiente</span>
-                        <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-green-500"></span> Despachado</span>
-                        <span class="flex items-center gap-1"><i class="fas fa-camera text-blue-500"></i> Evidencia/Nota</span>
-                    </div>
-
-                    <div id="calendar-wrapper" class="calendar-grid bg-white shadow-sm">
-                        </div>
-                </section>
-
-                <section id="view-orders" class="hidden animate__animated animate__fadeIn">
-                    <header class="flex flex-col md:flex-row justify-between items-start md:items-end mb-6 gap-4">
-                        <div>
-                            <h2 class="text-3xl font-black text-slate-800 tracking-tight">Órdenes de Producción</h2>
-                            <p class="text-slate-500 font-medium">Gestión completa, edición y despachos.</p>
-                        </div>
-                        <div class="flex gap-3">
-                            <div class="relative">
-                                <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
-                                <input type="text" id="order-search" onkeyup="App.Modules.Orders.filter()" placeholder="Buscar cliente..." class="pl-10 pr-4 py-2 rounded-xl border border-slate-300 focus:border-blue-500 focus:outline-none text-sm w-64 shadow-sm">
-                            </div>
-                            <button onclick="App.Modules.Orders.openEditor()" class="btn-primary shadow-lg shadow-blue-500/30">
-                                <i class="fas fa-plus"></i> NUEVA ORDEN
-                            </button>
-                        </div>
-                    </header>
-
-                    <div id="orders-container" class="grid grid-cols-1 gap-4">
-                        </div>
-                </section>
-
-                <section id="view-inventory" class="hidden animate__animated animate__fadeIn">
-                    <header class="flex flex-col md:flex-row justify-between items-start md:items-end mb-6 gap-4">
-                        <div>
-                            <h2 class="text-3xl font-black text-slate-800 tracking-tight">Bodega Maestra</h2>
-                            <p class="text-slate-500 font-medium">Control de Telas (Metros) y Productos (Tallas).</p>
-                        </div>
-                        <button onclick="App.Modules.Inventory.openEditor()" class="btn-primary bg-slate-800 shadow-lg">
-                            <i class="fas fa-box"></i> CREAR ÍTEM
-                        </button>
-                    </header>
-                    
-                    <div class="flex gap-2 mb-6 overflow-x-auto pb-2">
-                        <button onclick="App.Modules.Inventory.filter('all')" class="px-4 py-2 rounded-full bg-white border border-slate-200 text-xs font-bold text-slate-600 hover:bg-slate-50 active-filter ring-2 ring-transparent focus:ring-blue-500">TODOS</button>
-                        <button onclick="App.Modules.Inventory.filter('tela')" class="px-4 py-2 rounded-full bg-white border border-slate-200 text-xs font-bold text-slate-600 hover:bg-slate-50">SOLO TELAS</button>
-                        <button onclick="App.Modules.Inventory.filter('prenda')" class="px-4 py-2 rounded-full bg-white border border-slate-200 text-xs font-bold text-slate-600 hover:bg-slate-50">SOLO PRENDAS</button>
-                    </div>
-
-                    <div id="inventory-container" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
-                        </div>
-                </section>
-            </div>
-        </main>
-    </div>
-
-    <div id="modal-order" class="modal-overlay">
-        <div class="modal-content h-[90vh]">
-            <div class="bg-slate-900 text-white p-4 flex justify-between items-center shrink-0">
-                <h3 class="font-bold text-lg"><i class="fas fa-edit mr-2"></i>Editor Maestro de Orden</h3>
-                <button onclick="App.UI.closeModal('modal-order')" class="text-slate-400 hover:text-white"><i class="fas fa-times text-xl"></i></button>
-            </div>
-            
-            <div class="flex-1 overflow-y-auto p-6 bg-slate-50">
-                <input type="hidden" id="editor-order-id">
-
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 bg-white p-4 rounded-xl shadow-sm border border-slate-200">
-                    <div>
-                        <label class="block text-xs font-bold text-slate-500 mb-1">NÚMERO DE ORDEN</label>
-                        <input type="text" id="editor-number" class="input-std font-mono font-bold text-lg" placeholder="Ej: 1054">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-slate-500 mb-1">CLIENTE / RAZÓN SOCIAL</label>
-                        <input type="text" id="editor-client" class="input-std" placeholder="Nombre del Cliente">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-slate-500 mb-1">FECHA ENTREGA</label>
-                        <input type="date" id="editor-date" class="input-std">
-                    </div>
-                    <div class="md:col-span-3">
-                        <label class="block text-xs font-bold text-slate-500 mb-1">NOTAS INTERNAS</label>
-                        <input type="text" id="editor-notes" class="input-std" placeholder="Detalles de envío, observaciones...">
-                    </div>
-                </div>
-
-                <div class="bg-blue-50 border border-blue-100 p-4 rounded-xl mb-6 flex flex-col md:flex-row gap-4 items-center justify-between">
-                    <div class="w-full">
-                        <label class="block text-xs font-bold text-blue-800 mb-1">AGREGAR PRODUCTO AL PEDIDO</label>
-                        <select id="editor-product-select" class="input-std">
-                            <option value="">-- Seleccionar del Inventario --</option>
-                        </select>
-                    </div>
-                    <button onclick="App.Modules.Orders.addProductRow()" class="btn-primary bg-blue-600 w-full md:w-auto mt-4 md:mt-0 whitespace-nowrap">
-                        <i class="fas fa-plus-circle"></i> AGREGAR
-                    </button>
-                </div>
-
-                <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-                    <table class="w-full text-sm text-left">
-                        <thead class="bg-slate-100 text-slate-600 font-bold uppercase text-xs">
-                            <tr>
-                                <th class="p-3">Producto</th>
-                                <th class="p-3 text-center">Configuración (Tallas / Metros)</th>
-                                <th class="p-3 text-right">Subtotal</th>
-                                <th class="p-3 w-10"></th>
-                            </tr>
-                        </thead>
-                        <tbody id="editor-rows-container" class="divide-y divide-slate-100">
-                            </tbody>
-                    </table>
-                    
-                    <div id="editor-empty-state" class="p-8 text-center text-slate-400">
-                        <i class="fas fa-basket-shopping text-4xl mb-2 opacity-30"></i>
-                        <p>No hay productos en esta orden aún.</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="p-4 bg-white border-t border-slate-200 flex justify-between items-center shrink-0">
-                <div class="text-right">
-                    <p class="text-xs text-slate-500 font-bold">TOTAL UNIDADES</p>
-                    <p class="text-2xl font-black text-slate-800" id="editor-total-units">0</p>
-                </div>
-                <button onclick="App.Modules.Orders.save()" class="btn-primary bg-green-600 hover:bg-green-700 px-8 py-3 text-lg shadow-lg shadow-green-500/30">
-                    <i class="fas fa-save"></i> GUARDAR ORDEN
+        <div id="view-orders" class="view-section hidden">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-3xl font-bold">Órdenes</h2>
+                <button onclick="App.Logic.Orders.create()" class="bg-blue-600 text-white px-5 py-2.5 rounded-full font-bold shadow-lg shadow-blue-500/30 tap-effect">
+                    <i class="fas fa-plus mr-2"></i>Nueva
                 </button>
             </div>
+            <div class="relative mb-6">
+                <i class="fas fa-search absolute left-4 top-4 text-slate-400"></i>
+                <input type="text" id="search-orders" onkeyup="App.UI.renderOrders()" placeholder="Buscar cliente, orden..." class="ios-input pl-12">
+            </div>
+            <div id="orders-list" class="grid grid-cols-1 gap-4"></div>
+        </div>
+
+        <div id="view-inventory" class="view-section hidden">
+            <h2 class="text-3xl font-bold mb-6">Bodega Digital</h2>
+            <div class="flex p-1 bg-slate-200 rounded-xl mb-6">
+                <button onclick="App.Logic.Inventory.switchTab('prendas')" id="tab-prendas" class="flex-1 py-2 rounded-lg font-bold text-sm bg-white shadow transition-all">PRENDAS</button>
+                <button onclick="App.Logic.Inventory.switchTab('telas')" id="tab-telas" class="flex-1 py-2 rounded-lg font-bold text-sm text-slate-500 transition-all">TELAS</button>
+            </div>
+            <button onclick="App.Logic.Inventory.createProduct()" class="w-full mb-6 py-3 border-2 border-dashed border-slate-300 rounded-xl text-slate-400 font-bold hover:bg-slate-50">+ Agregar Nuevo Producto</button>
+            <div id="inventory-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+        </div>
+
+    </main>
+
+    <nav class="md:hidden bottom-nav flex justify-around py-3 px-2">
+        <button onclick="App.UI.navigate('dashboard')" class="flex flex-col items-center gap-1 w-16 text-blue-600 nav-mobile" data-target="dashboard">
+            <i class="fas fa-chart-pie text-xl"></i><span class="text-[10px] font-bold">Inicio</span>
+        </button>
+        <button onclick="App.UI.navigate('orders')" class="flex flex-col items-center gap-1 w-16 text-slate-400 nav-mobile" data-target="orders">
+            <i class="fas fa-file-invoice text-xl"></i><span class="text-[10px] font-bold">Órdenes</span>
+        </button>
+        <button onclick="App.UI.navigate('inventory')" class="flex flex-col items-center gap-1 w-16 text-slate-400 nav-mobile" data-target="inventory">
+            <i class="fas fa-boxes text-xl"></i><span class="text-[10px] font-bold">Bodega</span>
+        </button>
+    </nav>
+
+    <div id="universal-modal" class="fixed inset-0 bg-slate-900/80 z-[60] hidden backdrop-blur-sm flex items-end md:items-center justify-center">
+        <div class="bg-white w-full md:max-w-3xl h-[95vh] md:h-auto md:max-h-[90vh] rounded-t-3xl md:rounded-3xl flex flex-col shadow-2xl overflow-hidden animate-slide-up">
+            <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-white z-10">
+                <h3 class="font-black text-xl text-slate-800" id="modal-title">...</h3>
+                <button onclick="App.UI.closeModal()" class="w-9 h-9 rounded-full bg-slate-100 text-slate-500 tap-effect flex items-center justify-center"><i class="fas fa-times"></i></button>
+            </div>
+            <div id="modal-body" class="flex-1 overflow-y-auto p-6 bg-slate-50"></div>
+            <div id="modal-footer" class="p-4 bg-white border-t border-slate-100"></div>
         </div>
     </div>
 
-    <div id="modal-day" class="modal-overlay">
-        <div class="modal-content max-w-lg">
-            <div class="bg-white p-6 border-b border-slate-100 flex justify-between items-center">
-                <h3 class="font-black text-xl text-slate-800" id="day-modal-title">...</h3>
-                <button onclick="App.UI.closeModal('modal-day')" class="text-slate-400 hover:text-red-500"><i class="fas fa-times"></i></button>
-            </div>
-            <div class="p-6 overflow-y-auto max-h-[60vh]">
-                
-                <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Entregas Programadas</h4>
-                <div id="day-events-list" class="space-y-2 mb-6"></div>
-
-                <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 flex justify-between items-center">
-                    Bitácora Visual
-                    <label class="cursor-pointer text-blue-600 hover:underline text-[10px]">
-                        <input type="file" class="hidden" accept="image/*" onchange="App.Modules.Calendar.uploadPhoto(this)">
-                        + SUBIR FOTO
-                    </label>
-                </h4>
-                <div id="day-photos-grid" class="grid grid-cols-3 gap-2"></div>
-            </div>
-        </div>
-    </div>
-    
     <script type="module">
-/* ======================== FIN DE PARTE 1 ======================== */
-/* PEGA A CONTINUACIÓN LA PARTE 2 SIN BORRAR NADA */
+        // ==========================================
+        // CAPA 0: CONFIGURACIÓN Y LIBRERÍAS
+        // ==========================================
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
-        import { getDatabase, ref, set, onValue, update, remove } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
+        import { getFirestore, collection, addDoc, getDocs, updateDoc, doc, deleteDoc, onSnapshot, query, orderBy, setDoc } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+        import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-storage.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBg-Cx9SqZw35TyyMxtpVBEFlwZTjBXBew",
+            authDomain: "ideastextilesapp.firebaseapp.com",
+            databaseURL: "https://ideastextilesapp-default-rtdb.firebaseio.com",
+            projectId: "ideastextilesapp",
+            storageBucket: "ideastextilesapp.firebasestorage.app",
+            messagingSenderId: "268995530035",
+            appId: "1:268995530035:web:1890f45ac761cc81eb0246"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const storage = getStorage(app);
+
+        // Estado Global de la App
+        const State = {
+            orders: [],
+            inventory: [],
+            inventoryFilter: 'prendas',
+            listeners: {} // Para suscripciones en tiempo real
+        };
 
         // ==========================================
-        // 1. CONFIGURACIÓN Y UTILIDADES ENTERPRISE
+        // CAPA 1: SERVICIOS DE DATOS (DATA LAYER)
         // ==========================================
-        
-        const Config = {
-            firebase: { 
-                apiKey: "AIzaSyBg-Cx9SqZw35TyyMxtpVBEFlwZTjBXBew", 
-                authDomain: "ideastextilesapp.firebaseapp.com", 
-                databaseURL: "https://ideastextilesapp-default-rtdb.firebaseio.com", 
-                projectId: "ideastextilesapp", 
-                appId: "1:268995530035:web:1890f45ac761cc81eb0246" 
+        const DataService = {
+            // Escuchar cambios en tiempo real (Velocidad de luz)
+            initListeners: () => {
+                // Escuchar Órdenes
+                const qOrders = query(collection(db, "orders"), orderBy("date", "asc"));
+                State.listeners.orders = onSnapshot(qOrders, (snapshot) => {
+                    State.orders = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                    App.UI.renderOrders();
+                    App.UI.renderDashboard();
+                });
+
+                // Escuchar Inventario
+                State.listeners.inventory = onSnapshot(collection(db, "inventory"), (snapshot) => {
+                    State.inventory = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                    App.UI.renderInventory();
+                });
             },
-            sizes: ["XS","S","M","L","XL","XXL","3XL","4XL","5XL"],
-            dateFormat: 'es-CL',
-            currency: 'CLP'
-        };
 
-        const Utils = {
-            uid: () => 'ID-' + Date.now() + '-' + Math.floor(Math.random() * 1000),
-            formatDate: (d) => new Date(d).toLocaleDateString(Config.dateFormat),
-            fileToBase64: (file) => new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.readAsDataURL(file);
-                reader.onload = () => resolve(reader.result);
-                reader.onerror = error => reject(error);
-            }),
-            compressImage: async (base64Str, maxWidth = 800) => {
-                return new Promise((resolve) => {
-                    const img = new Image();
-                    img.src = base64Str;
-                    img.onload = () => {
-                        const canvas = document.createElement('canvas');
-                        const ratio = maxWidth / img.width;
-                        canvas.width = maxWidth;
-                        canvas.height = img.height * ratio;
-                        const ctx = canvas.getContext('2d');
-                        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                        resolve(canvas.toDataURL('image/jpeg', 0.7)); // Compresión 0.7
-                    };
-                });
-            }
-        };
+            // Subir Fotos a Firebase Storage
+            uploadPhoto: async (file, path) => {
+                if(!file) return null;
+                const storageRef = ref(storage, `${path}/${Date.now()}_${file.name}`);
+                const snapshot = await uploadBytes(storageRef, file);
+                return await getDownloadURL(snapshot.ref);
+            },
 
-        // ==========================================
-        // 2. CAPA DE DATOS (FIREBASE WRAPPER)
-        // ==========================================
-        
-        class DatabaseService {
-            constructor() {
-                this.app = initializeApp(Config.firebase);
-                this.db = getDatabase(this.app);
-                this.listeners = {};
-                this.state = { inventory: [], orders: [], calendarPhotos: {} };
-                
-                // Monitor de Conexión
-                onValue(ref(this.db, ".info/connected"), (snap) => {
-                    const connected = snap.val() === true;
-                    const el = document.getElementById('connection-status');
-                    const txt = document.getElementById('status-text');
-                    const dot = document.getElementById('dot-color');
-                    const ping = document.getElementById('ping-color');
-                    
-                    el.style.opacity = "1";
-                    if(connected) {
-                        txt.innerText = "SISTEMA ONLINE";
-                        dot.className = "relative inline-flex rounded-full h-3 w-3 bg-emerald-500";
-                        ping.className = "animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75";
-                    } else {
-                        txt.innerText = "DESCONECTADO";
-                        dot.className = "relative inline-flex rounded-full h-3 w-3 bg-red-500";
-                        ping.className = "hidden";
-                    }
-                });
-            }
-
-            init(callback) {
-                // Listener Inventario
-                onValue(ref(this.db, 'inventory'), (s) => {
-                    this.state.inventory = s.val() || [];
-                    App.Modules.Inventory.render();
-                    // Refrescar selector en el editor de órdenes si está abierto
-                    App.Modules.Orders.populateSelector();
-                });
-
-                // Listener Órdenes
-                onValue(ref(this.db, 'orders'), (s) => {
-                    this.state.orders = s.val() || [];
-                    App.Modules.Orders.render();
-                    App.Modules.Calendar.render(); // Las órdenes afectan al calendario
-                });
-
-                // Listener Bitácora (Fotos Calendario)
-                onValue(ref(this.db, 'calendar_photos'), (s) => {
-                    this.state.calendarPhotos = s.val() || {};
-                    // Si el modal del día está abierto, refrescar
-                    const openDate = document.getElementById('day-modal-title').getAttribute('data-date');
-                    if(openDate) App.Modules.Calendar.renderModalContent(openDate);
-                });
-                
-                if(callback) callback();
-            }
-
-            async save(path, data) { await set(ref(this.db, path), data); }
-            async update(path, data) { await update(ref(this.db, path), data); }
-            async delete(path) { await remove(ref(this.db, path)); }
-        }
-
-        const DB = new DatabaseService();
-
-        // ==========================================
-        // 3. MÓDULO DE INVENTARIO (POLIMÓRFICO)
-        // ==========================================
-
-        const InventoryModule = {
-            currentFilter: 'all',
-            
-            render: () => {
-                const container = document.getElementById('inventory-container');
-                container.innerHTML = '';
-                
-                let items = DB.state.inventory;
-                if(InventoryModule.currentFilter !== 'all') {
-                    items = items.filter(i => i.type === InventoryModule.currentFilter);
+            // Operaciones CRUD Genéricas
+            saveOrder: async (orderData) => {
+                if(orderData.id) {
+                    await updateDoc(doc(db, "orders", orderData.id), orderData);
+                } else {
+                    await addDoc(collection(db, "orders"), orderData);
                 }
+            },
+            deleteOrder: async (id) => await deleteDoc(doc(db, "orders", id)),
+            
+            saveProduct: async (prodData) => await addDoc(collection(db, "inventory"), prodData),
+            updateProduct: async (id, data) => await updateDoc(doc(db, "inventory", id), data)
+        };
 
-                items.forEach(item => {
-                    const isTela = item.type === 'tela';
-                    let stockDisplay = '';
+        // ==========================================
+        // CAPA 2: LÓGICA DE NEGOCIO (CONTROLLER)
+        // ==========================================
+        const Logic = {
+            init: () => {
+                DataService.initListeners();
+                setTimeout(() => document.getElementById('app-loader').style.display = 'none', 1000);
+            },
 
-                    if(isTela) {
-                        stockDisplay = `
-                            <div class="mt-4 p-3 bg-blue-50 rounded-lg border border-blue-100 flex justify-between items-center">
-                                <span class="text-xs font-bold text-blue-800 uppercase tracking-wider">STOCK DISPONIBLE</span>
-                                <span class="text-2xl font-black text-blue-600">${item.meters} <small class="text-sm font-normal text-slate-500">mts</small></span>
-                            </div>`;
-                    } else {
-                        // Resumen de tallas
-                        const totalUnits = Object.values(item.stock || {}).reduce((a,b)=>a+b,0);
-                        const pills = Object.entries(item.stock || {})
-                            .filter(([_, qty]) => qty > 0)
-                            .map(([size, qty]) => `<span class="bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded text-[10px] font-bold border border-slate-200">${size}:${qty}</span>`)
-                            .join('');
+            // --- Lógica de Órdenes ---
+            Orders: {
+                create: () => { App.UI.Modals.orderEditor(); },
+                edit: (id) => { 
+                    const order = State.orders.find(o => o.id === id);
+                    App.UI.Modals.orderEditor(order); 
+                },
+                save: async (id) => {
+                    try {
+                        const btn = document.getElementById('btn-save-order');
+                        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Guardando...';
                         
-                        stockDisplay = `
-                            <div class="mt-4">
-                                <div class="flex flex-wrap gap-1 mb-2 h-12 overflow-hidden content-start">${pills}</div>
-                                <div class="text-right text-xs font-bold text-slate-400">Total: ${totalUnits} un.</div>
-                            </div>`;
-                    }
-
-                    const html = `
-                        <div class="card-premium p-5 relative group">
-                            <div class="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity flex gap-2">
-                                <button onclick="App.Modules.Inventory.openEditor('${item.id}')" class="w-8 h-8 rounded-full bg-white shadow flex items-center justify-center text-blue-500 hover:text-blue-700"><i class="fas fa-pencil-alt"></i></button>
-                            </div>
-                            <span class="inline-block px-2 py-1 rounded text-[10px] font-black uppercase mb-2 ${isTela ? 'bg-purple-100 text-purple-700' : 'bg-emerald-100 text-emerald-700'}">${isTela ? 'MATERIA PRIMA' : 'PRODUCTO'}</span>
-                            <h3 class="font-bold text-slate-800 text-lg leading-tight">${item.name}</h3>
-                            <p class="font-mono text-xs text-slate-400 mt-1">SKU: ${item.sku}</p>
-                            ${stockDisplay}
-                        </div>
-                    `;
-                    container.innerHTML += html;
-                });
-            },
-
-            filter: (type) => {
-                InventoryModule.currentFilter = type;
-                // Update UI buttons styling logic here (simplified)
-                InventoryModule.render();
-            },
-
-            openEditor: async (id = null) => {
-                const item = id ? DB.state.inventory.find(i => i.id === id) : null;
-                const isTela = item ? item.type === 'tela' : false;
-
-                const { value: formValues } = await Swal.fire({
-                    title: id ? 'Editar Ítem' : 'Nuevo Ítem',
-                    html: `
-                        <div class="text-left space-y-3">
-                            <div>
-                                <label class="text-xs font-bold block mb-1">TIPO DE ÍTEM</label>
-                                <select id="swal-type" class="input-std" onchange="document.getElementById('stock-panel').style.display = this.value==='prenda'?'grid':'none'; document.getElementById('meters-panel').style.display = this.value==='tela'?'block':'none';">
-                                    <option value="prenda" ${!isTela?'selected':''}>Producto Terminado (Tallas)</option>
-                                    <option value="tela" ${isTela?'selected':''}>Tela / Insumo (Metros)</option>
-                                </select>
-                            </div>
-                            <div class="grid grid-cols-2 gap-3">
-                                <input id="swal-sku" class="input-std" placeholder="SKU" value="${item?.sku || ''}">
-                                <input id="swal-price" type="number" class="input-std" placeholder="Precio" value="${item?.price || ''}">
-                            </div>
-                            <input id="swal-name" class="input-std" placeholder="Nombre Descriptivo" value="${item?.name || ''}">
-                            
-                            <div id="stock-panel" class="grid grid-cols-4 gap-2 bg-slate-50 p-3 rounded border border-slate-200" style="display:${!isTela?'grid':'none'}">
-                                ${Config.sizes.map(s => `
-                                    <div class="text-center">
-                                        <label class="text-[9px] font-bold text-slate-400 block">${s}</label>
-                                        <input id="qty-${s}" type="number" class="w-full text-center border rounded p-1 text-xs" value="${item?.stock?.[s] || ''}">
-                                    </div>
-                                `).join('')}
-                            </div>
-
-                            <div id="meters-panel" class="bg-blue-50 p-4 rounded border border-blue-100" style="display:${isTela?'block':'none'}">
-                                <label class="text-xs font-bold text-blue-800 block mb-1">METROS DISPONIBLES</label>
-                                <input id="swal-meters" type="number" step="0.01" class="input-std text-xl font-bold text-blue-600" value="${item?.meters || ''}">
-                            </div>
-                        </div>
-                    `,
-                    width: '500px',
-                    showCancelButton: true,
-                    confirmButtonText: 'Guardar',
-                    confirmButtonColor: '#0f172a',
-                    preConfirm: () => {
-                        const type = document.getElementById('swal-type').value;
+                        // Recolectar datos del DOM
                         const data = {
-                            id: id || Utils.uid(),
-                            type,
-                            sku: document.getElementById('swal-sku').value.toUpperCase(),
-                            name: document.getElementById('swal-name').value,
-                            price: Number(document.getElementById('swal-price').value),
-                            updatedAt: new Date().toISOString()
+                            number: document.getElementById('inp-number').value,
+                            client: document.getElementById('inp-client').value,
+                            date: document.getElementById('inp-date').value,
+                            notes: document.getElementById('inp-notes').value,
+                            invoice: document.getElementById('inp-invoice').value,
+                            bultos: document.getElementById('inp-bultos').value,
+                            items: Logic.Orders.collectItemsFromDOM(),
+                            status: id ? (State.orders.find(o=>o.id===id).status || 'Pendiente') : 'Pendiente'
                         };
 
-                        if(!data.sku || !data.name) return Swal.showValidationMessage('SKU y Nombre son obligatorios');
-
-                        if(type === 'prenda'){
-                            data.stock = {};
-                            Config.sizes.forEach(s => {
-                                const val = document.getElementById(`qty-${s}`).value;
-                                if(val) data.stock[s] = parseInt(val);
-                            });
-                        } else {
-                            data.meters = parseFloat(document.getElementById('swal-meters').value) || 0;
-                        }
-                        return data;
+                        if(id) data.id = id;
+                        await DataService.saveOrder(data);
+                        App.UI.closeModal();
+                        Swal.fire({ icon: 'success', title: 'Guardado', timer: 1500, showConfirmButton: false });
+                    } catch (e) {
+                        console.error(e);
+                        Swal.fire('Error', 'No se pudo guardar. Revisa tu conexión.', 'error');
                     }
-                });
-
-                if(formValues) {
-                    let newInventory = [...DB.state.inventory];
-                    if(id) {
-                        const idx = newInventory.findIndex(i => i.id === id);
-                        newInventory[idx] = formValues;
-                    } else {
-                        newInventory.push(formValues);
-                    }
-                    await DB.save('inventory', newInventory);
-                    Swal.fire({icon: 'success', title: 'Guardado', timer: 1500, showConfirmButton: false});
-                }
-            }
-        };
-
-        // ==========================================
-        // 4. MÓDULO DE ÓRDENES (CORREGIDO / COMPATIBLE)
-        // ==========================================
-
-        const OrdersModule = {
-            currentEditorItems: [], 
-
-            render: () => {
-                const container = document.getElementById('orders-container');
-                const searchInput = document.getElementById('order-search');
-                const searchTerm = searchInput ? searchInput.value.toLowerCase() : '';
-                container.innerHTML = '';
-
-                // COMPATIBILIDAD: Intentamos leer 'orders' (si está vacío, intenta cambiar la palabra 'orders' por 'ordenes' en el DatabaseService)
-                let orders = DB.state.orders || [];
+                },
+                collectItemsFromDOM: () => {
+                    const rows = document.querySelectorAll('.item-row');
+                    return Array.from(rows).map(row => ({
+                        product: row.querySelector('.inp-prod').value,
+                        qty: row.querySelector('.inp-qty').value
+                    })).filter(i => i.product);
+                },
+                delete: async (id) => {
+                    const res = await Swal.fire({ title: '¿Borrar Orden?', icon: 'warning', showCancelButton: true, confirmButtonColor: '#d33', confirmButtonText: 'Sí, borrar' });
+                    if(res.isConfirmed) await DataService.deleteOrder(id);
+                },
                 
-                // Filtro de búsqueda seguro
-                orders = orders.filter(o => {
-                    const client = o.client || o.cliente || "Sin Cliente";
-                    const number = o.number || o.numero || "???";
-                    return client.toLowerCase().includes(searchTerm) || number.toString().includes(searchTerm);
-                });
-                
-                // Ordenar por fecha (más nuevas primero)
-                orders.sort((a,b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
-
-                if(orders.length === 0) {
-                    container.innerHTML = `<div class="p-8 text-center text-slate-400">No se encontraron órdenes o la ruta de Firebase es distinta (revisa si es 'orders' o 'ordenes').</div>`;
-                    return;
-                }
-
-                orders.forEach(o => {
-                    const isDespachado = o.status === 'Despachado';
-                    const statusClass = isDespachado ? 'bg-green-100 text-green-700 border-green-200' : 'bg-orange-100 text-orange-700 border-orange-200';
-                    const icon = isDespachado ? '<i class="fas fa-check-circle"></i>' : '<i class="fas fa-clock"></i>';
-                    
-                    // CORRECCIÓN CRÍTICA: Detectar si es estructura nueva (items) o vieja (products)
-                    const productsList = o.items || o.products || [];
-                    
-                    // Cálculo total items a prueba de fallos
-                    let totalItems = 0;
-                    try {
-                        totalItems = productsList.reduce((acc, item) => {
-                            // Caso Tela
-                            if(item.type === 'tela') return acc + 1;
-                            // Caso Prenda Nueva
-                            if(item.distribution) return acc + Object.values(item.distribution).reduce((a,b)=>a+b,0);
-                            // Caso Prenda Antigua (Legacy)
-                            if(item.stock) return acc + Object.values(item.stock).reduce((a,b)=>a+b,0); // Si usabas stock
-                            // Caso Genérico
-                            return acc + (parseInt(item.cantidad || item.quantity || 1));
-                        }, 0);
-                    } catch(e) { totalItems = "?"; }
-
-                    // Usar nombres de campos compatibles (inglés o español)
-                    const displayNumber = o.number || o.numero || "S/N";
-                    const displayClient = o.client || o.cliente || "Cliente Desconocido";
-                    const displayDate = o.deliveryDate || o.fechaEntrega || "";
-
-                    const html = `
-                        <div class="card-premium p-6 border-l-4 ${isDespachado ? 'border-l-green-500' : 'border-l-orange-500'}">
-                            <div class="flex flex-col md:flex-row justify-between md:items-center gap-4">
-                                <div>
-                                    <div class="flex items-center gap-3 mb-1">
-                                        <span class="text-xl font-black text-slate-800">#${displayNumber}</span>
-                                        <span class="px-3 py-1 rounded-full text-[10px] font-bold uppercase border flex items-center gap-1 ${statusClass}">
-                                            ${icon} ${o.status || 'Pendiente'}
-                                        </span>
-                                    </div>
-                                    <h4 class="font-bold text-slate-600">${displayClient}</h4>
-                                    <div class="flex gap-4 mt-1">
-                                        <p class="text-xs text-slate-400"><i class="fas fa-calendar mr-1"></i> ${displayDate ? Utils.formatDate(displayDate) : 'Sin Fecha'}</p>
-                                        <p class="text-xs text-slate-400"><i class="fas fa-box mr-1"></i> Total: ${totalItems} un.</p>
-                                    </div>
-                                </div>
-                                
-                                <div class="flex items-center gap-2">
-                                    <button onclick="App.Modules.Orders.openEditor('${o.id}')" class="px-4 py-2 bg-white border border-slate-200 text-slate-600 rounded-lg text-sm font-bold hover:bg-slate-50 transition-colors shadow-sm">
-                                        EDITAR / VER
-                                    </button>
-                                    
-                                    ${!isDespachado ? `
-                                    <button onclick="App.Modules.Dispatch.init('${o.id}')" class="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-bold hover:bg-blue-700 shadow-lg shadow-blue-500/30 transition-transform hover:-translate-y-1">
-                                        <i class="fas fa-truck-fast mr-2"></i> DESPACHAR
-                                    </button>` : `
-                                    <button onclick="App.Modules.Dispatch.regeneratePDF('${o.id}')" class="px-4 py-2 bg-emerald-600 text-white rounded-lg text-sm font-bold hover:bg-emerald-700 shadow-lg shadow-emerald-500/30">
-                                        <i class="fas fa-file-pdf mr-2"></i> VER TACHA
-                                    </button>
-                                    `}
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                    container.innerHTML += html;
-                });
-            },
-
-            populateSelector: () => {
-                const select = document.getElementById('editor-product-select');
-                if(!select) return;
-                select.innerHTML = '<option value="">-- Seleccionar --</option>';
-                (DB.state.inventory || []).forEach(p => {
-                    select.innerHTML += `<option value="${p.id}">${p.sku || '???'} - ${p.name || 'Sin Nombre'} (${p.type === 'tela' ? 'Tela' : 'Prenda'})</option>`;
-                });
-            },
-
-            openEditor: (id = null) => {
-                OrdersModule.populateSelector();
-                const modal = document.getElementById('modal-order');
-                const emptyState = document.getElementById('editor-empty-state');
-                const rowsContainer = document.getElementById('editor-rows-container');
-                
-                // Limpiar form
-                document.getElementById('editor-order-id').value = '';
-                document.getElementById('editor-number').value = '';
-                document.getElementById('editor-client').value = '';
-                document.getElementById('editor-date').value = '';
-                document.getElementById('editor-notes').value = '';
-                rowsContainer.innerHTML = '';
-                OrdersModule.currentEditorItems = [];
-
-                if(id) {
-                    // MODO EDICIÓN: REHIDRATAR CON COMPATIBILIDAD
-                    const order = DB.state.orders.find(o => o.id === id);
-                    if(order) {
-                        document.getElementById('editor-order-id').value = order.id;
-                        document.getElementById('editor-number').value = order.number || order.numero || "";
-                        document.getElementById('editor-client').value = order.client || order.cliente || "";
-                        document.getElementById('editor-date').value = order.deliveryDate || order.fechaEntrega || "";
-                        document.getElementById('editor-notes').value = order.notes || order.notas || "";
-                        
-                        // Detectar lista de productos (Nueva o Vieja)
-                        const rawItems = order.items || order.products || [];
-
-                        rawItems.forEach(item => {
-                            // Intento de vincular con inventario actual
-                            const prodId = item.productId || item.id; 
-                            const freshProd = DB.state.inventory.find(p => p.id === prodId);
-                            
-                            if(freshProd) {
-                                // Si existe el producto en bodega, usamos sus datos frescos + cantidad guardada
-                                OrdersModule.addItemToUI(freshProd, item.distribution || item.stock || {}, item.meters || 0);
-                            } else {
-                                // PRODUCTO FANTASMA (Se borró de bodega o es muy viejo)
-                                // Lo agregamos como "Item Legacy" para que no se pierda la info visual
-                                OrdersModule.addLegacyItemToUI(item);
-                            }
-                        });
-                    }
-                } else {
-                    // MODO CREAR
-                    const maxNum = DB.state.orders.reduce((max, o) => Math.max(max, parseInt(o.number || o.numero)||0), 1000);
-                    document.getElementById('editor-number').value = maxNum + 1;
-                }
-
-                OrdersModule.updateTotals();
-                App.UI.openModal('modal-order');
-            },
-
-            // Función auxiliar para mostrar items viejos que ya no están en bodega
-            addLegacyItemToUI: (item) => {
-                const rowsContainer = document.getElementById('editor-rows-container');
-                document.getElementById('editor-empty-state').style.display = 'none';
-                
-                // Intentamos rescatar datos
-                const name = item.name || item.nombre || "Item Antiguo";
-                const sku = item.sku || "LEGACY";
-                const qty = item.quantity || item.cantidad || "?";
-
-                const tr = document.createElement('tr');
-                tr.className = "bg-orange-50 opacity-70";
-                tr.innerHTML = `
-                    <td class="p-3 align-middle">
-                        <div class="font-bold text-slate-800 text-sm">${name} <span class="text-[9px] text-red-500">(Archivo)</span></div>
-                        <div class="text-[10px] text-slate-400 font-mono">${sku}</div>
-                    </td>
-                    <td class="p-3 align-middle text-xs text-slate-500">
-                        Datos no editables (Formato Antiguo)<br>
-                        Cantidad original: <b>${qty}</b>
-                    </td>
-                    <td class="p-3"></td>
-                    <td class="p-3 align-middle text-center">
-                        <button type="button" onclick="this.closest('tr').remove(); OrdersModule.updateTotals();" class="text-red-500"><i class="fas fa-trash"></i></button>
-                    </td>
-                `;
-                rowsContainer.appendChild(tr);
-            },
-
-            addProductRow: () => {
-                const select = document.getElementById('editor-product-select');
-                const prodId = select.value;
-                if(!prodId) return;
-
-                const product = DB.state.inventory.find(p => p.id === prodId);
-                if(OrdersModule.currentEditorItems.find(i => i.productId === prodId)){
-                    Swal.fire('Atención', 'Este producto ya está en la lista.', 'warning');
-                    return;
-                }
-                OrdersModule.addItemToUI(product);
-                select.value = ""; 
-            },
-
-            addItemToUI: (product, savedDistribution = {}, savedMeters = 0) => {
-                const rowsContainer = document.getElementById('editor-rows-container');
-                document.getElementById('editor-empty-state').style.display = 'none';
-
-                const rowId = 'row-' + product.id;
-                const isTela = product.type === 'tela';
-                
-                OrdersModule.currentEditorItems.push({
-                    productId: product.id,
-                    type: product.type,
-                    sku: product.sku,
-                    name: product.name,
-                    price: product.price,
-                    distribution: savedDistribution,
-                    meters: savedMeters
-                });
-
-                const tr = document.createElement('tr');
-                tr.id = rowId;
-                tr.className = "hover:bg-slate-50 transition-colors group";
-                
-                let inputsHTML = '';
-                if(isTela) {
-                    inputsHTML = `
-                        <div class="flex items-center gap-2">
-                            <input type="number" step="0.01" class="w-32 border border-blue-300 rounded p-2 text-center font-bold text-blue-600 bg-blue-50" 
-                                value="${savedMeters || ''}" placeholder="0.00"
-                                onchange="App.Modules.Orders.updateItemData('${product.id}', 'meters', this.value)">
-                            <span class="text-xs font-bold text-slate-500">MTS</span>
-                        </div>`;
-                } else {
-                    inputsHTML = `<div class="grid grid-cols-5 md:grid-cols-9 gap-1">`;
-                    Config.sizes.forEach(s => {
-                        const val = savedDistribution[s] || '';
-                        inputsHTML += `
-                            <div class="flex flex-col items-center">
-                                <label class="text-[8px] text-slate-400 font-bold">${s}</label>
-                                <input type="number" class="w-full text-center border border-slate-200 rounded text-xs p-1 focus:border-blue-500 focus:bg-white transition-colors" 
-                                    placeholder="-" value="${val}"
-                                    onchange="App.Modules.Orders.updateItemData('${product.id}', '${s}', this.value)">
-                            </div>`;
+                // INTRANSABLE: Reporte de Fallas con Foto
+                reportIssue: async (id) => {
+                    const { value: file } = await Swal.fire({
+                        title: 'Reportar Falla / Incidencia',
+                        text: 'Sube una foto del defecto obligatoriamente.',
+                        input: 'file',
+                        inputAttributes: { 'accept': 'image/*', 'aria-label': 'Sube la foto' },
+                        showCancelButton: true
                     });
-                    inputsHTML += `</div>`;
-                }
 
-                tr.innerHTML = `
-                    <td class="p-3 align-middle">
-                        <div class="font-bold text-slate-800 text-sm">${product.name}</div>
-                        <div class="text-[10px] text-slate-400 font-mono">${product.sku}</div>
-                    </td>
-                    <td class="p-3 align-middle">${inputsHTML}</td>
-                    <td class="p-3 align-middle text-right font-mono text-xs text-slate-500">-</td>
-                    <td class="p-3 align-middle text-center">
-                        <button onclick="App.Modules.Orders.removeItem('${product.id}')" class="text-slate-300 hover:text-red-500 transition-colors"><i class="fas fa-trash"></i></button>
-                    </td>
-                `;
-                rowsContainer.appendChild(tr);
-            },
-
-            updateItemData: (prodId, key, value) => {
-                const item = OrdersModule.currentEditorItems.find(i => i.productId === prodId);
-                if(!item) return;
-
-                if(key === 'meters') {
-                    item.meters = parseFloat(value) || 0;
-                } else {
-                    if(!item.distribution) item.distribution = {};
-                    const qty = parseInt(value);
-                    if(qty > 0) item.distribution[key] = qty;
-                    else delete item.distribution[key];
-                }
-                OrdersModule.updateTotals();
-            },
-
-            updateItemSubtotal: (prodId) => {},
-
-            removeItem: (prodId) => {
-                OrdersModule.currentEditorItems = OrdersModule.currentEditorItems.filter(i => i.productId !== prodId);
-                const row = document.getElementById('row-'+prodId);
-                if(row) row.remove();
-                if(OrdersModule.currentEditorItems.length === 0) {
-                    const empty = document.getElementById('editor-empty-state');
-                    if(empty) empty.style.display = 'block';
-                }
-                OrdersModule.updateTotals();
-            },
-
-            updateTotals: () => {
-                let totalUn = 0;
-                OrdersModule.currentEditorItems.forEach(i => {
-                    if(i.type === 'tela') totalUn += 1; 
-                    else totalUn += Object.values(i.distribution || {}).reduce((a,b)=>a+b,0);
-                });
-                const totalEl = document.getElementById('editor-total-units');
-                if(totalEl) totalEl.innerText = totalUn;
-            },
-
-            save: async () => {
-                const id = document.getElementById('editor-order-id').value;
-                const number = document.getElementById('editor-number').value;
-                const client = document.getElementById('editor-client').value;
-                const date = document.getElementById('editor-date').value;
-                const notes = document.getElementById('editor-notes').value;
-
-                if(!number || !client || !date) return Swal.fire('Error', 'Completa los campos obligatorios', 'error');
-                
-                // Validar que hay items (o items viejos que no tocamos)
-                const hasNewItems = OrdersModule.currentEditorItems.length > 0;
-                // En un caso real, podríamos querer permitir guardar sin items nuevos si solo hay legacy, 
-                // pero por ahora exigimos re-hacer la orden para modernizarla.
-                if(!hasNewItems) return Swal.fire('Error', 'La orden debe tener productos válidos.', 'error');
-
-                const orderData = {
-                    id: id || Utils.uid(),
-                    number,
-                    client,
-                    deliveryDate: date,
-                    notes,
-                    items: OrdersModule.currentEditorItems, // Esto sobrescribe lo viejo con formato nuevo
-                    status: id ? (DB.state.orders.find(o=>o.id===id)?.status || 'Pendiente') : 'Pendiente',
-                    createdAt: id ? (DB.state.orders.find(o=>o.id===id)?.createdAt) : new Date().toISOString()
-                };
-
-                // Preservar info despacho
-                if(id) {
-                    const oldOrder = DB.state.orders.find(o => o.id === id);
-                    if(oldOrder && oldOrder.dispatchInfo) orderData.dispatchInfo = oldOrder.dispatchInfo;
-                }
-
-                let newOrders = [...DB.state.orders];
-                if(id) {
-                    const idx = newOrders.findIndex(o => o.id === id);
-                    newOrders[idx] = orderData;
-                } else {
-                    newOrders.push(orderData);
-                }
-
-                await DB.save('orders', newOrders); // AQUÍ ESTÁ EL NOMBRE DE LA COLECCIÓN
-                App.UI.closeModal('modal-order');
-                Swal.fire('Éxito', 'Orden guardada y actualizada al formato v2.0', 'success');
-            },
-            
-            filter: () => OrdersModule.render()
-        };
-        // ==========================================
-        // 5. MÓDULO DE DESPACHO (ADUANA & PDF)
-        // ==========================================
-
-        const DispatchModule = {
-            init: async (orderId) => {
-                const order = DB.state.orders.find(o => o.id === orderId);
-                
-                // ADUANA: VALIDACIÓN OBLIGATORIA
-                const { value: formValues } = await Swal.fire({
-                    title: 'ADUANA DE DESPACHO',
-                    html: `
-                        <div class="text-left space-y-4">
-                            <div class="p-3 bg-slate-100 rounded text-xs text-slate-500">
-                                Para liberar la orden <b>#${order.number}</b>, debes ingresar la evidencia legal obligatoria.
-                            </div>
-                            
-                            <div>
-                                <label class="block text-xs font-bold text-slate-700">N° FACTURA / GUÍA</label>
-                                <input id="dsp-doc" class="input-std font-mono" placeholder="Ej: 139002">
-                            </div>
-
-                            <div>
-                                <label class="block text-xs font-bold text-slate-700">TOTAL BULTOS/CAJAS</label>
-                                <input id="dsp-pkgs" type="number" class="input-std" value="1" min="1">
-                            </div>
-
-                            <div>
-                                <label class="block text-xs font-bold text-slate-700 text-red-600">* EVIDENCIA FOTOGRÁFICA</label>
-                                <input id="dsp-file" type="file" accept="image/*" class="w-full text-xs text-slate-500 border rounded p-2 bg-white">
-                                <p class="text-[10px] text-slate-400 mt-1">Sube foto de la carga etiquetada o guía firmada.</p>
-                            </div>
-                        </div>
-                    `,
-                    confirmButtonText: 'VALIDAR Y GENERAR TACHAS',
-                    confirmButtonColor: '#2563eb',
-                    showCancelButton: true,
-                    preConfirm: async () => {
-                        const doc = document.getElementById('dsp-doc').value;
-                        const pkgs = document.getElementById('dsp-pkgs').value;
-                        const fileInput = document.getElementById('dsp-file');
-
-                        if(!doc || !pkgs || fileInput.files.length === 0) {
-                            Swal.showValidationMessage('Todos los campos y la FOTO son obligatorios.');
-                            return false;
-                        }
-
-                        // Procesar imagen
-                        const base64 = await Utils.fileToBase64(fileInput.files[0]);
-                        const compressed = await Utils.compressImage(base64, 600); // Comprimir para no saturar DB
-                        
-                        return { doc, pkgs, evidence: compressed };
+                    if (file) {
+                        Swal.showLoading();
+                        const url = await DataService.uploadPhoto(file, 'issues');
+                        await DataService.saveOrder({ id, hasIssue: true, issuePhoto: url });
+                        Swal.fire('Reportado', 'La orden quedó marcada en ROJO.', 'warning');
                     }
-                });
+                },
 
-                if(formValues) {
-                    // Actualizar Estado Orden
-                    const idx = DB.state.orders.findIndex(o => o.id === orderId);
-                    const updatedOrder = {
-                        ...DB.state.orders[idx],
-                        status: 'Despachado',
-                        dispatchInfo: {
-                            docNumber: formValues.doc,
-                            packagesCount: parseInt(formValues.pkgs),
-                            evidencePhoto: formValues.evidence,
-                            dispatchedAt: new Date().toISOString()
-                        }
+                // INTRANSABLE: Despacho con Foto
+                dispatch: async (id) => {
+                    const { value: file } = await Swal.fire({
+                        title: 'Validar Despacho',
+                        text: 'Sube foto de la etiqueta o bulto cerrado.',
+                        input: 'file',
+                        inputAttributes: { 'accept': 'image/*', 'aria-label': 'Sube la foto' },
+                        showCancelButton: true,
+                        confirmButtonText: 'Confirmar Despacho'
+                    });
+
+                    if (file) {
+                        Swal.showLoading();
+                        const url = await DataService.uploadPhoto(file, 'dispatches');
+                        await DataService.saveOrder({ id, status: 'Despachado', dispatchPhoto: url });
+                        Swal.fire('¡Éxito!', 'Orden despachada correctamente.', 'success');
+                    }
+                }
+            },
+
+            // --- Lógica de Inventario ---
+            Inventory: {
+                switchTab: (type) => {
+                    State.inventoryFilter = type;
+                    document.getElementById('tab-prendas').className = `flex-1 py-2 rounded-lg font-bold text-sm transition-all ${type==='prendas'?'bg-white shadow text-slate-800':'text-slate-500'}`;
+                    document.getElementById('tab-telas').className = `flex-1 py-2 rounded-lg font-bold text-sm transition-all ${type==='telas'?'bg-white shadow text-slate-800':'text-slate-500'}`;
+                    App.UI.renderInventory();
+                },
+                createProduct: async () => {
+                    const { value: formValues } = await Swal.fire({
+                        title: 'Nuevo Producto',
+                        html: `
+                            <input id="swal-prod" class="swal2-input" placeholder="Nombre (ej: Polera Piqué)">
+                            <select id="swal-type" class="swal2-input"><option value="prendas">Prenda</option><option value="telas">Tela</option></select>
+                        `,
+                        focusConfirm: false,
+                        preConfirm: () => [document.getElementById('swal-prod').value, document.getElementById('swal-type').value]
+                    });
+                    if(formValues) await DataService.saveProduct({ name: formValues[0], type: formValues[1], stock: 0, history: [] });
+                },
+                moveStock: async (id, currentStock) => {
+                    // Kardex con Foto
+                    const prod = State.inventory.find(p => p.id === id);
+                    App.UI.Modals.stockMover(prod);
+                },
+                saveMove: async (id, isEntry) => {
+                    const qty = parseFloat(document.getElementById('mv-qty').value);
+                    const note = document.getElementById('mv-note').value;
+                    const file = document.getElementById('mv-file').files[0];
+                    
+                    if(!qty || !file) return Swal.fire('Faltan datos', 'Cantidad y FOTO son obligatorios', 'error');
+                    
+                    Swal.showLoading();
+                    const url = await DataService.uploadPhoto(file, 'kardex');
+                    const prod = State.inventory.find(p => p.id === id);
+                    
+                    const newStock = isEntry ? (parseFloat(prod.stock || 0) + qty) : (parseFloat(prod.stock || 0) - qty);
+                    const movement = {
+                        date: new Date().toISOString(),
+                        type: isEntry ? 'Entrada' : 'Salida',
+                        qty: qty,
+                        note: note,
+                        photo: url,
+                        user: 'Admin' 
                     };
 
-                    let newOrders = [...DB.state.orders];
-                    newOrders[idx] = updatedOrder;
-                    
-                    // Guardar y Generar PDF
-                    Swal.fire({title: 'Generando Documentos...', allowOutsideClick: false, didOpen: () => Swal.showLoading()});
-                    await DB.save('orders', newOrders);
-                    
-                    setTimeout(() => {
-                        PDFEngine.generateTachas(updatedOrder);
-                        Swal.close();
-                        Swal.fire('Despacho Exitoso', 'La orden ha sido cerrada y las etiquetas descargadas.', 'success');
-                    }, 1000);
-                }
-            },
+                    const history = prod.history || [];
+                    history.unshift(movement); // Agregar al principio
 
-            regeneratePDF: (orderId) => {
-                const order = DB.state.orders.find(o => o.id === orderId);
-                PDFEngine.generateTachas(order);
+                    await DataService.updateProduct(id, { stock: newStock, history: history });
+                    App.UI.closeModal();
+                    Swal.fire('Registrado', 'Movimiento guardado con evidencia.', 'success');
+                }
             }
         };
 
-        const PDFEngine = {
-            generateTachas: (order) => {
-                const { jsPDF } = window.jspdf;
-                // Tamaño estándar etiqueta envío 100x150mm
-                const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: [100, 150] }); 
-                const totalBultos = order.dispatchInfo.packagesCount;
+        // ==========================================
+        // CAPA 3: INTERFAZ DE USUARIO (VIEW)
+        // ==========================================
+        const UI = {
+            navigate: (viewId) => {
+                document.querySelectorAll('.view-section').forEach(el => el.classList.add('hidden'));
+                document.getElementById(`view-${viewId}`).classList.remove('hidden');
+                
+                // Actualizar menú móvil y desktop
+                document.querySelectorAll('.nav-mobile').forEach(btn => {
+                    btn.classList.toggle('text-blue-600', btn.dataset.target === viewId);
+                    btn.classList.toggle('text-slate-400', btn.dataset.target !== viewId);
+                });
+            },
 
-                for (let i = 1; i <= totalBultos; i++) {
-                    if (i > 1) doc.addPage();
-                    
-                    // Marco
-                    doc.setLineWidth(0.5);
-                    doc.rect(2, 2, 146, 96);
-
-                    // Header
-                    doc.setFontSize(16);
-                    doc.setFont("helvetica", "bold");
-                    doc.text("IDEAS TEXTILES", 5, 10);
-                    
-                    doc.setFontSize(10);
-                    doc.setFont("helvetica", "normal");
-                    doc.text("ORDEN DE COMPRA:", 5, 20);
-                    doc.setFontSize(14);
-                    doc.setFont("helvetica", "bold");
-                    doc.text(`#${order.number}`, 5, 26);
-
-                    // Info Cliente
-                    doc.setFontSize(8);
-                    doc.setFont("helvetica", "normal");
-                    doc.text("CLIENTE:", 60, 20);
-                    doc.setFontSize(10);
-                    doc.setFont("helvetica", "bold");
-                    doc.text(order.client.substring(0, 25), 60, 26);
-
-                    // Destino/Doc
-                    doc.setFontSize(8);
-                    doc.setFont("helvetica", "normal");
-                    doc.text(`DOC: ${order.dispatchInfo.docNumber}`, 5, 35);
-                    doc.text(`FECHA: ${Utils.formatDate(order.dispatchInfo.dispatchedAt)}`, 60, 35);
-
-                    // GRAN NÚMERO BULTO
-                    doc.setDrawColor(0);
-                    doc.setFillColor(240, 240, 240);
-                    doc.rect(100, 5, 40, 25, 'FD');
-                    doc.setFontSize(24);
-                    doc.text(`${i} / ${totalBultos}`, 120, 20, { align: 'center' });
-                    doc.setFontSize(8);
-                    doc.text("BULTO", 120, 28, { align: 'center' });
-
-                    // Línea divisoria
-                    doc.line(5, 40, 145, 40);
-
-                    // Contenido (Resumen)
-                    doc.setFontSize(9);
-                    doc.text("CONTENIDO DE LA ORDEN (GENÉRICO):", 5, 46);
-                    
-                    let y = 52;
-                    order.items.slice(0, 6).forEach(item => {
-                        let txt = `- ${item.sku} ${item.name}`;
-                        if(item.type==='tela') txt += ` (${item.meters} mts)`;
-                        else {
-                            const total = Object.values(item.distribution).reduce((a,b)=>a+b,0);
-                            txt += ` (${total} un)`;
-                        }
-                        doc.text(txt, 5, y);
-                        y += 5;
+            renderDashboard: () => {
+                const grid = document.getElementById('calendar-grid');
+                grid.innerHTML = '';
+                const days = ['L','M','M','J','V','S','D'];
+                days.forEach(d => grid.innerHTML += `<div class="text-center text-xs font-bold text-slate-300 py-2">${d}</div>`);
+                
+                // Lógica simple de calendario para visualización
+                for(let i=1; i<=30; i++) {
+                    // Buscar si hay entrega este día
+                    const hasDelivery = State.orders.some(o => {
+                        if(!o.date) return false;
+                        const d = parseInt(o.date.split('-')[2]);
+                        return d === i && o.status !== 'Despachado';
                     });
                     
-                    if(order.items.length > 6) doc.text("... y más items.", 5, y);
-                }
-
-                doc.save(`Tacha_Orden_${order.number}.pdf`);
-            }
-        };
-
-        // ==========================================
-        // 6. MÓDULO DE AGENDA VISUAL (CALENDARIO)
-        // ==========================================
-
-        const CalendarModule = {
-            currentDate: new Date(),
-
-            changeMonth: (dir) => {
-                CalendarModule.currentDate.setMonth(CalendarModule.currentDate.getMonth() + dir);
-                CalendarModule.render();
-            },
-
-            render: () => {
-                const year = CalendarModule.currentDate.getFullYear();
-                const month = CalendarModule.currentDate.getMonth();
-                
-                // Titulo
-                const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
-                document.getElementById('cal-current-date').innerText = `${monthNames[month]} ${year}`;
-
-                // Cálculos Grid
-                const firstDay = new Date(year, month, 1).getDay(); // 0 Dom, 1 Lun...
-                const daysInMonth = new Date(year, month + 1, 0).getDate();
-                const startingDay = firstDay === 0 ? 6 : firstDay - 1; // Ajuste para que Lunes sea 0
-
-                const grid = document.getElementById('calendar-wrapper');
-                grid.innerHTML = '';
-
-                // Headers Días
-                const daysOfWeek = ["LUN", "MAR", "MIE", "JUE", "VIE", "SAB", "DOM"];
-                daysOfWeek.forEach(d => grid.innerHTML += `<div class="p-2 text-center text-[10px] font-black text-slate-400 bg-slate-50">${d}</div>`);
-
-                // Espacios vacíos
-                for(let i=0; i<startingDay; i++) grid.innerHTML += `<div class="bg-slate-50 border-t border-slate-100"></div>`;
-
-                // Días
-                for(let i=1; i<=daysInMonth; i++) {
-                    const dateStr = `${year}-${String(month+1).padStart(2,'0')}-${String(i).padStart(2,'0')}`;
-                    const isToday = new Date().toISOString().split('T')[0] === dateStr;
-                    
-                    // Buscar Eventos (Órdenes)
-                    const dayOrders = DB.state.orders.filter(o => o.deliveryDate === dateStr);
-                    const pending = dayOrders.filter(o => o.status !== 'Despachado').length;
-                    const done = dayOrders.filter(o => o.status === 'Despachado').length;
-                    
-                    // Buscar Fotos
-                    const hasPhotos = DB.state.calendarPhotos[dateStr] ? true : false;
-
-                    let indicators = '';
-                    if(pending > 0) indicators += `<span class="event-dot bg-orange-500 mr-1" title="${pending} Pendientes"></span>`;
-                    if(done > 0) indicators += `<span class="event-dot bg-green-500 mr-1" title="${done} Despachados"></span>`;
-                    if(hasPhotos) indicators += `<div class="photo-badge"><i class="fas fa-camera"></i></div>`;
-
                     grid.innerHTML += `
-                        <div onclick="App.Modules.Calendar.openDayModal('${dateStr}')" class="calendar-day ${isToday ? 'today' : ''}">
-                            <div class="flex justify-between items-start">
-                                <span class="font-bold text-sm ${isToday ? 'text-blue-600' : 'text-slate-700'}">${i}</span>
-                                ${dayOrders.length > 0 ? `<span class="text-[9px] font-bold text-slate-400">${dayOrders.length} ped.</span>` : ''}
-                            </div>
-                            <div class="mt-auto">
-                                ${indicators}
-                            </div>
+                        <div class="aspect-square rounded-lg flex flex-col items-center justify-center border ${hasDelivery ? 'bg-blue-50 border-blue-200' : 'bg-white border-transparent'}">
+                            <span class="text-sm ${hasDelivery ? 'font-bold text-blue-600' : 'text-slate-500'}">${i}</span>
+                            ${hasDelivery ? '<div class="w-1.5 h-1.5 bg-orange-500 rounded-full mt-1"></div>' : ''}
                         </div>
                     `;
                 }
-            },
 
-            openDayModal: (dateStr) => {
-                document.getElementById('day-modal-title').innerText = "Bitácora: " + Utils.formatDate(dateStr);
-                document.getElementById('day-modal-title').setAttribute('data-date', dateStr);
-                
-                CalendarModule.renderModalContent(dateStr);
-                App.UI.openModal('modal-day');
-            },
-
-            renderModalContent: (dateStr) => {
-                // 1. Render Eventos
-                const list = document.getElementById('day-events-list');
-                const orders = DB.state.orders.filter(o => o.deliveryDate === dateStr);
-                
-                if(orders.length === 0) list.innerHTML = '<p class="text-sm text-slate-400 italic">No hay entregas programadas.</p>';
-                else {
-                    list.innerHTML = orders.map(o => `
-                        <div class="flex justify-between items-center p-2 rounded border border-slate-100 hover:bg-slate-50 cursor-pointer" onclick="App.UI.closeModal('modal-day'); App.Modules.Orders.openEditor('${o.id}')">
+                // Lista de próximos
+                const list = document.getElementById('upcoming-list');
+                list.innerHTML = '';
+                State.orders.filter(o => o.status !== 'Despachado').slice(0,3).forEach(o => {
+                    list.innerHTML += `
+                        <div class="ios-card p-4 border-l-4 border-orange-400 flex justify-between items-center">
                             <div>
-                                <span class="font-bold text-slate-700 text-sm">#${o.number}</span>
-                                <span class="text-xs text-slate-500 ml-2">${o.client}</span>
+                                <div class="font-bold text-slate-700">${o.client}</div>
+                                <div class="text-xs text-slate-400">#${o.number} • ${o.date}</div>
                             </div>
-                            <span class="text-[10px] font-bold px-2 py-0.5 rounded ${o.status==='Despachado'?'bg-green-100 text-green-600':'bg-orange-100 text-orange-600'}">${o.status}</span>
+                            <span class="text-xs font-bold text-orange-500 bg-orange-50 px-2 py-1 rounded">Pendiente</span>
+                        </div>
+                    `;
+                });
+            },
+
+            renderOrders: () => {
+                const container = document.getElementById('orders-list');
+                const term = document.getElementById('search-orders').value.toLowerCase();
+                container.innerHTML = '';
+
+                State.orders.filter(o => 
+                    (o.client || '').toLowerCase().includes(term) || (o.number || '').includes(term)
+                ).forEach(o => {
+                    const isPending = o.status !== 'Despachado';
+                    const hasIssue = o.hasIssue;
+                    let border = isPending ? 'border-orange-500' : 'border-green-500';
+                    let icon = isPending ? 'fa-clock text-orange-500' : 'fa-check-circle text-green-500';
+                    if(hasIssue) { border = 'border-red-500'; icon = 'fa-exclamation-triangle text-red-500'; }
+
+                    container.innerHTML += `
+                        <div class="ios-card p-5 border-l-4 ${border} relative overflow-hidden tap-effect">
+                            <div class="flex justify-between items-start mb-2">
+                                <div>
+                                    <h3 class="font-black text-lg text-slate-800">#${o.number} <span class="text-sm font-normal text-slate-500">| ${o.client}</span></h3>
+                                    <p class="text-xs font-bold text-slate-400 mt-0.5"><i class="fas fa-calendar mr-1"></i> ${o.date || 'Sin fecha'}</p>
+                                </div>
+                                <div class="flex flex-col items-end gap-2">
+                                    <i class="fas ${icon} text-2xl"></i>
+                                </div>
+                            </div>
+                            <div class="flex gap-2 mt-4 pt-3 border-t border-slate-100">
+                                <button onclick="App.Logic.Orders.edit('${o.id}')" class="flex-1 py-2 bg-slate-100 text-slate-600 rounded-lg text-xs font-bold">Ver / Editar</button>
+                                ${isPending ? `<button onclick="App.Logic.Orders.dispatch('${o.id}')" class="flex-1 py-2 bg-slate-800 text-white rounded-lg text-xs font-bold">Despachar</button>` : ''}
+                            </div>
+                        </div>
+                    `;
+                });
+            },
+
+            renderInventory: () => {
+                const container = document.getElementById('inventory-grid');
+                container.innerHTML = '';
+                const items = State.inventory.filter(i => i.type === State.inventoryFilter);
+                
+                items.forEach(p => {
+                    container.innerHTML += `
+                        <div class="ios-card p-5 flex flex-col justify-between h-full">
+                            <div>
+                                <div class="flex justify-between items-start">
+                                    <h4 class="font-bold text-lg text-slate-700 leading-tight">${p.name}</h4>
+                                    <span class="text-xs font-bold bg-slate-100 px-2 py-1 rounded text-slate-400 uppercase">${p.type}</span>
+                                </div>
+                                <div class="mt-4 mb-4">
+                                    <span class="text-4xl font-black text-slate-800">${p.stock || 0}</span>
+                                    <span class="text-sm font-bold text-slate-400">${p.type === 'telas' ? 'Metros' : 'Unid.'}</span>
+                                </div>
+                            </div>
+                            <button onclick="App.Logic.Inventory.moveStock('${p.id}')" class="w-full py-3 bg-blue-50 text-blue-600 rounded-xl font-bold text-sm hover:bg-blue-100 transition-colors">
+                                Registrar Movimiento
+                            </button>
+                        </div>
+                    `;
+                });
+            },
+
+            Modals: {
+                orderEditor: (order = null) => {
+                    document.getElementById('modal-title').innerText = order ? `Editar Orden #${order.number}` : 'Nueva Orden';
+                    const itemsHtml = (order?.items || []).map(i => `
+                        <div class="item-row flex gap-2 mb-2">
+                            <input class="ios-input inp-prod text-sm" value="${i.product}" placeholder="Producto">
+                            <input class="ios-input inp-qty w-24 text-center" type="number" value="${i.qty}" placeholder="#">
+                            <button onclick="this.parentElement.remove()" class="text-red-400 px-2"><i class="fas fa-times"></i></button>
                         </div>
                     `).join('');
-                }
 
-                // 2. Render Fotos
-                const grid = document.getElementById('day-photos-grid');
-                const photos = DB.state.calendarPhotos[dateStr] || [];
-                
-                grid.innerHTML = photos.map((img, idx) => `
-                    <div class="relative group aspect-square bg-slate-100 rounded overflow-hidden">
-                        <img src="${img}" class="w-full h-full object-cover">
-                        <button onclick="App.Modules.Calendar.deletePhoto('${dateStr}', ${idx})" class="absolute top-1 right-1 bg-red-500 text-white w-5 h-5 rounded-full text-[10px] flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"><i class="fas fa-times"></i></button>
-                    </div>
-                `).join('');
-            },
+                    document.getElementById('modal-body').innerHTML = `
+                        <div class="space-y-4">
+                            <div class="grid grid-cols-3 gap-3">
+                                <div class="col-span-1"><label class="text-xs font-bold text-slate-400">NÚMERO</label><input id="inp-number" type="number" class="ios-input font-bold text-blue-600" value="${order?.number || ''}"></div>
+                                <div class="col-span-2"><label class="text-xs font-bold text-slate-400">CLIENTE</label><input id="inp-client" class="ios-input font-bold" value="${order?.client || ''}"></div>
+                            </div>
+                            <div><label class="text-xs font-bold text-slate-400">FECHA ENTREGA</label><input type="date" id="inp-date" class="ios-input" value="${order?.date || ''}"></div>
+                            
+                            <div class="bg-white p-3 rounded-xl border border-slate-200">
+                                <div class="flex justify-between mb-2"><label class="text-xs font-bold text-slate-400">PRODUCTOS</label><button onclick="App.UI.addTempItem()" class="text-blue-500 text-xs font-bold">+ Item</button></div>
+                                <div id="items-container">${itemsHtml}</div>
+                            </div>
 
-            uploadPhoto: async (input) => {
-                if(input.files.length === 0) return;
-                const dateStr = document.getElementById('day-modal-title').getAttribute('data-date');
-                
-                // Loader visual
-                Swal.fire({title: 'Subiendo...', didOpen: () => Swal.showLoading(), backdrop:false, width: 200});
+                            <div><label class="text-xs font-bold text-slate-400">NOTAS GENERALES</label><textarea id="inp-notes" class="ios-input h-20" placeholder="Instrucciones...">${order?.notes || ''}</textarea></div>
+                            
+                            <div class="grid grid-cols-2 gap-3">
+                                <div><label class="text-xs font-bold text-slate-400">FACTURA</label><input id="inp-invoice" class="ios-input" value="${order?.invoice || ''}"></div>
+                                <div><label class="text-xs font-bold text-slate-400">BULTOS</label><input id="inp-bultos" type="number" class="ios-input" value="${order?.bultos || ''}"></div>
+                            </div>
 
-                try {
-                    const base64 = await Utils.fileToBase64(input.files[0]);
-                    const compressed = await Utils.compressImage(base64, 800);
-                    
-                    const currentPhotos = DB.state.calendarPhotos[dateStr] || [];
-                    currentPhotos.push(compressed);
-                    
-                    await DB.update(`calendar_photos/${dateStr}`, currentPhotos); // Firebase detecta el array y lo actualiza
-                    
-                    Swal.close();
-                    CalendarModule.renderModalContent(dateStr);
-                } catch(e) {
-                    Swal.fire('Error', 'No se pudo procesar la imagen', 'error');
-                }
-                input.value = ''; // Reset
-            },
-
-            deletePhoto: async (dateStr, idx) => {
-                if(confirm('¿Borrar foto?')) {
-                    const currentPhotos = DB.state.calendarPhotos[dateStr];
-                    currentPhotos.splice(idx, 1);
-                    if(currentPhotos.length === 0) await DB.delete(`calendar_photos/${dateStr}`);
-                    else await DB.save(`calendar_photos/${dateStr}`, currentPhotos);
-                    CalendarModule.renderModalContent(dateStr);
-                }
-            }
-        };
-
-        // ==========================================
-        // CORE: INICIALIZADOR DE APP
-        // ==========================================
-
-        window.App = {
-            Modules: {
-                Inventory: InventoryModule,
-                Orders: OrdersModule,
-                Dispatch: DispatchModule,
-                Calendar: CalendarModule
-            },
-            Navigation: {
-                go: (viewId) => {
-                    // Ocultar todas
-                    document.querySelectorAll('main section').forEach(el => el.classList.add('hidden'));
-                    // Mostrar target
-                    document.getElementById('view-'+viewId).classList.remove('hidden');
-                    // Actualizar Sidebar
-                    document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-                    document.getElementById('nav-'+viewId).classList.add('active');
-                    
-                    // Trigger Renders específicos
-                    if(viewId === 'inventory') InventoryModule.render();
-                    if(viewId === 'orders') OrdersModule.render();
-                    if(viewId === 'calendar') CalendarModule.render();
-                }
-            },
-            UI: {
-                openModal: (id) => {
-                    const el = document.getElementById(id);
-                    el.classList.add('open');
-                    document.body.style.overflow = 'hidden';
+                            ${order ? `
+                            <div class="flex gap-2 pt-4 border-t border-slate-200">
+                                <button onclick="App.Logic.Orders.reportIssue('${order.id}')" class="flex-1 py-3 bg-red-50 text-red-500 rounded-xl font-bold text-sm"><i class="fas fa-camera mr-2"></i>Reportar Falla</button>
+                                <button onclick="App.Logic.Orders.delete('${order.id}')" class="w-12 bg-slate-100 text-slate-400 rounded-xl"><i class="fas fa-trash"></i></button>
+                            </div>
+                            ` : ''}
+                        </div>
+                    `;
+                    document.getElementById('modal-footer').innerHTML = `
+                        <button onclick="App.Logic.Orders.save('${order?.id || ''}')" id="btn-save-order" class="w-full py-4 bg-slate-900 text-white rounded-xl font-bold text-lg shadow-xl shadow-slate-300">GUARDAR ORDEN</button>
+                    `;
+                    App.UI.openModal();
                 },
-                closeModal: (id) => {
-                    const el = document.getElementById(id);
-                    el.classList.remove('open');
-                    document.body.style.overflow = 'auto';
+
+                stockMover: (prod) => {
+                    document.getElementById('modal-title').innerText = prod.name;
+                    // Historial
+                    const historyHtml = (prod.history || []).slice(0,5).map(h => `
+                        <div class="flex justify-between items-center text-xs p-2 border-b border-slate-100">
+                            <div><span class="font-bold ${h.type==='Entrada'?'text-green-600':'text-red-500'}">${h.type}</span> <span class="text-slate-400">(${h.qty})</span></div>
+                            <div class="flex items-center gap-2">
+                                <span class="text-slate-400">${h.note || '-'}</span>
+                                <a href="${h.photo}" target="_blank" class="text-blue-500"><i class="fas fa-image"></i></a>
+                            </div>
+                        </div>
+                    `).join('');
+
+                    document.getElementById('modal-body').innerHTML = `
+                        <div class="text-center mb-6">
+                            <h2 class="text-5xl font-black text-slate-800">${prod.stock}</h2>
+                            <p class="text-xs font-bold text-slate-400 uppercase">Stock Actual</p>
+                        </div>
+                        <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 mb-6">
+                            <label class="text-xs font-bold text-slate-400 uppercase block mb-2">Registrar Nuevo Movimiento</label>
+                            <input id="mv-qty" type="number" class="ios-input mb-3 text-center text-xl font-bold" placeholder="Cantidad">
+                            <input id="mv-note" type="text" class="ios-input mb-3" placeholder="Responsable / Nota (Ej: Taller Yolanda)">
+                            <div class="p-4 border-2 border-dashed border-slate-300 rounded-xl text-center relative bg-slate-50">
+                                <i class="fas fa-camera text-slate-400 mb-2"></i>
+                                <p class="text-xs font-bold text-slate-500">FOTO EVIDENCIA (OBLIGATORIA)</p>
+                                <input type="file" id="mv-file" class="absolute inset-0 opacity-0 w-full h-full cursor-pointer" accept="image/*">
+                            </div>
+                        </div>
+                        <div>
+                            <p class="text-xs font-bold text-slate-400 mb-2 uppercase">Historial Reciente</p>
+                            ${historyHtml || '<p class="text-xs text-slate-300 italic">Sin movimientos</p>'}
+                        </div>
+                    `;
+                    document.getElementById('modal-footer').innerHTML = `
+                        <div class="flex gap-3">
+                            <button onclick="App.Logic.Inventory.saveMove('${prod.id}', true)" class="flex-1 py-4 bg-green-500 text-white rounded-xl font-bold shadow-lg shadow-green-200">ENTRADA</button>
+                            <button onclick="App.Logic.Inventory.saveMove('${prod.id}', false)" class="flex-1 py-4 bg-red-500 text-white rounded-xl font-bold shadow-lg shadow-red-200">SALIDA</button>
+                        </div>
+                    `;
+                    App.UI.openModal();
                 }
             },
-            init: () => {
-                console.log("Iniciando IDEAS TEXTILES ERP v2.0...");
-                DB.init(() => {
-                    // Carga inicial
-                    CalendarModule.render();
-                });
-            }
+
+            addTempItem: () => {
+                const div = document.createElement('div');
+                div.className = 'item-row flex gap-2 mb-2 animate-fade-in';
+                div.innerHTML = `
+                    <input class="ios-input inp-prod text-sm" placeholder="Producto">
+                    <input class="ios-input inp-qty w-24 text-center" type="number" placeholder="#">
+                    <button onclick="this.parentElement.remove()" class="text-red-400 px-2"><i class="fas fa-times"></i></button>
+                `;
+                document.getElementById('items-container').appendChild(div);
+            },
+
+            openModal: () => document.getElementById('universal-modal').classList.remove('hidden'),
+            closeModal: () => document.getElementById('universal-modal').classList.add('hidden')
         };
 
-        // Boot
-        window.onload = App.init;
+        // Exponer al Global Scope para usar onclick en HTML
+        window.App = { Logic, UI };
+        
+        // INICIO AUTOMÁTICO
+        Logic.init();
 
     </script>
 </body>
