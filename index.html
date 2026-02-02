@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>IDEAS TEXTILES</title>
+    <title>IDEAS TEXTILES </title>
 
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
@@ -13,11 +13,10 @@
         :root { --primary: #0f172a; --blue: #2563eb; --bg: #f8fafc; }
         body { font-family: 'Inter', system-ui, sans-serif; background: var(--bg); color: #334155; user-select: none; -webkit-tap-highlight-color: transparent; }
 
-        /* ESTILOS BOTONES E INPUTS */
+        /* UI BASE */
         .btn { display: inline-flex; align-items: center; justify-content: center; padding: 10px 16px; border-radius: 8px; font-weight: 700; cursor: pointer; transition: all 0.2s; font-size: 0.9rem; }
         .btn:active { transform: scale(0.96); }
         .btn-blue { background: var(--blue); color: white; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3); }
-        .btn-icon { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 6px; }
         
         .input-std { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 8px; outline: none; background: white; font-weight: 500; transition: border 0.2s; }
         .input-std:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1); }
@@ -35,11 +34,15 @@
         .dot { width: 6px; height: 6px; border-radius: 50%; margin-right: 4px; flex-shrink: 0; }
         .dot-blue { background: #3b82f6; } .dot-green { background: #22c55e; } .dot-red { background: #ef4444; }
 
-        /* BODEGA */
+        /* BODEGA PRO */
         .inv-item { display: flex; align-items: center; justify-content: space-between; padding: 12px; border-bottom: 1px solid #f1f5f9; }
-        .inv-item:last-child { border-bottom: none; }
         .inv-controls { display: flex; align-items: center; gap: 4px; background: #f8fafc; padding: 4px; border-radius: 8px; border: 1px solid #e2e8f0; }
-        .stock-num { width: 40px; text-align: center; font-weight: 800; font-size: 1.1rem; color: #0f172a; }
+        .stock-num { width: 60px; text-align: center; font-weight: 800; font-size: 1.1rem; color: #0f172a; line-height: 1; }
+        .stock-unit { font-size: 10px; color: #64748b; display: block; font-weight: 600; text-transform: uppercase; }
+
+        /* TABS BODEGA */
+        .tab-btn { flex: 1; text-align: center; padding: 8px; font-size: 12px; font-weight: 700; border-radius: 6px; cursor: pointer; color: #64748b; }
+        .tab-btn.active { background: white; color: var(--blue); box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
 
         /* LOADER */
         .loader-overlay { position: fixed; inset: 0; background: white; z-index: 9999; display: flex; flex-col; align-items: center; justify-content: center; transition: opacity 0.4s; }
@@ -49,7 +52,7 @@
 
     <div id="loader" class="loader-overlay">
         <div class="w-10 h-10 border-4 border-slate-200 border-t-blue-600 rounded-full animate-spin mb-4"></div>
-        <p class="text-xs font-bold text-slate-400 tracking-widest">CONECTANDO...</p>
+        <p class="text-xs font-bold text-slate-400 tracking-widest">CARGANDO...</p>
     </div>
 
     <aside class="hidden md:flex fixed left-0 top-0 h-full w-64 bg-slate-900 text-white flex-col z-50 shadow-2xl">
@@ -113,19 +116,25 @@
             <div class="flex justify-between items-center mb-6">
                 <h2 class="text-2xl font-bold text-slate-800">Bodega</h2>
                 <button onclick="App.Actions.Inventory.add()" class="btn bg-slate-800 text-white text-sm shadow-lg">
-                    <i class="fas fa-plus mr-2"></i> ITEM
+                    <i class="fas fa-plus mr-2"></i> NUEVO
                 </button>
             </div>
             
             <div class="mb-4 relative">
                 <i class="fas fa-search absolute left-4 top-3.5 text-slate-400"></i>
-                <input type="text" id="search-inventory" onkeyup="App.Render.inventory()" class="input-std pl-10" placeholder="Buscar material...">
+                <input type="text" id="search-inventory" onkeyup="App.Render.inventory()" class="input-std pl-10" placeholder="Buscar tela, prenda...">
+            </div>
+
+            <div class="bg-slate-100 p-1 rounded-lg flex gap-1 mb-4 border border-slate-200">
+                <div onclick="App.UI.setInvFilter('all')" class="tab-btn active" id="tab-all">TODO</div>
+                <div onclick="App.UI.setInvFilter('tela')" class="tab-btn" id="tab-tela">TELAS (Mts)</div>
+                <div onclick="App.UI.setInvFilter('prenda')" class="tab-btn" id="tab-prenda">PRENDAS (Unid)</div>
             </div>
 
             <div class="card overflow-hidden">
                 <div class="bg-slate-50 border-b px-4 py-2 text-[10px] font-bold text-slate-400 flex justify-between uppercase">
-                    <span>Producto</span>
-                    <span>Stock</span>
+                    <span>Ítem / Categoría</span>
+                    <span>Existencias</span>
                 </div>
                 <div id="inventory-list" class="divide-y divide-slate-100"></div>
             </div>
@@ -142,7 +151,7 @@
     <div id="modal-order" class="fixed inset-0 bg-slate-900/80 z-[60] hidden flex items-end md:items-center justify-center p-0 md:p-4 backdrop-blur-sm">
         <div class="bg-white w-full md:max-w-3xl h-[95vh] md:h-auto rounded-t-2xl md:rounded-2xl flex flex-col shadow-2xl overflow-hidden">
             <div class="p-4 border-b flex justify-between items-center bg-slate-50">
-                <h3 class="font-black text-lg text-slate-800">Orden</h3>
+                <h3 class="font-black text-lg text-slate-800">Ficha de Orden</h3>
                 <button onclick="document.getElementById('modal-order').classList.add('hidden')" class="w-8 h-8 bg-slate-200 rounded-full flex items-center justify-center text-slate-500"><i class="fas fa-times"></i></button>
             </div>
             <div class="p-6 overflow-y-auto flex-1 space-y-4">
@@ -164,7 +173,7 @@
                 <div><label class="text-xs font-bold text-slate-400">NOTAS</label><textarea id="o-notes" class="input-std h-20 resize-none"></textarea></div>
                 <button id="btn-delete-order" onclick="App.Actions.Orders.delete()" class="hidden w-full py-3 text-red-500 font-bold border border-red-100 rounded-lg hover:bg-red-50"><i class="fas fa-trash mr-2"></i> ELIMINAR ORDEN</button>
             </div>
-            <div class="p-4 border-t bg-white"><button onclick="App.Actions.Orders.save()" class="btn btn-blue w-full text-lg shadow-xl py-3">GUARDAR</button></div>
+            <div class="p-4 border-t bg-white"><button onclick="App.Actions.Orders.save()" class="btn btn-blue w-full text-lg shadow-xl py-3">GUARDAR CAMBIOS</button></div>
         </div>
     </div>
 
@@ -174,7 +183,7 @@
                 <h3 class="font-black text-lg text-slate-800">Nota del Día</h3>
                 <span id="note-date-display" class="text-xs font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded">...</span>
             </div>
-            <textarea id="cal-note-input" class="input-std h-32 resize-none mb-4" placeholder="Escribe aquí..."></textarea>
+            <textarea id="cal-note-input" class="input-std h-32 resize-none mb-4" placeholder="Escribir nota..."></textarea>
             <div class="flex gap-2">
                 <button onclick="App.Actions.Calendar.deleteNote()" class="btn bg-red-50 text-red-500 border border-red-100"><i class="fas fa-trash"></i></button>
                 <button onclick="document.getElementById('modal-note').classList.add('hidden')" class="flex-1 btn bg-slate-100 text-slate-600">Cancelar</button>
@@ -188,7 +197,7 @@
         import { getFirestore, collection, onSnapshot, addDoc, updateDoc, deleteDoc, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
         import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-storage.js";
 
-        // --- IMPORTANTE: CONFIGURACIÓN DE FIREBASE ---
+        // CONFIGURACIÓN FIREBASE
         const firebaseConfig = {
             apiKey: "AIzaSyBg-Cx9SqZw35TyyMxtpVBEFlwZTjBXBew",
             authDomain: "ideastextilesapp.firebaseapp.com",
@@ -199,8 +208,7 @@
             appId: "1:268995530035:web:1890f45ac761cc81eb0246"
         };
 
-        // --- NOMBRES DE LAS CARPETAS (COLLECTIONS) ---
-        // Si NO carga tus datos, cambia "orders" por "pedidos" o "inventory" por "inventario" aquí:
+        // COLECCIONES
         const COL_ORDERS = "orders";
         const COL_INVENTORY = "inventory";
         const COL_CALENDAR = "calendar";
@@ -211,7 +219,8 @@
 
         const State = {
             orders: [], inventory: [], calendar: {},
-            currentDate: new Date(), editingId: null, editingDateKey: null
+            currentDate: new Date(), editingId: null, editingDateKey: null,
+            invFilter: 'all' // all, tela, prenda
         };
 
         const Actions = {
@@ -266,18 +275,14 @@
                             notes: document.getElementById('o-notes').value,
                             items: [], updatedAt: serverTimestamp()
                         };
-                        
                         document.querySelectorAll('.item-row').forEach(r => {
                             const p = r.querySelector('.i-prod').value;
                             const q = r.querySelector('.i-qty').value;
                             if(p) data.items.push({prod:p, qty:q});
                         });
-
-                        if (!data.number || !data.client || !data.date) throw new Error("Faltan número, cliente o fecha");
-
+                        if (!data.number || !data.client || !data.date) throw new Error("Faltan datos obligatorios");
                         if (State.editingId) await updateDoc(doc(db, COL_ORDERS, State.editingId), data);
                         else { data.status = "Pendiente"; await addDoc(collection(db, COL_ORDERS), data); }
-                        
                         document.getElementById('modal-order').classList.add('hidden');
                         Swal.fire({icon:'success', title:'Guardado', toast:true, position:'top', timer:1500, showConfirmButton:false});
                     } catch (e) { Swal.fire("Atención", e.message, "warning"); }
@@ -295,7 +300,6 @@
                         text: 'Sube foto evidencia (opcional):',
                         input: 'file', showCancelButton: true
                     });
-
                     let url = null;
                     if (file) {
                         Swal.fire({title:'Subiendo...', didOpen: () => Swal.showLoading()});
@@ -303,18 +307,27 @@
                         await uploadBytes(imgRef, file);
                         url = await getDownloadURL(imgRef);
                     }
-                    
                     const updateData = { status: isIssue ? 'Problema' : 'Despachado' };
                     if(url) updateData.evidence = url;
-                    
                     await updateDoc(doc(db, COL_ORDERS, id), updateData);
                     Swal.fire("Listo", "Estado actualizado", "success");
                 }
             },
             Inventory: {
                 add: async () => {
-                    const { value: name } = await Swal.fire({title:'Nuevo Item', input:'text'});
-                    if(name) await addDoc(collection(db, COL_INVENTORY), { name: name.toUpperCase(), stock: 0 });
+                    // Preguntar TIPO
+                    const { value: type } = await Swal.fire({
+                        title: 'Tipo de Ítem',
+                        input: 'radio',
+                        inputOptions: { 'tela': 'Tela (Metros)', 'prenda': 'Prenda (Unidades)' },
+                        inputValidator: (value) => { if (!value) return 'Debes elegir un tipo' }
+                    });
+                    if(!type) return;
+
+                    // Preguntar NOMBRE
+                    const { value: name } = await Swal.fire({title: type==='tela'?'Nombre de la Tela':'Nombre de la Prenda', input:'text'});
+                    
+                    if(name) await addDoc(collection(db, COL_INVENTORY), { name: name.toUpperCase(), type: type, stock: 0 });
                 },
                 edit: async (id, oldName) => {
                     const { value: name } = await Swal.fire({title:'Editar Nombre', input:'text', inputValue: oldName});
@@ -339,6 +352,12 @@
                 div.className = 'item-row flex gap-2';
                 div.innerHTML = `<input class="i-prod input-std text-sm flex-1" placeholder="Descripción" value="${p}"><input class="i-qty input-std w-20 text-center" type="number" placeholder="#" value="${q}">`;
                 document.getElementById('items-rows').appendChild(div);
+            },
+            setInvFilter: (f) => {
+                State.invFilter = f;
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                document.getElementById(`tab-${f}`).classList.add('active');
+                Render.inventory();
             }
         };
 
@@ -384,9 +403,6 @@
                 const filtered = State.orders.filter(o => (o.client||'').toLowerCase().includes(term) || (o.number||'').includes(term));
                 filtered.sort((a,b) => (a.number < b.number ? 1 : -1));
 
-                if(filtered.length === 0 && State.orders.length > 0) list.innerHTML = '<div class="text-center p-4 text-slate-400">No hay coincidencias</div>';
-                if(State.orders.length === 0) list.innerHTML = '<div class="text-center p-8 text-slate-400">No hay órdenes cargadas.<br>Si deberías tener datos, revisa el nombre de la carpeta en el código.</div>';
-
                 filtered.forEach(o => {
                     let stClass = "bg-blue-100 text-blue-700 border-blue-200";
                     if(o.status === 'Despachado') stClass = "bg-green-100 text-green-700 border-green-200";
@@ -421,19 +437,36 @@
                 const list = document.getElementById('inventory-list');
                 list.innerHTML = '';
 
-                const filtered = State.inventory.filter(i => (i.name||'').toLowerCase().includes(term)).sort((a,b)=>a.name.localeCompare(b.name));
+                // Filtrar por texto Y por tipo (tab)
+                const filtered = State.inventory.filter(i => {
+                    const matchText = (i.name||'').toLowerCase().includes(term);
+                    const matchType = State.invFilter === 'all' || i.type === State.invFilter || (!i.type && State.invFilter === 'prenda'); // compatibilidad
+                    return matchText && matchType;
+                }).sort((a,b)=>a.name.localeCompare(b.name));
 
                 filtered.forEach(i => {
+                    // Determinar etiqueta (Tela vs Prenda)
+                    const isTela = i.type === 'tela';
+                    const badge = isTela 
+                        ? `<span class="bg-purple-100 text-purple-700 px-2 py-0.5 rounded text-[9px] font-bold uppercase">TELA</span>`
+                        : `<span class="bg-orange-100 text-orange-700 px-2 py-0.5 rounded text-[9px] font-bold uppercase">PRENDA</span>`;
+                    
+                    const unit = isTela ? 'METROS' : 'UNIDADES';
+
                     list.innerHTML += `
                         <div class="inv-item bg-white hover:bg-slate-50 transition">
                             <div class="pl-2">
+                                <div class="flex items-center gap-2 mb-1">${badge}</div>
                                 <div class="font-bold text-sm text-slate-700">${i.name}</div>
                                 <div class="text-[10px] text-slate-400 cursor-pointer hover:text-blue-500" onclick="App.Actions.Inventory.edit('${i.id}', '${i.name}')">Editar Nombre</div>
                             </div>
                             <div class="flex items-center gap-3">
                                 <div class="inv-controls shadow-sm">
                                     <button onclick="App.Actions.Inventory.adjust('${i.id}', -1, ${i.stock})" class="w-8 h-8 flex items-center justify-center text-slate-500 hover:bg-white hover:shadow rounded"><i class="fas fa-minus text-xs"></i></button>
-                                    <div class="stock-num">${i.stock}</div>
+                                    <div>
+                                        <div class="stock-num">${i.stock}</div>
+                                        <span class="stock-unit">${unit}</span>
+                                    </div>
                                     <button onclick="App.Actions.Inventory.adjust('${i.id}', 1, ${i.stock})" class="w-8 h-8 flex items-center justify-center text-blue-600 hover:bg-white hover:shadow rounded"><i class="fas fa-plus text-xs"></i></button>
                                 </div>
                                 <button onclick="App.Actions.Inventory.delete('${i.id}')" class="w-8 h-8 flex items-center justify-center text-red-300 hover:text-red-500 rounded-full hover:bg-red-50 transition"><i class="fas fa-trash text-xs"></i></button>
