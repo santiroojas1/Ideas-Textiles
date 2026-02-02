@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>IDEAS TEXTILES SpA</title>
+    <title>IDEAS TEXTILES</title>
 
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
@@ -13,7 +13,7 @@
         :root { --primary: #0f172a; --blue: #2563eb; --bg: #f8fafc; }
         body { font-family: 'Inter', system-ui, sans-serif; background: var(--bg); color: #334155; user-select: none; -webkit-tap-highlight-color: transparent; }
 
-        /* UI BASE */
+        /* ESTILOS BOTONES E INPUTS */
         .btn { display: inline-flex; align-items: center; justify-content: center; padding: 10px 16px; border-radius: 8px; font-weight: 700; cursor: pointer; transition: all 0.2s; font-size: 0.9rem; }
         .btn:active { transform: scale(0.96); }
         .btn-blue { background: var(--blue); color: white; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3); }
@@ -30,12 +30,12 @@
         .cal-cell:hover { background: #f1f5f9; }
         .cal-cell.today { background: #eff6ff; }
         .cal-num { font-size: 11px; font-weight: 800; color: #64748b; }
-        .cal-note { background: #fef08a; color: #854d0e; font-size: 10px; padding: 2px 4px; border-radius: 4px; border-left: 2px solid #eab308; line-height: 1.2; font-weight: 600; margin-bottom: 2px; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; }
+        .cal-note { background: #fef08a; color: #854d0e; font-size: 10px; padding: 2px 4px; border-radius: 4px; border-left: 2px solid #eab308; line-height: 1.2; font-weight: 600; margin-bottom: 2px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
         .dot-row { font-size: 9px; display: flex; align-items: center; color: #475569; padding: 1px 2px; background: #f8fafc; border-radius: 3px; }
         .dot { width: 6px; height: 6px; border-radius: 50%; margin-right: 4px; flex-shrink: 0; }
         .dot-blue { background: #3b82f6; } .dot-green { background: #22c55e; } .dot-red { background: #ef4444; }
 
-        /* BODEGA PRO */
+        /* BODEGA */
         .inv-item { display: flex; align-items: center; justify-content: space-between; padding: 12px; border-bottom: 1px solid #f1f5f9; }
         .inv-item:last-child { border-bottom: none; }
         .inv-controls { display: flex; align-items: center; gap: 4px; background: #f8fafc; padding: 4px; border-radius: 8px; border: 1px solid #e2e8f0; }
@@ -49,7 +49,7 @@
 
     <div id="loader" class="loader-overlay">
         <div class="w-10 h-10 border-4 border-slate-200 border-t-blue-600 rounded-full animate-spin mb-4"></div>
-        <p class="text-xs font-bold text-slate-400 tracking-widest">SISTEMA TEXTIL...</p>
+        <p class="text-xs font-bold text-slate-400 tracking-widest">CONECTANDO...</p>
     </div>
 
     <aside class="hidden md:flex fixed left-0 top-0 h-full w-64 bg-slate-900 text-white flex-col z-50 shadow-2xl">
@@ -57,7 +57,7 @@
             <h1 class="text-2xl font-black italic">IDEAS TEXTILES <span class="text-blue-500">.</span></h1>
             <div class="flex items-center gap-2 mt-2">
                 <div class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></div>
-                <span class="text-[10px] font-bold text-slate-400">CONECTADO</span>
+                <span class="text-[10px] font-bold text-slate-400">EN LÍNEA</span>
             </div>
         </div>
         <nav class="p-4 space-y-2">
@@ -84,22 +84,16 @@
                 </div>
             </div>
             
-            <div class="flex gap-4 mb-4 overflow-x-auto pb-2">
-                <div class="card p-3 min-w-[120px] flex-1 border-l-4 border-blue-500">
-                    <div class="text-[10px] text-slate-400 font-bold uppercase">Pendientes</div>
-                    <div id="kpi-pending" class="text-xl font-black text-slate-800">0</div>
-                </div>
-                <div class="card p-3 min-w-[120px] flex-1 border-l-4 border-red-500">
-                    <div class="text-[10px] text-slate-400 font-bold uppercase">Problemas</div>
-                    <div id="kpi-issue" class="text-xl font-black text-red-600">0</div>
-                </div>
-            </div>
-
             <div class="bg-white rounded-xl shadow-sm border overflow-hidden">
                 <div class="grid grid-cols-7 text-center py-2 bg-slate-50 text-[10px] font-bold text-slate-500 uppercase border-b">
                     <div>Do</div><div>Lu</div><div>Ma</div><div>Mi</div><div>Ju</div><div>Vi</div><div>Sá</div>
                 </div>
                 <div id="calendar-grid" class="cal-grid"></div>
+            </div>
+            <div class="mt-4 flex flex-wrap gap-4 text-xs font-bold text-slate-500 justify-center md:justify-start">
+                <span class="flex items-center gap-1"><div class="w-3 h-3 rounded-full bg-blue-500"></div> Pendiente</span>
+                <span class="flex items-center gap-1"><div class="w-3 h-3 rounded-full bg-green-500"></div> Despachado</span>
+                <span class="flex items-center gap-1"><div class="w-3 h-3 rounded bg-yellow-300 border border-yellow-500"></div> Nota Manual</span>
             </div>
         </div>
 
@@ -119,22 +113,21 @@
             <div class="flex justify-between items-center mb-6">
                 <h2 class="text-2xl font-bold text-slate-800">Bodega</h2>
                 <button onclick="App.Actions.Inventory.add()" class="btn bg-slate-800 text-white text-sm shadow-lg">
-                    <i class="fas fa-plus mr-2"></i> CREAR
+                    <i class="fas fa-plus mr-2"></i> ITEM
                 </button>
             </div>
             
             <div class="mb-4 relative">
                 <i class="fas fa-search absolute left-4 top-3.5 text-slate-400"></i>
-                <input type="text" id="search-inventory" onkeyup="App.Render.inventory()" class="input-std pl-10" placeholder="Buscar tela, hilo, insumo...">
+                <input type="text" id="search-inventory" onkeyup="App.Render.inventory()" class="input-std pl-10" placeholder="Buscar material...">
             </div>
 
             <div class="card overflow-hidden">
                 <div class="bg-slate-50 border-b px-4 py-2 text-[10px] font-bold text-slate-400 flex justify-between uppercase">
                     <span>Producto</span>
-                    <span>Gestión de Stock</span>
+                    <span>Stock</span>
                 </div>
-                <div id="inventory-list" class="divide-y divide-slate-100">
-                    </div>
+                <div id="inventory-list" class="divide-y divide-slate-100"></div>
             </div>
         </div>
 
@@ -149,32 +142,29 @@
     <div id="modal-order" class="fixed inset-0 bg-slate-900/80 z-[60] hidden flex items-end md:items-center justify-center p-0 md:p-4 backdrop-blur-sm">
         <div class="bg-white w-full md:max-w-3xl h-[95vh] md:h-auto rounded-t-2xl md:rounded-2xl flex flex-col shadow-2xl overflow-hidden">
             <div class="p-4 border-b flex justify-between items-center bg-slate-50">
-                <h3 class="font-black text-lg text-slate-800">Ficha de Orden</h3>
+                <h3 class="font-black text-lg text-slate-800">Orden</h3>
                 <button onclick="document.getElementById('modal-order').classList.add('hidden')" class="w-8 h-8 bg-slate-200 rounded-full flex items-center justify-center text-slate-500"><i class="fas fa-times"></i></button>
             </div>
             <div class="p-6 overflow-y-auto flex-1 space-y-4">
                 <div class="grid grid-cols-3 gap-3">
-                    <div><label class="text-xs font-bold text-slate-400">N° ORDEN</label><input id="o-num" type="number" class="input-std font-bold text-blue-600 text-lg"></div>
+                    <div><label class="text-xs font-bold text-slate-400">N°</label><input id="o-num" type="number" class="input-std font-bold text-blue-600 text-lg"></div>
                     <div class="col-span-2"><label class="text-xs font-bold text-slate-400">CLIENTE</label><input id="o-client" type="text" class="input-std font-bold uppercase"></div>
                 </div>
                 <div class="grid grid-cols-2 gap-3">
-                    <div><label class="text-xs font-bold text-slate-400">FECHA ENTREGA</label><input id="o-date" type="date" class="input-std"></div>
-                    <div><label class="text-xs font-bold text-slate-400">FACTURA/BOLETA</label><input id="o-inv" type="text" class="input-std"></div>
+                    <div><label class="text-xs font-bold text-slate-400">FECHA</label><input id="o-date" type="date" class="input-std"></div>
+                    <div><label class="text-xs font-bold text-slate-400">DOC/REF</label><input id="o-inv" type="text" class="input-std"></div>
                 </div>
-                
                 <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
                     <div class="flex justify-between mb-2 items-center">
-                        <span class="text-xs font-bold text-slate-400">DETALLE DE PRODUCTOS</span>
-                        <button onclick="App.UI.addRow()" class="text-blue-600 text-xs font-bold bg-blue-50 px-2 py-1 rounded hover:bg-blue-100">+ AGREGAR LÍNEA</button>
+                        <span class="text-xs font-bold text-slate-400">DETALLE</span>
+                        <button onclick="App.UI.addRow()" class="text-blue-600 text-xs font-bold bg-blue-50 px-2 py-1 rounded">+ AGREGAR</button>
                     </div>
                     <div id="items-rows" class="space-y-2"></div>
                 </div>
-
-                <div><label class="text-xs font-bold text-slate-400">NOTAS / OBSERVACIONES</label><textarea id="o-notes" class="input-std h-20 resize-none"></textarea></div>
-                
-                <button id="btn-delete-order" onclick="App.Actions.Orders.delete()" class="hidden w-full py-3 text-red-500 font-bold border border-red-100 rounded-lg hover:bg-red-50"><i class="fas fa-trash mr-2"></i> ELIMINAR ESTA ORDEN</button>
+                <div><label class="text-xs font-bold text-slate-400">NOTAS</label><textarea id="o-notes" class="input-std h-20 resize-none"></textarea></div>
+                <button id="btn-delete-order" onclick="App.Actions.Orders.delete()" class="hidden w-full py-3 text-red-500 font-bold border border-red-100 rounded-lg hover:bg-red-50"><i class="fas fa-trash mr-2"></i> ELIMINAR ORDEN</button>
             </div>
-            <div class="p-4 border-t bg-white"><button onclick="App.Actions.Orders.save()" class="btn btn-blue w-full text-lg shadow-xl py-3">GUARDAR CAMBIOS</button></div>
+            <div class="p-4 border-t bg-white"><button onclick="App.Actions.Orders.save()" class="btn btn-blue w-full text-lg shadow-xl py-3">GUARDAR</button></div>
         </div>
     </div>
 
@@ -184,7 +174,7 @@
                 <h3 class="font-black text-lg text-slate-800">Nota del Día</h3>
                 <span id="note-date-display" class="text-xs font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded">...</span>
             </div>
-            <textarea id="cal-note-input" class="input-std h-32 resize-none mb-4" placeholder="Ej: Comprar botones, llamar mecánico..."></textarea>
+            <textarea id="cal-note-input" class="input-std h-32 resize-none mb-4" placeholder="Escribe aquí..."></textarea>
             <div class="flex gap-2">
                 <button onclick="App.Actions.Calendar.deleteNote()" class="btn bg-red-50 text-red-500 border border-red-100"><i class="fas fa-trash"></i></button>
                 <button onclick="document.getElementById('modal-note').classList.add('hidden')" class="flex-1 btn bg-slate-100 text-slate-600">Cancelar</button>
@@ -198,7 +188,7 @@
         import { getFirestore, collection, onSnapshot, addDoc, updateDoc, deleteDoc, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
         import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-storage.js";
 
-        // CONFIGURACIÓN (Tus Credenciales)
+        // --- IMPORTANTE: CONFIGURACIÓN DE FIREBASE ---
         const firebaseConfig = {
             apiKey: "AIzaSyBg-Cx9SqZw35TyyMxtpVBEFlwZTjBXBew",
             authDomain: "ideastextilesapp.firebaseapp.com",
@@ -209,11 +199,16 @@
             appId: "1:268995530035:web:1890f45ac761cc81eb0246"
         };
 
+        // --- NOMBRES DE LAS CARPETAS (COLLECTIONS) ---
+        // Si NO carga tus datos, cambia "orders" por "pedidos" o "inventory" por "inventario" aquí:
+        const COL_ORDERS = "orders";
+        const COL_INVENTORY = "inventory";
+        const COL_CALENDAR = "calendar";
+
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const storage = getStorage(app);
 
-        // ESTADO GLOBAL
         const State = {
             orders: [], inventory: [], calendar: {},
             currentDate: new Date(), editingId: null, editingDateKey: null
@@ -230,12 +225,12 @@
                 },
                 saveNote: async () => {
                     const txt = document.getElementById('cal-note-input').value.trim();
-                    if(txt) await setDoc(doc(db, "calendar", State.editingDateKey), { note: txt });
-                    else await deleteDoc(doc(db, "calendar", State.editingDateKey));
+                    if(txt) await setDoc(doc(db, COL_CALENDAR, State.editingDateKey), { note: txt });
+                    else await deleteDoc(doc(db, COL_CALENDAR, State.editingDateKey));
                     document.getElementById('modal-note').classList.add('hidden');
                 },
                 deleteNote: async () => {
-                    await deleteDoc(doc(db, "calendar", State.editingDateKey));
+                    await deleteDoc(doc(db, COL_CALENDAR, State.editingDateKey));
                     document.getElementById('modal-note').classList.add('hidden');
                 }
             },
@@ -246,7 +241,6 @@
                     const delBtn = document.getElementById('btn-delete-order');
                     
                     if (id) {
-                        // MODO EDICIÓN
                         const o = State.orders.find(x => x.id === id);
                         document.getElementById('o-num').value = o.number;
                         document.getElementById('o-client').value = o.client;
@@ -256,7 +250,6 @@
                         (o.items || []).forEach(i => UI.addRow(i.prod, i.qty));
                         delBtn.classList.remove('hidden');
                     } else {
-                        // MODO CREACIÓN
                         document.querySelectorAll('#modal-order input, #modal-order textarea').forEach(i => i.value = '');
                         UI.addRow();
                         delBtn.classList.add('hidden');
@@ -280,18 +273,18 @@
                             if(p) data.items.push({prod:p, qty:q});
                         });
 
-                        if (!data.number || !data.client || !data.date) throw new Error("Faltan datos obligatorios");
+                        if (!data.number || !data.client || !data.date) throw new Error("Faltan número, cliente o fecha");
 
-                        if (State.editingId) await updateDoc(doc(db, "orders", State.editingId), data);
-                        else { data.status = "Pendiente"; await addDoc(collection(db, "orders"), data); }
+                        if (State.editingId) await updateDoc(doc(db, COL_ORDERS, State.editingId), data);
+                        else { data.status = "Pendiente"; await addDoc(collection(db, COL_ORDERS), data); }
                         
                         document.getElementById('modal-order').classList.add('hidden');
-                        Swal.fire({icon:'success', title:'Guardado Correctamente', toast:true, position:'top', timer:1500, showConfirmButton:false});
+                        Swal.fire({icon:'success', title:'Guardado', toast:true, position:'top', timer:1500, showConfirmButton:false});
                     } catch (e) { Swal.fire("Atención", e.message, "warning"); }
                 },
                 delete: async () => {
-                    if ((await Swal.fire({title:'¿Borrar Orden?', text:'No se puede deshacer', icon:'warning', showCancelButton:true, confirmButtonText:'Sí, borrar'})).isConfirmed) {
-                        await deleteDoc(doc(db, "orders", State.editingId));
+                    if ((await Swal.fire({title:'¿Borrar Orden?', text:'No se puede deshacer', icon:'warning', showCancelButton:true})).isConfirmed) {
+                        await deleteDoc(doc(db, COL_ORDERS, State.editingId));
                         document.getElementById('modal-order').classList.add('hidden');
                     }
                 },
@@ -299,43 +292,42 @@
                     const isIssue = type === 'issue';
                     const { value: file } = await Swal.fire({
                         title: isIssue ? 'Reportar Problema' : 'Confirmar Despacho',
-                        text: 'Sube una foto de evidencia para continuar:',
-                        input: 'file',
-                        inputAttributes: { accept: 'image/*' },
-                        showCancelButton: true
+                        text: 'Sube foto evidencia (opcional):',
+                        input: 'file', showCancelButton: true
                     });
 
+                    let url = null;
                     if (file) {
-                        Swal.fire({title:'Subiendo Foto...', didOpen: () => Swal.showLoading()});
+                        Swal.fire({title:'Subiendo...', didOpen: () => Swal.showLoading()});
                         const imgRef = ref(storage, `evidence/${Date.now()}_${file.name}`);
                         await uploadBytes(imgRef, file);
-                        const url = await getDownloadURL(imgRef);
-                        
-                        await updateDoc(doc(db, "orders", id), {
-                            status: isIssue ? 'Problema' : 'Despachado',
-                            evidence: url
-                        });
-                        Swal.fire("Listo", "Estado y foto actualizados", "success");
+                        url = await getDownloadURL(imgRef);
                     }
+                    
+                    const updateData = { status: isIssue ? 'Problema' : 'Despachado' };
+                    if(url) updateData.evidence = url;
+                    
+                    await updateDoc(doc(db, COL_ORDERS, id), updateData);
+                    Swal.fire("Listo", "Estado actualizado", "success");
                 }
             },
             Inventory: {
                 add: async () => {
-                    const { value: name } = await Swal.fire({title:'Nuevo Material', input:'text', inputPlaceholder:'Ej: Tela Algodón, Hilo Rojo...'});
-                    if(name) await addDoc(collection(db, "inventory"), { name: name.toUpperCase(), stock: 0 });
+                    const { value: name } = await Swal.fire({title:'Nuevo Item', input:'text'});
+                    if(name) await addDoc(collection(db, COL_INVENTORY), { name: name.toUpperCase(), stock: 0 });
                 },
                 edit: async (id, oldName) => {
                     const { value: name } = await Swal.fire({title:'Editar Nombre', input:'text', inputValue: oldName});
-                    if(name) await updateDoc(doc(db, "inventory", id), { name: name.toUpperCase() });
+                    if(name) await updateDoc(doc(db, COL_INVENTORY, id), { name: name.toUpperCase() });
                 },
                 adjust: async (id, delta, current) => {
                     const newVal = Number(current) + delta;
                     if(newVal < 0) return; 
-                    await updateDoc(doc(db, "inventory", id), { stock: newVal });
+                    await updateDoc(doc(db, COL_INVENTORY, id), { stock: newVal });
                 },
                 delete: async (id) => {
                     if((await Swal.fire({title:'¿Eliminar?', icon:'warning', showCancelButton:true})).isConfirmed) {
-                        await deleteDoc(doc(db, "inventory", id));
+                        await deleteDoc(doc(db, COL_INVENTORY, id));
                     }
                 }
             }
@@ -345,7 +337,7 @@
             addRow: (p='', q='') => {
                 const div = document.createElement('div');
                 div.className = 'item-row flex gap-2';
-                div.innerHTML = `<input class="i-prod input-std text-sm flex-1" placeholder="Descripción Producto" value="${p}"><input class="i-qty input-std w-20 text-center" type="number" placeholder="Cant" value="${q}">`;
+                div.innerHTML = `<input class="i-prod input-std text-sm flex-1" placeholder="Descripción" value="${p}"><input class="i-qty input-std w-20 text-center" type="number" placeholder="#" value="${q}">`;
                 document.getElementById('items-rows').appendChild(div);
             }
         };
@@ -392,20 +384,18 @@
                 const filtered = State.orders.filter(o => (o.client||'').toLowerCase().includes(term) || (o.number||'').includes(term));
                 filtered.sort((a,b) => (a.number < b.number ? 1 : -1));
 
-                // Contadores KPI
-                document.getElementById('kpi-pending').innerText = State.orders.filter(o=>o.status!=='Despachado').length;
-                document.getElementById('kpi-issue').innerText = State.orders.filter(o=>o.status==='Problema').length;
+                if(filtered.length === 0 && State.orders.length > 0) list.innerHTML = '<div class="text-center p-4 text-slate-400">No hay coincidencias</div>';
+                if(State.orders.length === 0) list.innerHTML = '<div class="text-center p-8 text-slate-400">No hay órdenes cargadas.<br>Si deberías tener datos, revisa el nombre de la carpeta en el código.</div>';
 
                 filtered.forEach(o => {
                     let stClass = "bg-blue-100 text-blue-700 border-blue-200";
                     if(o.status === 'Despachado') stClass = "bg-green-100 text-green-700 border-green-200";
                     if(o.status === 'Problema') stClass = "bg-red-100 text-red-700 border-red-200";
-
-                    const evidenceBtn = o.evidence ? `<a href="${o.evidence}" target="_blank" class="text-xs text-blue-600 underline ml-2"><i class="fas fa-image"></i> Ver Foto</a>` : '';
+                    const evidenceBtn = o.evidence ? `<a href="${o.evidence}" target="_blank" class="text-blue-600 ml-2"><i class="fas fa-image"></i></a>` : '';
 
                     list.innerHTML += `
                         <div class="card p-4 flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
-                            <div class="flex-1">
+                            <div class="flex-1 w-full">
                                 <div class="flex items-center gap-2 mb-1">
                                     <span class="font-bold text-slate-400 text-xs">#${o.number}</span>
                                     <span class="px-2 py-0.5 rounded text-[10px] font-black uppercase border ${stClass}">${o.status}</span>
@@ -415,13 +405,12 @@
                                 <div class="text-xs text-slate-500 mt-2 flex gap-3">
                                     <span><i class="far fa-calendar-alt"></i> ${o.date}</span>
                                     <span><i class="fas fa-box"></i> ${(o.items||[]).length} Items</span>
-                                    ${o.invoice ? `<span><i class="fas fa-receipt"></i> ${o.invoice}</span>` : ''}
                                 </div>
                             </div>
                             <div class="flex gap-2 w-full md:w-auto mt-2 md:mt-0">
-                                <button onclick="App.Actions.Orders.changeStatus('${o.id}', 'issue')" class="btn-icon bg-red-50 text-red-500 border border-red-100 hover:bg-red-100" title="Reportar Problema"><i class="fas fa-bug"></i></button>
+                                <button onclick="App.Actions.Orders.changeStatus('${o.id}', 'issue')" class="btn-icon bg-red-50 text-red-500 border border-red-100 hover:bg-red-100"><i class="fas fa-bug"></i></button>
                                 <button onclick="App.Actions.Orders.openModal('${o.id}')" class="flex-1 md:flex-none px-4 py-2 border rounded-lg font-bold text-xs text-slate-600 hover:bg-slate-50">EDITAR</button>
-                                ${o.status !== 'Despachado' ? `<button onclick="App.Actions.Orders.changeStatus('${o.id}', 'ok')" class="flex-1 md:flex-none px-4 py-2 bg-slate-800 hover:bg-slate-900 text-white rounded-lg font-bold text-xs shadow-lg flex items-center gap-2"><i class="fas fa-check"></i> DESPACHAR</button>` : ''}
+                                ${o.status !== 'Despachado' ? `<button onclick="App.Actions.Orders.changeStatus('${o.id}', 'ok')" class="flex-1 md:flex-none px-4 py-2 bg-slate-800 hover:bg-slate-900 text-white rounded-lg font-bold text-xs shadow-lg flex items-center gap-2 justify-center"><i class="fas fa-check"></i> DESPACHAR</button>` : ''}
                             </div>
                         </div>
                     `;
@@ -466,28 +455,24 @@
             }
         };
 
-        // INICIALIZACIÓN
         window.App = { Actions, UI, Render, Router };
 
-        const loadData = () => {
-            onSnapshot(collection(db, "orders"), (s) => {
-                State.orders = s.docs.map(d => ({id:d.id, ...d.data()}));
-                Render.orders(); Render.calendar();
-                document.getElementById('loader').style.opacity = '0';
-                setTimeout(()=>document.getElementById('loader').remove(), 500);
-            });
-            onSnapshot(collection(db, "inventory"), (s) => {
-                State.inventory = s.docs.map(d => ({id:d.id, ...d.data()}));
-                Render.inventory();
-            });
-            onSnapshot(collection(db, "calendar"), (s) => {
-                State.calendar = {};
-                s.forEach(d => State.calendar[d.id] = d.data().note);
-                Render.calendar();
-            });
-        };
+        onSnapshot(collection(db, COL_ORDERS), (s) => {
+            State.orders = s.docs.map(d => ({id:d.id, ...d.data()}));
+            Render.orders(); Render.calendar();
+            document.getElementById('loader').style.opacity = '0';
+            setTimeout(()=>document.getElementById('loader').remove(), 500);
+        });
+        onSnapshot(collection(db, COL_INVENTORY), (s) => {
+            State.inventory = s.docs.map(d => ({id:d.id, ...d.data()}));
+            Render.inventory();
+        });
+        onSnapshot(collection(db, COL_CALENDAR), (s) => {
+            State.calendar = {};
+            s.forEach(d => State.calendar[d.id] = d.data().note);
+            Render.calendar();
+        });
 
-        loadData();
     </script>
 </body>
 </html>
