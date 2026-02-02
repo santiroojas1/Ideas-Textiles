@@ -3,58 +3,61 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>IDEAS TEXTILES | Sistema Maestro</title>
+    <title>IDEAS TEXTILES SpA</title>
 
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <style>
-        :root { --primary: #1e293b; --blue: #2563eb; --bg: #f1f5f9; }
+        :root { --primary: #0f172a; --blue: #2563eb; --bg: #f8fafc; }
         body { font-family: 'Inter', system-ui, sans-serif; background: var(--bg); color: #334155; user-select: none; -webkit-tap-highlight-color: transparent; }
 
-        /* UI GENERICA */
-        .btn { display: inline-flex; align-items: center; justify-content: center; padding: 10px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
-        .btn-blue { background: var(--blue); color: white; box-shadow: 0 4px 10px rgba(37, 99, 235, 0.2); }
-        .btn-blue:active { transform: scale(0.98); }
-        .input-std { width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; outline: none; background: #f8fafc; font-weight: 500; }
-        .input-std:focus { background: white; border-color: var(--blue); box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1); }
-        .card { background: white; border-radius: 12px; border: 1px solid #e2e8f0; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+        /* UI BASE */
+        .btn { display: inline-flex; align-items: center; justify-content: center; padding: 10px 16px; border-radius: 8px; font-weight: 700; cursor: pointer; transition: all 0.2s; font-size: 0.9rem; }
+        .btn:active { transform: scale(0.96); }
+        .btn-blue { background: var(--blue); color: white; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3); }
+        .btn-icon { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 6px; }
+        
+        .input-std { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 8px; outline: none; background: white; font-weight: 500; transition: border 0.2s; }
+        .input-std:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1); }
+        
+        .card { background: white; border-radius: 12px; border: 1px solid #e2e8f0; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
 
-        /* --- CALENDARIO EDITABLE PRO --- */
+        /* CALENDARIO */
         .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 1px; background: #cbd5e1; border: 1px solid #cbd5e1; border-radius: 0 0 12px 12px; overflow: hidden; }
-        .cal-cell { background: white; min-height: 100px; padding: 4px; position: relative; cursor: pointer; transition: background 0.1s; display: flex; flex-direction: column; gap: 2px; }
+        .cal-cell { background: white; min-height: 85px; padding: 4px; cursor: pointer; display: flex; flex-direction: column; gap: 2px; }
         .cal-cell:hover { background: #f1f5f9; }
         .cal-cell.today { background: #eff6ff; }
-        .cal-num { font-size: 12px; font-weight: 800; color: #64748b; margin-bottom: 2px; }
-        
-        /* Notas escritas por ti */
-        .cal-note { background: #fef9c3; color: #854d0e; font-size: 10px; padding: 3px 4px; border-radius: 4px; border-left: 3px solid #eab308; line-height: 1.2; margin-bottom: 2px; font-weight: 600; box-shadow: 0 1px 1px rgba(0,0,0,0.05); }
-        
-        /* Puntos de Órdenes (Automáticos) */
-        .cal-dot-row { display: flex; align-items: center; font-size: 9px; color: #475569; padding: 1px 2px; border-radius: 3px; background: #f8fafc; }
+        .cal-num { font-size: 11px; font-weight: 800; color: #64748b; }
+        .cal-note { background: #fef08a; color: #854d0e; font-size: 10px; padding: 2px 4px; border-radius: 4px; border-left: 2px solid #eab308; line-height: 1.2; font-weight: 600; margin-bottom: 2px; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; }
+        .dot-row { font-size: 9px; display: flex; align-items: center; color: #475569; padding: 1px 2px; background: #f8fafc; border-radius: 3px; }
         .dot { width: 6px; height: 6px; border-radius: 50%; margin-right: 4px; flex-shrink: 0; }
-        .dot-blue { background: #3b82f6; } /* Pendiente */
-        .dot-green { background: #22c55e; } /* Listo */
-        .dot-red { background: #ef4444; }   /* Problema */
+        .dot-blue { background: #3b82f6; } .dot-green { background: #22c55e; } .dot-red { background: #ef4444; }
+
+        /* BODEGA PRO */
+        .inv-item { display: flex; align-items: center; justify-content: space-between; padding: 12px; border-bottom: 1px solid #f1f5f9; }
+        .inv-item:last-child { border-bottom: none; }
+        .inv-controls { display: flex; align-items: center; gap: 4px; background: #f8fafc; padding: 4px; border-radius: 8px; border: 1px solid #e2e8f0; }
+        .stock-num { width: 40px; text-align: center; font-weight: 800; font-size: 1.1rem; color: #0f172a; }
 
         /* LOADER */
-        .loader-overlay { position: fixed; inset: 0; background: white; z-index: 9999; display: flex; flex-col; align-items: center; justify-content: center; transition: opacity 0.5s; }
+        .loader-overlay { position: fixed; inset: 0; background: white; z-index: 9999; display: flex; flex-col; align-items: center; justify-content: center; transition: opacity 0.4s; }
     </style>
 </head>
 <body class="pb-24 md:pb-0 md:pl-64">
 
     <div id="loader" class="loader-overlay">
-        <div class="w-12 h-12 border-4 border-slate-200 border-t-blue-600 rounded-full animate-spin mb-4"></div>
-        <p class="text-xs font-bold text-slate-400 tracking-widest">CARGANDO SISTEMA...</p>
+        <div class="w-10 h-10 border-4 border-slate-200 border-t-blue-600 rounded-full animate-spin mb-4"></div>
+        <p class="text-xs font-bold text-slate-400 tracking-widest">SISTEMA TEXTIL...</p>
     </div>
 
-    <aside class="hidden md:flex fixed left-0 top-0 h-full w-64 bg-slate-900 text-white flex-col z-50">
+    <aside class="hidden md:flex fixed left-0 top-0 h-full w-64 bg-slate-900 text-white flex-col z-50 shadow-2xl">
         <div class="p-6 border-b border-slate-800">
-            <h1 class="text-2xl font-black italic">IDEAS<span class="text-blue-500">.</span></h1>
+            <h1 class="text-2xl font-black italic">IDEAS TEXTILES <span class="text-blue-500">.</span></h1>
             <div class="flex items-center gap-2 mt-2">
                 <div class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></div>
-                <span class="text-[10px] font-bold text-slate-400">EN LÍNEA</span>
+                <span class="text-[10px] font-bold text-slate-400">CONECTADO</span>
             </div>
         </div>
         <nav class="p-4 space-y-2">
@@ -65,7 +68,7 @@
     </aside>
 
     <header class="md:hidden sticky top-0 bg-white/90 backdrop-blur border-b z-40 px-4 py-3 flex justify-between items-center shadow-sm">
-        <span class="font-black text-lg text-slate-800">IDEAS<span class="text-blue-600">APP</span></span>
+        <span class="font-black text-lg text-slate-800">IDEAS TEXTILES<span class="text-blue-600">APP</span></span>
         <button onclick="location.reload()" class="p-2 text-slate-400"><i class="fas fa-sync-alt"></i></button>
     </header>
 
@@ -73,26 +76,30 @@
 
         <div id="view-dashboard" class="view-section animate-fade">
             <div class="flex justify-between items-center mb-4">
-                <h2 class="text-2xl font-bold text-slate-800">Panorama Mensual</h2>
+                <h2 class="text-2xl font-bold text-slate-800">Agenda</h2>
                 <div class="flex items-center gap-2 bg-white p-1 rounded-lg border shadow-sm">
                     <button onclick="App.Actions.Calendar.move(-1)" class="w-8 h-8 flex items-center justify-center hover:bg-slate-100 rounded"><i class="fas fa-chevron-left"></i></button>
-                    <span id="cal-title" class="px-2 font-bold text-sm min-w-[120px] text-center capitalize">Cargando...</span>
+                    <span id="cal-title" class="px-2 font-bold text-sm min-w-[100px] text-center capitalize">...</span>
                     <button onclick="App.Actions.Calendar.move(1)" class="w-8 h-8 flex items-center justify-center hover:bg-slate-100 rounded"><i class="fas fa-chevron-right"></i></button>
+                </div>
+            </div>
+            
+            <div class="flex gap-4 mb-4 overflow-x-auto pb-2">
+                <div class="card p-3 min-w-[120px] flex-1 border-l-4 border-blue-500">
+                    <div class="text-[10px] text-slate-400 font-bold uppercase">Pendientes</div>
+                    <div id="kpi-pending" class="text-xl font-black text-slate-800">0</div>
+                </div>
+                <div class="card p-3 min-w-[120px] flex-1 border-l-4 border-red-500">
+                    <div class="text-[10px] text-slate-400 font-bold uppercase">Problemas</div>
+                    <div id="kpi-issue" class="text-xl font-black text-red-600">0</div>
                 </div>
             </div>
 
             <div class="bg-white rounded-xl shadow-sm border overflow-hidden">
-                <div class="grid grid-cols-7 text-center py-2 bg-slate-50 text-[10px] font-bold text-slate-500 uppercase border-b tracking-wider">
-                    <div>Dom</div><div>Lun</div><div>Mar</div><div>Mié</div><div>Jue</div><div>Vie</div><div>Sáb</div>
+                <div class="grid grid-cols-7 text-center py-2 bg-slate-50 text-[10px] font-bold text-slate-500 uppercase border-b">
+                    <div>Do</div><div>Lu</div><div>Ma</div><div>Mi</div><div>Ju</div><div>Vi</div><div>Sá</div>
                 </div>
-                <div id="calendar-grid" class="cal-grid">
-                    </div>
-            </div>
-
-            <div class="mt-4 flex gap-4 text-xs font-bold text-slate-500">
-                <span class="flex items-center gap-1"><div class="w-3 h-3 rounded-full bg-blue-500"></div> Pendiente</span>
-                <span class="flex items-center gap-1"><div class="w-3 h-3 rounded-full bg-green-500"></div> Listo</span>
-                <span class="flex items-center gap-1"><div class="w-3 h-3 rounded bg-yellow-300 border border-yellow-500"></div> Nota Manual</span>
+                <div id="calendar-grid" class="cal-grid"></div>
             </div>
         </div>
 
@@ -101,19 +108,34 @@
                 <h2 class="text-2xl font-bold text-slate-800">Órdenes</h2>
                 <button onclick="App.Actions.Orders.openModal()" class="btn btn-blue text-sm shadow-lg"><i class="fas fa-plus mr-2"></i> NUEVA</button>
             </div>
-            <div class="mb-6 relative">
+            <div class="mb-4 relative">
                 <i class="fas fa-search absolute left-4 top-3.5 text-slate-400"></i>
-                <input type="text" id="search-order" onkeyup="App.Render.orders()" class="input-std pl-10" placeholder="Buscar cliente...">
+                <input type="text" id="search-order" onkeyup="App.Render.orders()" class="input-std pl-10" placeholder="Buscar cliente, número...">
             </div>
             <div id="orders-list" class="grid grid-cols-1 gap-3"></div>
         </div>
 
         <div id="view-inventory" class="view-section hidden">
-             <div class="flex justify-between items-center mb-6">
+            <div class="flex justify-between items-center mb-6">
                 <h2 class="text-2xl font-bold text-slate-800">Bodega</h2>
-                <button onclick="App.Actions.Inventory.add()" class="btn bg-slate-800 text-white text-sm"><i class="fas fa-plus mr-2"></i> ITEM</button>
+                <button onclick="App.Actions.Inventory.add()" class="btn bg-slate-800 text-white text-sm shadow-lg">
+                    <i class="fas fa-plus mr-2"></i> CREAR
+                </button>
             </div>
-            <div id="inventory-list" class="grid grid-cols-2 md:grid-cols-4 gap-4"></div>
+            
+            <div class="mb-4 relative">
+                <i class="fas fa-search absolute left-4 top-3.5 text-slate-400"></i>
+                <input type="text" id="search-inventory" onkeyup="App.Render.inventory()" class="input-std pl-10" placeholder="Buscar tela, hilo, insumo...">
+            </div>
+
+            <div class="card overflow-hidden">
+                <div class="bg-slate-50 border-b px-4 py-2 text-[10px] font-bold text-slate-400 flex justify-between uppercase">
+                    <span>Producto</span>
+                    <span>Gestión de Stock</span>
+                </div>
+                <div id="inventory-list" class="divide-y divide-slate-100">
+                    </div>
+            </div>
         </div>
 
     </main>
@@ -121,48 +143,53 @@
     <nav class="md:hidden fixed bottom-0 w-full bg-white/95 backdrop-blur border-t z-50 flex justify-around py-3 pb-safe">
         <button onclick="App.Router.go('dashboard')" class="flex flex-col items-center w-16 text-blue-600 nav-btn" data-target="dashboard"><i class="fas fa-calendar-alt text-xl mb-1"></i><span class="text-[9px] font-bold">AGENDA</span></button>
         <button onclick="App.Router.go('orders')" class="flex flex-col items-center w-16 text-slate-400 nav-btn" data-target="orders"><i class="fas fa-file-invoice text-xl mb-1"></i><span class="text-[9px] font-bold">ORDEN</span></button>
-        <button onclick="App.Router.go('inventory')" class="flex flex-col items-center w-16 text-slate-400 nav-btn" data-target="inventory"><i class="fas fa-boxes-stacked text-xl mb-1"></i><span class="text-[9px] font-bold">STOCK</span></button>
+        <button onclick="App.Router.go('inventory')" class="flex flex-col items-center w-16 text-slate-400 nav-btn" data-target="inventory"><i class="fas fa-boxes-stacked text-xl mb-1"></i><span class="text-[9px] font-bold">BODEGA</span></button>
     </nav>
-
-    <div id="modal-note" class="fixed inset-0 bg-slate-900/80 z-[70] hidden flex items-center justify-center p-4 backdrop-blur-sm">
-        <div class="bg-white w-full max-w-sm rounded-xl p-6 shadow-2xl animate-fade">
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="font-black text-lg text-slate-800">Nota del Día</h3>
-                <span id="note-date-display" class="text-xs font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded">...</span>
-            </div>
-            <label class="text-xs font-bold text-slate-400 mb-1 block">RECORDATORIOS / TAREAS</label>
-            <textarea id="cal-note-input" class="input-std h-32 resize-none mb-4" placeholder="Ej: Comprar botones, llamar a mecánico, pagar luz..."></textarea>
-            <div class="flex gap-2">
-                <button onclick="App.Actions.Calendar.deleteNote()" class="px-4 py-2 text-red-500 font-bold border border-red-100 rounded-lg hover:bg-red-50"><i class="fas fa-trash"></i></button>
-                <button onclick="document.getElementById('modal-note').classList.add('hidden')" class="flex-1 py-2 text-slate-500 font-bold">Cancelar</button>
-                <button onclick="App.Actions.Calendar.saveNote()" class="flex-1 btn btn-blue">Guardar Nota</button>
-            </div>
-        </div>
-    </div>
 
     <div id="modal-order" class="fixed inset-0 bg-slate-900/80 z-[60] hidden flex items-end md:items-center justify-center p-0 md:p-4 backdrop-blur-sm">
         <div class="bg-white w-full md:max-w-3xl h-[95vh] md:h-auto rounded-t-2xl md:rounded-2xl flex flex-col shadow-2xl overflow-hidden">
             <div class="p-4 border-b flex justify-between items-center bg-slate-50">
-                <h3 class="font-black text-lg text-slate-800">Gestión de Orden</h3>
+                <h3 class="font-black text-lg text-slate-800">Ficha de Orden</h3>
                 <button onclick="document.getElementById('modal-order').classList.add('hidden')" class="w-8 h-8 bg-slate-200 rounded-full flex items-center justify-center text-slate-500"><i class="fas fa-times"></i></button>
             </div>
             <div class="p-6 overflow-y-auto flex-1 space-y-4">
                 <div class="grid grid-cols-3 gap-3">
-                    <div><label class="text-xs font-bold text-slate-400">N°</label><input id="o-num" type="number" class="input-std font-bold text-blue-600"></div>
-                    <div class="col-span-2"><label class="text-xs font-bold text-slate-400">CLIENTE</label><input id="o-client" type="text" class="input-std font-bold"></div>
+                    <div><label class="text-xs font-bold text-slate-400">N° ORDEN</label><input id="o-num" type="number" class="input-std font-bold text-blue-600 text-lg"></div>
+                    <div class="col-span-2"><label class="text-xs font-bold text-slate-400">CLIENTE</label><input id="o-client" type="text" class="input-std font-bold uppercase"></div>
                 </div>
                 <div class="grid grid-cols-2 gap-3">
-                    <div><label class="text-xs font-bold text-slate-400">FECHA</label><input id="o-date" type="date" class="input-std"></div>
-                    <div><label class="text-xs font-bold text-slate-400">FACTURA</label><input id="o-inv" type="text" class="input-std"></div>
+                    <div><label class="text-xs font-bold text-slate-400">FECHA ENTREGA</label><input id="o-date" type="date" class="input-std"></div>
+                    <div><label class="text-xs font-bold text-slate-400">FACTURA/BOLETA</label><input id="o-inv" type="text" class="input-std"></div>
                 </div>
-                <div class="bg-slate-50 p-3 rounded-lg border">
-                    <div class="flex justify-between mb-2"><span class="text-xs font-bold text-slate-400">PRODUCTOS</span><button onclick="App.UI.addRow()" class="text-blue-600 text-xs font-bold">+ AGREGAR</button></div>
+                
+                <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
+                    <div class="flex justify-between mb-2 items-center">
+                        <span class="text-xs font-bold text-slate-400">DETALLE DE PRODUCTOS</span>
+                        <button onclick="App.UI.addRow()" class="text-blue-600 text-xs font-bold bg-blue-50 px-2 py-1 rounded hover:bg-blue-100">+ AGREGAR LÍNEA</button>
+                    </div>
                     <div id="items-rows" class="space-y-2"></div>
                 </div>
-                <div><label class="text-xs font-bold text-slate-400">NOTAS</label><textarea id="o-notes" class="input-std h-20 resize-none"></textarea></div>
-                <button id="btn-delete-order" onclick="App.Actions.Orders.delete()" class="hidden w-full py-3 text-red-500 font-bold border border-red-100 rounded-lg hover:bg-red-50"><i class="fas fa-trash mr-2"></i> ELIMINAR</button>
+
+                <div><label class="text-xs font-bold text-slate-400">NOTAS / OBSERVACIONES</label><textarea id="o-notes" class="input-std h-20 resize-none"></textarea></div>
+                
+                <button id="btn-delete-order" onclick="App.Actions.Orders.delete()" class="hidden w-full py-3 text-red-500 font-bold border border-red-100 rounded-lg hover:bg-red-50"><i class="fas fa-trash mr-2"></i> ELIMINAR ESTA ORDEN</button>
             </div>
-            <div class="p-4 border-t"><button onclick="App.Actions.Orders.save()" class="btn btn-blue w-full text-lg shadow-xl">GUARDAR</button></div>
+            <div class="p-4 border-t bg-white"><button onclick="App.Actions.Orders.save()" class="btn btn-blue w-full text-lg shadow-xl py-3">GUARDAR CAMBIOS</button></div>
+        </div>
+    </div>
+
+    <div id="modal-note" class="fixed inset-0 bg-slate-900/80 z-[70] hidden flex items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-white w-full max-w-sm rounded-xl p-6 shadow-2xl">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="font-black text-lg text-slate-800">Nota del Día</h3>
+                <span id="note-date-display" class="text-xs font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded">...</span>
+            </div>
+            <textarea id="cal-note-input" class="input-std h-32 resize-none mb-4" placeholder="Ej: Comprar botones, llamar mecánico..."></textarea>
+            <div class="flex gap-2">
+                <button onclick="App.Actions.Calendar.deleteNote()" class="btn bg-red-50 text-red-500 border border-red-100"><i class="fas fa-trash"></i></button>
+                <button onclick="document.getElementById('modal-note').classList.add('hidden')" class="flex-1 btn bg-slate-100 text-slate-600">Cancelar</button>
+                <button onclick="App.Actions.Calendar.saveNote()" class="flex-1 btn btn-blue">Guardar</button>
+            </div>
         </div>
     </div>
 
@@ -171,7 +198,7 @@
         import { getFirestore, collection, onSnapshot, addDoc, updateDoc, deleteDoc, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
         import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-storage.js";
 
-        // CONFIGURACIÓN ORIGINAL
+        // CONFIGURACIÓN (Tus Credenciales)
         const firebaseConfig = {
             apiKey: "AIzaSyBg-Cx9SqZw35TyyMxtpVBEFlwZTjBXBew",
             authDomain: "ideastextilesapp.firebaseapp.com",
@@ -186,17 +213,15 @@
         const db = getFirestore(app);
         const storage = getStorage(app);
 
+        // ESTADO GLOBAL
         const State = {
-            orders: [], inventory: [], calendar: {}, // Notas manuales
+            orders: [], inventory: [], calendar: {},
             currentDate: new Date(), editingId: null, editingDateKey: null
         };
 
         const Actions = {
             Calendar: {
-                move: (delta) => {
-                    State.currentDate.setMonth(State.currentDate.getMonth() + delta);
-                    Render.calendar();
-                },
+                move: (d) => { State.currentDate.setMonth(State.currentDate.getMonth() + d); Render.calendar(); },
                 openNote: (dateStr) => {
                     State.editingDateKey = dateStr;
                     document.getElementById('note-date-display').innerText = dateStr;
@@ -206,7 +231,7 @@
                 saveNote: async () => {
                     const txt = document.getElementById('cal-note-input').value.trim();
                     if(txt) await setDoc(doc(db, "calendar", State.editingDateKey), { note: txt });
-                    else await deleteDoc(doc(db, "calendar", State.editingDateKey)); // Si está vacío, borrar
+                    else await deleteDoc(doc(db, "calendar", State.editingDateKey));
                     document.getElementById('modal-note').classList.add('hidden');
                 },
                 deleteNote: async () => {
@@ -219,16 +244,19 @@
                     State.editingId = id;
                     document.getElementById('items-rows').innerHTML = '';
                     const delBtn = document.getElementById('btn-delete-order');
+                    
                     if (id) {
+                        // MODO EDICIÓN
                         const o = State.orders.find(x => x.id === id);
                         document.getElementById('o-num').value = o.number;
                         document.getElementById('o-client').value = o.client;
                         document.getElementById('o-date').value = o.date;
                         document.getElementById('o-inv').value = o.invoice || '';
                         document.getElementById('o-notes').value = o.notes || '';
-                        (o.items||[]).forEach(i => UI.addRow(i.prod, i.qty));
+                        (o.items || []).forEach(i => UI.addRow(i.prod, i.qty));
                         delBtn.classList.remove('hidden');
                     } else {
+                        // MODO CREACIÓN
                         document.querySelectorAll('#modal-order input, #modal-order textarea').forEach(i => i.value = '');
                         UI.addRow();
                         delBtn.classList.add('hidden');
@@ -239,27 +267,30 @@
                     try {
                         const data = {
                             number: document.getElementById('o-num').value,
-                            client: document.getElementById('o-client').value,
+                            client: document.getElementById('o-client').value.toUpperCase(),
                             date: document.getElementById('o-date').value,
                             invoice: document.getElementById('o-inv').value,
                             notes: document.getElementById('o-notes').value,
                             items: [], updatedAt: serverTimestamp()
                         };
+                        
                         document.querySelectorAll('.item-row').forEach(r => {
                             const p = r.querySelector('.i-prod').value;
                             const q = r.querySelector('.i-qty').value;
                             if(p) data.items.push({prod:p, qty:q});
                         });
-                        if (!data.number || !data.client) throw new Error("Faltan datos");
+
+                        if (!data.number || !data.client || !data.date) throw new Error("Faltan datos obligatorios");
 
                         if (State.editingId) await updateDoc(doc(db, "orders", State.editingId), data);
                         else { data.status = "Pendiente"; await addDoc(collection(db, "orders"), data); }
+                        
                         document.getElementById('modal-order').classList.add('hidden');
-                        Swal.fire({icon:'success', title:'Guardado', toast:true, position:'top-end', timer:1500, showConfirmButton:false});
-                    } catch (e) { Swal.fire("Error", e.message, "warning"); }
+                        Swal.fire({icon:'success', title:'Guardado Correctamente', toast:true, position:'top', timer:1500, showConfirmButton:false});
+                    } catch (e) { Swal.fire("Atención", e.message, "warning"); }
                 },
                 delete: async () => {
-                    if(confirm("¿Eliminar orden permanentemente?")) {
+                    if ((await Swal.fire({title:'¿Borrar Orden?', text:'No se puede deshacer', icon:'warning', showCancelButton:true, confirmButtonText:'Sí, borrar'})).isConfirmed) {
                         await deleteDoc(doc(db, "orders", State.editingId));
                         document.getElementById('modal-order').classList.add('hidden');
                     }
@@ -267,37 +298,55 @@
                 changeStatus: async (id, type) => {
                     const isIssue = type === 'issue';
                     const { value: file } = await Swal.fire({
-                        title: isIssue ? 'Reportar Falla' : 'Despachar',
-                        text: 'Sube foto evidencia:', input: 'file', showCancelButton: true
+                        title: isIssue ? 'Reportar Problema' : 'Confirmar Despacho',
+                        text: 'Sube una foto de evidencia para continuar:',
+                        input: 'file',
+                        inputAttributes: { accept: 'image/*' },
+                        showCancelButton: true
                     });
+
                     if (file) {
-                        Swal.showLoading();
-                        const refImg = ref(storage, `evidence/${Date.now()}_${file.name}`);
-                        await uploadBytes(refImg, file);
-                        const url = await getDownloadURL(refImg);
-                        await updateDoc(doc(db, "orders", id), { status: isIssue?'Problema':'Despachado', evidence: url });
-                        Swal.fire("Listo", "Estado actualizado", "success");
+                        Swal.fire({title:'Subiendo Foto...', didOpen: () => Swal.showLoading()});
+                        const imgRef = ref(storage, `evidence/${Date.now()}_${file.name}`);
+                        await uploadBytes(imgRef, file);
+                        const url = await getDownloadURL(imgRef);
+                        
+                        await updateDoc(doc(db, "orders", id), {
+                            status: isIssue ? 'Problema' : 'Despachado',
+                            evidence: url
+                        });
+                        Swal.fire("Listo", "Estado y foto actualizados", "success");
                     }
                 }
             },
             Inventory: {
                 add: async () => {
-                    const { value: name } = await Swal.fire({title:'Nuevo Item', input:'text'});
-                    if(name) await addDoc(collection(db, "inventory"), { name, stock: 0 });
+                    const { value: name } = await Swal.fire({title:'Nuevo Material', input:'text', inputPlaceholder:'Ej: Tela Algodón, Hilo Rojo...'});
+                    if(name) await addDoc(collection(db, "inventory"), { name: name.toUpperCase(), stock: 0 });
                 },
-                update: async (id, current) => {
-                    const { value: qty } = await Swal.fire({title:'Ajustar Stock', input:'number', inputValue: current});
-                    if(qty) await updateDoc(doc(db, "inventory", id), { stock: Number(qty) });
+                edit: async (id, oldName) => {
+                    const { value: name } = await Swal.fire({title:'Editar Nombre', input:'text', inputValue: oldName});
+                    if(name) await updateDoc(doc(db, "inventory", id), { name: name.toUpperCase() });
+                },
+                adjust: async (id, delta, current) => {
+                    const newVal = Number(current) + delta;
+                    if(newVal < 0) return; 
+                    await updateDoc(doc(db, "inventory", id), { stock: newVal });
+                },
+                delete: async (id) => {
+                    if((await Swal.fire({title:'¿Eliminar?', icon:'warning', showCancelButton:true})).isConfirmed) {
+                        await deleteDoc(doc(db, "inventory", id));
+                    }
                 }
             }
         };
 
         const UI = {
             addRow: (p='', q='') => {
-                const d = document.createElement('div');
-                d.className = 'item-row flex gap-2';
-                d.innerHTML = `<input class="i-prod input-std text-sm" placeholder="Prod" value="${p}"><input class="i-qty input-std w-20 text-center" type="number" placeholder="#" value="${q}">`;
-                document.getElementById('items-rows').appendChild(d);
+                const div = document.createElement('div');
+                div.className = 'item-row flex gap-2';
+                div.innerHTML = `<input class="i-prod input-std text-sm flex-1" placeholder="Descripción Producto" value="${p}"><input class="i-qty input-std w-20 text-center" type="number" placeholder="Cant" value="${q}">`;
+                document.getElementById('items-rows').appendChild(div);
             }
         };
 
@@ -324,13 +373,11 @@
                     let html = `<div onclick="App.Actions.Calendar.openNote('${dateStr}')" class="cal-cell ${isToday ? 'today' : ''}">`;
                     html += `<span class="cal-num">${d}</span>`;
                     
-                    // 1. Mostrar NOTA MANUAL (Editable)
                     if(note) html += `<div class="cal-note">${note}</div>`;
-
-                    // 2. Mostrar Puntos de Órdenes (Automático)
+                    
                     orders.forEach(o => {
                         const color = o.status === 'Problema' ? 'dot-red' : (o.status==='Despachado' ? 'dot-green' : 'dot-blue');
-                        html += `<div class="cal-dot-row"><div class="dot ${color}"></div>#${o.number}</div>`;
+                        html += `<div class="dot-row"><div class="dot ${color}"></div>#${o.number}</div>`;
                     });
 
                     html += `</div>`;
@@ -345,38 +392,63 @@
                 const filtered = State.orders.filter(o => (o.client||'').toLowerCase().includes(term) || (o.number||'').includes(term));
                 filtered.sort((a,b) => (a.number < b.number ? 1 : -1));
 
+                // Contadores KPI
+                document.getElementById('kpi-pending').innerText = State.orders.filter(o=>o.status!=='Despachado').length;
+                document.getElementById('kpi-issue').innerText = State.orders.filter(o=>o.status==='Problema').length;
+
                 filtered.forEach(o => {
-                    let stColor = "text-yellow-600 bg-yellow-50 border-yellow-200";
-                    if(o.status === 'Despachado') stColor = "text-green-600 bg-green-50 border-green-200";
-                    if(o.status === 'Problema') stColor = "text-red-600 bg-red-50 border-red-200";
+                    let stClass = "bg-blue-100 text-blue-700 border-blue-200";
+                    if(o.status === 'Despachado') stClass = "bg-green-100 text-green-700 border-green-200";
+                    if(o.status === 'Problema') stClass = "bg-red-100 text-red-700 border-red-200";
+
+                    const evidenceBtn = o.evidence ? `<a href="${o.evidence}" target="_blank" class="text-xs text-blue-600 underline ml-2"><i class="fas fa-image"></i> Ver Foto</a>` : '';
 
                     list.innerHTML += `
                         <div class="card p-4 flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
-                            <div>
+                            <div class="flex-1">
                                 <div class="flex items-center gap-2 mb-1">
                                     <span class="font-bold text-slate-400 text-xs">#${o.number}</span>
-                                    <span class="px-2 py-0.5 rounded text-[10px] font-black uppercase border ${stColor}">${o.status}</span>
+                                    <span class="px-2 py-0.5 rounded text-[10px] font-black uppercase border ${stClass}">${o.status}</span>
+                                    ${evidenceBtn}
                                 </div>
-                                <h3 class="font-bold text-lg leading-none">${o.client}</h3>
-                                <p class="text-xs text-slate-500 mt-1"><i class="fas fa-calendar-alt mr-1"></i> ${o.date}</p>
+                                <h3 class="font-bold text-lg leading-none text-slate-800">${o.client}</h3>
+                                <div class="text-xs text-slate-500 mt-2 flex gap-3">
+                                    <span><i class="far fa-calendar-alt"></i> ${o.date}</span>
+                                    <span><i class="fas fa-box"></i> ${(o.items||[]).length} Items</span>
+                                    ${o.invoice ? `<span><i class="fas fa-receipt"></i> ${o.invoice}</span>` : ''}
+                                </div>
                             </div>
-                            <div class="flex gap-2 w-full md:w-auto">
-                                <button onclick="App.Actions.Orders.changeStatus('${o.id}', 'issue')" class="px-3 py-2 bg-red-50 text-red-500 rounded border border-red-100"><i class="fas fa-bug"></i></button>
-                                <button onclick="App.Actions.Orders.openModal('${o.id}')" class="flex-1 px-4 py-2 border rounded font-bold text-xs text-slate-600">EDITAR</button>
-                                ${o.status !== 'Despachado' ? `<button onclick="App.Actions.Orders.changeStatus('${o.id}', 'ok')" class="flex-1 px-4 py-2 bg-slate-800 text-white rounded font-bold text-xs shadow-lg">DESPACHAR</button>` : ''}
+                            <div class="flex gap-2 w-full md:w-auto mt-2 md:mt-0">
+                                <button onclick="App.Actions.Orders.changeStatus('${o.id}', 'issue')" class="btn-icon bg-red-50 text-red-500 border border-red-100 hover:bg-red-100" title="Reportar Problema"><i class="fas fa-bug"></i></button>
+                                <button onclick="App.Actions.Orders.openModal('${o.id}')" class="flex-1 md:flex-none px-4 py-2 border rounded-lg font-bold text-xs text-slate-600 hover:bg-slate-50">EDITAR</button>
+                                ${o.status !== 'Despachado' ? `<button onclick="App.Actions.Orders.changeStatus('${o.id}', 'ok')" class="flex-1 md:flex-none px-4 py-2 bg-slate-800 hover:bg-slate-900 text-white rounded-lg font-bold text-xs shadow-lg flex items-center gap-2"><i class="fas fa-check"></i> DESPACHAR</button>` : ''}
                             </div>
                         </div>
                     `;
                 });
             },
             inventory: () => {
+                const term = document.getElementById('search-inventory').value.toLowerCase();
                 const list = document.getElementById('inventory-list');
                 list.innerHTML = '';
-                State.inventory.forEach(i => {
+
+                const filtered = State.inventory.filter(i => (i.name||'').toLowerCase().includes(term)).sort((a,b)=>a.name.localeCompare(b.name));
+
+                filtered.forEach(i => {
                     list.innerHTML += `
-                        <div onclick="App.Actions.Inventory.update('${i.id}', ${i.stock})" class="card p-4 text-center cursor-pointer hover:border-blue-400">
-                            <h4 class="font-bold text-sm truncate">${i.name}</h4>
-                            <div class="text-2xl font-black text-slate-700 mt-2">${i.stock}</div>
+                        <div class="inv-item bg-white hover:bg-slate-50 transition">
+                            <div class="pl-2">
+                                <div class="font-bold text-sm text-slate-700">${i.name}</div>
+                                <div class="text-[10px] text-slate-400 cursor-pointer hover:text-blue-500" onclick="App.Actions.Inventory.edit('${i.id}', '${i.name}')">Editar Nombre</div>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <div class="inv-controls shadow-sm">
+                                    <button onclick="App.Actions.Inventory.adjust('${i.id}', -1, ${i.stock})" class="w-8 h-8 flex items-center justify-center text-slate-500 hover:bg-white hover:shadow rounded"><i class="fas fa-minus text-xs"></i></button>
+                                    <div class="stock-num">${i.stock}</div>
+                                    <button onclick="App.Actions.Inventory.adjust('${i.id}', 1, ${i.stock})" class="w-8 h-8 flex items-center justify-center text-blue-600 hover:bg-white hover:shadow rounded"><i class="fas fa-plus text-xs"></i></button>
+                                </div>
+                                <button onclick="App.Actions.Inventory.delete('${i.id}')" class="w-8 h-8 flex items-center justify-center text-red-300 hover:text-red-500 rounded-full hover:bg-red-50 transition"><i class="fas fa-trash text-xs"></i></button>
+                            </div>
                         </div>
                     `;
                 });
@@ -394,28 +466,28 @@
             }
         };
 
-        // INICIO
+        // INICIALIZACIÓN
         window.App = { Actions, UI, Render, Router };
 
-        // 1. Órdenes
-        onSnapshot(collection(db, "orders"), (s) => {
-            State.orders = s.docs.map(d => ({id:d.id, ...d.data()}));
-            Render.orders(); Render.calendar();
-            document.getElementById('loader').style.opacity = '0';
-            setTimeout(()=>document.getElementById('loader').remove(), 500);
-        });
-        // 2. Inventario
-        onSnapshot(collection(db, "inventory"), (s) => {
-            State.inventory = s.docs.map(d => ({id:d.id, ...d.data()}));
-            Render.inventory();
-        });
-        // 3. CALENDARIO NOTAS (Nueva Colección)
-        onSnapshot(collection(db, "calendar"), (s) => {
-            State.calendar = {};
-            s.forEach(d => State.calendar[d.id] = d.data().note);
-            Render.calendar();
-        });
+        const loadData = () => {
+            onSnapshot(collection(db, "orders"), (s) => {
+                State.orders = s.docs.map(d => ({id:d.id, ...d.data()}));
+                Render.orders(); Render.calendar();
+                document.getElementById('loader').style.opacity = '0';
+                setTimeout(()=>document.getElementById('loader').remove(), 500);
+            });
+            onSnapshot(collection(db, "inventory"), (s) => {
+                State.inventory = s.docs.map(d => ({id:d.id, ...d.data()}));
+                Render.inventory();
+            });
+            onSnapshot(collection(db, "calendar"), (s) => {
+                State.calendar = {};
+                s.forEach(d => State.calendar[d.id] = d.data().note);
+                Render.calendar();
+            });
+        };
 
+        loadData();
     </script>
 </body>
 </html>
